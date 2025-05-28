@@ -1,19 +1,27 @@
-INDUSTRIVERSE COMMERCIAL LICENSE
+Industriverse Commercial License v1.0
 
-Copyright (c) 2025 Industriverse
+Copyright © [2024] Industriverse
 
-All rights reserved.
+All rights reserved. This software and its associated materials (the "Software") are the intellectual property of the Industriverse team and are protected by applicable copyright, trade secret, and international law.
 
-This software and associated documentation files (the "Software") are the proprietary property of Industriverse and are protected by copyright law and international treaty provisions. Unauthorized reproduction, distribution, or use of this Software, in whole or in part, may result in severe civil and criminal penalties, and will be prosecuted to the maximum extent possible under the law.
+You are granted limited rights to:
 
-Subject to the terms and conditions of this License, Industriverse hereby grants you a limited, non-exclusive, non-transferable license to use the Software solely for your internal business purposes, provided that you:
+• View, read, and evaluate the Software for personal or internal research purposes.
+• Clone or fork this repository for private, non-commercial testing or educational purposes.
 
-1. Maintain this copyright notice and license terms in all copies of the Software.
-2. Do not modify, adapt, translate, reverse engineer, decompile, disassemble, or create derivative works based on the Software.
-3. Do not rent, lease, loan, sell, distribute, or sublicense the Software.
-4. Do not remove or obscure any proprietary notices or labels on the Software.
-5. Use the Software only in accordance with its documentation and all applicable laws and regulations.
+You are NOT permitted to:
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+• Use the Software or any of its components for any commercial product, service, or hosted offering without prior written consent from Industriverse.
+• Modify, distribute, sublicense, sell, or relicense the Software, in whole or in part, without a commercial license agreement.
+• Deploy the Software in a production, customer-facing, sovereign, or enterprise environment without an approved license.
+• Reverse engineer, disassemble, or attempt to derive source code or technical design from the Software for competitive or derivative development.
 
-For licensing inquiries, please contact: licensing@industriverse.com
+No license or rights are granted by implication, estoppel, or otherwise unless expressly stated herein.
+
+To inquire about commercial licensing, deployment rights, or white-label options, contact:
+
+📩 license@industriverse.ai
+
+Jurisdiction: This license is governed by the laws of [Your Preferred Legal Jurisdiction, e.g., UAE or Delaware, USA].
+
+This license supersedes any conflicting open-source licenses or interpretations unless otherwise stated in a dual-licensed component's directory.
