@@ -100,6 +100,5 @@ Comprehensive documentation is available in the `docs/` directory:
 
 For contribution guidelines, please refer to the [Contributing Guide](CONTRIBUTING.md).
 
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+### License
+This project is licensed under the [Industriverse Commercial License v1.0](LICENSE.txt). For licensing inquiries, please contact license@industriverse.ai.
