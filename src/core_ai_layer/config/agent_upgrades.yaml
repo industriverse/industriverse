@@ -1,0 +1,167 @@
+---
+# Agent Upgrades Configuration for Industriverse Core AI Layer
+# This file defines supported upgrade paths and strategies for Core AI Layer components
+
+# LLM Service Components
+core-ai-llm-service:
+  upgrade_modes: [rolling, blue_green]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+core-ai-llm-inference:
+  upgrade_modes: [rolling, blue_green, canary]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+core-ai-llm-finetuning:
+  upgrade_modes: [blue_green]
+  cache_transfer_supported: false
+  retry_safe: false
+  warm_restart: false
+  zero_downtime: false
+
+# ML Service Components
+core-ai-ml-service:
+  upgrade_modes: [rolling, blue_green]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+core-ai-ml-training:
+  upgrade_modes: [blue_green]
+  cache_transfer_supported: false
+  retry_safe: false
+  warm_restart: false
+  zero_downtime: false
+
+core-ai-ml-inference:
+  upgrade_modes: [rolling, blue_green, canary]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+# Explainability Service Components
+core-ai-explainability-service:
+  upgrade_modes: [rolling, blue_green]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+# Monitoring Service Components
+core-ai-monitoring-service:
+  upgrade_modes: [rolling, blue_green]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+# Protocol Components
+core-ai-protocol-translator:
+  upgrade_modes: [rolling, blue_green]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+core-ai-protocol-conflict-resolver:
+  upgrade_modes: [rolling]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+# Distributed Intelligence Components
+core-ai-observability-agent:
+  upgrade_modes: [rolling]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+core-ai-model-feedback-loop:
+  upgrade_modes: [blue_green]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: false
+
+core-ai-simulation-replay:
+  upgrade_modes: [blue_green]
+  cache_transfer_supported: true
+  retry_safe: false
+  warm_restart: false
+  zero_downtime: false
+
+core-ai-mesh-intent-graph:
+  upgrade_modes: [rolling]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+core-ai-consensus-resolver:
+  upgrade_modes: [rolling]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+core-ai-mesh-workload-router:
+  upgrade_modes: [blue_green]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+# Industrial AI Adapters
+core-ai-predictive-maintenance:
+  upgrade_modes: [rolling, blue_green]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+core-ai-quality-control:
+  upgrade_modes: [rolling, blue_green]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+core-ai-energy-optimization:
+  upgrade_modes: [rolling, blue_green]
+  cache_transfer_supported: true
+  retry_safe: true
+  warm_restart: true
+  zero_downtime: true
+
+# Upgrade Strategy Definitions
+upgrade_strategies:
+  rolling:
+    description: "Sequential upgrade of instances with health checks between each"
+    max_unavailable: 25%
+    max_surge: 25%
+    health_check_timeout: 60
+    
+  blue_green:
+    description: "Deploy new version alongside old, switch traffic when ready"
+    traffic_switch_mode: "instant"
+    warm_up_period: 120
+    rollback_timeout: 300
+    
+  canary:
+    description: "Gradually shift traffic to new version"
+    initial_traffic_percentage: 5
+    increment_percentage: 20
+    increment_interval: 300
+    auto_promote_threshold:
+      success_rate: 99.5
+      latency_p95_ms: 200
+      error_rate: 0.1

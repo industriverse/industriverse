@@ -1,0 +1,43 @@
+{{/* Service account for workflow-layer */}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "workflow-layer.serviceAccountName" . }}
+  labels:
+    {{- include "workflow-layer.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+{{/* RBAC role for workflow-layer */}}
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "workflow-layer.fullname" . }}-role
+  labels:
+    {{- include "workflow-layer.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets", "pods"]
+    verbs: ["get", "list", "watch"]
+  {{- if .Values.rbac.extraRules }}
+  {{- toYaml .Values.rbac.extraRules | nindent 2 }}
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "workflow-layer.fullname" . }}-rolebinding
+  labels:
+    {{- include "workflow-layer.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "workflow-layer.fullname" . }}-role
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "workflow-layer.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: industriverse-generative-layer
+  namespace: industriverse
+  labels:
+    app: industriverse-generative-layer
+    layer: generative
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: industriverse-generative-layer
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: industriverse-generative-layer
+        layer: generative
+    spec:
+      containers:
+      - name: generative-layer
+        image: ${REGISTRY}/industriverse-generative-layer:${VERSION}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8082
+          name: http
+        - containerPort: 8083
+          name: grpc
+        env:
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: MESH_COORDINATION_ROLE
+          value: "follower"
+        - name: INTELLIGENCE_ROLE
+          value: "generator"
+        - name: RESILIENCE_MODE
+          value: "active"
+        - name: BOOTSTRAP_NODES
+          value: "core-ai-layer-service:8081,data-layer-service:8080"
+        - name: ENABLE_CAPSULE_INTEGRATION
+          value: "true"
+        - name: ENABLE_ZK_TRACEABILITY
+          value: "true"
+        - name: ENABLE_AGENT_LINEAGE
+          value: "true"
+        volumeMounts:
+        - name: generative-layer-config
+          mountPath: /app/config
+        - name: generative-layer-storage
+          mountPath: /app/generative_layer_storage
+        - name: offer-templates
+          mountPath: /app/offer_templates
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8082
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8082
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: generative-layer-config
+        configMap:
+          name: generative-layer-config
+      - name: generative-layer-storage
+        persistentVolumeClaim:
+          claimName: generative-layer-storage
+      - name: offer-templates
+        persistentVolumeClaim:
+          claimName: offer-templates-storage

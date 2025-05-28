@@ -1,0 +1,89 @@
+---
+# Agent Manifest Template for Industriverse Generative Layer
+
+# Basic Identification
+agent_id: "generative-{component}-agent"  # Replace {component} with specific component name
+layer_designation: "generative_layer"
+version: "1.0.0"
+
+# Capabilities
+capabilities:
+  - name: "template_rendering"
+    description: "Renders templates with provided data"
+    input_schema: "template_rendering_input.json"
+    output_schema: "template_rendering_output.json"
+  - name: "component_generation"
+    description: "Generates UI components based on specifications"
+    input_schema: "component_generation_input.json"
+    output_schema: "component_generation_output.json"
+  - name: "documentation_generation"
+    description: "Generates documentation from code or specifications"
+    input_schema: "documentation_generation_input.json"
+    output_schema: "documentation_generation_output.json"
+  - name: "code_generation"
+    description: "Generates code based on specifications"
+    input_schema: "code_generation_input.json"
+    output_schema: "code_generation_output.json"
+
+# Protocol Support
+supported_mcp_events:
+  - "observe/template_status"
+  - "simulate/generation_preview"
+  - "recommend/template_selection"
+  - "act/generate_artifact"
+  - "generate/artifact"
+  - "generation/workflow_collaboration"
+
+supported_trust_modes:
+  - "passive"      # Read-only operations
+  - "approval"     # Requires explicit approval for generation
+  - "autonomous"   # Can generate without approval
+
+# Protocol Hooks
+protocol_hooks:
+  mcp:
+    - "mcp://generative_layer/template_rendering"
+    - "mcp://generative_layer/component_generation"
+    - "mcp://generative_layer/documentation_generation"
+    - "mcp://generative_layer/code_generation"
+  a2a:
+    - "a2a://generative_layer/template_rendering"
+    - "a2a://generative_layer/component_generation"
+    - "a2a://generative_layer/documentation_generation"
+    - "a2a://generative_layer/code_generation"
+
+# Enhanced Fields
+generation_type: "ui"  # Options: "code", "ui", "documentation", "configuration"
+generation_role: "template_renderer"  # Options: "template_renderer", "component_assembler", "variability_resolver"
+resilience_mode: "failover_chain"  # Options: "redundant_pair", "failover_chain", "quorum_vote"
+mesh_coordination_role: "follower"  # Options: "leader", "follower", "observer"
+
+# Agent Lineage for Inheritance and Introspection
+agent_lineage:
+  parent_agent: "core_ai_layer/llm_service"
+  derived_from: ["template_renderer", "semantic_generator"]
+  inheritance_behavior: "override"
+
+# UI Capsule Support for Interactive Interfaces
+ui_capsule_support:
+  supported_interfaces: ["AG-UI", "Dynamic Capsule Panel"]
+  live_preview: true
+  editable_fields: ["prompt", "template", "style"]
+  preview_refresh_ms: 500
+
+# Mesh Lifecycle Hooks
+mesh_lifecycle_hooks:
+  - on_init: "generative_layer/init/bootstrap_mesh"
+  - on_failure: "generative_layer/failover/trigger_chain"
+  - on_quorum_violation: "consensus_resolver_agent/resolve_with_fallback"
+
+# Context Window
+context_window:
+  max_history_depth: 10
+  generation_context_tokens: 2048
+  artifact_reference: "artifact_registry_agent"
+
+# Upgrade Mode
+upgrade_mode: "rolling"
+template_cache_transfer: true
+blue_green_deploy: "supported"

@@ -1,0 +1,1163 @@
+# Task Contract Templates for the Workflow Automation Layer
+# 
+# This file contains predefined task contract templates for various workflow scenarios.
+# These templates define the structure, requirements, and constraints for tasks within workflows.
+# They support the trust-aware execution modes and mesh topology features.
+
+# Generic Task Contract Template
+generic_task:
+  version: "1.0"
+  schema:
+    type: "generic"
+    description: "Generic task contract template for basic workflow tasks"
+    inputs:
+      type: "object"
+      required: ["task_id", "task_name"]
+      properties:
+        task_id:
+          type: "string"
+          description: "Unique identifier for the task"
+        task_name:
+          type: "string"
+          description: "Human-readable name for the task"
+        description:
+          type: "string"
+          description: "Detailed description of the task"
+        priority:
+          type: "integer"
+          enum: [1, 2, 3, 4, 5]
+          default: 3
+          description: "Priority level (1=lowest, 5=highest)"
+        deadline:
+          type: "string"
+          format: "date-time"
+          description: "Deadline for task completion"
+        dependencies:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of task IDs that must be completed before this task"
+        parameters:
+          type: "object"
+          description: "Task-specific parameters"
+    outputs:
+      type: "object"
+      required: ["status", "completion_time"]
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "failure", "partial"]
+          description: "Completion status of the task"
+        completion_time:
+          type: "string"
+          format: "date-time"
+          description: "Time when the task was completed"
+        result:
+          type: "object"
+          description: "Task-specific result data"
+        metrics:
+          type: "object"
+          description: "Performance metrics for the task"
+        error:
+          type: "object"
+          description: "Error information if the task failed"
+    constraints:
+      execution_modes:
+        - "autonomous"
+        - "supervised"
+        - "collaborative"
+        - "assistive"
+        - "manual"
+      trust_threshold: 0.7
+      timeout_seconds: 3600
+      retry_count: 3
+      retry_delay_seconds: 60
+      resource_limits:
+        cpu: "1"
+        memory: "512Mi"
+      logging_level: "standard"
+
+# Data Processing Task Contract Template
+data_processing_task:
+  version: "1.0"
+  schema:
+    type: "data_processing"
+    description: "Task contract template for data processing operations"
+    inputs:
+      type: "object"
+      required: ["task_id", "task_name", "data_source", "processing_type"]
+      properties:
+        task_id:
+          type: "string"
+          description: "Unique identifier for the task"
+        task_name:
+          type: "string"
+          description: "Human-readable name for the task"
+        description:
+          type: "string"
+          description: "Detailed description of the task"
+        priority:
+          type: "integer"
+          enum: [1, 2, 3, 4, 5]
+          default: 3
+          description: "Priority level (1=lowest, 5=highest)"
+        deadline:
+          type: "string"
+          format: "date-time"
+          description: "Deadline for task completion"
+        dependencies:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of task IDs that must be completed before this task"
+        data_source:
+          type: "object"
+          required: ["type", "location"]
+          properties:
+            type:
+              type: "string"
+              enum: ["database", "file", "api", "stream", "message_queue"]
+              description: "Type of data source"
+            location:
+              type: "string"
+              description: "Location or identifier of the data source"
+            credentials:
+              type: "object"
+              description: "Credentials for accessing the data source"
+            query:
+              type: "string"
+              description: "Query or filter for the data source"
+        processing_type:
+          type: "string"
+          enum: ["transform", "filter", "aggregate", "enrich", "validate", "analyze"]
+          description: "Type of processing to perform"
+        processing_parameters:
+          type: "object"
+          description: "Parameters for the processing operation"
+        output_destination:
+          type: "object"
+          properties:
+            type:
+              type: "string"
+              enum: ["database", "file", "api", "stream", "message_queue"]
+              description: "Type of output destination"
+            location:
+              type: "string"
+              description: "Location or identifier of the output destination"
+            credentials:
+              type: "object"
+              description: "Credentials for accessing the output destination"
+    outputs:
+      type: "object"
+      required: ["status", "completion_time", "records_processed"]
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "failure", "partial"]
+          description: "Completion status of the task"
+        completion_time:
+          type: "string"
+          format: "date-time"
+          description: "Time when the task was completed"
+        records_processed:
+          type: "integer"
+          description: "Number of records processed"
+        records_succeeded:
+          type: "integer"
+          description: "Number of records successfully processed"
+        records_failed:
+          type: "integer"
+          description: "Number of records that failed processing"
+        processing_time_ms:
+          type: "integer"
+          description: "Processing time in milliseconds"
+        output_location:
+          type: "string"
+          description: "Location of the processed data"
+        error:
+          type: "object"
+          description: "Error information if the task failed"
+    constraints:
+      execution_modes:
+        - "autonomous"
+        - "supervised"
+        - "collaborative"
+      trust_threshold: 0.8
+      timeout_seconds: 7200
+      retry_count: 2
+      retry_delay_seconds: 120
+      resource_limits:
+        cpu: "2"
+        memory: "2Gi"
+      logging_level: "verbose"
+      data_validation:
+        enabled: true
+        schema_validation: true
+        quality_checks: true
+      data_lineage:
+        track: true
+        store: true
+
+# AI Inference Task Contract Template
+ai_inference_task:
+  version: "1.0"
+  schema:
+    type: "ai_inference"
+    description: "Task contract template for AI model inference operations"
+    inputs:
+      type: "object"
+      required: ["task_id", "task_name", "model_id", "input_data"]
+      properties:
+        task_id:
+          type: "string"
+          description: "Unique identifier for the task"
+        task_name:
+          type: "string"
+          description: "Human-readable name for the task"
+        description:
+          type: "string"
+          description: "Detailed description of the task"
+        priority:
+          type: "integer"
+          enum: [1, 2, 3, 4, 5]
+          default: 4
+          description: "Priority level (1=lowest, 5=highest)"
+        deadline:
+          type: "string"
+          format: "date-time"
+          description: "Deadline for task completion"
+        dependencies:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of task IDs that must be completed before this task"
+        model_id:
+          type: "string"
+          description: "Identifier for the AI model to use"
+        model_version:
+          type: "string"
+          description: "Version of the AI model to use"
+        model_parameters:
+          type: "object"
+          description: "Parameters for the AI model"
+        input_data:
+          type: "object"
+          properties:
+            type:
+              type: "string"
+              enum: ["text", "image", "audio", "video", "tabular", "multimodal"]
+              description: "Type of input data"
+            source:
+              type: "string"
+              description: "Source of the input data"
+            format:
+              type: "string"
+              description: "Format of the input data"
+            preprocessing:
+              type: "object"
+              description: "Preprocessing steps for the input data"
+        inference_parameters:
+          type: "object"
+          properties:
+            batch_size:
+              type: "integer"
+              description: "Batch size for inference"
+            timeout_ms:
+              type: "integer"
+              description: "Timeout for inference in milliseconds"
+            max_tokens:
+              type: "integer"
+              description: "Maximum number of tokens for text generation"
+            temperature:
+              type: "number"
+              description: "Temperature for sampling"
+            top_p:
+              type: "number"
+              description: "Top-p for nucleus sampling"
+    outputs:
+      type: "object"
+      required: ["status", "completion_time", "inference_results"]
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "failure", "partial"]
+          description: "Completion status of the task"
+        completion_time:
+          type: "string"
+          format: "date-time"
+          description: "Time when the task was completed"
+        inference_results:
+          type: "object"
+          description: "Results of the inference operation"
+        confidence_scores:
+          type: "object"
+          description: "Confidence scores for the inference results"
+        inference_time_ms:
+          type: "integer"
+          description: "Inference time in milliseconds"
+        tokens_used:
+          type: "integer"
+          description: "Number of tokens used for text generation"
+        explanation:
+          type: "object"
+          description: "Explanation of the inference results"
+        error:
+          type: "object"
+          description: "Error information if the task failed"
+    constraints:
+      execution_modes:
+        - "autonomous"
+        - "supervised"
+        - "collaborative"
+      trust_threshold: 0.85
+      timeout_seconds: 300
+      retry_count: 2
+      retry_delay_seconds: 30
+      resource_limits:
+        cpu: "4"
+        memory: "8Gi"
+        gpu: "1"
+      logging_level: "verbose"
+      explainability:
+        required: true
+        level: "detailed"
+      fairness:
+        check: true
+        thresholds:
+          demographic_parity: 0.8
+          equal_opportunity: 0.8
+      privacy:
+        pii_detection: true
+        anonymization: true
+
+# Human Decision Task Contract Template
+human_decision_task:
+  version: "1.0"
+  schema:
+    type: "human_decision"
+    description: "Task contract template for human decision points in workflows"
+    inputs:
+      type: "object"
+      required: ["task_id", "task_name", "decision_type", "options", "assignee_roles"]
+      properties:
+        task_id:
+          type: "string"
+          description: "Unique identifier for the task"
+        task_name:
+          type: "string"
+          description: "Human-readable name for the task"
+        description:
+          type: "string"
+          description: "Detailed description of the task"
+        priority:
+          type: "integer"
+          enum: [1, 2, 3, 4, 5]
+          default: 3
+          description: "Priority level (1=lowest, 5=highest)"
+        deadline:
+          type: "string"
+          format: "date-time"
+          description: "Deadline for task completion"
+        dependencies:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of task IDs that must be completed before this task"
+        decision_type:
+          type: "string"
+          enum: ["approval", "selection", "input", "review", "escalation"]
+          description: "Type of decision required"
+        context:
+          type: "object"
+          description: "Context information for the decision"
+        options:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "string"
+                description: "Identifier for the option"
+              label:
+                type: "string"
+                description: "Label for the option"
+              description:
+                type: "string"
+                description: "Description of the option"
+              consequences:
+                type: "string"
+                description: "Potential consequences of selecting this option"
+          description: "Available options for the decision"
+        assignee_roles:
+          type: "array"
+          items:
+            type: "string"
+          description: "Roles that can make this decision"
+        assignee_users:
+          type: "array"
+          items:
+            type: "string"
+          description: "Specific users that can make this decision"
+        notification_channels:
+          type: "array"
+          items:
+            type: "string"
+            enum: ["email", "sms", "push", "slack", "teams", "webhook"]
+          description: "Channels for notifying assignees"
+        ui_configuration:
+          type: "object"
+          description: "Configuration for the decision UI"
+        escalation_policy:
+          type: "object"
+          properties:
+            timeout_minutes:
+              type: "integer"
+              description: "Time in minutes before escalation"
+            escalation_levels:
+              type: "array"
+              items:
+                type: "object"
+                properties:
+                  level:
+                    type: "integer"
+                    description: "Escalation level"
+                  roles:
+                    type: "array"
+                    items:
+                      type: "string"
+                    description: "Roles to escalate to"
+                  timeout_minutes:
+                    type: "integer"
+                    description: "Time in minutes before next escalation"
+              description: "Levels of escalation"
+    outputs:
+      type: "object"
+      required: ["status", "completion_time", "decision"]
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "failure", "timeout", "escalated"]
+          description: "Completion status of the task"
+        completion_time:
+          type: "string"
+          format: "date-time"
+          description: "Time when the task was completed"
+        decision:
+          type: "object"
+          properties:
+            option_id:
+              type: "string"
+              description: "Identifier of the selected option"
+            input_value:
+              type: "string"
+              description: "Input value provided by the user"
+            notes:
+              type: "string"
+              description: "Notes provided with the decision"
+          description: "Decision made by the human"
+        decision_maker:
+          type: "object"
+          properties:
+            user_id:
+              type: "string"
+              description: "Identifier of the user who made the decision"
+            role:
+              type: "string"
+              description: "Role of the user who made the decision"
+          description: "Information about who made the decision"
+        decision_time_ms:
+          type: "integer"
+          description: "Time taken to make the decision in milliseconds"
+        escalation_history:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              level:
+                type: "integer"
+                description: "Escalation level"
+              timestamp:
+                type: "string"
+                format: "date-time"
+                description: "Time of escalation"
+              reason:
+                type: "string"
+                description: "Reason for escalation"
+          description: "History of escalations for this task"
+        error:
+          type: "object"
+          description: "Error information if the task failed"
+    constraints:
+      execution_modes:
+        - "supervised"
+        - "collaborative"
+        - "assistive"
+        - "manual"
+      trust_threshold: 0.0  # Human decisions don't require trust threshold
+      timeout_seconds: 86400  # 24 hours
+      retry_count: 0
+      logging_level: "detailed"
+      audit:
+        enabled: true
+        store_history: true
+        capture_reasoning: true
+      n8n_integration:
+        enabled: true
+        workflow_template: "human_decision"
+
+# IoT Device Control Task Contract Template
+iot_device_control_task:
+  version: "1.0"
+  schema:
+    type: "iot_device_control"
+    description: "Task contract template for IoT device control operations"
+    inputs:
+      type: "object"
+      required: ["task_id", "task_name", "device_id", "command"]
+      properties:
+        task_id:
+          type: "string"
+          description: "Unique identifier for the task"
+        task_name:
+          type: "string"
+          description: "Human-readable name for the task"
+        description:
+          type: "string"
+          description: "Detailed description of the task"
+        priority:
+          type: "integer"
+          enum: [1, 2, 3, 4, 5]
+          default: 4
+          description: "Priority level (1=lowest, 5=highest)"
+        deadline:
+          type: "string"
+          format: "date-time"
+          description: "Deadline for task completion"
+        dependencies:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of task IDs that must be completed before this task"
+        device_id:
+          type: "string"
+          description: "Identifier for the IoT device"
+        device_type:
+          type: "string"
+          description: "Type of IoT device"
+        command:
+          type: "string"
+          description: "Command to send to the device"
+        parameters:
+          type: "object"
+          description: "Parameters for the command"
+        validation:
+          type: "object"
+          properties:
+            required:
+              type: "boolean"
+              description: "Whether validation is required"
+            timeout_seconds:
+              type: "integer"
+              description: "Timeout for validation in seconds"
+            expected_state:
+              type: "object"
+              description: "Expected state after command execution"
+        safety_checks:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              check_type:
+                type: "string"
+                enum: ["range", "state", "dependency", "environment"]
+                description: "Type of safety check"
+              parameters:
+                type: "object"
+                description: "Parameters for the safety check"
+          description: "Safety checks to perform before execution"
+    outputs:
+      type: "object"
+      required: ["status", "completion_time"]
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "failure", "partial", "timeout"]
+          description: "Completion status of the task"
+        completion_time:
+          type: "string"
+          format: "date-time"
+          description: "Time when the task was completed"
+        device_response:
+          type: "object"
+          description: "Response from the device"
+        execution_time_ms:
+          type: "integer"
+          description: "Execution time in milliseconds"
+        validation_result:
+          type: "object"
+          properties:
+            validated:
+              type: "boolean"
+              description: "Whether the command was validated"
+            actual_state:
+              type: "object"
+              description: "Actual state after command execution"
+            validation_time_ms:
+              type: "integer"
+              description: "Validation time in milliseconds"
+          description: "Result of command validation"
+        safety_check_results:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              check_type:
+                type: "string"
+                description: "Type of safety check"
+              passed:
+                type: "boolean"
+                description: "Whether the safety check passed"
+              details:
+                type: "object"
+                description: "Details of the safety check result"
+          description: "Results of safety checks"
+        error:
+          type: "object"
+          description: "Error information if the task failed"
+    constraints:
+      execution_modes:
+        - "autonomous"
+        - "supervised"
+        - "collaborative"
+      trust_threshold: 0.9
+      timeout_seconds: 300
+      retry_count: 3
+      retry_delay_seconds: 30
+      resource_limits:
+        cpu: "0.5"
+        memory: "256Mi"
+      logging_level: "detailed"
+      safety:
+        required: true
+        verification: true
+        rollback: true
+      edge_execution:
+        enabled: true
+        fallback_to_cloud: true
+
+# Cross-Mesh Federation Task Contract Template
+cross_mesh_federation_task:
+  version: "1.0"
+  schema:
+    type: "cross_mesh_federation"
+    description: "Task contract template for cross-mesh federation operations"
+    inputs:
+      type: "object"
+      required: ["task_id", "task_name", "source_mesh_id", "target_mesh_id", "federation_type"]
+      properties:
+        task_id:
+          type: "string"
+          description: "Unique identifier for the task"
+        task_name:
+          type: "string"
+          description: "Human-readable name for the task"
+        description:
+          type: "string"
+          description: "Detailed description of the task"
+        priority:
+          type: "integer"
+          enum: [1, 2, 3, 4, 5]
+          default: 4
+          description: "Priority level (1=lowest, 5=highest)"
+        deadline:
+          type: "string"
+          format: "date-time"
+          description: "Deadline for task completion"
+        dependencies:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of task IDs that must be completed before this task"
+        source_mesh_id:
+          type: "string"
+          description: "Identifier for the source mesh"
+        target_mesh_id:
+          type: "string"
+          description: "Identifier for the target mesh"
+        federation_type:
+          type: "string"
+          enum: ["workflow_delegation", "data_sharing", "agent_transfer", "capability_sharing", "resource_sharing"]
+          description: "Type of federation operation"
+        federation_parameters:
+          type: "object"
+          description: "Parameters for the federation operation"
+        security_context:
+          type: "object"
+          properties:
+            authentication:
+              type: "object"
+              description: "Authentication information for the federation"
+            authorization:
+              type: "object"
+              description: "Authorization information for the federation"
+            encryption:
+              type: "object"
+              description: "Encryption information for the federation"
+          description: "Security context for the federation"
+        trust_context:
+          type: "object"
+          properties:
+            trust_level:
+              type: "number"
+              minimum: 0.0
+              maximum: 1.0
+              description: "Trust level for the federation"
+            trust_pathway:
+              type: "array"
+              items:
+                type: "object"
+              description: "Trust pathway for the federation"
+            verification_requirements:
+              type: "object"
+              description: "Verification requirements for the federation"
+          description: "Trust context for the federation"
+    outputs:
+      type: "object"
+      required: ["status", "completion_time"]
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "failure", "partial", "rejected"]
+          description: "Completion status of the task"
+        completion_time:
+          type: "string"
+          format: "date-time"
+          description: "Time when the task was completed"
+        federation_result:
+          type: "object"
+          description: "Result of the federation operation"
+        federation_id:
+          type: "string"
+          description: "Identifier for the federation"
+        execution_time_ms:
+          type: "integer"
+          description: "Execution time in milliseconds"
+        target_mesh_response:
+          type: "object"
+          description: "Response from the target mesh"
+        verification_results:
+          type: "object"
+          description: "Results of verification checks"
+        error:
+          type: "object"
+          description: "Error information if the task failed"
+    constraints:
+      execution_modes:
+        - "supervised"
+        - "collaborative"
+      trust_threshold: 0.95
+      timeout_seconds: 600
+      retry_count: 2
+      retry_delay_seconds: 60
+      resource_limits:
+        cpu: "1"
+        memory: "512Mi"
+      logging_level: "detailed"
+      security:
+        required: true
+        encryption: true
+        audit: true
+      verification:
+        required: true
+        zk_attestation: true
+
+# Workflow Evolution Task Contract Template
+workflow_evolution_task:
+  version: "1.0"
+  schema:
+    type: "workflow_evolution"
+    description: "Task contract template for workflow evolution operations"
+    inputs:
+      type: "object"
+      required: ["task_id", "task_name", "workflow_id", "evolution_type"]
+      properties:
+        task_id:
+          type: "string"
+          description: "Unique identifier for the task"
+        task_name:
+          type: "string"
+          description: "Human-readable name for the task"
+        description:
+          type: "string"
+          description: "Detailed description of the task"
+        priority:
+          type: "integer"
+          enum: [1, 2, 3, 4, 5]
+          default: 3
+          description: "Priority level (1=lowest, 5=highest)"
+        deadline:
+          type: "string"
+          format: "date-time"
+          description: "Deadline for task completion"
+        dependencies:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of task IDs that must be completed before this task"
+        workflow_id:
+          type: "string"
+          description: "Identifier for the workflow to evolve"
+        workflow_version:
+          type: "string"
+          description: "Version of the workflow to evolve"
+        evolution_type:
+          type: "string"
+          enum: ["optimization", "adaptation", "expansion", "specialization", "generalization", "repair"]
+          description: "Type of evolution to perform"
+        evolution_parameters:
+          type: "object"
+          description: "Parameters for the evolution operation"
+        fitness_criteria:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              criterion:
+                type: "string"
+                description: "Name of the fitness criterion"
+              weight:
+                type: "number"
+                description: "Weight of the fitness criterion"
+              threshold:
+                type: "number"
+                description: "Threshold for the fitness criterion"
+          description: "Criteria for evaluating fitness of evolved workflows"
+        constraints:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              constraint_type:
+                type: "string"
+                description: "Type of constraint"
+              parameters:
+                type: "object"
+                description: "Parameters for the constraint"
+          description: "Constraints for the evolution"
+        historical_data:
+          type: "object"
+          description: "Historical data for the evolution"
+    outputs:
+      type: "object"
+      required: ["status", "completion_time"]
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "failure", "partial"]
+          description: "Completion status of the task"
+        completion_time:
+          type: "string"
+          format: "date-time"
+          description: "Time when the task was completed"
+        evolved_workflow:
+          type: "object"
+          description: "The evolved workflow"
+        evolved_workflow_id:
+          type: "string"
+          description: "Identifier for the evolved workflow"
+        evolved_workflow_version:
+          type: "string"
+          description: "Version of the evolved workflow"
+        fitness_scores:
+          type: "object"
+          description: "Fitness scores for the evolved workflow"
+        evolution_time_ms:
+          type: "integer"
+          description: "Evolution time in milliseconds"
+        generations:
+          type: "integer"
+          description: "Number of generations in the evolution"
+        mutation_rate:
+          type: "number"
+          description: "Mutation rate used in the evolution"
+        crossover_rate:
+          type: "number"
+          description: "Crossover rate used in the evolution"
+        population_size:
+          type: "integer"
+          description: "Population size used in the evolution"
+        error:
+          type: "object"
+          description: "Error information if the task failed"
+    constraints:
+      execution_modes:
+        - "autonomous"
+        - "supervised"
+      trust_threshold: 0.8
+      timeout_seconds: 3600
+      retry_count: 1
+      retry_delay_seconds: 300
+      resource_limits:
+        cpu: "4"
+        memory: "8Gi"
+      logging_level: "detailed"
+      simulation:
+        required: true
+        iterations: 10
+      verification:
+        required: true
+        methods: ["static_analysis", "simulation", "formal_verification"]
+
+# DTSL Twin Interaction Task Contract Template
+dtsl_twin_interaction_task:
+  version: "1.0"
+  schema:
+    type: "dtsl_twin_interaction"
+    description: "Task contract template for digital twin interaction operations"
+    inputs:
+      type: "object"
+      required: ["task_id", "task_name", "twin_id", "interaction_type"]
+      properties:
+        task_id:
+          type: "string"
+          description: "Unique identifier for the task"
+        task_name:
+          type: "string"
+          description: "Human-readable name for the task"
+        description:
+          type: "string"
+          description: "Detailed description of the task"
+        priority:
+          type: "integer"
+          enum: [1, 2, 3, 4, 5]
+          default: 3
+          description: "Priority level (1=lowest, 5=highest)"
+        deadline:
+          type: "string"
+          format: "date-time"
+          description: "Deadline for task completion"
+        dependencies:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of task IDs that must be completed before this task"
+        twin_id:
+          type: "string"
+          description: "Identifier for the digital twin"
+        twin_type:
+          type: "string"
+          description: "Type of digital twin"
+        interaction_type:
+          type: "string"
+          enum: ["query", "update", "command", "subscribe", "unsubscribe", "simulate"]
+          description: "Type of interaction with the twin"
+        interaction_parameters:
+          type: "object"
+          description: "Parameters for the interaction"
+        dtsl_script:
+          type: "string"
+          description: "DTSL script for the interaction"
+        edge_execution:
+          type: "boolean"
+          description: "Whether to execute on the edge"
+        simulation_parameters:
+          type: "object"
+          description: "Parameters for simulation"
+    outputs:
+      type: "object"
+      required: ["status", "completion_time"]
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "failure", "partial", "timeout"]
+          description: "Completion status of the task"
+        completion_time:
+          type: "string"
+          format: "date-time"
+          description: "Time when the task was completed"
+        twin_response:
+          type: "object"
+          description: "Response from the digital twin"
+        execution_time_ms:
+          type: "integer"
+          description: "Execution time in milliseconds"
+        execution_location:
+          type: "string"
+          enum: ["edge", "cloud", "hybrid"]
+          description: "Location where the interaction was executed"
+        state_changes:
+          type: "object"
+          description: "State changes resulting from the interaction"
+        simulation_results:
+          type: "object"
+          description: "Results of simulation"
+        error:
+          type: "object"
+          description: "Error information if the task failed"
+    constraints:
+      execution_modes:
+        - "autonomous"
+        - "supervised"
+        - "collaborative"
+      trust_threshold: 0.85
+      timeout_seconds: 300
+      retry_count: 3
+      retry_delay_seconds: 30
+      resource_limits:
+        cpu: "1"
+        memory: "512Mi"
+      logging_level: "standard"
+      edge_execution:
+        enabled: true
+        fallback_to_cloud: true
+      twin_security:
+        required: true
+        authentication: true
+        authorization: true
+
+# Forensic Analysis Task Contract Template
+forensic_analysis_task:
+  version: "1.0"
+  schema:
+    type: "forensic_analysis"
+    description: "Task contract template for workflow forensic analysis operations"
+    inputs:
+      type: "object"
+      required: ["task_id", "task_name", "target_id", "analysis_type"]
+      properties:
+        task_id:
+          type: "string"
+          description: "Unique identifier for the task"
+        task_name:
+          type: "string"
+          description: "Human-readable name for the task"
+        description:
+          type: "string"
+          description: "Detailed description of the task"
+        priority:
+          type: "integer"
+          enum: [1, 2, 3, 4, 5]
+          default: 3
+          description: "Priority level (1=lowest, 5=highest)"
+        deadline:
+          type: "string"
+          format: "date-time"
+          description: "Deadline for task completion"
+        dependencies:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of task IDs that must be completed before this task"
+        target_id:
+          type: "string"
+          description: "Identifier for the target of analysis"
+        target_type:
+          type: "string"
+          enum: ["workflow", "task", "agent", "system", "incident"]
+          description: "Type of target for analysis"
+        analysis_type:
+          type: "string"
+          enum: ["root_cause", "performance", "security", "compliance", "pattern", "anomaly"]
+          description: "Type of analysis to perform"
+        analysis_parameters:
+          type: "object"
+          description: "Parameters for the analysis"
+        time_range:
+          type: "object"
+          properties:
+            start_time:
+              type: "string"
+              format: "date-time"
+              description: "Start time for the analysis"
+            end_time:
+              type: "string"
+              format: "date-time"
+              description: "End time for the analysis"
+          description: "Time range for the analysis"
+        data_sources:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              source_type:
+                type: "string"
+                description: "Type of data source"
+              source_id:
+                type: "string"
+                description: "Identifier for the data source"
+              parameters:
+                type: "object"
+                description: "Parameters for the data source"
+          description: "Data sources for the analysis"
+    outputs:
+      type: "object"
+      required: ["status", "completion_time"]
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "failure", "partial"]
+          description: "Completion status of the task"
+        completion_time:
+          type: "string"
+          format: "date-time"
+          description: "Time when the task was completed"
+        findings:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              finding_id:
+                type: "string"
+                description: "Identifier for the finding"
+              finding_type:
+                type: "string"
+                description: "Type of finding"
+              severity:
+                type: "string"
+                enum: ["critical", "high", "medium", "low", "info"]
+                description: "Severity of the finding"
+              description:
+                type: "string"
+                description: "Description of the finding"
+              evidence:
+                type: "object"
+                description: "Evidence supporting the finding"
+              recommendations:
+                type: "array"
+                items:
+                  type: "object"
+                description: "Recommendations based on the finding"
+          description: "Findings from the analysis"
+        analysis_time_ms:
+          type: "integer"
+          description: "Analysis time in milliseconds"
+        data_processed:
+          type: "object"
+          description: "Information about the data processed"
+        patterns_identified:
+          type: "array"
+          items:
+            type: "object"
+          description: "Patterns identified in the analysis"
+        error:
+          type: "object"
+          description: "Error information if the task failed"
+    constraints:
+      execution_modes:
+        - "autonomous"
+        - "supervised"
+        - "collaborative"
+      trust_threshold: 0.9
+      timeout_seconds: 1800
+      retry_count: 1
+      retry_delay_seconds: 60
+      resource_limits:
+        cpu: "2"
+        memory: "4Gi"
+      logging_level: "detailed"
+      privacy:
+        pii_detection: true
+        anonymization: true
+      security:
+        required: true
+        access_control: true

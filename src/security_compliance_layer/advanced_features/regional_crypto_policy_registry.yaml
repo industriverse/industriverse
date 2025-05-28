@@ -1,0 +1,561 @@
+regional_policies:
+  eu:
+    name: "European Union"
+    description: "Cryptographic policy registry for EU region"
+    regulatory_frameworks:
+      - name: "GDPR"
+        description: "General Data Protection Regulation"
+        requirements:
+          - "Strong encryption for personal data at rest and in transit"
+          - "Cryptographic erasure capabilities"
+          - "Key management with proper access controls"
+      - name: "eIDAS"
+        description: "Electronic Identification, Authentication and Trust Services"
+        requirements:
+          - "Qualified electronic signatures"
+          - "Qualified electronic seals"
+          - "Qualified time stamps"
+      - name: "NIS2 Directive"
+        description: "Network and Information Security Directive"
+        requirements:
+          - "State-of-the-art encryption"
+          - "Regular security assessments"
+          - "Incident reporting capabilities"
+    national_authorities:
+      - name: "ANSSI (France)"
+        description: "Agence nationale de la sécurité des systèmes d'information"
+        algorithm_recommendations:
+          key_encapsulation:
+            - "kyber-768"
+            - "kyber-1024"
+          signatures:
+            - "dilithium-3"
+            - "dilithium-5"
+          symmetric:
+            - "aes-256-gcm"
+          hash:
+            - "sha-512"
+            - "sha3-384"
+        transition_timeline: "2025-2027"
+      - name: "BSI (Germany)"
+        description: "Bundesamt für Sicherheit in der Informationstechnik"
+        algorithm_recommendations:
+          key_encapsulation:
+            - "kyber-768"
+            - "kyber-1024"
+          signatures:
+            - "dilithium-3"
+            - "dilithium-5"
+            - "falcon-512"
+          symmetric:
+            - "aes-256-gcm"
+          hash:
+            - "sha-384"
+            - "sha3-384"
+        transition_timeline: "2025-2028"
+      - name: "CCN (Spain)"
+        description: "Centro Criptológico Nacional"
+        algorithm_recommendations:
+          key_encapsulation:
+            - "kyber-768"
+          signatures:
+            - "dilithium-3"
+          symmetric:
+            - "aes-256-gcm"
+          hash:
+            - "sha-384"
+        transition_timeline: "2026-2028"
+    default_policy:
+      security_level: "enhanced"
+      key_encapsulation: "kyber-768"
+      signatures: "dilithium-3"
+      symmetric: "aes-256-gcm"
+      hash: "sha-384"
+      quantum_resistant_required: true
+      hybrid_allowed: true
+      traditional_only_allowed: false
+      compliance_verification_required: true
+    override_policy:
+      allowed_overrides:
+        - "algorithm_strength_increase"
+        - "hybrid_implementation"
+      approval_required: true
+      documentation_required: true
+      time_limited: true
+      max_override_days: 90
+
+  us:
+    name: "United States"
+    description: "Cryptographic policy registry for US region"
+    regulatory_frameworks:
+      - name: "FISMA"
+        description: "Federal Information Security Modernization Act"
+        requirements:
+          - "FIPS 140-2/3 validated cryptography"
+          - "NIST SP 800-53 controls"
+          - "Continuous monitoring"
+      - name: "HIPAA"
+        description: "Health Insurance Portability and Accountability Act"
+        requirements:
+          - "Encryption of protected health information"
+          - "Access controls and audit logs"
+          - "Risk assessment and management"
+      - name: "FedRAMP"
+        description: "Federal Risk and Authorization Management Program"
+        requirements:
+          - "FIPS 140-2/3 validated cryptography"
+          - "Encryption of data at rest and in transit"
+          - "Multi-factor authentication"
+    national_authorities:
+      - name: "NIST"
+        description: "National Institute of Standards and Technology"
+        algorithm_recommendations:
+          key_encapsulation:
+            - "kyber-768"
+            - "kyber-1024"
+          signatures:
+            - "dilithium-3"
+            - "dilithium-5"
+            - "falcon-512"
+          symmetric:
+            - "aes-256-gcm"
+          hash:
+            - "sha-384"
+            - "sha-512"
+            - "sha3-384"
+        transition_timeline: "2025-2027"
+      - name: "NSA"
+        description: "National Security Agency"
+        algorithm_recommendations:
+          key_encapsulation:
+            - "kyber-768"
+            - "kyber-1024"
+          signatures:
+            - "dilithium-3"
+            - "dilithium-5"
+          symmetric:
+            - "aes-256-gcm"
+          hash:
+            - "sha-384"
+            - "sha-512"
+        transition_timeline: "2024-2026"
+    default_policy:
+      security_level: "enhanced"
+      key_encapsulation: "kyber-768"
+      signatures: "dilithium-3"
+      symmetric: "aes-256-gcm"
+      hash: "sha-384"
+      quantum_resistant_required: true
+      hybrid_allowed: true
+      traditional_only_allowed: false
+      compliance_verification_required: true
+    override_policy:
+      allowed_overrides:
+        - "algorithm_strength_increase"
+        - "hybrid_implementation"
+        - "fips_140_2_compatibility"
+      approval_required: true
+      documentation_required: true
+      time_limited: true
+      max_override_days: 180
+
+  uk:
+    name: "United Kingdom"
+    description: "Cryptographic policy registry for UK region"
+    regulatory_frameworks:
+      - name: "UK GDPR"
+        description: "UK General Data Protection Regulation"
+        requirements:
+          - "Strong encryption for personal data"
+          - "Appropriate technical measures"
+          - "Data protection by design and default"
+      - name: "NIS Regulations"
+        description: "Network and Information Systems Regulations"
+        requirements:
+          - "Appropriate security measures"
+          - "Incident reporting"
+          - "Risk management"
+    national_authorities:
+      - name: "NCSC"
+        description: "National Cyber Security Centre"
+        algorithm_recommendations:
+          key_encapsulation:
+            - "kyber-768"
+            - "kyber-1024"
+          signatures:
+            - "dilithium-3"
+            - "dilithium-5"
+          symmetric:
+            - "aes-256-gcm"
+          hash:
+            - "sha-384"
+            - "sha3-384"
+        transition_timeline: "2025-2027"
+    default_policy:
+      security_level: "enhanced"
+      key_encapsulation: "kyber-768"
+      signatures: "dilithium-3"
+      symmetric: "aes-256-gcm"
+      hash: "sha-384"
+      quantum_resistant_required: true
+      hybrid_allowed: true
+      traditional_only_allowed: false
+      compliance_verification_required: true
+    override_policy:
+      allowed_overrides:
+        - "algorithm_strength_increase"
+        - "hybrid_implementation"
+      approval_required: true
+      documentation_required: true
+      time_limited: true
+      max_override_days: 90
+
+  canada:
+    name: "Canada"
+    description: "Cryptographic policy registry for Canada region"
+    regulatory_frameworks:
+      - name: "PIPEDA"
+        description: "Personal Information Protection and Electronic Documents Act"
+        requirements:
+          - "Safeguards for personal information"
+          - "Appropriate security measures"
+          - "Accountability for information handling"
+    national_authorities:
+      - name: "CSE"
+        description: "Communications Security Establishment"
+        algorithm_recommendations:
+          key_encapsulation:
+            - "kyber-768"
+          signatures:
+            - "dilithium-3"
+          symmetric:
+            - "aes-256-gcm"
+          hash:
+            - "sha-384"
+        transition_timeline: "2025-2028"
+    default_policy:
+      security_level: "enhanced"
+      key_encapsulation: "kyber-768"
+      signatures: "dilithium-3"
+      symmetric: "aes-256-gcm"
+      hash: "sha-384"
+      quantum_resistant_required: true
+      hybrid_allowed: true
+      traditional_only_allowed: false
+      compliance_verification_required: true
+    override_policy:
+      allowed_overrides:
+        - "algorithm_strength_increase"
+        - "hybrid_implementation"
+      approval_required: true
+      documentation_required: true
+      time_limited: true
+      max_override_days: 90
+
+  australia:
+    name: "Australia"
+    description: "Cryptographic policy registry for Australia region"
+    regulatory_frameworks:
+      - name: "Privacy Act"
+        description: "Privacy Act 1988"
+        requirements:
+          - "Reasonable steps to protect personal information"
+          - "Security safeguards"
+          - "Data breach notification"
+    national_authorities:
+      - name: "ASD"
+        description: "Australian Signals Directorate"
+        algorithm_recommendations:
+          key_encapsulation:
+            - "kyber-768"
+          signatures:
+            - "dilithium-3"
+          symmetric:
+            - "aes-256-gcm"
+          hash:
+            - "sha-384"
+        transition_timeline: "2026-2028"
+    default_policy:
+      security_level: "enhanced"
+      key_encapsulation: "kyber-768"
+      signatures: "dilithium-3"
+      symmetric: "aes-256-gcm"
+      hash: "sha-384"
+      quantum_resistant_required: true
+      hybrid_allowed: true
+      traditional_only_allowed: false
+      compliance_verification_required: true
+    override_policy:
+      allowed_overrides:
+        - "algorithm_strength_increase"
+        - "hybrid_implementation"
+      approval_required: true
+      documentation_required: true
+      time_limited: true
+      max_override_days: 90
+
+  japan:
+    name: "Japan"
+    description: "Cryptographic policy registry for Japan region"
+    regulatory_frameworks:
+      - name: "APPI"
+        description: "Act on the Protection of Personal Information"
+        requirements:
+          - "Security control measures"
+          - "Supervision of employees and contractors"
+          - "Prevention of leakage, loss, or damage"
+    national_authorities:
+      - name: "CRYPTREC"
+        description: "Cryptography Research and Evaluation Committees"
+        algorithm_recommendations:
+          key_encapsulation:
+            - "kyber-768"
+          signatures:
+            - "dilithium-3"
+          symmetric:
+            - "aes-256-gcm"
+          hash:
+            - "sha-384"
+        transition_timeline: "2026-2028"
+    default_policy:
+      security_level: "enhanced"
+      key_encapsulation: "kyber-768"
+      signatures: "dilithium-3"
+      symmetric: "aes-256-gcm"
+      hash: "sha-384"
+      quantum_resistant_required: true
+      hybrid_allowed: true
+      traditional_only_allowed: false
+      compliance_verification_required: true
+    override_policy:
+      allowed_overrides:
+        - "algorithm_strength_increase"
+        - "hybrid_implementation"
+      approval_required: true
+      documentation_required: true
+      time_limited: true
+      max_override_days: 90
+
+  singapore:
+    name: "Singapore"
+    description: "Cryptographic policy registry for Singapore region"
+    regulatory_frameworks:
+      - name: "PDPA"
+        description: "Personal Data Protection Act"
+        requirements:
+          - "Reasonable security arrangements"
+          - "Protection of personal data"
+          - "Data breach notification"
+    national_authorities:
+      - name: "CSA"
+        description: "Cyber Security Agency of Singapore"
+        algorithm_recommendations:
+          key_encapsulation:
+            - "kyber-768"
+          signatures:
+            - "dilithium-3"
+          symmetric:
+            - "aes-256-gcm"
+          hash:
+            - "sha-384"
+        transition_timeline: "2026-2028"
+    default_policy:
+      security_level: "enhanced"
+      key_encapsulation: "kyber-768"
+      signatures: "dilithium-3"
+      symmetric: "aes-256-gcm"
+      hash: "sha-384"
+      quantum_resistant_required: true
+      hybrid_allowed: true
+      traditional_only_allowed: false
+      compliance_verification_required: true
+    override_policy:
+      allowed_overrides:
+        - "algorithm_strength_increase"
+        - "hybrid_implementation"
+      approval_required: true
+      documentation_required: true
+      time_limited: true
+      max_override_days: 90
+
+  brazil:
+    name: "Brazil"
+    description: "Cryptographic policy registry for Brazil region"
+    regulatory_frameworks:
+      - name: "LGPD"
+        description: "Lei Geral de Proteção de Dados"
+        requirements:
+          - "Security measures to protect personal data"
+          - "Technical and administrative safeguards"
+          - "Data breach notification"
+    national_authorities:
+      - name: "ANPD"
+        description: "Autoridade Nacional de Proteção de Dados"
+        algorithm_recommendations:
+          key_encapsulation:
+            - "kyber-768"
+          signatures:
+            - "dilithium-3"
+          symmetric:
+            - "aes-256-gcm"
+          hash:
+            - "sha-384"
+        transition_timeline: "2026-2028"
+    default_policy:
+      security_level: "enhanced"
+      key_encapsulation: "kyber-768"
+      signatures: "dilithium-3"
+      symmetric: "aes-256-gcm"
+      hash: "sha-384"
+      quantum_resistant_required: true
+      hybrid_allowed: true
+      traditional_only_allowed: true
+      compliance_verification_required: true
+    override_policy:
+      allowed_overrides:
+        - "algorithm_strength_increase"
+        - "hybrid_implementation"
+      approval_required: true
+      documentation_required: true
+      time_limited: true
+      max_override_days: 90
+
+  india:
+    name: "India"
+    description: "Cryptographic policy registry for India region"
+    regulatory_frameworks:
+      - name: "PDPB"
+        description: "Personal Data Protection Bill"
+        requirements:
+          - "Reasonable security safeguards"
+          - "Prevention of misuse, unauthorized access, modification"
+          - "Data breach notification"
+    national_authorities:
+      - name: "CERT-In"
+        description: "Indian Computer Emergency Response Team"
+        algorithm_recommendations:
+          key_encapsulation:
+            - "kyber-768"
+          signatures:
+            - "dilithium-3"
+          symmetric:
+            - "aes-256-gcm"
+          hash:
+            - "sha-384"
+        transition_timeline: "2026-2028"
+    default_policy:
+      security_level: "enhanced"
+      key_encapsulation: "kyber-768"
+      signatures: "dilithium-3"
+      symmetric: "aes-256-gcm"
+      hash: "sha-384"
+      quantum_resistant_required: false
+      hybrid_allowed: true
+      traditional_only_allowed: true
+      compliance_verification_required: true
+    override_policy:
+      allowed_overrides:
+        - "algorithm_strength_increase"
+        - "hybrid_implementation"
+      approval_required: true
+      documentation_required: true
+      time_limited: true
+      max_override_days: 90
+
+cross_regional_requirements:
+  financial_services:
+    description: "Cross-regional requirements for financial services"
+    minimum_security_level: "high"
+    key_encapsulation: "kyber-1024"
+    signatures: "dilithium-5"
+    symmetric: "aes-256-gcm"
+    hash: "sha3-384"
+    quantum_resistant_required: true
+    hybrid_allowed: true
+    traditional_only_allowed: false
+    compliance_verification_required: true
+    override_policy:
+      allowed_overrides:
+        - "algorithm_strength_increase"
+      approval_required: true
+      documentation_required: true
+      time_limited: true
+      max_override_days: 30
+
+  healthcare:
+    description: "Cross-regional requirements for healthcare"
+    minimum_security_level: "high"
+    key_encapsulation: "kyber-768"
+    signatures: "dilithium-3"
+    symmetric: "aes-256-gcm"
+    hash: "sha-384"
+    quantum_resistant_required: true
+    hybrid_allowed: true
+    traditional_only_allowed: false
+    compliance_verification_required: true
+    override_policy:
+      allowed_overrides:
+        - "algorithm_strength_increase"
+        - "hybrid_implementation"
+      approval_required: true
+      documentation_required: true
+      time_limited: true
+      max_override_days: 60
+
+  defense:
+    description: "Cross-regional requirements for defense"
+    minimum_security_level: "critical"
+    key_encapsulation: "kyber-1024"
+    signatures: "dilithium-5"
+    symmetric: "aes-256-gcm"
+    hash: "sha3-512"
+    quantum_resistant_required: true
+    hybrid_allowed: false
+    traditional_only_allowed: false
+    compliance_verification_required: true
+    override_policy:
+      allowed_overrides:
+        - "algorithm_strength_increase"
+      approval_required: true
+      documentation_required: true
+      time_limited: true
+      max_override_days: 30
+
+global_policy:
+  description: "Global cryptographic policy"
+  minimum_security_level: "enhanced"
+  key_encapsulation: "kyber-768"
+  signatures: "dilithium-3"
+  symmetric: "aes-256-gcm"
+  hash: "sha-384"
+  quantum_resistant_required: false
+  hybrid_allowed: true
+  traditional_only_allowed: true
+  compliance_verification_required: true
+  override_policy:
+    allowed_overrides:
+      - "algorithm_strength_increase"
+      - "hybrid_implementation"
+      - "traditional_only"
+    approval_required: true
+    documentation_required: true
+    time_limited: true
+    max_override_days: 90
+  transition_timeline:
+    hybrid_required_by: "2026-01-01"
+    quantum_resistant_required_by: "2028-01-01"
+    traditional_only_deprecated_by: "2027-01-01"
+
+policy_enforcement:
+  verification_frequency: "daily"
+  grace_period_days: 30
+  non_compliance_actions:
+    - "warning_notification"
+    - "trust_score_reduction"
+    - "automatic_rekey_scheduling"
+    - "operation_restriction"
+  emergency_override_procedure:
+    approval_required: false
+    documentation_required: true
+    max_duration_hours: 72
+    post_override_review_required: true

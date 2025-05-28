@@ -1,0 +1,1122 @@
+# ZK Proof Contracts
+
+# This document defines the zero-knowledge proof contracts and attestation mechanisms
+# for the Industriverse platform
+
+version: "1.0.0"
+last_updated: "2025-05-24"
+maintainer: "Security & Compliance Team"
+
+# Global ZK proof settings
+global_settings:
+  default_proving_system: "Groth16"
+  fallback_proving_system: "Plonk"
+  quantum_resistant: true
+  verification_timeout: 30s
+  proof_retention_period: "30d"
+  max_proof_size: "1MB"
+  trusted_setup_required: true
+  trusted_setup_participants: 10
+  minimum_security_level: 128
+
+# ZK proof types and their configurations
+proof_types:
+  - id: "identity_attestation"
+    name: "Identity Attestation"
+    description: "Zero-knowledge proof of identity attributes without revealing the attributes themselves"
+    use_cases:
+      - "Age verification without revealing birthdate"
+      - "Credential verification without revealing credential details"
+      - "Location verification within a region without revealing exact location"
+      - "Role verification without revealing identity"
+    
+    circuit_parameters:
+      complexity: "medium"
+      constraints: 10000
+      verification_time: "50ms"
+      proving_time: "2s"
+    
+    attributes:
+      - name: "identity_provider"
+        description: "The identity provider that issued the identity"
+        required: true
+        zk_friendly: true
+      
+      - name: "issuance_date"
+        description: "The date the identity was issued"
+        required: true
+        zk_friendly: true
+      
+      - name: "expiration_date"
+        description: "The date the identity expires"
+        required: true
+        zk_friendly: true
+      
+      - name: "credential_type"
+        description: "The type of credential being attested"
+        required: true
+        zk_friendly: true
+      
+      - name: "credential_level"
+        description: "The level or strength of the credential"
+        required: true
+        zk_friendly: true
+      
+      - name: "verification_method"
+        description: "The method used to verify the identity"
+        required: false
+        zk_friendly: true
+    
+    verification_rules:
+      - "Identity provider must be in the trusted provider list"
+      - "Issuance date must be in the past"
+      - "Expiration date must be in the future"
+      - "Credential type must be appropriate for the requested access"
+      - "Credential level must meet minimum requirements for the requested access"
+    
+    privacy_guarantees:
+      - "No personal identifiable information is revealed"
+      - "Only the fact that the identity meets the criteria is revealed"
+      - "No correlation between multiple proofs is possible"
+    
+    implementation:
+      circuit_language: "Circom"
+      witness_generation: "wasm"
+      verification_contract: "/contracts/identity_attestation_verifier.sol"
+      proof_generation_service: "/services/identity_attestation_prover"
+  
+  - id: "authorization_attestation"
+    name: "Authorization Attestation"
+    description: "Zero-knowledge proof of authorization without revealing the authorization details"
+    use_cases:
+      - "Role-based access control without revealing role"
+      - "Permission verification without revealing all permissions"
+      - "Delegation verification without revealing delegation chain"
+      - "Multi-party approval without revealing approvers"
+    
+    circuit_parameters:
+      complexity: "high"
+      constraints: 25000
+      verification_time: "100ms"
+      proving_time: "5s"
+    
+    attributes:
+      - name: "authorization_issuer"
+        description: "The entity that issued the authorization"
+        required: true
+        zk_friendly: true
+      
+      - name: "issuance_date"
+        description: "The date the authorization was issued"
+        required: true
+        zk_friendly: true
+      
+      - name: "expiration_date"
+        description: "The date the authorization expires"
+        required: true
+        zk_friendly: true
+      
+      - name: "authorization_scope"
+        description: "The scope of the authorization"
+        required: true
+        zk_friendly: true
+      
+      - name: "authorization_context"
+        description: "The context in which the authorization is valid"
+        required: false
+        zk_friendly: true
+      
+      - name: "delegation_depth"
+        description: "The depth of delegation if the authorization is delegated"
+        required: false
+        zk_friendly: true
+    
+    verification_rules:
+      - "Authorization issuer must be authorized to issue the authorization"
+      - "Issuance date must be in the past"
+      - "Expiration date must be in the future"
+      - "Authorization scope must include the requested action"
+      - "Authorization context must match the current context if specified"
+      - "Delegation depth must not exceed maximum allowed delegation depth"
+    
+    privacy_guarantees:
+      - "No details about the authorization beyond what is necessary are revealed"
+      - "The authorization chain is not revealed"
+      - "The specific permissions within the authorization scope are not revealed"
+    
+    implementation:
+      circuit_language: "Circom"
+      witness_generation: "wasm"
+      verification_contract: "/contracts/authorization_attestation_verifier.sol"
+      proof_generation_service: "/services/authorization_attestation_prover"
+  
+  - id: "compliance_attestation"
+    name: "Compliance Attestation"
+    description: "Zero-knowledge proof of compliance with regulations or policies"
+    use_cases:
+      - "Regulatory compliance verification without revealing sensitive details"
+      - "Policy compliance verification without revealing implementation details"
+      - "Audit completion verification without revealing audit results"
+      - "Security control implementation without revealing control details"
+    
+    circuit_parameters:
+      complexity: "very high"
+      constraints: 50000
+      verification_time: "200ms"
+      proving_time: "10s"
+    
+    attributes:
+      - name: "compliance_framework"
+        description: "The compliance framework being attested to"
+        required: true
+        zk_friendly: true
+      
+      - name: "compliance_version"
+        description: "The version of the compliance framework"
+        required: true
+        zk_friendly: true
+      
+      - name: "assessment_date"
+        description: "The date of the compliance assessment"
+        required: true
+        zk_friendly: true
+      
+      - name: "assessor"
+        description: "The entity that performed the assessment"
+        required: true
+        zk_friendly: true
+      
+      - name: "compliance_scope"
+        description: "The scope of the compliance assessment"
+        required: true
+        zk_friendly: true
+      
+      - name: "compliance_level"
+        description: "The level of compliance achieved"
+        required: true
+        zk_friendly: true
+      
+      - name: "exceptions_count"
+        description: "The number of exceptions or findings"
+        required: false
+        zk_friendly: true
+    
+    verification_rules:
+      - "Compliance framework must be recognized and supported"
+      - "Compliance version must be current or within acceptable range"
+      - "Assessment date must be within the valid assessment period"
+      - "Assessor must be authorized to perform the assessment"
+      - "Compliance scope must include the relevant systems or processes"
+      - "Compliance level must meet minimum requirements"
+      - "Exceptions count must not exceed maximum allowed exceptions"
+    
+    privacy_guarantees:
+      - "Specific compliance findings are not revealed"
+      - "Implementation details of controls are not revealed"
+      - "Sensitive organizational information is not revealed"
+    
+    implementation:
+      circuit_language: "Circom"
+      witness_generation: "wasm"
+      verification_contract: "/contracts/compliance_attestation_verifier.sol"
+      proof_generation_service: "/services/compliance_attestation_prover"
+  
+  - id: "data_integrity_attestation"
+    name: "Data Integrity Attestation"
+    description: "Zero-knowledge proof of data integrity without revealing the data"
+    use_cases:
+      - "Data has not been modified without revealing the data"
+      - "Data meets certain criteria without revealing the data"
+      - "Data exists in a database without revealing which records"
+      - "Data processing was performed correctly without revealing the data"
+    
+    circuit_parameters:
+      complexity: "medium"
+      constraints: 15000
+      verification_time: "75ms"
+      proving_time: "3s"
+    
+    attributes:
+      - name: "data_hash"
+        description: "The hash of the data being attested"
+        required: true
+        zk_friendly: true
+      
+      - name: "data_schema"
+        description: "The schema or structure of the data"
+        required: true
+        zk_friendly: true
+      
+      - name: "data_timestamp"
+        description: "The timestamp when the data was created or last modified"
+        required: true
+        zk_friendly: true
+      
+      - name: "data_source"
+        description: "The source of the data"
+        required: true
+        zk_friendly: true
+      
+      - name: "data_size"
+        description: "The size of the data in bytes"
+        required: false
+        zk_friendly: true
+      
+      - name: "processing_method"
+        description: "The method used to process the data if applicable"
+        required: false
+        zk_friendly: true
+    
+    verification_rules:
+      - "Data hash must match the expected hash if provided"
+      - "Data schema must be valid and supported"
+      - "Data timestamp must be within acceptable range"
+      - "Data source must be trusted"
+      - "Data size must be within acceptable range if specified"
+      - "Processing method must be approved if specified"
+    
+    privacy_guarantees:
+      - "The actual data is not revealed"
+      - "Only the fact that the data meets the criteria is revealed"
+      - "Data relationships and patterns are not revealed"
+    
+    implementation:
+      circuit_language: "Circom"
+      witness_generation: "wasm"
+      verification_contract: "/contracts/data_integrity_attestation_verifier.sol"
+      proof_generation_service: "/services/data_integrity_attestation_prover"
+  
+  - id: "capsule_integrity_attestation"
+    name: "Capsule Integrity Attestation"
+    description: "Zero-knowledge proof of capsule integrity without revealing capsule contents"
+    use_cases:
+      - "Capsule has not been tampered with without revealing contents"
+      - "Capsule meets security requirements without revealing implementation"
+      - "Capsule processing was performed correctly without revealing logic"
+      - "Capsule state is valid without revealing state details"
+    
+    circuit_parameters:
+      complexity: "high"
+      constraints: 30000
+      verification_time: "150ms"
+      proving_time: "7s"
+    
+    attributes:
+      - name: "capsule_id"
+        description: "The identifier of the capsule"
+        required: true
+        zk_friendly: true
+      
+      - name: "capsule_version"
+        description: "The version of the capsule"
+        required: true
+        zk_friendly: true
+      
+      - name: "capsule_hash"
+        description: "The hash of the capsule code and configuration"
+        required: true
+        zk_friendly: true
+      
+      - name: "creation_timestamp"
+        description: "The timestamp when the capsule was created"
+        required: true
+        zk_friendly: true
+      
+      - name: "last_modified_timestamp"
+        description: "The timestamp when the capsule was last modified"
+        required: true
+        zk_friendly: true
+      
+      - name: "creator_id"
+        description: "The identifier of the capsule creator"
+        required: true
+        zk_friendly: true
+      
+      - name: "security_level"
+        description: "The security level of the capsule"
+        required: true
+        zk_friendly: true
+    
+    verification_rules:
+      - "Capsule hash must match the expected hash"
+      - "Capsule version must be current or within acceptable range"
+      - "Creation timestamp must be valid"
+      - "Last modified timestamp must be valid and after creation timestamp"
+      - "Creator must be authorized to create capsules"
+      - "Security level must meet minimum requirements"
+    
+    privacy_guarantees:
+      - "Capsule code and logic are not revealed"
+      - "Capsule configuration details are not revealed"
+      - "Capsule state and data are not revealed"
+    
+    implementation:
+      circuit_language: "Circom"
+      witness_generation: "wasm"
+      verification_contract: "/contracts/capsule_integrity_attestation_verifier.sol"
+      proof_generation_service: "/services/capsule_integrity_attestation_prover"
+
+# ZK attestation services
+attestation_services:
+  - id: "identity_attestation_service"
+    name: "Identity Attestation Service"
+    description: "Service for generating and verifying identity attestation proofs"
+    proof_type: "identity_attestation"
+    endpoints:
+      - path: "/api/v1/identity/generate-proof"
+        method: "POST"
+        description: "Generate an identity attestation proof"
+        rate_limit: 100
+        authentication_required: true
+      
+      - path: "/api/v1/identity/verify-proof"
+        method: "POST"
+        description: "Verify an identity attestation proof"
+        rate_limit: 500
+        authentication_required: false
+    
+    integration_points:
+      - layer: "identity_trust"
+        component: "identity_provider"
+        interface: "generateIdentityProof"
+      
+      - layer: "identity_trust"
+        component: "identity_token_resolver"
+        interface: "verifyIdentityProof"
+      
+      - layer: "access_control"
+        component: "access_control_system"
+        interface: "validateIdentityAttestation"
+  
+  - id: "authorization_attestation_service"
+    name: "Authorization Attestation Service"
+    description: "Service for generating and verifying authorization attestation proofs"
+    proof_type: "authorization_attestation"
+    endpoints:
+      - path: "/api/v1/authorization/generate-proof"
+        method: "POST"
+        description: "Generate an authorization attestation proof"
+        rate_limit: 100
+        authentication_required: true
+      
+      - path: "/api/v1/authorization/verify-proof"
+        method: "POST"
+        description: "Verify an authorization attestation proof"
+        rate_limit: 500
+        authentication_required: false
+    
+    integration_points:
+      - layer: "access_control"
+        component: "access_control_system"
+        interface: "generateAuthorizationProof"
+      
+      - layer: "access_control"
+        component: "capsule_acl_service"
+        interface: "verifyAuthorizationProof"
+      
+      - layer: "policy_governance"
+        component: "regulatory_twin_engine"
+        interface: "validateAuthorizationAttestation"
+  
+  - id: "compliance_attestation_service"
+    name: "Compliance Attestation Service"
+    description: "Service for generating and verifying compliance attestation proofs"
+    proof_type: "compliance_attestation"
+    endpoints:
+      - path: "/api/v1/compliance/generate-proof"
+        method: "POST"
+        description: "Generate a compliance attestation proof"
+        rate_limit: 50
+        authentication_required: true
+      
+      - path: "/api/v1/compliance/verify-proof"
+        method: "POST"
+        description: "Verify a compliance attestation proof"
+        rate_limit: 200
+        authentication_required: false
+    
+    integration_points:
+      - layer: "policy_governance"
+        component: "regulatory_twin_engine"
+        interface: "generateComplianceProof"
+      
+      - layer: "policy_governance"
+        component: "regulatory_twin_engine"
+        interface: "verifyComplianceProof"
+      
+      - layer: "advanced_features"
+        component: "autonomous_compliance_networks"
+        interface: "validateComplianceAttestation"
+  
+  - id: "data_integrity_attestation_service"
+    name: "Data Integrity Attestation Service"
+    description: "Service for generating and verifying data integrity attestation proofs"
+    proof_type: "data_integrity_attestation"
+    endpoints:
+      - path: "/api/v1/data-integrity/generate-proof"
+        method: "POST"
+        description: "Generate a data integrity attestation proof"
+        rate_limit: 100
+        authentication_required: true
+      
+      - path: "/api/v1/data-integrity/verify-proof"
+        method: "POST"
+        description: "Verify a data integrity attestation proof"
+        rate_limit: 500
+        authentication_required: false
+    
+    integration_points:
+      - layer: "data_security"
+        component: "data_security_system"
+        interface: "generateDataIntegrityProof"
+      
+      - layer: "data_security"
+        component: "homomorphic_encryption_engine"
+        interface: "verifyDataIntegrityProof"
+      
+      - layer: "data_security"
+        component: "secure_mpc_engine"
+        interface: "validateDataIntegrityAttestation"
+  
+  - id: "capsule_integrity_attestation_service"
+    name: "Capsule Integrity Attestation Service"
+    description: "Service for generating and verifying capsule integrity attestation proofs"
+    proof_type: "capsule_integrity_attestation"
+    endpoints:
+      - path: "/api/v1/capsule-integrity/generate-proof"
+        method: "POST"
+        description: "Generate a capsule integrity attestation proof"
+        rate_limit: 50
+        authentication_required: true
+      
+      - path: "/api/v1/capsule-integrity/verify-proof"
+        method: "POST"
+        description: "Verify a capsule integrity attestation proof"
+        rate_limit: 200
+        authentication_required: false
+    
+    integration_points:
+      - layer: "advanced_features"
+        component: "capsule_mutation_watchdog"
+        interface: "generateCapsuleIntegrityProof"
+      
+      - layer: "advanced_features"
+        component: "capsule_mutation_watchdog"
+        interface: "verifyCapsuleIntegrityProof"
+      
+      - layer: "advanced_features"
+        component: "ethical_capsule_simulation"
+        interface: "validateCapsuleIntegrityAttestation"
+
+# ZK proof verification contracts
+verification_contracts:
+  - id: "identity_attestation_verifier"
+    name: "Identity Attestation Verifier"
+    description: "Smart contract for verifying identity attestation proofs"
+    contract_path: "/contracts/identity_attestation_verifier.sol"
+    abi_path: "/contracts/abi/identity_attestation_verifier.json"
+    deployment:
+      network: "ethereum"
+      address: "0x1234567890123456789012345678901234567890"
+      deployment_date: "2025-01-15"
+    
+    functions:
+      - name: "verifyProof"
+        description: "Verify an identity attestation proof"
+        inputs:
+          - name: "proof"
+            type: "bytes"
+            description: "The ZK proof to verify"
+          - name: "publicInputs"
+            type: "uint256[]"
+            description: "The public inputs to the proof"
+        outputs:
+          - name: "valid"
+            type: "bool"
+            description: "Whether the proof is valid"
+      
+      - name: "batchVerifyProofs"
+        description: "Verify multiple identity attestation proofs"
+        inputs:
+          - name: "proofs"
+            type: "bytes[]"
+            description: "The ZK proofs to verify"
+          - name: "publicInputs"
+            type: "uint256[][]"
+            description: "The public inputs to each proof"
+        outputs:
+          - name: "valid"
+            type: "bool[]"
+            description: "Whether each proof is valid"
+  
+  - id: "authorization_attestation_verifier"
+    name: "Authorization Attestation Verifier"
+    description: "Smart contract for verifying authorization attestation proofs"
+    contract_path: "/contracts/authorization_attestation_verifier.sol"
+    abi_path: "/contracts/abi/authorization_attestation_verifier.json"
+    deployment:
+      network: "ethereum"
+      address: "0x2345678901234567890123456789012345678901"
+      deployment_date: "2025-01-15"
+    
+    functions:
+      - name: "verifyProof"
+        description: "Verify an authorization attestation proof"
+        inputs:
+          - name: "proof"
+            type: "bytes"
+            description: "The ZK proof to verify"
+          - name: "publicInputs"
+            type: "uint256[]"
+            description: "The public inputs to the proof"
+        outputs:
+          - name: "valid"
+            type: "bool"
+            description: "Whether the proof is valid"
+      
+      - name: "batchVerifyProofs"
+        description: "Verify multiple authorization attestation proofs"
+        inputs:
+          - name: "proofs"
+            type: "bytes[]"
+            description: "The ZK proofs to verify"
+          - name: "publicInputs"
+            type: "uint256[][]"
+            description: "The public inputs to each proof"
+        outputs:
+          - name: "valid"
+            type: "bool[]"
+            description: "Whether each proof is valid"
+  
+  - id: "compliance_attestation_verifier"
+    name: "Compliance Attestation Verifier"
+    description: "Smart contract for verifying compliance attestation proofs"
+    contract_path: "/contracts/compliance_attestation_verifier.sol"
+    abi_path: "/contracts/abi/compliance_attestation_verifier.json"
+    deployment:
+      network: "ethereum"
+      address: "0x3456789012345678901234567890123456789012"
+      deployment_date: "2025-01-15"
+    
+    functions:
+      - name: "verifyProof"
+        description: "Verify a compliance attestation proof"
+        inputs:
+          - name: "proof"
+            type: "bytes"
+            description: "The ZK proof to verify"
+          - name: "publicInputs"
+            type: "uint256[]"
+            description: "The public inputs to the proof"
+        outputs:
+          - name: "valid"
+            type: "bool"
+            description: "Whether the proof is valid"
+      
+      - name: "batchVerifyProofs"
+        description: "Verify multiple compliance attestation proofs"
+        inputs:
+          - name: "proofs"
+            type: "bytes[]"
+            description: "The ZK proofs to verify"
+          - name: "publicInputs"
+            type: "uint256[][]"
+            description: "The public inputs to each proof"
+        outputs:
+          - name: "valid"
+            type: "bool[]"
+            description: "Whether each proof is valid"
+  
+  - id: "data_integrity_attestation_verifier"
+    name: "Data Integrity Attestation Verifier"
+    description: "Smart contract for verifying data integrity attestation proofs"
+    contract_path: "/contracts/data_integrity_attestation_verifier.sol"
+    abi_path: "/contracts/abi/data_integrity_attestation_verifier.json"
+    deployment:
+      network: "ethereum"
+      address: "0x4567890123456789012345678901234567890123"
+      deployment_date: "2025-01-15"
+    
+    functions:
+      - name: "verifyProof"
+        description: "Verify a data integrity attestation proof"
+        inputs:
+          - name: "proof"
+            type: "bytes"
+            description: "The ZK proof to verify"
+          - name: "publicInputs"
+            type: "uint256[]"
+            description: "The public inputs to the proof"
+        outputs:
+          - name: "valid"
+            type: "bool"
+            description: "Whether the proof is valid"
+      
+      - name: "batchVerifyProofs"
+        description: "Verify multiple data integrity attestation proofs"
+        inputs:
+          - name: "proofs"
+            type: "bytes[]"
+            description: "The ZK proofs to verify"
+          - name: "publicInputs"
+            type: "uint256[][]"
+            description: "The public inputs to each proof"
+        outputs:
+          - name: "valid"
+            type: "bool[]"
+            description: "Whether each proof is valid"
+  
+  - id: "capsule_integrity_attestation_verifier"
+    name: "Capsule Integrity Attestation Verifier"
+    description: "Smart contract for verifying capsule integrity attestation proofs"
+    contract_path: "/contracts/capsule_integrity_attestation_verifier.sol"
+    abi_path: "/contracts/abi/capsule_integrity_attestation_verifier.json"
+    deployment:
+      network: "ethereum"
+      address: "0x5678901234567890123456789012345678901234"
+      deployment_date: "2025-01-15"
+    
+    functions:
+      - name: "verifyProof"
+        description: "Verify a capsule integrity attestation proof"
+        inputs:
+          - name: "proof"
+            type: "bytes"
+            description: "The ZK proof to verify"
+          - name: "publicInputs"
+            type: "uint256[]"
+            description: "The public inputs to the proof"
+        outputs:
+          - name: "valid"
+            type: "bool"
+            description: "Whether the proof is valid"
+      
+      - name: "batchVerifyProofs"
+        description: "Verify multiple capsule integrity attestation proofs"
+        inputs:
+          - name: "proofs"
+            type: "bytes[]"
+            description: "The ZK proofs to verify"
+          - name: "publicInputs"
+            type: "uint256[][]"
+            description: "The public inputs to each proof"
+        outputs:
+          - name: "valid"
+            type: "bool[]"
+            description: "Whether each proof is valid"
+
+# ZK proof circuits
+circuits:
+  - id: "identity_attestation_circuit"
+    name: "Identity Attestation Circuit"
+    description: "Circuit for generating identity attestation proofs"
+    circuit_path: "/circuits/identity_attestation.circom"
+    wasm_path: "/circuits/identity_attestation.wasm"
+    r1cs_path: "/circuits/identity_attestation.r1cs"
+    
+    inputs:
+      private:
+        - name: "identityAttributes"
+          type: "array"
+          description: "The private identity attributes"
+        - name: "identitySignature"
+          type: "array"
+          description: "The signature on the identity attributes"
+        - name: "identityNonce"
+          type: "field"
+          description: "A nonce to prevent replay attacks"
+      
+      public:
+        - name: "identityProviderPublicKey"
+          type: "array"
+          description: "The public key of the identity provider"
+        - name: "minimumRequirements"
+          type: "array"
+          description: "The minimum requirements that must be met"
+        - name: "attestationTimestamp"
+          type: "field"
+          description: "The timestamp of the attestation"
+    
+    constraints:
+      - "Signature verification"
+      - "Attribute range checks"
+      - "Timestamp validity"
+      - "Requirement satisfaction"
+  
+  - id: "authorization_attestation_circuit"
+    name: "Authorization Attestation Circuit"
+    description: "Circuit for generating authorization attestation proofs"
+    circuit_path: "/circuits/authorization_attestation.circom"
+    wasm_path: "/circuits/authorization_attestation.wasm"
+    r1cs_path: "/circuits/authorization_attestation.r1cs"
+    
+    inputs:
+      private:
+        - name: "authorizationAttributes"
+          type: "array"
+          description: "The private authorization attributes"
+        - name: "authorizationSignature"
+          type: "array"
+          description: "The signature on the authorization attributes"
+        - name: "authorizationNonce"
+          type: "field"
+          description: "A nonce to prevent replay attacks"
+      
+      public:
+        - name: "authorizationIssuerPublicKey"
+          type: "array"
+          description: "The public key of the authorization issuer"
+        - name: "requiredPermissions"
+          type: "array"
+          description: "The permissions that must be granted"
+        - name: "attestationTimestamp"
+          type: "field"
+          description: "The timestamp of the attestation"
+    
+    constraints:
+      - "Signature verification"
+      - "Permission checks"
+      - "Timestamp validity"
+      - "Scope validation"
+  
+  - id: "compliance_attestation_circuit"
+    name: "Compliance Attestation Circuit"
+    description: "Circuit for generating compliance attestation proofs"
+    circuit_path: "/circuits/compliance_attestation.circom"
+    wasm_path: "/circuits/compliance_attestation.wasm"
+    r1cs_path: "/circuits/compliance_attestation.r1cs"
+    
+    inputs:
+      private:
+        - name: "complianceAttributes"
+          type: "array"
+          description: "The private compliance attributes"
+        - name: "complianceSignature"
+          type: "array"
+          description: "The signature on the compliance attributes"
+        - name: "complianceNonce"
+          type: "field"
+          description: "A nonce to prevent replay attacks"
+      
+      public:
+        - name: "assessorPublicKey"
+          type: "array"
+          description: "The public key of the assessor"
+        - name: "complianceFramework"
+          type: "field"
+          description: "The compliance framework identifier"
+        - name: "attestationTimestamp"
+          type: "field"
+          description: "The timestamp of the attestation"
+    
+    constraints:
+      - "Signature verification"
+      - "Framework validation"
+      - "Timestamp validity"
+      - "Assessment validation"
+  
+  - id: "data_integrity_attestation_circuit"
+    name: "Data Integrity Attestation Circuit"
+    description: "Circuit for generating data integrity attestation proofs"
+    circuit_path: "/circuits/data_integrity_attestation.circom"
+    wasm_path: "/circuits/data_integrity_attestation.wasm"
+    r1cs_path: "/circuits/data_integrity_attestation.r1cs"
+    
+    inputs:
+      private:
+        - name: "data"
+          type: "array"
+          description: "The private data"
+        - name: "dataSignature"
+          type: "array"
+          description: "The signature on the data"
+        - name: "dataNonce"
+          type: "field"
+          description: "A nonce to prevent replay attacks"
+      
+      public:
+        - name: "dataSourcePublicKey"
+          type: "array"
+          description: "The public key of the data source"
+        - name: "dataRequirements"
+          type: "array"
+          description: "The requirements the data must meet"
+        - name: "attestationTimestamp"
+          type: "field"
+          description: "The timestamp of the attestation"
+    
+    constraints:
+      - "Signature verification"
+      - "Data validation"
+      - "Timestamp validity"
+      - "Requirement satisfaction"
+  
+  - id: "capsule_integrity_attestation_circuit"
+    name: "Capsule Integrity Attestation Circuit"
+    description: "Circuit for generating capsule integrity attestation proofs"
+    circuit_path: "/circuits/capsule_integrity_attestation.circom"
+    wasm_path: "/circuits/capsule_integrity_attestation.wasm"
+    r1cs_path: "/circuits/capsule_integrity_attestation.r1cs"
+    
+    inputs:
+      private:
+        - name: "capsuleCode"
+          type: "array"
+          description: "The private capsule code"
+        - name: "capsuleSignature"
+          type: "array"
+          description: "The signature on the capsule code"
+        - name: "capsuleNonce"
+          type: "field"
+          description: "A nonce to prevent replay attacks"
+      
+      public:
+        - name: "capsuleCreatorPublicKey"
+          type: "array"
+          description: "The public key of the capsule creator"
+        - name: "capsuleRequirements"
+          type: "array"
+          description: "The requirements the capsule must meet"
+        - name: "attestationTimestamp"
+          type: "field"
+          description: "The timestamp of the attestation"
+    
+    constraints:
+      - "Signature verification"
+      - "Code validation"
+      - "Timestamp validity"
+      - "Requirement satisfaction"
+
+# ZK proof integration with other Industriverse layers
+layer_integrations:
+  - layer: "data_layer"
+    components:
+      - component: "data_ingestion"
+        proof_types: ["data_integrity_attestation"]
+        integration_points:
+          - "Data source verification"
+          - "Data quality attestation"
+          - "Data lineage tracking"
+      
+      - component: "data_processing"
+        proof_types: ["data_integrity_attestation"]
+        integration_points:
+          - "Processing integrity verification"
+          - "Transformation attestation"
+          - "Result validation"
+      
+      - component: "data_security"
+        proof_types: ["data_integrity_attestation", "authorization_attestation"]
+        integration_points:
+          - "Access control verification"
+          - "Encryption key management"
+          - "Data classification enforcement"
+  
+  - layer: "core_ai_layer"
+    components:
+      - component: "model_training"
+        proof_types: ["data_integrity_attestation"]
+        integration_points:
+          - "Training data verification"
+          - "Model integrity attestation"
+          - "Bias detection verification"
+      
+      - component: "inference_engine"
+        proof_types: ["data_integrity_attestation", "capsule_integrity_attestation"]
+        integration_points:
+          - "Model verification"
+          - "Input data validation"
+          - "Output integrity attestation"
+      
+      - component: "ai_security"
+        proof_types: ["authorization_attestation", "compliance_attestation"]
+        integration_points:
+          - "Access control verification"
+          - "Ethical use attestation"
+          - "Regulatory compliance verification"
+  
+  - layer: "generative_layer"
+    components:
+      - component: "code_generation"
+        proof_types: ["capsule_integrity_attestation"]
+        integration_points:
+          - "Generated code verification"
+          - "Security policy compliance"
+          - "Vulnerability attestation"
+      
+      - component: "content_generation"
+        proof_types: ["data_integrity_attestation", "compliance_attestation"]
+        integration_points:
+          - "Content policy compliance"
+          - "Source attribution verification"
+          - "Ethical guidelines attestation"
+  
+  - layer: "application_layer"
+    components:
+      - component: "api_gateway"
+        proof_types: ["identity_attestation", "authorization_attestation"]
+        integration_points:
+          - "API caller verification"
+          - "Permission attestation"
+          - "Rate limit compliance"
+      
+      - component: "business_logic"
+        proof_types: ["capsule_integrity_attestation", "compliance_attestation"]
+        integration_points:
+          - "Logic integrity verification"
+          - "Business rule compliance"
+          - "Audit trail attestation"
+  
+  - layer: "protocol_layer"
+    components:
+      - component: "mcp_protocol"
+        proof_types: ["data_integrity_attestation", "capsule_integrity_attestation"]
+        integration_points:
+          - "Message integrity verification"
+          - "Context validation"
+          - "Protocol compliance attestation"
+      
+      - component: "a2a_protocol"
+        proof_types: ["identity_attestation", "authorization_attestation"]
+        integration_points:
+          - "Agent identity verification"
+          - "Capability attestation"
+          - "Interaction authorization"
+  
+  - layer: "workflow_layer"
+    components:
+      - component: "workflow_engine"
+        proof_types: ["capsule_integrity_attestation", "authorization_attestation"]
+        integration_points:
+          - "Workflow integrity verification"
+          - "Step authorization attestation"
+          - "Execution validation"
+      
+      - component: "automation_service"
+        proof_types: ["identity_attestation", "compliance_attestation"]
+        integration_points:
+          - "Automation identity verification"
+          - "Policy compliance attestation"
+          - "Audit trail validation"
+  
+  - layer: "ui_ux_layer"
+    components:
+      - component: "avatar_interface"
+        proof_types: ["identity_attestation", "authorization_attestation"]
+        integration_points:
+          - "Avatar identity verification"
+          - "User authorization attestation"
+          - "Interaction validation"
+      
+      - component: "trust_ribbon"
+        proof_types: ["compliance_attestation", "capsule_integrity_attestation"]
+        integration_points:
+          - "Trust level verification"
+          - "Security status attestation"
+          - "Compliance visualization"
+
+# ZK proof performance and scaling configuration
+performance:
+  caching:
+    enabled: true
+    cache_duration: "1h"
+    max_cache_size: "10GB"
+    distributed_cache: true
+  
+  batching:
+    enabled: true
+    max_batch_size: 100
+    batch_timeout: "1s"
+    priority_levels: 3
+  
+  hardware_acceleration:
+    enabled: true
+    gpu_support: true
+    fpga_support: true
+    asic_support: false
+  
+  scaling:
+    horizontal_scaling: true
+    auto_scaling: true
+    min_instances: 3
+    max_instances: 20
+    scaling_metrics:
+      - "cpu_utilization"
+      - "request_rate"
+      - "proof_generation_time"
+
+# ZK proof monitoring and alerting
+monitoring:
+  metrics:
+    - name: "proof_generation_time"
+      description: "Time taken to generate a proof"
+      unit: "milliseconds"
+      thresholds:
+        warning: 5000
+        critical: 10000
+    
+    - name: "proof_verification_time"
+      description: "Time taken to verify a proof"
+      unit: "milliseconds"
+      thresholds:
+        warning: 200
+        critical: 500
+    
+    - name: "proof_size"
+      description: "Size of the generated proof"
+      unit: "bytes"
+      thresholds:
+        warning: 500000
+        critical: 1000000
+    
+    - name: "verification_success_rate"
+      description: "Percentage of successful verifications"
+      unit: "percentage"
+      thresholds:
+        warning: 95
+        critical: 90
+    
+    - name: "proof_generation_success_rate"
+      description: "Percentage of successful proof generations"
+      unit: "percentage"
+      thresholds:
+        warning: 95
+        critical: 90
+  
+  alerting:
+    channels:
+      - "email"
+      - "slack"
+      - "pagerduty"
+      - "dashboard"
+    
+    rules:
+      - name: "high_verification_failure_rate"
+        description: "High rate of verification failures"
+        condition: "verification_success_rate < 95 for 5m"
+        severity: "warning"
+      
+      - name: "critical_verification_failure_rate"
+        description: "Critical rate of verification failures"
+        condition: "verification_success_rate < 90 for 5m"
+        severity: "critical"
+      
+      - name: "high_generation_failure_rate"
+        description: "High rate of proof generation failures"
+        condition: "proof_generation_success_rate < 95 for 5m"
+        severity: "warning"
+      
+      - name: "critical_generation_failure_rate"
+        description: "Critical rate of proof generation failures"
+        condition: "proof_generation_success_rate < 90 for 5m"
+        severity: "critical"
+      
+      - name: "slow_proof_generation"
+        description: "Slow proof generation time"
+        condition: "proof_generation_time > 5000 for 5m"
+        severity: "warning"
+      
+      - name: "very_slow_proof_generation"
+        description: "Very slow proof generation time"
+        condition: "proof_generation_time > 10000 for 5m"
+        severity: "critical"

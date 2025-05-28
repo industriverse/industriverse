@@ -1,0 +1,1029 @@
+# Escalation Protocol Templates for the Workflow Automation Layer
+#
+# This file contains predefined escalation protocol templates for different industries
+# and scenarios. These templates define how workflow issues are escalated, who is involved
+# in the escalation process, and what actions are taken at each escalation level.
+
+# Manufacturing Escalation Protocol
+manufacturing_escalation_protocol:
+  version: "1.0"
+  metadata:
+    name: "Manufacturing Escalation Protocol"
+    description: "Escalation protocol for manufacturing workflows"
+    industry: "manufacturing"
+    author: "Industriverse"
+    created: "2025-05-22"
+    tags: ["manufacturing", "escalation", "quality", "production"]
+  
+  escalation_levels:
+    - level: 1
+      name: "Automated Resolution"
+      description: "System attempts to resolve the issue automatically"
+      resolver_group: "system"
+      timeout_minutes: 5
+      actions:
+        - "retry_operation"
+        - "apply_fallback_configuration"
+        - "execute_recovery_procedure"
+      notification_channels: ["system_log"]
+    
+    - level: 2
+      name: "Operator Intervention"
+      description: "Machine operator or line technician intervention required"
+      resolver_group: "operators"
+      timeout_minutes: 15
+      actions:
+        - "notify_operator"
+        - "provide_troubleshooting_steps"
+        - "suggest_corrective_actions"
+      notification_channels: ["dashboard", "mobile_app"]
+    
+    - level: 3
+      name: "Supervisor Resolution"
+      description: "Production supervisor or team lead intervention required"
+      resolver_group: "supervisors"
+      timeout_minutes: 30
+      actions:
+        - "notify_supervisor"
+        - "escalate_to_n8n_workflow"
+        - "provide_impact_assessment"
+      notification_channels: ["dashboard", "mobile_app", "email"]
+    
+    - level: 4
+      name: "Management Resolution"
+      description: "Production manager or department head intervention required"
+      resolver_group: "management"
+      timeout_minutes: 60
+      actions:
+        - "notify_management"
+        - "initiate_incident_response"
+        - "prepare_alternative_production_plan"
+      notification_channels: ["dashboard", "email", "sms"]
+    
+    - level: 5
+      name: "Executive Resolution"
+      description: "Executive intervention required for critical issues"
+      resolver_group: "executives"
+      timeout_minutes: 120
+      actions:
+        - "notify_executives"
+        - "activate_crisis_management"
+        - "prepare_stakeholder_communications"
+      notification_channels: ["email", "sms", "phone"]
+  
+  escalation_triggers:
+    time_based:
+      - condition: "issue_duration > 5 minutes"
+        escalate_to: 2
+      - condition: "issue_duration > 20 minutes"
+        escalate_to: 3
+      - condition: "issue_duration > 50 minutes"
+        escalate_to: 4
+      - condition: "issue_duration > 110 minutes"
+        escalate_to: 5
+    
+    severity_based:
+      - condition: "severity == 'critical'"
+        escalate_to: 3
+      - condition: "severity == 'critical' && affects_multiple_lines"
+        escalate_to: 4
+      - condition: "severity == 'critical' && affects_entire_plant"
+        escalate_to: 5
+    
+    context_based:
+      - condition: "production_line == 'high_priority'"
+        escalate_to: 3
+      - condition: "customer_order == 'rush'"
+        escalate_to: 3
+      - condition: "production_schedule_impact > 4 hours"
+        escalate_to: 4
+    
+    confidence_based:
+      - condition: "resolution_confidence < 0.4"
+        escalate_to: 2
+      - condition: "resolution_confidence < 0.2"
+        escalate_to: 3
+  
+  bid_system:
+    enabled: true
+    bid_request_format:
+      issue_description: true
+      severity: true
+      context: true
+      required_skills: true
+      estimated_resolution_time: true
+      priority: true
+    
+    bid_selection_criteria:
+      skill_match_weight: 0.4
+      availability_weight: 0.3
+      response_time_weight: 0.2
+      past_performance_weight: 0.1
+    
+    resolver_groups:
+      operators:
+        roles:
+          - "machine_operator"
+          - "line_technician"
+          - "maintenance_technician"
+        skill_categories:
+          - "equipment_operation"
+          - "basic_troubleshooting"
+          - "quality_control"
+      
+      supervisors:
+        roles:
+          - "production_supervisor"
+          - "team_lead"
+          - "shift_manager"
+          - "quality_supervisor"
+        skill_categories:
+          - "production_management"
+          - "team_coordination"
+          - "advanced_troubleshooting"
+      
+      management:
+        roles:
+          - "production_manager"
+          - "operations_manager"
+          - "quality_manager"
+          - "maintenance_manager"
+        skill_categories:
+          - "production_planning"
+          - "resource_allocation"
+          - "incident_management"
+      
+      executives:
+        roles:
+          - "plant_manager"
+          - "director_of_operations"
+          - "vp_manufacturing"
+          - "coo"
+        skill_categories:
+          - "strategic_decision_making"
+          - "crisis_management"
+          - "stakeholder_management"
+  
+  n8n_integration:
+    workflows:
+      - level: 2
+        workflow_id: "manufacturing_operator_resolution"
+        trigger_conditions:
+          - "requires_human_decision"
+          - "equipment_specific_knowledge_required"
+      
+      - level: 3
+        workflow_id: "manufacturing_supervisor_resolution"
+        trigger_conditions:
+          - "multiple_operators_required"
+          - "production_schedule_adjustment_needed"
+      
+      - level: 4
+        workflow_id: "manufacturing_management_resolution"
+        trigger_conditions:
+          - "resource_reallocation_required"
+          - "external_vendor_coordination_needed"
+      
+      - level: 5
+        workflow_id: "manufacturing_executive_resolution"
+        trigger_conditions:
+          - "business_continuity_threatened"
+          - "major_customer_impact"
+  
+  learning_optimization:
+    metrics_tracked:
+      - "time_to_resolution"
+      - "escalation_frequency"
+      - "resolution_success_rate"
+      - "customer_impact"
+      - "resource_utilization"
+    
+    optimization_targets:
+      - "minimize_escalation_frequency"
+      - "minimize_time_to_resolution"
+      - "optimize_resolver_selection"
+      - "improve_first_attempt_resolution_rate"
+
+# Energy Sector Escalation Protocol
+energy_escalation_protocol:
+  version: "1.0"
+  metadata:
+    name: "Energy Sector Escalation Protocol"
+    description: "Escalation protocol for energy generation and distribution workflows"
+    industry: "energy"
+    author: "Industriverse"
+    created: "2025-05-22"
+    tags: ["energy", "escalation", "grid", "power"]
+  
+  escalation_levels:
+    - level: 1
+      name: "Automated Resolution"
+      description: "System attempts to resolve the issue automatically"
+      resolver_group: "system"
+      timeout_minutes: 3
+      actions:
+        - "apply_self_healing_procedures"
+        - "execute_failover_protocols"
+        - "implement_load_balancing"
+      notification_channels: ["system_log"]
+    
+    - level: 2
+      name: "Control Room Operator Intervention"
+      description: "Control room operator intervention required"
+      resolver_group: "operators"
+      timeout_minutes: 10
+      actions:
+        - "notify_control_room"
+        - "provide_system_diagnostics"
+        - "suggest_corrective_actions"
+      notification_channels: ["control_room_dashboard", "mobile_app"]
+    
+    - level: 3
+      name: "Engineering Team Resolution"
+      description: "Engineering team intervention required"
+      resolver_group: "engineers"
+      timeout_minutes: 20
+      actions:
+        - "notify_engineering_team"
+        - "escalate_to_n8n_workflow"
+        - "provide_impact_assessment"
+        - "initiate_technical_response_team"
+      notification_channels: ["dashboard", "mobile_app", "email"]
+    
+    - level: 4
+      name: "Management Resolution"
+      description: "Operations manager or department head intervention required"
+      resolver_group: "management"
+      timeout_minutes: 30
+      actions:
+        - "notify_management"
+        - "initiate_incident_response"
+        - "coordinate_with_external_entities"
+        - "prepare_customer_communications"
+      notification_channels: ["dashboard", "email", "sms"]
+    
+    - level: 5
+      name: "Executive Resolution"
+      description: "Executive intervention required for critical issues"
+      resolver_group: "executives"
+      timeout_minutes: 60
+      actions:
+        - "notify_executives"
+        - "activate_crisis_management"
+        - "coordinate_with_regulatory_bodies"
+        - "prepare_public_communications"
+      notification_channels: ["email", "sms", "phone"]
+  
+  escalation_triggers:
+    time_based:
+      - condition: "issue_duration > 3 minutes"
+        escalate_to: 2
+      - condition: "issue_duration > 13 minutes"
+        escalate_to: 3
+      - condition: "issue_duration > 33 minutes"
+        escalate_to: 4
+      - condition: "issue_duration > 63 minutes"
+        escalate_to: 5
+    
+    severity_based:
+      - condition: "severity == 'critical'"
+        escalate_to: 3
+      - condition: "severity == 'critical' && affects_multiple_systems"
+        escalate_to: 4
+      - condition: "severity == 'critical' && affects_grid_stability"
+        escalate_to: 5
+    
+    context_based:
+      - condition: "system == 'primary_generation'"
+        escalate_to: 3
+      - condition: "system == 'transmission_backbone'"
+        escalate_to: 3
+      - condition: "customer_impact > 1000"
+        escalate_to: 4
+      - condition: "customer_impact > 10000"
+        escalate_to: 5
+    
+    confidence_based:
+      - condition: "resolution_confidence < 0.5"
+        escalate_to: 2
+      - condition: "resolution_confidence < 0.3"
+        escalate_to: 3
+      - condition: "resolution_confidence < 0.1"
+        escalate_to: 4
+  
+  bid_system:
+    enabled: true
+    bid_request_format:
+      issue_description: true
+      severity: true
+      context: true
+      required_skills: true
+      estimated_resolution_time: true
+      priority: true
+      system_affected: true
+    
+    bid_selection_criteria:
+      skill_match_weight: 0.5
+      availability_weight: 0.2
+      response_time_weight: 0.2
+      past_performance_weight: 0.1
+    
+    resolver_groups:
+      operators:
+        roles:
+          - "control_room_operator"
+          - "field_technician"
+          - "monitoring_specialist"
+        skill_categories:
+          - "system_operation"
+          - "basic_troubleshooting"
+          - "monitoring_protocols"
+      
+      engineers:
+        roles:
+          - "power_systems_engineer"
+          - "network_engineer"
+          - "automation_engineer"
+          - "protection_engineer"
+        skill_categories:
+          - "power_systems_analysis"
+          - "network_management"
+          - "protection_systems"
+          - "SCADA_systems"
+      
+      management:
+        roles:
+          - "operations_manager"
+          - "grid_manager"
+          - "generation_manager"
+          - "technical_services_manager"
+        skill_categories:
+          - "operations_management"
+          - "resource_coordination"
+          - "incident_management"
+          - "stakeholder_management"
+      
+      executives:
+        roles:
+          - "director_of_operations"
+          - "chief_engineer"
+          - "vp_power_delivery"
+          - "coo"
+        skill_categories:
+          - "strategic_decision_making"
+          - "crisis_management"
+          - "regulatory_compliance"
+          - "public_relations"
+  
+  n8n_integration:
+    workflows:
+      - level: 2
+        workflow_id: "energy_operator_resolution"
+        trigger_conditions:
+          - "requires_human_decision"
+          - "system_specific_knowledge_required"
+      
+      - level: 3
+        workflow_id: "energy_engineering_resolution"
+        trigger_conditions:
+          - "technical_analysis_required"
+          - "system_reconfiguration_needed"
+      
+      - level: 4
+        workflow_id: "energy_management_resolution"
+        trigger_conditions:
+          - "customer_communication_required"
+          - "external_coordination_needed"
+      
+      - level: 5
+        workflow_id: "energy_executive_resolution"
+        trigger_conditions:
+          - "grid_stability_threatened"
+          - "regulatory_reporting_required"
+          - "major_customer_impact"
+  
+  learning_optimization:
+    metrics_tracked:
+      - "time_to_resolution"
+      - "escalation_frequency"
+      - "resolution_success_rate"
+      - "customer_outage_minutes"
+      - "resource_utilization"
+    
+    optimization_targets:
+      - "minimize_customer_outage_minutes"
+      - "minimize_time_to_resolution"
+      - "optimize_resolver_selection"
+      - "improve_first_attempt_resolution_rate"
+
+# Healthcare Escalation Protocol
+healthcare_escalation_protocol:
+  version: "1.0"
+  metadata:
+    name: "Healthcare Escalation Protocol"
+    description: "Escalation protocol for healthcare workflows"
+    industry: "healthcare"
+    author: "Industriverse"
+    created: "2025-05-22"
+    tags: ["healthcare", "escalation", "patient", "medical"]
+  
+  escalation_levels:
+    - level: 1
+      name: "Automated Resolution"
+      description: "System attempts to resolve the issue automatically"
+      resolver_group: "system"
+      timeout_minutes: 2
+      actions:
+        - "verify_data_accuracy"
+        - "apply_standard_protocols"
+        - "execute_automated_checks"
+      notification_channels: ["system_log"]
+    
+    - level: 2
+      name: "Nurse Intervention"
+      description: "Nurse or clinical staff intervention required"
+      resolver_group: "nurses"
+      timeout_minutes: 5
+      actions:
+        - "notify_assigned_nurse"
+        - "provide_patient_data"
+        - "suggest_clinical_actions"
+      notification_channels: ["nurse_station_dashboard", "mobile_app"]
+    
+    - level: 3
+      name: "Physician Resolution"
+      description: "Physician intervention required"
+      resolver_group: "physicians"
+      timeout_minutes: 10
+      actions:
+        - "notify_attending_physician"
+        - "escalate_to_n8n_workflow"
+        - "provide_clinical_assessment"
+        - "prepare_intervention_options"
+      notification_channels: ["dashboard", "mobile_app", "pager"]
+    
+    - level: 4
+      name: "Specialist Team Resolution"
+      description: "Specialist team or rapid response team intervention required"
+      resolver_group: "specialists"
+      timeout_minutes: 15
+      actions:
+        - "notify_specialist_team"
+        - "activate_rapid_response"
+        - "prepare_critical_care_resources"
+      notification_channels: ["dashboard", "pager", "overhead_announcement"]
+    
+    - level: 5
+      name: "Emergency Resolution"
+      description: "Emergency intervention required for life-threatening issues"
+      resolver_group: "emergency"
+      timeout_minutes: 5
+      actions:
+        - "activate_code_team"
+        - "prepare_emergency_equipment"
+        - "notify_family_liaison"
+      notification_channels: ["code_system", "pager", "overhead_announcement"]
+  
+  escalation_triggers:
+    time_based:
+      - condition: "issue_duration > 2 minutes"
+        escalate_to: 2
+      - condition: "issue_duration > 7 minutes"
+        escalate_to: 3
+      - condition: "issue_duration > 17 minutes"
+        escalate_to: 4
+      - condition: "issue_duration > 32 minutes"
+        escalate_to: 5
+    
+    severity_based:
+      - condition: "severity == 'critical'"
+        escalate_to: 3
+      - condition: "severity == 'critical' && patient_condition == 'unstable'"
+        escalate_to: 4
+      - condition: "severity == 'critical' && patient_condition == 'life_threatening'"
+        escalate_to: 5
+    
+    context_based:
+      - condition: "patient_risk_category == 'high'"
+        escalate_to: 3
+      - condition: "monitoring_alert == 'critical_vital_signs'"
+        escalate_to: 4
+      - condition: "medication_error == true"
+        escalate_to: 3
+    
+    confidence_based:
+      - condition: "diagnosis_confidence < 0.7"
+        escalate_to: 3
+      - condition: "treatment_confidence < 0.5"
+        escalate_to: 4
+  
+  bid_system:
+    enabled: true
+    bid_request_format:
+      patient_details: true
+      clinical_situation: true
+      severity: true
+      required_specialties: true
+      estimated_response_time: true
+      priority: true
+    
+    bid_selection_criteria:
+      specialty_match_weight: 0.5
+      availability_weight: 0.3
+      proximity_weight: 0.1
+      past_performance_weight: 0.1
+    
+    resolver_groups:
+      nurses:
+        roles:
+          - "registered_nurse"
+          - "nurse_practitioner"
+          - "clinical_nurse_specialist"
+        skill_categories:
+          - "patient_assessment"
+          - "clinical_care"
+          - "medication_administration"
+      
+      physicians:
+        roles:
+          - "attending_physician"
+          - "resident_physician"
+          - "hospitalist"
+        skill_categories:
+          - "diagnosis"
+          - "treatment_planning"
+          - "medical_decision_making"
+      
+      specialists:
+        roles:
+          - "cardiologist"
+          - "neurologist"
+          - "critical_care_specialist"
+          - "rapid_response_team"
+        skill_categories:
+          - "specialty_care"
+          - "advanced_diagnostics"
+          - "complex_treatment"
+      
+      emergency:
+        roles:
+          - "code_team"
+          - "emergency_physician"
+          - "anesthesiologist"
+          - "trauma_team"
+        skill_categories:
+          - "emergency_response"
+          - "resuscitation"
+          - "critical_intervention"
+  
+  n8n_integration:
+    workflows:
+      - level: 2
+        workflow_id: "healthcare_nurse_resolution"
+        trigger_conditions:
+          - "requires_clinical_assessment"
+          - "patient_specific_care_required"
+      
+      - level: 3
+        workflow_id: "healthcare_physician_resolution"
+        trigger_conditions:
+          - "requires_diagnosis"
+          - "treatment_decision_needed"
+      
+      - level: 4
+        workflow_id: "healthcare_specialist_resolution"
+        trigger_conditions:
+          - "requires_specialty_consultation"
+          - "complex_case_management_needed"
+      
+      - level: 5
+        workflow_id: "healthcare_emergency_resolution"
+        trigger_conditions:
+          - "life_threatening_condition"
+          - "requires_immediate_intervention"
+  
+  learning_optimization:
+    metrics_tracked:
+      - "time_to_resolution"
+      - "escalation_frequency"
+      - "patient_outcome_correlation"
+      - "resource_utilization"
+      - "protocol_adherence"
+    
+    optimization_targets:
+      - "optimize_patient_outcomes"
+      - "minimize_time_to_intervention"
+      - "optimize_resource_allocation"
+      - "improve_protocol_adherence"
+
+# Logistics Escalation Protocol
+logistics_escalation_protocol:
+  version: "1.0"
+  metadata:
+    name: "Logistics Escalation Protocol"
+    description: "Escalation protocol for logistics and supply chain workflows"
+    industry: "logistics"
+    author: "Industriverse"
+    created: "2025-05-22"
+    tags: ["logistics", "escalation", "supply_chain", "transportation"]
+  
+  escalation_levels:
+    - level: 1
+      name: "Automated Resolution"
+      description: "System attempts to resolve the issue automatically"
+      resolver_group: "system"
+      timeout_minutes: 15
+      actions:
+        - "recalculate_routes"
+        - "identify_alternative_carriers"
+        - "adjust_delivery_windows"
+      notification_channels: ["system_log"]
+    
+    - level: 2
+      name: "Dispatcher Intervention"
+      description: "Dispatcher or logistics coordinator intervention required"
+      resolver_group: "dispatchers"
+      timeout_minutes: 30
+      actions:
+        - "notify_dispatcher"
+        - "provide_shipment_details"
+        - "suggest_resolution_options"
+      notification_channels: ["dashboard", "mobile_app"]
+    
+    - level: 3
+      name: "Operations Manager Resolution"
+      description: "Operations manager intervention required"
+      resolver_group: "operations"
+      timeout_minutes: 60
+      actions:
+        - "notify_operations_manager"
+        - "escalate_to_n8n_workflow"
+        - "provide_impact_assessment"
+        - "prepare_customer_communications"
+      notification_channels: ["dashboard", "mobile_app", "email"]
+    
+    - level: 4
+      name: "Director Resolution"
+      description: "Director or department head intervention required"
+      resolver_group: "directors"
+      timeout_minutes: 120
+      actions:
+        - "notify_director"
+        - "initiate_incident_response"
+        - "coordinate_with_partners"
+        - "prepare_customer_escalation_plan"
+      notification_channels: ["dashboard", "email", "sms"]
+    
+    - level: 5
+      name: "Executive Resolution"
+      description: "Executive intervention required for critical issues"
+      resolver_group: "executives"
+      timeout_minutes: 240
+      actions:
+        - "notify_executives"
+        - "activate_crisis_management"
+        - "engage_external_resources"
+        - "prepare_stakeholder_communications"
+      notification_channels: ["email", "sms", "phone"]
+  
+  escalation_triggers:
+    time_based:
+      - condition: "issue_duration > 15 minutes"
+        escalate_to: 2
+      - condition: "issue_duration > 45 minutes"
+        escalate_to: 3
+      - condition: "issue_duration > 105 minutes"
+        escalate_to: 4
+      - condition: "issue_duration > 225 minutes"
+        escalate_to: 5
+    
+    severity_based:
+      - condition: "severity == 'high'"
+        escalate_to: 3
+      - condition: "severity == 'critical'"
+        escalate_to: 4
+      - condition: "severity == 'critical' && affects_multiple_customers"
+        escalate_to: 5
+    
+    context_based:
+      - condition: "shipment_priority == 'expedited'"
+        escalate_to: 3
+      - condition: "customer_tier == 'premium'"
+        escalate_to: 3
+      - condition: "delivery_window_risk > 0.7"
+        escalate_to: 3
+      - condition: "financial_impact > 10000"
+        escalate_to: 4
+      - condition: "financial_impact > 50000"
+        escalate_to: 5
+    
+    confidence_based:
+      - condition: "resolution_confidence < 0.5"
+        escalate_to: 2
+      - condition: "resolution_confidence < 0.3"
+        escalate_to: 3
+  
+  bid_system:
+    enabled: true
+    bid_request_format:
+      issue_description: true
+      severity: true
+      context: true
+      required_skills: true
+      estimated_resolution_time: true
+      priority: true
+      customer_impact: true
+    
+    bid_selection_criteria:
+      skill_match_weight: 0.3
+      availability_weight: 0.3
+      response_time_weight: 0.3
+      past_performance_weight: 0.1
+    
+    resolver_groups:
+      dispatchers:
+        roles:
+          - "dispatcher"
+          - "logistics_coordinator"
+          - "route_planner"
+        skill_categories:
+          - "route_management"
+          - "carrier_coordination"
+          - "shipment_tracking"
+      
+      operations:
+        roles:
+          - "operations_manager"
+          - "terminal_manager"
+          - "customer_service_manager"
+        skill_categories:
+          - "operations_management"
+          - "resource_allocation"
+          - "customer_management"
+      
+      directors:
+        roles:
+          - "logistics_director"
+          - "transportation_director"
+          - "customer_success_director"
+        skill_categories:
+          - "strategic_planning"
+          - "partner_management"
+          - "crisis_management"
+      
+      executives:
+        roles:
+          - "vp_logistics"
+          - "vp_operations"
+          - "coo"
+          - "ceo"
+        skill_categories:
+          - "executive_decision_making"
+          - "stakeholder_management"
+          - "strategic_resource_allocation"
+  
+  n8n_integration:
+    workflows:
+      - level: 2
+        workflow_id: "logistics_dispatcher_resolution"
+        trigger_conditions:
+          - "requires_route_adjustment"
+          - "carrier_coordination_needed"
+      
+      - level: 3
+        workflow_id: "logistics_operations_resolution"
+        trigger_conditions:
+          - "requires_resource_reallocation"
+          - "customer_communication_needed"
+      
+      - level: 4
+        workflow_id: "logistics_director_resolution"
+        trigger_conditions:
+          - "requires_partner_engagement"
+          - "significant_customer_impact"
+      
+      - level: 5
+        workflow_id: "logistics_executive_resolution"
+        trigger_conditions:
+          - "business_continuity_threatened"
+          - "major_financial_impact"
+          - "reputation_risk"
+  
+  learning_optimization:
+    metrics_tracked:
+      - "time_to_resolution"
+      - "escalation_frequency"
+      - "resolution_success_rate"
+      - "customer_satisfaction_impact"
+      - "financial_impact"
+    
+    optimization_targets:
+      - "minimize_delivery_delays"
+      - "minimize_time_to_resolution"
+      - "optimize_resolver_selection"
+      - "improve_first_attempt_resolution_rate"
+
+# Retail Escalation Protocol
+retail_escalation_protocol:
+  version: "1.0"
+  metadata:
+    name: "Retail Escalation Protocol"
+    description: "Escalation protocol for retail operations workflows"
+    industry: "retail"
+    author: "Industriverse"
+    created: "2025-05-22"
+    tags: ["retail", "escalation", "inventory", "customer"]
+  
+  escalation_levels:
+    - level: 1
+      name: "Automated Resolution"
+      description: "System attempts to resolve the issue automatically"
+      resolver_group: "system"
+      timeout_minutes: 10
+      actions:
+        - "adjust_inventory_allocations"
+        - "recalculate_forecasts"
+        - "suggest_alternative_products"
+      notification_channels: ["system_log"]
+    
+    - level: 2
+      name: "Store Associate Intervention"
+      description: "Store associate or department lead intervention required"
+      resolver_group: "associates"
+      timeout_minutes: 20
+      actions:
+        - "notify_store_associate"
+        - "provide_customer_details"
+        - "suggest_resolution_options"
+      notification_channels: ["pos_system", "mobile_app"]
+    
+    - level: 3
+      name: "Store Manager Resolution"
+      description: "Store manager intervention required"
+      resolver_group: "managers"
+      timeout_minutes: 40
+      actions:
+        - "notify_store_manager"
+        - "escalate_to_n8n_workflow"
+        - "provide_impact_assessment"
+        - "prepare_customer_resolution_options"
+      notification_channels: ["dashboard", "mobile_app", "email"]
+    
+    - level: 4
+      name: "Regional Manager Resolution"
+      description: "Regional manager or department head intervention required"
+      resolver_group: "regional"
+      timeout_minutes: 120
+      actions:
+        - "notify_regional_manager"
+        - "initiate_incident_response"
+        - "coordinate_with_other_stores"
+        - "prepare_customer_escalation_plan"
+      notification_channels: ["dashboard", "email", "sms"]
+    
+    - level: 5
+      name: "Executive Resolution"
+      description: "Executive intervention required for critical issues"
+      resolver_group: "executives"
+      timeout_minutes: 240
+      actions:
+        - "notify_executives"
+        - "activate_crisis_management"
+        - "engage_external_resources"
+        - "prepare_public_communications"
+      notification_channels: ["email", "sms", "phone"]
+  
+  escalation_triggers:
+    time_based:
+      - condition: "issue_duration > 10 minutes"
+        escalate_to: 2
+      - condition: "issue_duration > 30 minutes"
+        escalate_to: 3
+      - condition: "issue_duration > 70 minutes"
+        escalate_to: 4
+      - condition: "issue_duration > 190 minutes"
+        escalate_to: 5
+    
+    severity_based:
+      - condition: "severity == 'high'"
+        escalate_to: 3
+      - condition: "severity == 'critical'"
+        escalate_to: 4
+      - condition: "severity == 'critical' && affects_multiple_stores"
+        escalate_to: 5
+    
+    context_based:
+      - condition: "customer_tier == 'premium'"
+        escalate_to: 3
+      - condition: "order_value > 1000"
+        escalate_to: 3
+      - condition: "inventory_impact > 50000"
+        escalate_to: 4
+      - condition: "affects_promotional_items == true"
+        escalate_to: 3
+    
+    confidence_based:
+      - condition: "resolution_confidence < 0.5"
+        escalate_to: 2
+      - condition: "resolution_confidence < 0.3"
+        escalate_to: 3
+  
+  bid_system:
+    enabled: true
+    bid_request_format:
+      issue_description: true
+      severity: true
+      context: true
+      required_skills: true
+      estimated_resolution_time: true
+      priority: true
+      customer_details: true
+    
+    bid_selection_criteria:
+      skill_match_weight: 0.3
+      availability_weight: 0.3
+      response_time_weight: 0.3
+      past_performance_weight: 0.1
+    
+    resolver_groups:
+      associates:
+        roles:
+          - "sales_associate"
+          - "department_lead"
+          - "customer_service_representative"
+        skill_categories:
+          - "product_knowledge"
+          - "customer_service"
+          - "inventory_management"
+      
+      managers:
+        roles:
+          - "store_manager"
+          - "assistant_manager"
+          - "department_manager"
+        skill_categories:
+          - "store_operations"
+          - "staff_management"
+          - "customer_escalations"
+      
+      regional:
+        roles:
+          - "regional_manager"
+          - "district_manager"
+          - "regional_operations_director"
+        skill_categories:
+          - "multi_store_operations"
+          - "resource_allocation"
+          - "crisis_management"
+      
+      executives:
+        roles:
+          - "vp_retail_operations"
+          - "vp_customer_experience"
+          - "coo"
+          - "ceo"
+        skill_categories:
+          - "executive_decision_making"
+          - "stakeholder_management"
+          - "brand_protection"
+  
+  n8n_integration:
+    workflows:
+      - level: 2
+        workflow_id: "retail_associate_resolution"
+        trigger_conditions:
+          - "requires_product_knowledge"
+          - "customer_present_in_store"
+      
+      - level: 3
+        workflow_id: "retail_manager_resolution"
+        trigger_conditions:
+          - "requires_policy_exception"
+          - "significant_customer_impact"
+      
+      - level: 4
+        workflow_id: "retail_regional_resolution"
+        trigger_conditions:
+          - "requires_multi_store_coordination"
+          - "inventory_reallocation_needed"
+      
+      - level: 5
+        workflow_id: "retail_executive_resolution"
+        trigger_conditions:
+          - "brand_reputation_threatened"
+          - "major_financial_impact"
+          - "potential_media_coverage"
+  
+  learning_optimization:
+    metrics_tracked:
+      - "time_to_resolution"
+      - "escalation_frequency"
+      - "resolution_success_rate"
+      - "customer_satisfaction_impact"
+      - "sales_impact"
+    
+    optimization_targets:
+      - "maximize_customer_satisfaction"
+      - "minimize_time_to_resolution"
+      - "optimize_resolver_selection"
+      - "improve_first_attempt_resolution_rate"

@@ -1,0 +1,132 @@
+---
+# Edge Behavior Profile Configuration for Industriverse Core AI Layer
+# This file defines edge behavior profiles for deployment to lower-resource environments
+
+# Default Edge Profile
+default:
+  compute_fallback_mode: "approximate"
+  stream_input_window: 128
+  latency_threshold_ms: 250
+  offline_operation: true
+  cache_size_mb: 512
+  sync_interval_seconds: 300
+  battery_optimization: true
+  memory_limit_mb: 2048
+
+# Minimal Edge Profile (for very constrained devices)
+minimal:
+  compute_fallback_mode: "lightweight"
+  stream_input_window: 64
+  latency_threshold_ms: 500
+  offline_operation: true
+  cache_size_mb: 128
+  sync_interval_seconds: 600
+  battery_optimization: true
+  memory_limit_mb: 512
+  model_precision: "int8"
+  feature_reduction: true
+  max_batch_size: 1
+
+# Standard Edge Profile
+standard:
+  compute_fallback_mode: "approximate"
+  stream_input_window: 128
+  latency_threshold_ms: 250
+  offline_operation: true
+  cache_size_mb: 512
+  sync_interval_seconds: 300
+  battery_optimization: true
+  memory_limit_mb: 2048
+  model_precision: "fp16"
+  feature_reduction: false
+  max_batch_size: 4
+
+# Performance Edge Profile
+performance:
+  compute_fallback_mode: "full"
+  stream_input_window: 256
+  latency_threshold_ms: 150
+  offline_operation: true
+  cache_size_mb: 1024
+  sync_interval_seconds: 180
+  battery_optimization: false
+  memory_limit_mb: 4096
+  model_precision: "fp16"
+  feature_reduction: false
+  max_batch_size: 8
+
+# Industry-Specific Profiles
+
+# Manufacturing Edge Profile
+manufacturing:
+  compute_fallback_mode: "approximate"
+  stream_input_window: 192
+  latency_threshold_ms: 200
+  offline_operation: true
+  cache_size_mb: 768
+  sync_interval_seconds: 240
+  battery_optimization: false
+  memory_limit_mb: 3072
+  model_precision: "fp16"
+  feature_reduction: false
+  max_batch_size: 4
+  industry_optimizations:
+    predictive_maintenance: true
+    quality_control: true
+    energy_optimization: true
+
+# Energy Edge Profile
+energy:
+  compute_fallback_mode: "approximate"
+  stream_input_window: 256
+  latency_threshold_ms: 300
+  offline_operation: true
+  cache_size_mb: 1024
+  sync_interval_seconds: 360
+  battery_optimization: true
+  memory_limit_mb: 2048
+  model_precision: "fp16"
+  feature_reduction: false
+  max_batch_size: 2
+  industry_optimizations:
+    grid_monitoring: true
+    demand_forecasting: true
+    anomaly_detection: true
+
+# Healthcare Edge Profile
+healthcare:
+  compute_fallback_mode: "full"
+  stream_input_window: 128
+  latency_threshold_ms: 200
+  offline_operation: true
+  cache_size_mb: 768
+  sync_interval_seconds: 240
+  battery_optimization: false
+  memory_limit_mb: 3072
+  model_precision: "fp32"
+  feature_reduction: false
+  max_batch_size: 2
+  industry_optimizations:
+    patient_monitoring: true
+    diagnostic_assistance: true
+    medication_management: true
+
+# Fallback Modes
+fallback_modes:
+  full:
+    description: "No model degradation, full feature set"
+    precision_reduction: false
+    feature_reduction: false
+    batch_size_reduction: false
+    
+  approximate:
+    description: "Some approximation for better performance"
+    precision_reduction: true
+    feature_reduction: false
+    batch_size_reduction: true
+    
+  lightweight:
+    description: "Maximum performance optimization with feature reduction"
+    precision_reduction: true
+    feature_reduction: true
+    batch_size_reduction: true

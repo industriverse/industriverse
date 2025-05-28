@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui-ux-layer
+  labels:
+    app: ui-ux-layer
+    layer: ui-ux
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ui-ux-layer
+  template:
+    metadata:
+      labels:
+        app: ui-ux-layer
+        layer: ui-ux
+    spec:
+      containers:
+      - name: ui-ux-layer
+        image: industriverse/ui-ux-layer:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8443
+          name: https
+        - containerPort: 9090
+          name: metrics
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: LOG_LEVEL
+          value: "info"
+        - name: CONTEXT_BUS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: ui-ux-layer-config
+              key: context_bus_url
+        - name: PROTOCOL_BRIDGE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: ui-ux-layer-config
+              key: protocol_bridge_url
+        - name: DATA_LAYER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: ui-ux-layer-config
+              key: data_layer_url
+        - name: CORE_AI_LAYER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: ui-ux-layer-config
+              key: core_ai_layer_url
+        - name: GENERATIVE_LAYER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: ui-ux-layer-config
+              key: generative_layer_url
+        - name: APPLICATION_LAYER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: ui-ux-layer-config
+              key: application_layer_url
+        - name: PROTOCOL_LAYER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: ui-ux-layer-config
+              key: protocol_layer_url
+        - name: WORKFLOW_LAYER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: ui-ux-layer-config
+              key: workflow_layer_url
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ui-ux-layer-secrets
+              key: api_key
+        resources:
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+        - name: theme-volume
+          mountPath: /app/themes
+        - name: capsule-volume
+          mountPath: /app/capsules
+      volumes:
+      - name: config-volume
+        configMap:
+          name: ui-ux-layer-config
+      - name: theme-volume
+        persistentVolumeClaim:
+          claimName: ui-ux-layer-theme-pvc
+      - name: capsule-volume
+        persistentVolumeClaim:
+          claimName: ui-ux-layer-capsule-pvc

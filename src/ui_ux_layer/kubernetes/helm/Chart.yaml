@@ -1,0 +1,21 @@
+apiVersion: v2
+name: ui-ux-layer
+description: Helm chart for the Industriverse UI/UX Layer
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - industriverse
+  - ui-ux
+  - ambient-intelligence
+  - universal-skin
+maintainers:
+  - name: Industriverse Team
+    email: team@industriverse.io
+dependencies:
+  - name: common
+    version: "1.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: common.enabled
+    tags:
+      - common

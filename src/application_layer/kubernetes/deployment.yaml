@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: industriverse-application-layer
+  labels:
+    app: industriverse-application-layer
+    layer: application
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: industriverse-application-layer
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: industriverse-application-layer
+        layer: application
+    spec:
+      containers:
+      - name: application-layer
+        image: ${REGISTRY}/industriverse-application-layer:${TAG}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "2"
+            memory: "2Gi"
+        env:
+        - name: CONFIG_PATH
+          value: "/etc/industriverse/config/config.json"
+        - name: LOG_LEVEL
+          value: "info"
+        - name: DATA_LAYER_SERVICE
+          value: "industriverse-data-layer.default.svc.cluster.local"
+        - name: DATA_LAYER_PORT
+          value: "8000"
+        - name: CORE_AI_LAYER_SERVICE
+          value: "industriverse-core-ai-layer.default.svc.cluster.local"
+        - name: CORE_AI_LAYER_PORT
+          value: "8000"
+        - name: GENERATIVE_LAYER_SERVICE
+          value: "industriverse-generative-layer.default.svc.cluster.local"
+        - name: GENERATIVE_LAYER_PORT
+          value: "8000"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/industriverse/config
+        - name: data-volume
+          mountPath: /var/lib/industriverse
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      volumes:
+      - name: config-volume
+        configMap:
+          name: industriverse-application-layer-config
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: industriverse-application-layer-data
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      serviceAccountName: industriverse-application-layer

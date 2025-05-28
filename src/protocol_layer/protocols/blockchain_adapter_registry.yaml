@@ -1,0 +1,211 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blockchain-adapter-registry
+  namespace: industriverse-protocol
+data:
+  registry: |
+    # Blockchain Adapter Registry
+    # This registry defines all blockchain adapters available in the Industriverse Protocol Layer
+    
+    version: "1.0.0"
+    last_updated: "2025-05-22"
+    
+    adapters:
+      - id: "ethereum-mainnet"
+        name: "Ethereum Mainnet Adapter"
+        type: "ethereum"
+        version: "1.2.0"
+        network:
+          name: "Ethereum Mainnet"
+          chain_id: 1
+          rpc_endpoints:
+            - "https://mainnet.infura.io/v3/${INFURA_API_KEY}"
+            - "https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}"
+          explorer_url: "https://etherscan.io"
+        capabilities:
+          - "transaction_submission"
+          - "contract_deployment"
+          - "contract_interaction"
+          - "event_subscription"
+          - "block_monitoring"
+          - "account_management"
+        security:
+          tpm_integration: true
+          zkp_support: true
+          audit_logging: true
+        performance:
+          max_tps: 15
+          avg_confirmation_time: 15000
+          recommended_gas_station: "https://ethgasstation.info/api/ethgasAPI.json"
+      
+      - id: "ethereum-goerli"
+        name: "Ethereum Goerli Testnet Adapter"
+        type: "ethereum"
+        version: "1.2.0"
+        network:
+          name: "Ethereum Goerli Testnet"
+          chain_id: 5
+          rpc_endpoints:
+            - "https://goerli.infura.io/v3/${INFURA_API_KEY}"
+            - "https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}"
+          explorer_url: "https://goerli.etherscan.io"
+        capabilities:
+          - "transaction_submission"
+          - "contract_deployment"
+          - "contract_interaction"
+          - "event_subscription"
+          - "block_monitoring"
+          - "account_management"
+          - "faucet_integration"
+        security:
+          tpm_integration: true
+          zkp_support: true
+          audit_logging: true
+        performance:
+          max_tps: 15
+          avg_confirmation_time: 15000
+      
+      - id: "hyperledger-fabric-default"
+        name: "Hyperledger Fabric Default Network Adapter"
+        type: "hyperledger-fabric"
+        version: "2.1.0"
+        network:
+          name: "Default Fabric Network"
+          msp_id: "IndustriverseMSP"
+          channel: "industriverse-channel"
+          connection_profile: "/etc/industriverse/fabric/connection-profile.yaml"
+        capabilities:
+          - "chaincode_deployment"
+          - "chaincode_invocation"
+          - "event_subscription"
+          - "private_data_collections"
+          - "channel_management"
+        security:
+          tpm_integration: true
+          zkp_support: true
+          audit_logging: true
+          identity_management: true
+        performance:
+          max_tps: 3000
+          avg_confirmation_time: 500
+      
+      - id: "corda-industriverse"
+        name: "Corda Industriverse Network Adapter"
+        type: "corda"
+        version: "1.0.0"
+        network:
+          name: "Industriverse Corda Network"
+          network_map: "https://netmap.industriverse.io"
+          doorman_service: "https://doorman.industriverse.io"
+          notary_service: "O=Industriverse Notary,L=London,C=GB"
+        capabilities:
+          - "flow_invocation"
+          - "cordapp_deployment"
+          - "vault_queries"
+          - "transaction_building"
+          - "node_management"
+        security:
+          tpm_integration: true
+          zkp_support: false
+          audit_logging: true
+          identity_management: true
+        performance:
+          max_tps: 1000
+          avg_confirmation_time: 2000
+      
+      - id: "quorum-industriverse"
+        name: "Quorum Industriverse Network Adapter"
+        type: "quorum"
+        version: "1.0.0"
+        network:
+          name: "Industriverse Quorum Network"
+          chain_id: 10001
+          rpc_endpoints:
+            - "https://quorum.industriverse.io:8545"
+          explorer_url: "https://explorer.quorum.industriverse.io"
+        capabilities:
+          - "transaction_submission"
+          - "contract_deployment"
+          - "contract_interaction"
+          - "event_subscription"
+          - "private_transactions"
+          - "permission_management"
+        security:
+          tpm_integration: true
+          zkp_support: true
+          audit_logging: true
+          privacy_groups: true
+        performance:
+          max_tps: 100
+          avg_confirmation_time: 2000
+          consensus: "istanbul"
+    
+    default_adapters:
+      ethereum: "ethereum-mainnet"
+      hyperledger-fabric: "hyperledger-fabric-default"
+      corda: "corda-industriverse"
+      quorum: "quorum-industriverse"
+    
+    adapter_selection_policy:
+      rules:
+        - condition: "context.environment == 'development'"
+          adapter_overrides:
+            ethereum: "ethereum-goerli"
+        - condition: "context.security_level == 'high'"
+          adapter_requirements:
+            tpm_integration: true
+            zkp_support: true
+        - condition: "context.performance_level == 'high'"
+          adapter_selection_criteria:
+            sort_by: "max_tps"
+            order: "desc"
+    
+    adapter_configuration:
+      ethereum:
+        gas_price_strategy: "medium"
+        confirmation_blocks: 2
+        retry_strategy:
+          max_attempts: 3
+          backoff_factor: 1.5
+      hyperledger-fabric:
+        endorsement_timeout: 30000
+        commit_timeout: 60000
+        query_timeout: 10000
+      corda:
+        flow_timeout: 120000
+        retry_flow_on_error: true
+      quorum:
+        gas_price: 0
+        private_for_strategy: "explicit"
+    
+    security_configuration:
+      tpm:
+        key_storage: true
+        remote_attestation: true
+        secure_boot: true
+      zkp:
+        enabled: true
+        proof_types:
+          - "bulletproofs"
+          - "groth16"
+          - "plonk"
+      audit:
+        enabled: true
+        storage_duration_days: 90
+        ekis_integration: true
+    
+    monitoring_configuration:
+      metrics:
+        enabled: true
+        collection_interval: 60
+        retention_period_days: 30
+      alerts:
+        enabled: true
+        channels:
+          - "prometheus"
+          - "ekis-monitoring"
+      health_checks:
+        enabled: true
+        interval: 300
+        timeout: 30

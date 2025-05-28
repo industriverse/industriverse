@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "workflow-templates.fullname" . }}-config
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    apiVersion: v1
+    kind: WorkflowTemplatesConfig
+    metadata:
+      name: {{ .Release.Name }}-config
+    spec:
+      logLevel: {{ .Values.logLevel }}
+      workflowEngineUrl: {{ .Values.workflowEngine.url }}
+      templateSyncInterval: {{ .Values.templateSyncInterval }}
+      enableTemplateVersioning: {{ .Values.enableTemplateVersioning | quote }}
+      enableTemplateEvolution: {{ .Values.enableTemplateEvolution | quote }}
+      industryTemplates:
+        manufacturing:
+          enabled: {{ .Values.industryTemplates.manufacturing.enabled | quote }}
+          path: "/app/templates/manufacturing"
+        logistics:
+          enabled: {{ .Values.industryTemplates.logistics.enabled | quote }}
+          path: "/app/templates/logistics"
+        energy:
+          enabled: {{ .Values.industryTemplates.energy.enabled | quote }}
+          path: "/app/templates/energy"
+        retail:
+          enabled: {{ .Values.industryTemplates.retail.enabled | quote }}
+          path: "/app/templates/retail"
+      taskContractsPath: "/app/templates/task-contracts"
+      dtslWorkflowsPath: "/app/templates/dtsl-workflows"
+      escalationProtocolsPath: "/app/templates/escalation-protocols"
+      evolutionSettings:
+        enableGeneticAlgorithms: {{ .Values.evolutionSettings.enableGeneticAlgorithms | quote }}
+        populationSize: {{ .Values.evolutionSettings.populationSize }}
+        generationLimit: {{ .Values.evolutionSettings.generationLimit }}
+        mutationRate: {{ .Values.evolutionSettings.mutationRate }}
+        crossoverRate: {{ .Values.evolutionSettings.crossoverRate }}
+  workflowEngineUrl: {{ .Values.workflowEngine.url | quote }}

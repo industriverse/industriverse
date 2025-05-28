@@ -1,0 +1,129 @@
+{{- if .Values.persistence.enabled }}
+{{- if .Values.persistence.manufacturing.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "workflow-templates.fullname" . }}-manufacturing-pvc
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.manufacturing.accessMode }}
+  storageClassName: {{ .Values.persistence.manufacturing.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.manufacturing.size }}
+{{- end }}
+---
+{{- if .Values.persistence.logistics.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "workflow-templates.fullname" . }}-logistics-pvc
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.logistics.accessMode }}
+  storageClassName: {{ .Values.persistence.logistics.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.logistics.size }}
+{{- end }}
+---
+{{- if .Values.persistence.energy.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "workflow-templates.fullname" . }}-energy-pvc
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.energy.accessMode }}
+  storageClassName: {{ .Values.persistence.energy.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.energy.size }}
+{{- end }}
+---
+{{- if .Values.persistence.retail.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "workflow-templates.fullname" . }}-retail-pvc
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.retail.accessMode }}
+  storageClassName: {{ .Values.persistence.retail.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.retail.size }}
+{{- end }}
+---
+{{- if .Values.persistence.taskContracts.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "workflow-templates.fullname" . }}-task-contracts-pvc
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.taskContracts.accessMode }}
+  storageClassName: {{ .Values.persistence.taskContracts.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.taskContracts.size }}
+{{- end }}
+---
+{{- if .Values.persistence.dtslWorkflows.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "workflow-templates.fullname" . }}-dtsl-workflows-pvc
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.dtslWorkflows.accessMode }}
+  storageClassName: {{ .Values.persistence.dtslWorkflows.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.dtslWorkflows.size }}
+{{- end }}
+---
+{{- if .Values.persistence.escalationProtocols.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "workflow-templates.fullname" . }}-escalation-protocols-pvc
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.escalationProtocols.accessMode }}
+  storageClassName: {{ .Values.persistence.escalationProtocols.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.escalationProtocols.size }}
+{{- end }}
+---
+{{- if .Values.enablePersistentLogs }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "workflow-templates.fullname" . }}-logs-pvc
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.logs.accessMode }}
+  storageClassName: {{ .Values.persistence.logs.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.logs.size }}
+{{- end }}
+{{- end }}

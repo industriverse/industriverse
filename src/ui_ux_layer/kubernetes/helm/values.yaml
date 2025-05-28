@@ -1,0 +1,153 @@
+# UI/UX Layer Values for Helm Chart
+
+## Global settings
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+
+## Common settings
+common:
+  enabled: true
+
+## Image settings
+image:
+  registry: docker.io
+  repository: industriverse/ui-ux-layer
+  tag: latest
+  pullPolicy: Always
+  pullSecrets: []
+
+## Deployment settings
+deployment:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  podAnnotations: {}
+  podLabels: {}
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+## Service settings
+service:
+  type: ClusterIP
+  port: 80
+  httpsPort: 443
+  metricsPort: 9090
+  annotations: {}
+
+## Ingress settings
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: ui.industriverse.io
+      paths:
+        - path: /(.*)
+          pathType: Prefix
+  tls:
+    - secretName: ui-ux-layer-tls
+      hosts:
+        - ui.industriverse.io
+
+## Persistence settings
+persistence:
+  enabled: true
+  theme:
+    size: 1Gi
+    storageClass: ""
+    accessModes:
+      - ReadWriteMany
+  capsule:
+    size: 5Gi
+    storageClass: ""
+    accessModes:
+      - ReadWriteMany
+
+## Configuration settings
+config:
+  universal_skin:
+    theme: industriverse-default
+    adaptiveMode: true
+    ambientIntelligenceLevel: high
+    trustVisualization: true
+    capsuleAnimations: true
+    accessibilityFeatures: true
+  context_engine:
+    contextUpdateFrequency: 250
+    priorityLevels:
+      - critical
+      - high
+      - medium
+      - low
+      - ambient
+    contextHistoryLength: 100
+    spatialAwarenessEnabled: true
+  cross_layer_integration:
+    realTimeSynchronization: true
+    eventBufferSize: 1000
+    reconnectStrategy: exponential-backoff
+    heartbeatInterval: 30
+  rendering_engine:
+    renderingQuality: high
+    frameRateTarget: 60
+    adaptiveRendering: true
+    powerSavingMode: false
+  edge_support:
+    offlineCapabilities: true
+    syncStrategy: differential
+    compressionLevel: high
+    edgeCacheTTL: 3600
+
+## Integration settings
+integration:
+  context_bus_url: http://real-time-context-bus.industriverse.svc.cluster.local:8080
+  protocol_bridge_url: http://protocol-bridge.industriverse.svc.cluster.local:8080
+  data_layer_url: http://data-layer.industriverse.svc.cluster.local:8080
+  core_ai_layer_url: http://core-ai-layer.industriverse.svc.cluster.local:8080
+  generative_layer_url: http://generative-layer.industriverse.svc.cluster.local:8080
+  application_layer_url: http://application-layer.industriverse.svc.cluster.local:8080
+  protocol_layer_url: http://protocol-layer.industriverse.svc.cluster.local:8080
+  workflow_layer_url: http://workflow-layer.industriverse.svc.cluster.local:8080
+
+## Security settings
+security:
+  api_key: ""  # Will be auto-generated if not provided
+  jwt_secret: ""  # Will be auto-generated if not provided
+  encryption_key: ""  # Will be auto-generated if not provided
+
+## Metrics settings
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: false
+    namespace: monitoring
+    interval: 30s
+    scrapeTimeout: 10s
+    selector:
+      prometheus: kube-prometheus
+
+## Autoscaling settings
+autoscaling:
+  enabled: false
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80

@@ -1,0 +1,681 @@
+# Manufacturing Industry Workflow Manifest Templates
+# These templates define common workflow patterns for manufacturing operations
+
+---
+# Predictive Maintenance Workflow
+name: predictive_maintenance
+version: "1.0"
+description: "Workflow for predictive maintenance of manufacturing equipment"
+industry: "manufacturing"
+category: "maintenance"
+execution_modes:
+  - name: "reactive"
+    description: "Triggered by anomaly detection"
+    trust_threshold: 0.6
+    confidence_required: 0.7
+    human_oversight: true
+  - name: "proactive"
+    description: "Scheduled maintenance checks"
+    trust_threshold: 0.75
+    confidence_required: 0.8
+    human_oversight: true
+  - name: "autonomous"
+    description: "Fully automated maintenance"
+    trust_threshold: 0.9
+    confidence_required: 0.95
+    human_oversight: false
+mesh_topology:
+  edge_capable: true
+  cloud_fallback: true
+  data_locality: "edge_preferred"
+  routing_constraints:
+    - "sensitive_data_local_only"
+    - "time_critical_edge_only"
+debug_trace:
+  enabled: true
+  detail_level: "comprehensive"
+  retention_period_days: 90
+  pattern_recognition: true
+tasks:
+  - id: "data_collection"
+    name: "Collect Equipment Data"
+    description: "Collect sensor data from manufacturing equipment"
+    timeout_seconds: 300
+    retry_count: 3
+    inputs:
+      - name: "equipment_id"
+        type: "string"
+        required: true
+      - name: "sensor_types"
+        type: "array"
+        required: true
+    outputs:
+      - name: "sensor_data"
+        type: "object"
+        description: "Collected sensor data"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "manufacturing/schemas/sensor_data.json"
+  
+  - id: "anomaly_detection"
+    name: "Detect Anomalies"
+    description: "Analyze sensor data for anomalies"
+    timeout_seconds: 600
+    inputs:
+      - name: "sensor_data"
+        type: "object"
+        required: true
+      - name: "baseline_data"
+        type: "object"
+        required: false
+    outputs:
+      - name: "anomalies"
+        type: "array"
+        description: "Detected anomalies"
+      - name: "confidence_scores"
+        type: "object"
+        description: "Confidence scores for each anomaly"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "manufacturing/models/anomaly_detection.onnx"
+  
+  - id: "risk_assessment"
+    name: "Assess Maintenance Risk"
+    description: "Evaluate the risk level of detected anomalies"
+    timeout_seconds: 300
+    inputs:
+      - name: "anomalies"
+        type: "array"
+        required: true
+      - name: "equipment_history"
+        type: "object"
+        required: true
+    outputs:
+      - name: "risk_level"
+        type: "string"
+        description: "Assessed risk level (low, medium, high, critical)"
+      - name: "recommended_actions"
+        type: "array"
+        description: "Recommended maintenance actions"
+    contract:
+      verification_method: "rule_validation"
+      rules_ref: "manufacturing/rules/risk_assessment.json"
+  
+  - id: "maintenance_scheduling"
+    name: "Schedule Maintenance"
+    description: "Schedule maintenance based on risk assessment"
+    timeout_seconds: 600
+    inputs:
+      - name: "risk_level"
+        type: "string"
+        required: true
+      - name: "recommended_actions"
+        type: "array"
+        required: true
+      - name: "resource_availability"
+        type: "object"
+        required: true
+    outputs:
+      - name: "maintenance_schedule"
+        type: "object"
+        description: "Scheduled maintenance details"
+      - name: "work_orders"
+        type: "array"
+        description: "Generated work orders"
+    contract:
+      verification_method: "constraint_satisfaction"
+      constraints_ref: "manufacturing/constraints/scheduling.json"
+  
+  - id: "notification"
+    name: "Send Notifications"
+    description: "Notify relevant personnel about scheduled maintenance"
+    timeout_seconds: 300
+    inputs:
+      - name: "maintenance_schedule"
+        type: "object"
+        required: true
+      - name: "work_orders"
+        type: "array"
+        required: true
+      - name: "notification_preferences"
+        type: "object"
+        required: false
+    outputs:
+      - name: "notification_status"
+        type: "object"
+        description: "Status of sent notifications"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "manufacturing/schemas/notification.json"
+  
+  - id: "human_approval"
+    name: "Get Human Approval"
+    description: "Request approval for critical maintenance actions"
+    timeout_seconds: 3600
+    human_in_loop: true
+    inputs:
+      - name: "risk_level"
+        type: "string"
+        required: true
+      - name: "recommended_actions"
+        type: "array"
+        required: true
+      - name: "maintenance_schedule"
+        type: "object"
+        required: true
+    outputs:
+      - name: "approval_status"
+        type: "string"
+        description: "Approval status (approved, rejected, modified)"
+      - name: "modified_schedule"
+        type: "object"
+        description: "Modified maintenance schedule if applicable"
+    contract:
+      verification_method: "human_verification"
+      verification_ui: "manufacturing/ui/maintenance_approval.json"
+  
+  - id: "parts_inventory"
+    name: "Check Parts Inventory"
+    description: "Check availability of required parts for maintenance"
+    timeout_seconds: 300
+    inputs:
+      - name: "recommended_actions"
+        type: "array"
+        required: true
+    outputs:
+      - name: "parts_availability"
+        type: "object"
+        description: "Availability status of required parts"
+      - name: "order_recommendations"
+        type: "array"
+        description: "Recommendations for parts ordering"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "manufacturing/schemas/inventory.json"
+  
+  - id: "maintenance_execution"
+    name: "Execute Maintenance"
+    description: "Track execution of maintenance tasks"
+    timeout_seconds: 7200
+    inputs:
+      - name: "maintenance_schedule"
+        type: "object"
+        required: true
+      - name: "work_orders"
+        type: "array"
+        required: true
+      - name: "parts_availability"
+        type: "object"
+        required: true
+    outputs:
+      - name: "execution_status"
+        type: "object"
+        description: "Status of maintenance execution"
+      - name: "completion_report"
+        type: "object"
+        description: "Maintenance completion report"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "manufacturing/schemas/maintenance_execution.json"
+  
+  - id: "equipment_verification"
+    name: "Verify Equipment Status"
+    description: "Verify equipment status after maintenance"
+    timeout_seconds: 600
+    inputs:
+      - name: "equipment_id"
+        type: "string"
+        required: true
+      - name: "completion_report"
+        type: "object"
+        required: true
+    outputs:
+      - name: "verification_status"
+        type: "string"
+        description: "Equipment verification status"
+      - name: "performance_metrics"
+        type: "object"
+        description: "Post-maintenance performance metrics"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "manufacturing/schemas/verification.json"
+  
+  - id: "documentation_update"
+    name: "Update Documentation"
+    description: "Update equipment maintenance history and documentation"
+    timeout_seconds: 300
+    inputs:
+      - name: "equipment_id"
+        type: "string"
+        required: true
+      - name: "completion_report"
+        type: "object"
+        required: true
+      - name: "verification_status"
+        type: "string"
+        required: true
+      - name: "performance_metrics"
+        type: "object"
+        required: true
+    outputs:
+      - name: "documentation_status"
+        type: "string"
+        description: "Status of documentation update"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "manufacturing/schemas/documentation.json"
+
+workflow:
+  start: "data_collection"
+  transitions:
+    - from: "data_collection"
+      to: "anomaly_detection"
+      condition: "success"
+    - from: "anomaly_detection"
+      to: "risk_assessment"
+      condition: "anomalies.length > 0"
+    - from: "anomaly_detection"
+      to: "documentation_update"
+      condition: "anomalies.length == 0"
+    - from: "risk_assessment"
+      to: "human_approval"
+      condition: "risk_level == 'high' || risk_level == 'critical'"
+    - from: "risk_assessment"
+      to: "maintenance_scheduling"
+      condition: "risk_level == 'low' || risk_level == 'medium'"
+    - from: "human_approval"
+      to: "maintenance_scheduling"
+      condition: "approval_status == 'approved' || approval_status == 'modified'"
+    - from: "human_approval"
+      to: "documentation_update"
+      condition: "approval_status == 'rejected'"
+    - from: "maintenance_scheduling"
+      to: "parts_inventory"
+      condition: "success"
+    - from: "parts_inventory"
+      to: "notification"
+      condition: "success"
+    - from: "notification"
+      to: "maintenance_execution"
+      condition: "success"
+    - from: "maintenance_execution"
+      to: "equipment_verification"
+      condition: "execution_status.completed == true"
+    - from: "equipment_verification"
+      to: "documentation_update"
+      condition: "success"
+
+escalation:
+  policies:
+    - trigger: "task_timeout"
+      action: "notify_supervisor"
+      priority: "high"
+    - trigger: "task_failure"
+      action: "retry_then_escalate"
+      retry_count: 3
+      priority: "medium"
+    - trigger: "contract_violation"
+      action: "notify_engineer"
+      priority: "critical"
+    - trigger: "human_approval_timeout"
+      action: "notify_manager"
+      priority: "high"
+
+dtsl_embedding:
+  enabled: true
+  twin_source: "equipment_digital_twin"
+  edge_execution: true
+  twin_capabilities:
+    - "sensor_data_collection"
+    - "anomaly_detection"
+    - "local_decision_making"
+  synchronization:
+    mode: "eventual_consistency"
+    priority_events:
+      - "critical_anomaly_detected"
+      - "maintenance_scheduled"
+      - "maintenance_completed"
+
+---
+# Quality Control Workflow
+name: quality_control
+version: "1.0"
+description: "Workflow for quality control in manufacturing processes"
+industry: "manufacturing"
+category: "quality"
+execution_modes:
+  - name: "reactive"
+    description: "Triggered by quality issues"
+    trust_threshold: 0.7
+    confidence_required: 0.8
+    human_oversight: true
+  - name: "proactive"
+    description: "Continuous quality monitoring"
+    trust_threshold: 0.8
+    confidence_required: 0.85
+    human_oversight: true
+  - name: "autonomous"
+    description: "Fully automated quality control"
+    trust_threshold: 0.95
+    confidence_required: 0.98
+    human_oversight: false
+mesh_topology:
+  edge_capable: true
+  cloud_fallback: true
+  data_locality: "edge_preferred"
+  routing_constraints:
+    - "quality_data_local_only"
+    - "real_time_edge_only"
+debug_trace:
+  enabled: true
+  detail_level: "comprehensive"
+  retention_period_days: 90
+  pattern_recognition: true
+tasks:
+  - id: "data_collection"
+    name: "Collect Quality Data"
+    description: "Collect quality data from production line"
+    timeout_seconds: 300
+    retry_count: 3
+    inputs:
+      - name: "production_line_id"
+        type: "string"
+        required: true
+      - name: "product_id"
+        type: "string"
+        required: true
+      - name: "batch_id"
+        type: "string"
+        required: true
+    outputs:
+      - name: "quality_data"
+        type: "object"
+        description: "Collected quality data"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "manufacturing/schemas/quality_data.json"
+  
+  - id: "quality_analysis"
+    name: "Analyze Quality"
+    description: "Analyze quality data for defects and issues"
+    timeout_seconds: 600
+    inputs:
+      - name: "quality_data"
+        type: "object"
+        required: true
+      - name: "quality_standards"
+        type: "object"
+        required: true
+    outputs:
+      - name: "quality_issues"
+        type: "array"
+        description: "Detected quality issues"
+      - name: "quality_score"
+        type: "number"
+        description: "Overall quality score"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "manufacturing/models/quality_analysis.onnx"
+  
+  - id: "defect_classification"
+    name: "Classify Defects"
+    description: "Classify detected defects by type and severity"
+    timeout_seconds: 300
+    inputs:
+      - name: "quality_issues"
+        type: "array"
+        required: true
+    outputs:
+      - name: "classified_defects"
+        type: "array"
+        description: "Classified defects with type and severity"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "manufacturing/models/defect_classification.onnx"
+  
+  - id: "root_cause_analysis"
+    name: "Analyze Root Causes"
+    description: "Determine root causes of quality issues"
+    timeout_seconds: 900
+    inputs:
+      - name: "classified_defects"
+        type: "array"
+        required: true
+      - name: "production_data"
+        type: "object"
+        required: true
+      - name: "historical_issues"
+        type: "array"
+        required: false
+    outputs:
+      - name: "root_causes"
+        type: "array"
+        description: "Identified root causes"
+      - name: "confidence_scores"
+        type: "object"
+        description: "Confidence scores for each root cause"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "manufacturing/models/root_cause_analysis.onnx"
+  
+  - id: "corrective_action"
+    name: "Determine Corrective Actions"
+    description: "Determine corrective actions for quality issues"
+    timeout_seconds: 600
+    inputs:
+      - name: "root_causes"
+        type: "array"
+        required: true
+      - name: "classified_defects"
+        type: "array"
+        required: true
+    outputs:
+      - name: "corrective_actions"
+        type: "array"
+        description: "Recommended corrective actions"
+      - name: "priority_levels"
+        type: "object"
+        description: "Priority levels for each action"
+    contract:
+      verification_method: "rule_validation"
+      rules_ref: "manufacturing/rules/corrective_actions.json"
+  
+  - id: "human_review"
+    name: "Human Review"
+    description: "Request human review for critical quality issues"
+    timeout_seconds: 3600
+    human_in_loop: true
+    inputs:
+      - name: "classified_defects"
+        type: "array"
+        required: true
+      - name: "root_causes"
+        type: "array"
+        required: true
+      - name: "corrective_actions"
+        type: "array"
+        required: true
+    outputs:
+      - name: "review_status"
+        type: "string"
+        description: "Review status (approved, rejected, modified)"
+      - name: "modified_actions"
+        type: "array"
+        description: "Modified corrective actions if applicable"
+    contract:
+      verification_method: "human_verification"
+      verification_ui: "manufacturing/ui/quality_review.json"
+  
+  - id: "action_implementation"
+    name: "Implement Corrective Actions"
+    description: "Track implementation of corrective actions"
+    timeout_seconds: 7200
+    inputs:
+      - name: "corrective_actions"
+        type: "array"
+        required: true
+      - name: "priority_levels"
+        type: "object"
+        required: true
+      - name: "resource_availability"
+        type: "object"
+        required: true
+    outputs:
+      - name: "implementation_status"
+        type: "object"
+        description: "Status of action implementation"
+      - name: "completion_report"
+        type: "object"
+        description: "Action completion report"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "manufacturing/schemas/action_implementation.json"
+  
+  - id: "verification"
+    name: "Verify Effectiveness"
+    description: "Verify effectiveness of corrective actions"
+    timeout_seconds: 900
+    inputs:
+      - name: "implementation_status"
+        type: "object"
+        required: true
+      - name: "completion_report"
+        type: "object"
+        required: true
+      - name: "production_line_id"
+        type: "string"
+        required: true
+    outputs:
+      - name: "verification_results"
+        type: "object"
+        description: "Results of verification"
+      - name: "effectiveness_score"
+        type: "number"
+        description: "Effectiveness score of corrective actions"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "manufacturing/schemas/verification_results.json"
+  
+  - id: "documentation"
+    name: "Update Quality Documentation"
+    description: "Update quality documentation and records"
+    timeout_seconds: 300
+    inputs:
+      - name: "quality_issues"
+        type: "array"
+        required: true
+      - name: "root_causes"
+        type: "array"
+        required: true
+      - name: "corrective_actions"
+        type: "array"
+        required: true
+      - name: "verification_results"
+        type: "object"
+        required: true
+    outputs:
+      - name: "documentation_status"
+        type: "string"
+        description: "Status of documentation update"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "manufacturing/schemas/quality_documentation.json"
+  
+  - id: "process_improvement"
+    name: "Recommend Process Improvements"
+    description: "Recommend long-term process improvements"
+    timeout_seconds: 1800
+    inputs:
+      - name: "root_causes"
+        type: "array"
+        required: true
+      - name: "verification_results"
+        type: "object"
+        required: true
+      - name: "historical_issues"
+        type: "array"
+        required: true
+    outputs:
+      - name: "improvement_recommendations"
+        type: "array"
+        description: "Recommended process improvements"
+      - name: "expected_benefits"
+        type: "object"
+        description: "Expected benefits of improvements"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "manufacturing/schemas/process_improvements.json"
+
+workflow:
+  start: "data_collection"
+  transitions:
+    - from: "data_collection"
+      to: "quality_analysis"
+      condition: "success"
+    - from: "quality_analysis"
+      to: "defect_classification"
+      condition: "quality_issues.length > 0"
+    - from: "quality_analysis"
+      to: "documentation"
+      condition: "quality_issues.length == 0"
+    - from: "defect_classification"
+      to: "root_cause_analysis"
+      condition: "success"
+    - from: "root_cause_analysis"
+      to: "corrective_action"
+      condition: "success"
+    - from: "corrective_action"
+      to: "human_review"
+      condition: "corrective_actions.some(a => a.severity == 'critical')"
+    - from: "corrective_action"
+      to: "action_implementation"
+      condition: "!corrective_actions.some(a => a.severity == 'critical')"
+    - from: "human_review"
+      to: "action_implementation"
+      condition: "review_status == 'approved' || review_status == 'modified'"
+    - from: "human_review"
+      to: "corrective_action"
+      condition: "review_status == 'rejected'"
+    - from: "action_implementation"
+      to: "verification"
+      condition: "implementation_status.completed == true"
+    - from: "verification"
+      to: "documentation"
+      condition: "success"
+    - from: "documentation"
+      to: "process_improvement"
+      condition: "success"
+
+escalation:
+  policies:
+    - trigger: "task_timeout"
+      action: "notify_quality_manager"
+      priority: "high"
+    - trigger: "task_failure"
+      action: "retry_then_escalate"
+      retry_count: 3
+      priority: "medium"
+    - trigger: "contract_violation"
+      action: "notify_quality_engineer"
+      priority: "critical"
+    - trigger: "human_review_timeout"
+      action: "notify_quality_director"
+      priority: "high"
+    - trigger: "critical_defect_detected"
+      action: "halt_production_line"
+      priority: "critical"
+
+dtsl_embedding:
+  enabled: true
+  twin_source: "production_line_digital_twin"
+  edge_execution: true
+  twin_capabilities:
+    - "quality_data_collection"
+    - "defect_detection"
+    - "local_quality_control"
+  synchronization:
+    mode: "eventual_consistency"
+    priority_events:
+      - "critical_defect_detected"
+      - "production_line_halted"
+      - "corrective_action_implemented"

@@ -1,0 +1,1077 @@
+# DTSL Workflow Templates for the Workflow Automation Layer
+#
+# This file contains predefined DTSL workflow templates for embedding workflows directly
+# within Digital Twin Swarm Language configurations. These templates enable edge-native
+# autonomy and twin-sourced self-coordination.
+
+# Manufacturing Equipment Monitoring Workflow
+manufacturing_equipment_monitoring:
+  version: "1.0"
+  metadata:
+    name: "Manufacturing Equipment Monitoring"
+    description: "Monitors manufacturing equipment status and triggers maintenance workflows"
+    industry: "manufacturing"
+    author: "Industriverse"
+    created: "2025-05-22"
+    tags: ["monitoring", "maintenance", "manufacturing", "edge"]
+  
+  dtsl_configuration:
+    twin_type: "equipment"
+    edge_execution: true
+    data_retention:
+      local_storage_days: 7
+      cloud_sync_interval_minutes: 60
+    offline_capability: true
+    mesh_participation: true
+  
+  triggers:
+    - type: "state_change"
+      conditions:
+        property: "status"
+        operator: "changes_to"
+        value: "warning"
+      priority: "high"
+    
+    - type: "threshold"
+      conditions:
+        property: "temperature"
+        operator: "greater_than"
+        value: 85.0
+        duration_seconds: 300
+      priority: "critical"
+    
+    - type: "schedule"
+      cron: "0 0 * * *"  # Daily at midnight
+      priority: "normal"
+  
+  workflow:
+    steps:
+      - id: "collect_diagnostics"
+        type: "data_collection"
+        config:
+          metrics:
+            - "temperature"
+            - "vibration"
+            - "power_consumption"
+            - "operating_hours"
+          sampling_rate_seconds: 1
+          duration_seconds: 60
+        next: "analyze_diagnostics"
+      
+      - id: "analyze_diagnostics"
+        type: "ai_inference"
+        config:
+          model_id: "equipment_diagnostics_v2"
+          inputs:
+            - source: "step.collect_diagnostics.output"
+            - source: "twin.maintenance_history"
+          parameters:
+            confidence_threshold: 0.85
+        next: "decision_branch"
+      
+      - id: "decision_branch"
+        type: "conditional"
+        conditions:
+          - condition: "step.analyze_diagnostics.output.failure_probability > 0.7"
+            next: "create_maintenance_request"
+          - condition: "step.analyze_diagnostics.output.failure_probability > 0.4"
+            next: "schedule_inspection"
+          - condition: "true"
+            next: "update_twin_state"
+      
+      - id: "create_maintenance_request"
+        type: "task_creation"
+        config:
+          task_type: "maintenance_request"
+          priority: "high"
+          assignee_roles: ["maintenance_technician"]
+          details:
+            title: "Urgent Maintenance Required"
+            description: "Predictive analysis indicates high failure probability"
+            equipment_id: "${twin.id}"
+            location: "${twin.location}"
+            diagnostics: "${step.analyze_diagnostics.output}"
+        next: "notify_supervisor"
+      
+      - id: "notify_supervisor"
+        type: "notification"
+        config:
+          channels: ["email", "sms", "dashboard"]
+          recipient_roles: ["production_supervisor", "maintenance_manager"]
+          template: "urgent_maintenance_notification"
+          parameters:
+            equipment_id: "${twin.id}"
+            equipment_name: "${twin.name}"
+            failure_probability: "${step.analyze_diagnostics.output.failure_probability}"
+            estimated_downtime: "${step.analyze_diagnostics.output.estimated_downtime_hours}"
+        next: "update_twin_state"
+      
+      - id: "schedule_inspection"
+        type: "task_creation"
+        config:
+          task_type: "inspection_request"
+          priority: "medium"
+          assignee_roles: ["maintenance_technician"]
+          scheduling:
+            deadline_hours: 24
+          details:
+            title: "Preventive Inspection Required"
+            description: "Predictive analysis indicates moderate failure risk"
+            equipment_id: "${twin.id}"
+            location: "${twin.location}"
+            diagnostics: "${step.analyze_diagnostics.output}"
+        next: "update_twin_state"
+      
+      - id: "update_twin_state"
+        type: "twin_update"
+        config:
+          properties:
+            last_diagnostic_time: "${now()}"
+            last_diagnostic_result: "${step.analyze_diagnostics.output}"
+            maintenance_status: "${step.decision_branch.output.path == 'create_maintenance_request' ? 'maintenance_scheduled' : (step.decision_branch.output.path == 'schedule_inspection' ? 'inspection_scheduled' : 'normal')}"
+        next: "end"
+  
+  execution_modes:
+    default: "autonomous"
+    fallback: "supervised"
+    trust_threshold: 0.8
+    trust_factors:
+      data_quality_weight: 0.4
+      model_confidence_weight: 0.4
+      historical_accuracy_weight: 0.2
+  
+  error_handling:
+    retry_count: 3
+    retry_delay_seconds: 30
+    fallback_step: "notify_error"
+    
+    steps:
+      - id: "notify_error"
+        type: "notification"
+        config:
+          channels: ["dashboard", "email"]
+          recipient_roles: ["maintenance_manager", "system_administrator"]
+          template: "workflow_error_notification"
+          parameters:
+            equipment_id: "${twin.id}"
+            equipment_name: "${twin.name}"
+            error_details: "${error}"
+        next: "end"
+
+# Energy Grid Optimization Workflow
+energy_grid_optimization:
+  version: "1.0"
+  metadata:
+    name: "Energy Grid Optimization"
+    description: "Optimizes energy distribution based on demand forecasting and renewable availability"
+    industry: "energy"
+    author: "Industriverse"
+    created: "2025-05-22"
+    tags: ["energy", "optimization", "grid", "renewable"]
+  
+  dtsl_configuration:
+    twin_type: "grid_segment"
+    edge_execution: true
+    data_retention:
+      local_storage_days: 3
+      cloud_sync_interval_minutes: 15
+    offline_capability: true
+    mesh_participation: true
+  
+  triggers:
+    - type: "schedule"
+      cron: "*/15 * * * *"  # Every 15 minutes
+      priority: "normal"
+    
+    - type: "threshold"
+      conditions:
+        property: "load_factor"
+        operator: "greater_than"
+        value: 0.85
+      priority: "high"
+    
+    - type: "event"
+      event_type: "renewable_availability_change"
+      priority: "high"
+  
+  workflow:
+    steps:
+      - id: "collect_grid_data"
+        type: "data_collection"
+        config:
+          metrics:
+            - "current_load"
+            - "voltage_levels"
+            - "frequency"
+            - "renewable_output"
+            - "storage_levels"
+          sampling_rate_seconds: 5
+          duration_seconds: 30
+          include_neighbors: true
+        next: "forecast_demand"
+      
+      - id: "forecast_demand"
+        type: "ai_inference"
+        config:
+          model_id: "energy_demand_forecast_v3"
+          inputs:
+            - source: "step.collect_grid_data.output"
+            - source: "twin.historical_demand[24h]"
+            - source: "external.weather_forecast"
+          parameters:
+            forecast_horizon_hours: 4
+            resolution_minutes: 15
+        next: "optimize_distribution"
+      
+      - id: "optimize_distribution"
+        type: "ai_inference"
+        config:
+          model_id: "grid_optimization_v2"
+          inputs:
+            - source: "step.collect_grid_data.output"
+            - source: "step.forecast_demand.output"
+            - source: "twin.topology"
+            - source: "twin.constraints"
+          parameters:
+            optimization_objective: "minimize_cost_and_emissions"
+            constraints:
+              - "maintain_voltage_stability"
+              - "respect_equipment_limits"
+              - "prioritize_renewable_sources"
+        next: "decision_branch"
+      
+      - id: "decision_branch"
+        type: "conditional"
+        conditions:
+          - condition: "step.optimize_distribution.output.requires_human_approval"
+            next: "request_approval"
+          - condition: "step.optimize_distribution.output.requires_coordination"
+            next: "coordinate_with_neighbors"
+          - condition: "true"
+            next: "apply_optimization"
+      
+      - id: "request_approval"
+        type: "human_task"
+        config:
+          task_type: "approval_request"
+          priority: "high"
+          assignee_roles: ["grid_operator"]
+          timeout_minutes: 10
+          details:
+            title: "Grid Optimization Approval Required"
+            description: "Significant changes to grid configuration require approval"
+            segment_id: "${twin.id}"
+            optimization_plan: "${step.optimize_distribution.output.plan}"
+            impact_assessment: "${step.optimize_distribution.output.impact}"
+        next: "check_approval"
+      
+      - id: "check_approval"
+        type: "conditional"
+        conditions:
+          - condition: "step.request_approval.output.approved"
+            next: "apply_optimization"
+          - condition: "true"
+            next: "log_rejection"
+      
+      - id: "log_rejection"
+        type: "twin_update"
+        config:
+          properties:
+            last_optimization_attempt: "${now()}"
+            last_optimization_status: "rejected"
+            rejection_reason: "${step.request_approval.output.reason}"
+        next: "end"
+      
+      - id: "coordinate_with_neighbors"
+        type: "mesh_coordination"
+        config:
+          target_twins: "${twin.connected_segments}"
+          coordination_type: "negotiation"
+          proposal: "${step.optimize_distribution.output.coordination_proposal}"
+          timeout_seconds: 30
+        next: "check_coordination"
+      
+      - id: "check_coordination"
+        type: "conditional"
+        conditions:
+          - condition: "step.coordinate_with_neighbors.output.agreement_reached"
+            next: "apply_optimization"
+          - condition: "true"
+            next: "fallback_optimization"
+      
+      - id: "fallback_optimization"
+        type: "ai_inference"
+        config:
+          model_id: "grid_optimization_v2"
+          inputs:
+            - source: "step.collect_grid_data.output"
+            - source: "step.forecast_demand.output"
+            - source: "twin.topology"
+            - source: "twin.constraints"
+          parameters:
+            optimization_objective: "local_stability"
+            coordination_mode: "independent"
+        next: "apply_optimization"
+      
+      - id: "apply_optimization"
+        type: "control_action"
+        config:
+          action_type: "grid_reconfiguration"
+          parameters:
+            configuration: "${step.decision_branch.output.path == 'fallback_optimization' ? step.fallback_optimization.output.configuration : step.optimize_distribution.output.configuration}"
+            transition_duration_seconds: 60
+          verification:
+            required: true
+            timeout_seconds: 90
+            expected_state:
+              stability_metrics:
+                voltage_deviation_percent_max: 2.0
+                frequency_deviation_hz_max: 0.1
+        next: "update_twin_state"
+      
+      - id: "update_twin_state"
+        type: "twin_update"
+        config:
+          properties:
+            last_optimization_time: "${now()}"
+            last_optimization_result: "${step.decision_branch.output.path == 'fallback_optimization' ? step.fallback_optimization.output : step.optimize_distribution.output}"
+            current_configuration: "${step.apply_optimization.output.applied_configuration}"
+            optimization_metrics: "${step.apply_optimization.output.metrics}"
+        next: "end"
+  
+  execution_modes:
+    default: "collaborative"
+    fallback: "supervised"
+    trust_threshold: 0.9
+    trust_factors:
+      data_quality_weight: 0.3
+      model_confidence_weight: 0.3
+      historical_accuracy_weight: 0.2
+      coordination_success_weight: 0.2
+  
+  error_handling:
+    retry_count: 2
+    retry_delay_seconds: 15
+    fallback_step: "emergency_stabilization"
+    
+    steps:
+      - id: "emergency_stabilization"
+        type: "control_action"
+        config:
+          action_type: "emergency_stabilization"
+          parameters:
+            mode: "safe_state"
+          verification:
+            required: true
+            timeout_seconds: 30
+        next: "notify_error"
+      
+      - id: "notify_error"
+        type: "notification"
+        config:
+          channels: ["dashboard", "email", "sms"]
+          recipient_roles: ["grid_operator", "system_administrator"]
+          template: "grid_workflow_error_notification"
+          parameters:
+            segment_id: "${twin.id}"
+            segment_name: "${twin.name}"
+            error_details: "${error}"
+            current_state: "${twin.current_state}"
+        next: "end"
+
+# Logistics Fleet Optimization Workflow
+logistics_fleet_optimization:
+  version: "1.0"
+  metadata:
+    name: "Logistics Fleet Optimization"
+    description: "Optimizes fleet routing and scheduling based on real-time conditions"
+    industry: "logistics"
+    author: "Industriverse"
+    created: "2025-05-22"
+    tags: ["logistics", "fleet", "routing", "optimization"]
+  
+  dtsl_configuration:
+    twin_type: "fleet_manager"
+    edge_execution: true
+    data_retention:
+      local_storage_days: 5
+      cloud_sync_interval_minutes: 30
+    offline_capability: true
+    mesh_participation: true
+  
+  triggers:
+    - type: "schedule"
+      cron: "*/30 * * * *"  # Every 30 minutes
+      priority: "normal"
+    
+    - type: "event"
+      event_type: "new_delivery_request"
+      priority: "high"
+    
+    - type: "event"
+      event_type: "vehicle_status_change"
+      priority: "high"
+    
+    - type: "event"
+      event_type: "traffic_condition_change"
+      priority: "medium"
+  
+  workflow:
+    steps:
+      - id: "collect_fleet_data"
+        type: "data_collection"
+        config:
+          data_sources:
+            - source: "twin.vehicles"
+              properties:
+                - "location"
+                - "status"
+                - "cargo"
+                - "fuel_level"
+                - "maintenance_status"
+            - source: "twin.delivery_requests"
+              filter: "status == 'pending' || status == 'in_progress'"
+            - source: "external.traffic_conditions"
+              region: "${twin.operation_region}"
+            - source: "external.weather_conditions"
+              region: "${twin.operation_region}"
+        next: "optimize_routes"
+      
+      - id: "optimize_routes"
+        type: "ai_inference"
+        config:
+          model_id: "fleet_route_optimizer_v3"
+          inputs:
+            - source: "step.collect_fleet_data.output"
+            - source: "twin.historical_performance[7d]"
+            - source: "twin.constraints"
+          parameters:
+            optimization_objective: "minimize_cost_and_time"
+            consider_factors:
+              - "traffic"
+              - "weather"
+              - "vehicle_capabilities"
+              - "delivery_priorities"
+              - "driver_hours"
+            time_horizon_hours: 8
+        next: "evaluate_changes"
+      
+      - id: "evaluate_changes"
+        type: "data_processing"
+        config:
+          operation: "compare"
+          inputs:
+            - source: "step.optimize_routes.output.route_plan"
+            - source: "twin.current_route_plan"
+          output_property: "route_changes"
+        next: "decision_branch"
+      
+      - id: "decision_branch"
+        type: "conditional"
+        conditions:
+          - condition: "step.evaluate_changes.output.route_changes.significance_score > 0.7"
+            next: "request_approval"
+          - condition: "step.evaluate_changes.output.route_changes.significance_score > 0.3"
+            next: "notify_dispatchers"
+          - condition: "true"
+            next: "apply_route_changes"
+      
+      - id: "request_approval"
+        type: "human_task"
+        config:
+          task_type: "approval_request"
+          priority: "high"
+          assignee_roles: ["fleet_manager", "logistics_supervisor"]
+          timeout_minutes: 15
+          details:
+            title: "Significant Route Changes Require Approval"
+            description: "The optimization algorithm has suggested significant changes to current routes"
+            current_plan: "${twin.current_route_plan}"
+            proposed_plan: "${step.optimize_routes.output.route_plan}"
+            changes_summary: "${step.evaluate_changes.output.route_changes}"
+            estimated_impact:
+              cost_savings: "${step.optimize_routes.output.estimated_savings}"
+              time_savings: "${step.optimize_routes.output.estimated_time_savings}"
+              service_level_impact: "${step.optimize_routes.output.service_level_impact}"
+        next: "check_approval"
+      
+      - id: "check_approval"
+        type: "conditional"
+        conditions:
+          - condition: "step.request_approval.output.approved"
+            next: "apply_route_changes"
+          - condition: "true"
+            next: "log_rejection"
+      
+      - id: "log_rejection"
+        type: "twin_update"
+        config:
+          properties:
+            last_optimization_attempt: "${now()}"
+            last_optimization_status: "rejected"
+            rejection_reason: "${step.request_approval.output.reason}"
+        next: "end"
+      
+      - id: "notify_dispatchers"
+        type: "notification"
+        config:
+          channels: ["dashboard", "email"]
+          recipient_roles: ["dispatcher"]
+          template: "route_change_notification"
+          parameters:
+            changes_summary: "${step.evaluate_changes.output.route_changes}"
+            estimated_impact: "${step.optimize_routes.output.impact_summary}"
+        next: "apply_route_changes"
+      
+      - id: "apply_route_changes"
+        type: "multi_step"
+        steps:
+          - id: "update_vehicle_instructions"
+            type: "mesh_communication"
+            config:
+              target_twins: "${twin.vehicles}"
+              message_type: "route_update"
+              message_content:
+                route_plan: "${step.optimize_routes.output.route_plan}"
+                timestamp: "${now()}"
+              delivery_confirmation: true
+          
+          - id: "update_customer_etas"
+            type: "external_api_call"
+            config:
+              api: "customer_notification_service"
+              method: "updateDeliveryETAs"
+              parameters:
+                delivery_updates: "${step.optimize_routes.output.delivery_etas}"
+          
+          - id: "log_route_changes"
+            type: "data_storage"
+            config:
+              storage_type: "time_series"
+              data:
+                timestamp: "${now()}"
+                previous_plan: "${twin.current_route_plan}"
+                new_plan: "${step.optimize_routes.output.route_plan}"
+                change_reason: "${trigger}"
+                estimated_impact: "${step.optimize_routes.output.impact_summary}"
+        next: "update_twin_state"
+      
+      - id: "update_twin_state"
+        type: "twin_update"
+        config:
+          properties:
+            current_route_plan: "${step.optimize_routes.output.route_plan}"
+            last_optimization_time: "${now()}"
+            last_optimization_trigger: "${trigger.type}"
+            optimization_metrics: "${step.optimize_routes.output.metrics}"
+        next: "end"
+  
+  execution_modes:
+    default: "collaborative"
+    fallback: "supervised"
+    trust_threshold: 0.85
+    trust_factors:
+      data_quality_weight: 0.3
+      model_confidence_weight: 0.3
+      historical_accuracy_weight: 0.2
+      external_data_reliability_weight: 0.2
+  
+  error_handling:
+    retry_count: 2
+    retry_delay_seconds: 30
+    fallback_step: "maintain_current_routes"
+    
+    steps:
+      - id: "maintain_current_routes"
+        type: "notification"
+        config:
+          channels: ["dashboard", "email"]
+          recipient_roles: ["fleet_manager", "dispatcher"]
+          template: "optimization_failure_notification"
+          parameters:
+            fleet_id: "${twin.id}"
+            error_details: "${error}"
+            current_route_plan: "${twin.current_route_plan}"
+        next: "end"
+
+# Retail Inventory Management Workflow
+retail_inventory_management:
+  version: "1.0"
+  metadata:
+    name: "Retail Inventory Management"
+    description: "Manages inventory levels and triggers reordering based on demand forecasting"
+    industry: "retail"
+    author: "Industriverse"
+    created: "2025-05-22"
+    tags: ["retail", "inventory", "forecasting", "ordering"]
+  
+  dtsl_configuration:
+    twin_type: "store_inventory"
+    edge_execution: true
+    data_retention:
+      local_storage_days: 14
+      cloud_sync_interval_minutes: 60
+    offline_capability: true
+    mesh_participation: true
+  
+  triggers:
+    - type: "schedule"
+      cron: "0 1 * * *"  # Daily at 1 AM
+      priority: "normal"
+    
+    - type: "threshold"
+      conditions:
+        property: "inventory_levels.*.stock_on_hand"
+        operator: "less_than"
+        value: "${twin.inventory_levels.*.reorder_point}"
+      priority: "high"
+    
+    - type: "event"
+      event_type: "sales_pattern_change"
+      priority: "medium"
+  
+  workflow:
+    steps:
+      - id: "collect_inventory_data"
+        type: "data_collection"
+        config:
+          data_sources:
+            - source: "twin.inventory_levels"
+            - source: "twin.sales_history[30d]"
+            - source: "twin.receiving_history[30d]"
+            - source: "external.upcoming_promotions"
+              filter: "start_date <= (now() + 14d)"
+            - source: "external.seasonal_factors"
+              region: "${twin.region}"
+        next: "forecast_demand"
+      
+      - id: "forecast_demand"
+        type: "ai_inference"
+        config:
+          model_id: "retail_demand_forecast_v2"
+          inputs:
+            - source: "step.collect_inventory_data.output"
+            - source: "twin.historical_forecast_accuracy"
+          parameters:
+            forecast_horizon_days: 30
+            confidence_interval: 0.9
+            include_factors:
+              - "seasonality"
+              - "promotions"
+              - "price_changes"
+              - "local_events"
+        next: "calculate_order_recommendations"
+      
+      - id: "calculate_order_recommendations"
+        type: "data_processing"
+        config:
+          operation: "inventory_optimization"
+          inputs:
+            - source: "step.collect_inventory_data.output.inventory_levels"
+            - source: "step.forecast_demand.output.forecast"
+            - source: "twin.supplier_lead_times"
+            - source: "twin.ordering_constraints"
+          parameters:
+            service_level_target: 0.95
+            holding_cost_factor: "${twin.holding_cost_factor}"
+            stockout_cost_factor: "${twin.stockout_cost_factor}"
+        next: "filter_recommendations"
+      
+      - id: "filter_recommendations"
+        type: "data_processing"
+        config:
+          operation: "filter"
+          input: "step.calculate_order_recommendations.output.recommendations"
+          filter: "action != 'none'"
+          output_property: "filtered_recommendations"
+        next: "decision_branch"
+      
+      - id: "decision_branch"
+        type: "conditional"
+        conditions:
+          - condition: "step.filter_recommendations.output.filtered_recommendations.length == 0"
+            next: "update_twin_state"
+          - condition: "step.filter_recommendations.output.filtered_recommendations.total_value > twin.approval_threshold"
+            next: "request_approval"
+          - condition: "true"
+            next: "process_orders"
+      
+      - id: "request_approval"
+        type: "human_task"
+        config:
+          task_type: "approval_request"
+          priority: "medium"
+          assignee_roles: ["inventory_manager", "store_manager"]
+          timeout_hours: 8
+          details:
+            title: "High-Value Order Recommendations Require Approval"
+            description: "The system has generated order recommendations exceeding the approval threshold"
+            store_id: "${twin.id}"
+            store_name: "${twin.name}"
+            recommendations: "${step.filter_recommendations.output.filtered_recommendations}"
+            total_value: "${step.filter_recommendations.output.filtered_recommendations.total_value}"
+            forecast_confidence: "${step.forecast_demand.output.confidence_metrics}"
+        next: "check_approval"
+      
+      - id: "check_approval"
+        type: "conditional"
+        conditions:
+          - condition: "step.request_approval.output.approved"
+            next: "process_orders"
+          - condition: "true"
+            next: "log_rejection"
+      
+      - id: "log_rejection"
+        type: "twin_update"
+        config:
+          properties:
+            last_order_recommendation_time: "${now()}"
+            last_order_recommendation_status: "rejected"
+            rejection_reason: "${step.request_approval.output.reason}"
+        next: "end"
+      
+      - id: "process_orders"
+        type: "multi_step"
+        steps:
+          - id: "create_purchase_orders"
+            type: "external_api_call"
+            config:
+              api: "inventory_management_system"
+              method: "createPurchaseOrders"
+              parameters:
+                store_id: "${twin.id}"
+                orders: "${step.filter_recommendations.output.filtered_recommendations}"
+                requested_by: "automated_system"
+                reference: "dtsl_workflow_${workflow.id}"
+          
+          - id: "notify_suppliers"
+            type: "notification"
+            config:
+              channels: ["email", "api"]
+              recipients: "${step.filter_recommendations.output.filtered_recommendations.*.supplier_contact}"
+              template: "purchase_order_notification"
+              parameters:
+                store_name: "${twin.name}"
+                store_id: "${twin.id}"
+                purchase_orders: "${step.create_purchase_orders.output.purchase_orders}"
+          
+          - id: "log_orders"
+            type: "data_storage"
+            config:
+              storage_type: "transaction_log"
+              data:
+                timestamp: "${now()}"
+                action: "purchase_orders_created"
+                order_details: "${step.create_purchase_orders.output.purchase_orders}"
+                forecast_basis: "${step.forecast_demand.output.summary}"
+        next: "update_twin_state"
+      
+      - id: "update_twin_state"
+        type: "twin_update"
+        config:
+          properties:
+            last_forecast_time: "${now()}"
+            last_forecast: "${step.forecast_demand.output}"
+            last_order_recommendation_time: "${now()}"
+            last_order_recommendations: "${step.calculate_order_recommendations.output.recommendations}"
+            pending_orders: "${step.decision_branch.output.path == 'process_orders' ? step.create_purchase_orders.output.purchase_orders : twin.pending_orders}"
+        next: "end"
+  
+  execution_modes:
+    default: "supervised"
+    fallback: "manual"
+    trust_threshold: 0.85
+    trust_factors:
+      data_quality_weight: 0.3
+      model_confidence_weight: 0.4
+      historical_accuracy_weight: 0.3
+  
+  error_handling:
+    retry_count: 2
+    retry_delay_seconds: 60
+    fallback_step: "notify_error"
+    
+    steps:
+      - id: "notify_error"
+        type: "notification"
+        config:
+          channels: ["dashboard", "email"]
+          recipient_roles: ["inventory_manager", "system_administrator"]
+          template: "inventory_workflow_error_notification"
+          parameters:
+            store_id: "${twin.id}"
+            store_name: "${twin.name}"
+            error_details: "${error}"
+        next: "end"
+
+# Healthcare Patient Monitoring Workflow
+healthcare_patient_monitoring:
+  version: "1.0"
+  metadata:
+    name: "Healthcare Patient Monitoring"
+    description: "Monitors patient vital signs and triggers appropriate interventions"
+    industry: "healthcare"
+    author: "Industriverse"
+    created: "2025-05-22"
+    tags: ["healthcare", "monitoring", "patient", "medical"]
+  
+  dtsl_configuration:
+    twin_type: "patient_monitor"
+    edge_execution: true
+    data_retention:
+      local_storage_days: 2
+      cloud_sync_interval_minutes: 15
+    offline_capability: true
+    mesh_participation: true
+    security:
+      encryption: "end_to_end"
+      access_control: "role_based"
+      audit_logging: true
+  
+  triggers:
+    - type: "threshold"
+      conditions:
+        property: "vital_signs.heart_rate"
+        operator: "outside_range"
+        min_value: "${twin.normal_ranges.heart_rate.min}"
+        max_value: "${twin.normal_ranges.heart_rate.max}"
+      priority: "critical"
+    
+    - type: "threshold"
+      conditions:
+        property: "vital_signs.blood_pressure.systolic"
+        operator: "outside_range"
+        min_value: "${twin.normal_ranges.blood_pressure.systolic.min}"
+        max_value: "${twin.normal_ranges.blood_pressure.systolic.max}"
+      priority: "high"
+    
+    - type: "threshold"
+      conditions:
+        property: "vital_signs.blood_pressure.diastolic"
+        operator: "outside_range"
+        min_value: "${twin.normal_ranges.blood_pressure.diastolic.min}"
+        max_value: "${twin.normal_ranges.blood_pressure.diastolic.max}"
+      priority: "high"
+    
+    - type: "threshold"
+      conditions:
+        property: "vital_signs.oxygen_saturation"
+        operator: "less_than"
+        value: "${twin.normal_ranges.oxygen_saturation.min}"
+      priority: "critical"
+    
+    - type: "threshold"
+      conditions:
+        property: "vital_signs.temperature"
+        operator: "outside_range"
+        min_value: "${twin.normal_ranges.temperature.min}"
+        max_value: "${twin.normal_ranges.temperature.max}"
+      priority: "medium"
+    
+    - type: "schedule"
+      cron: "*/15 * * * *"  # Every 15 minutes
+      priority: "low"
+  
+  workflow:
+    steps:
+      - id: "collect_patient_data"
+        type: "data_collection"
+        config:
+          data_sources:
+            - source: "twin.vital_signs"
+              sampling_rate_seconds: 1
+              duration_seconds: 60
+            - source: "twin.medication_history[24h]"
+            - source: "twin.patient_profile"
+            - source: "twin.care_plan"
+        next: "analyze_vitals"
+      
+      - id: "analyze_vitals"
+        type: "ai_inference"
+        config:
+          model_id: "patient_condition_analyzer_v2"
+          inputs:
+            - source: "step.collect_patient_data.output"
+            - source: "twin.historical_vitals[6h]"
+          parameters:
+            sensitivity: "${twin.monitoring_sensitivity}"
+            consider_factors:
+              - "medication_effects"
+              - "circadian_rhythm"
+              - "activity_level"
+              - "medical_history"
+        next: "assess_severity"
+      
+      - id: "assess_severity"
+        type: "conditional"
+        conditions:
+          - condition: "step.analyze_vitals.output.alert_level == 'critical'"
+            next: "critical_alert"
+          - condition: "step.analyze_vitals.output.alert_level == 'warning'"
+            next: "warning_alert"
+          - condition: "step.analyze_vitals.output.alert_level == 'notice'"
+            next: "notice_alert"
+          - condition: "true"
+            next: "update_twin_state"
+      
+      - id: "critical_alert"
+        type: "multi_step"
+        steps:
+          - id: "notify_medical_team"
+            type: "notification"
+            config:
+              channels: ["pager", "sms", "dashboard"]
+              recipient_roles: ["attending_physician", "charge_nurse", "rapid_response_team"]
+              template: "critical_patient_alert"
+              parameters:
+                patient_id: "${twin.id}"
+                patient_name: "${twin.patient_profile.name}"
+                room_number: "${twin.location.room}"
+                vital_signs: "${step.collect_patient_data.output.vital_signs}"
+                analysis: "${step.analyze_vitals.output}"
+                medical_history_summary: "${twin.patient_profile.medical_history_summary}"
+              priority: "critical"
+          
+          - id: "activate_bedside_alert"
+            type: "control_action"
+            config:
+              action_type: "bedside_alert"
+              parameters:
+                alert_level: "critical"
+                sound: true
+                visual: true
+          
+          - id: "log_critical_event"
+            type: "data_storage"
+            config:
+              storage_type: "medical_record"
+              data:
+                timestamp: "${now()}"
+                event_type: "critical_alert"
+                vital_signs: "${step.collect_patient_data.output.vital_signs}"
+                analysis: "${step.analyze_vitals.output}"
+                alert_id: "${uuid()}"
+        next: "update_twin_state"
+      
+      - id: "warning_alert"
+        type: "multi_step"
+        steps:
+          - id: "notify_nurse"
+            type: "notification"
+            config:
+              channels: ["dashboard", "mobile_app"]
+              recipient_roles: ["assigned_nurse", "charge_nurse"]
+              template: "warning_patient_alert"
+              parameters:
+                patient_id: "${twin.id}"
+                patient_name: "${twin.patient_profile.name}"
+                room_number: "${twin.location.room}"
+                vital_signs: "${step.collect_patient_data.output.vital_signs}"
+                analysis: "${step.analyze_vitals.output}"
+              priority: "high"
+          
+          - id: "activate_bedside_alert"
+            type: "control_action"
+            config:
+              action_type: "bedside_alert"
+              parameters:
+                alert_level: "warning"
+                sound: false
+                visual: true
+          
+          - id: "log_warning_event"
+            type: "data_storage"
+            config:
+              storage_type: "medical_record"
+              data:
+                timestamp: "${now()}"
+                event_type: "warning_alert"
+                vital_signs: "${step.collect_patient_data.output.vital_signs}"
+                analysis: "${step.analyze_vitals.output}"
+                alert_id: "${uuid()}"
+        next: "update_twin_state"
+      
+      - id: "notice_alert"
+        type: "multi_step"
+        steps:
+          - id: "notify_nurse"
+            type: "notification"
+            config:
+              channels: ["dashboard"]
+              recipient_roles: ["assigned_nurse"]
+              template: "notice_patient_alert"
+              parameters:
+                patient_id: "${twin.id}"
+                patient_name: "${twin.patient_profile.name}"
+                room_number: "${twin.location.room}"
+                vital_signs: "${step.collect_patient_data.output.vital_signs}"
+                analysis: "${step.analyze_vitals.output}"
+              priority: "medium"
+          
+          - id: "log_notice_event"
+            type: "data_storage"
+            config:
+              storage_type: "medical_record"
+              data:
+                timestamp: "${now()}"
+                event_type: "notice_alert"
+                vital_signs: "${step.collect_patient_data.output.vital_signs}"
+                analysis: "${step.analyze_vitals.output}"
+                alert_id: "${uuid()}"
+        next: "update_twin_state"
+      
+      - id: "update_twin_state"
+        type: "twin_update"
+        config:
+          properties:
+            last_assessment_time: "${now()}"
+            last_assessment_result: "${step.analyze_vitals.output}"
+            current_alert_level: "${step.analyze_vitals.output.alert_level}"
+            monitoring_status: "active"
+        next: "end"
+  
+  execution_modes:
+    default: "supervised"
+    fallback: "collaborative"
+    trust_threshold: 0.95
+    trust_factors:
+      data_quality_weight: 0.4
+      model_confidence_weight: 0.4
+      device_reliability_weight: 0.2
+  
+  error_handling:
+    retry_count: 3
+    retry_delay_seconds: 10
+    fallback_step: "error_fallback"
+    
+    steps:
+      - id: "error_fallback"
+        type: "multi_step"
+        steps:
+          - id: "notify_technical_support"
+            type: "notification"
+            config:
+              channels: ["email", "dashboard"]
+              recipient_roles: ["biomedical_technician", "system_administrator"]
+              template: "monitoring_system_error"
+              parameters:
+                patient_id: "${twin.id}"
+                patient_name: "${twin.patient_profile.name}"
+                room_number: "${twin.location.room}"
+                error_details: "${error}"
+                device_id: "${twin.device_id}"
+              priority: "high"
+          
+          - id: "notify_nurse"
+            type: "notification"
+            config:
+              channels: ["dashboard", "pager"]
+              recipient_roles: ["assigned_nurse", "charge_nurse"]
+              template: "monitoring_system_error_clinical"
+              parameters:
+                patient_id: "${twin.id}"
+                patient_name: "${twin.patient_profile.name}"
+                room_number: "${twin.location.room}"
+                message: "Patient monitoring system error. Please check patient manually."
+              priority: "high"
+        next: "end"

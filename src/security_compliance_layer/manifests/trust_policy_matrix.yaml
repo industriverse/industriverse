@@ -1,0 +1,715 @@
+# Trust Policy Matrix
+
+# This matrix defines the trust relationships, policies, and evaluation criteria
+# for entities within the Industriverse platform
+
+version: "1.0.0"
+last_updated: "2025-05-24"
+maintainer: "Security & Compliance Team"
+
+# Trust levels and their definitions
+trust_levels:
+  - level: 0
+    name: "Untrusted"
+    description: "Entity has not been verified or has failed verification"
+    minimum_score: 0
+    maximum_score: 19
+    capabilities:
+      - "None"
+  
+  - level: 1
+    name: "Basic Trust"
+    description: "Entity has minimal verification but limited privileges"
+    minimum_score: 20
+    maximum_score: 39
+    capabilities:
+      - "Read public data"
+      - "Execute public workflows"
+      - "Use public services"
+  
+  - level: 2
+    name: "Standard Trust"
+    description: "Entity has standard verification and normal privileges"
+    minimum_score: 40
+    maximum_score: 59
+    capabilities:
+      - "Read internal data"
+      - "Execute standard workflows"
+      - "Use standard services"
+      - "Create basic capsules"
+  
+  - level: 3
+    name: "High Trust"
+    description: "Entity has strong verification and elevated privileges"
+    minimum_score: 60
+    maximum_score: 79
+    capabilities:
+      - "Read confidential data"
+      - "Execute privileged workflows"
+      - "Use advanced services"
+      - "Create advanced capsules"
+      - "Modify standard capsules"
+  
+  - level: 4
+    name: "Full Trust"
+    description: "Entity has comprehensive verification and full privileges"
+    minimum_score: 80
+    maximum_score: 100
+    capabilities:
+      - "Read restricted data"
+      - "Execute critical workflows"
+      - "Use all services"
+      - "Create all capsule types"
+      - "Modify all capsule types"
+      - "Approve trust elevation"
+
+# Trust factors and their weights in trust score calculation
+trust_factors:
+  identity_verification:
+    weight: 25
+    factors:
+      - name: "Identity Provider Strength"
+        description: "Strength and reputation of the identity provider"
+        weight: 5
+        values:
+          - value: "Unverified"
+            score: 0
+          - value: "Self-attested"
+            score: 1
+          - value: "Third-party basic"
+            score: 3
+          - value: "Third-party enhanced"
+            score: 4
+          - value: "Government issued"
+            score: 5
+      
+      - name: "Authentication Strength"
+        description: "Strength of the authentication method used"
+        weight: 5
+        values:
+          - value: "None"
+            score: 0
+          - value: "Password only"
+            score: 1
+          - value: "Password + second factor"
+            score: 3
+          - value: "Hardware token"
+            score: 4
+          - value: "Biometric + hardware token"
+            score: 5
+      
+      - name: "Identity Age"
+        description: "Age of the identity in the system"
+        weight: 3
+        values:
+          - value: "New (< 1 day)"
+            score: 0
+          - value: "Recent (1-7 days)"
+            score: 1
+          - value: "Established (8-30 days)"
+            score: 2
+          - value: "Mature (31-90 days)"
+            score: 3
+          - value: "Veteran (91-365 days)"
+            score: 4
+          - value: "Long-standing (> 365 days)"
+            score: 5
+      
+      - name: "Identity Consistency"
+        description: "Consistency of identity attributes over time"
+        weight: 4
+        values:
+          - value: "Highly inconsistent"
+            score: 0
+          - value: "Somewhat inconsistent"
+            score: 1
+          - value: "Mostly consistent"
+            score: 3
+          - value: "Highly consistent"
+            score: 5
+      
+      - name: "Cross-verification"
+        description: "Verification across multiple systems or contexts"
+        weight: 3
+        values:
+          - value: "None"
+            score: 0
+          - value: "Single verification"
+            score: 1
+          - value: "Dual verification"
+            score: 3
+          - value: "Multiple verification"
+            score: 5
+      
+      - name: "ZK Attestation"
+        description: "Zero-knowledge attestation of identity attributes"
+        weight: 5
+        values:
+          - value: "None"
+            score: 0
+          - value: "Basic attributes"
+            score: 2
+          - value: "Enhanced attributes"
+            score: 4
+          - value: "Comprehensive attributes"
+            score: 5
+  
+  behavioral_analysis:
+    weight: 20
+    factors:
+      - name: "Usage Pattern Consistency"
+        description: "Consistency of usage patterns over time"
+        weight: 5
+        values:
+          - value: "Highly anomalous"
+            score: 0
+          - value: "Somewhat anomalous"
+            score: 1
+          - value: "Neutral"
+            score: 2
+          - value: "Somewhat consistent"
+            score: 3
+          - value: "Highly consistent"
+            score: 5
+      
+      - name: "Interaction Quality"
+        description: "Quality of interactions with the system and other entities"
+        weight: 4
+        values:
+          - value: "Malicious"
+            score: 0
+          - value: "Suspicious"
+            score: 1
+          - value: "Neutral"
+            score: 2
+          - value: "Positive"
+            score: 4
+          - value: "Exemplary"
+            score: 5
+      
+      - name: "Resource Usage"
+        description: "Appropriate use of system resources"
+        weight: 3
+        values:
+          - value: "Abusive"
+            score: 0
+          - value: "Excessive"
+            score: 1
+          - value: "Normal"
+            score: 3
+          - value: "Efficient"
+            score: 5
+      
+      - name: "Error Rate"
+        description: "Rate of errors or failed operations"
+        weight: 3
+        values:
+          - value: "Very high"
+            score: 0
+          - value: "High"
+            score: 1
+          - value: "Moderate"
+            score: 2
+          - value: "Low"
+            score: 4
+          - value: "Very low"
+            score: 5
+      
+      - name: "Velocity"
+        description: "Speed and frequency of operations"
+        weight: 3
+        values:
+          - value: "Suspiciously high"
+            score: 0
+          - value: "Somewhat high"
+            score: 1
+          - value: "Normal"
+            score: 3
+          - value: "Somewhat low"
+            score: 4
+          - value: "Very low"
+            score: 5
+      
+      - name: "Context Appropriateness"
+        description: "Appropriateness of actions in context"
+        weight: 2
+        values:
+          - value: "Highly inappropriate"
+            score: 0
+          - value: "Somewhat inappropriate"
+            score: 1
+          - value: "Neutral"
+            score: 3
+          - value: "Appropriate"
+            score: 5
+  
+  reputation:
+    weight: 15
+    factors:
+      - name: "Historical Trust Score"
+        description: "Average trust score over time"
+        weight: 5
+        values:
+          - value: "Very low (0-19)"
+            score: 0
+          - value: "Low (20-39)"
+            score: 1
+          - value: "Moderate (40-59)"
+            score: 2
+          - value: "High (60-79)"
+            score: 4
+          - value: "Very high (80-100)"
+            score: 5
+      
+      - name: "Incident History"
+        description: "History of security or compliance incidents"
+        weight: 4
+        values:
+          - value: "Multiple critical incidents"
+            score: 0
+          - value: "Single critical incident"
+            score: 1
+          - value: "Multiple minor incidents"
+            score: 2
+          - value: "Single minor incident"
+            score: 3
+          - value: "No incidents"
+            score: 5
+      
+      - name: "Peer Endorsements"
+        description: "Endorsements from other trusted entities"
+        weight: 3
+        values:
+          - value: "None"
+            score: 0
+          - value: "Few low-trust endorsements"
+            score: 1
+          - value: "Multiple low-trust endorsements"
+            score: 2
+          - value: "Few high-trust endorsements"
+            score: 3
+          - value: "Multiple high-trust endorsements"
+            score: 5
+      
+      - name: "Community Standing"
+        description: "Standing within the Industriverse community"
+        weight: 3
+        values:
+          - value: "Negative"
+            score: 0
+          - value: "Neutral"
+            score: 2
+          - value: "Positive"
+            score: 4
+          - value: "Exemplary"
+            score: 5
+  
+  technical_security:
+    weight: 20
+    factors:
+      - name: "Cryptographic Strength"
+        description: "Strength of cryptographic methods used"
+        weight: 5
+        values:
+          - value: "Weak or outdated"
+            score: 0
+          - value: "Minimum acceptable"
+            score: 1
+          - value: "Industry standard"
+            score: 3
+          - value: "Strong"
+            score: 4
+          - value: "Quantum-resistant"
+            score: 5
+      
+      - name: "Vulnerability Status"
+        description: "Known vulnerabilities in the entity"
+        weight: 5
+        values:
+          - value: "Critical vulnerabilities"
+            score: 0
+          - value: "High vulnerabilities"
+            score: 1
+          - value: "Medium vulnerabilities"
+            score: 2
+          - value: "Low vulnerabilities"
+            score: 3
+          - value: "No known vulnerabilities"
+            score: 5
+      
+      - name: "Patch Status"
+        description: "Status of security patches and updates"
+        weight: 4
+        values:
+          - value: "Severely outdated"
+            score: 0
+          - value: "Outdated"
+            score: 1
+          - value: "Mostly current"
+            score: 3
+          - value: "Fully current"
+            score: 5
+      
+      - name: "Security Controls"
+        description: "Implementation of security controls"
+        weight: 3
+        values:
+          - value: "Minimal"
+            score: 0
+          - value: "Basic"
+            score: 1
+          - value: "Standard"
+            score: 2
+          - value: "Enhanced"
+            score: 4
+          - value: "Comprehensive"
+            score: 5
+      
+      - name: "Security Testing"
+        description: "Frequency and depth of security testing"
+        weight: 3
+        values:
+          - value: "None"
+            score: 0
+          - value: "Infrequent basic testing"
+            score: 1
+          - value: "Regular basic testing"
+            score: 2
+          - value: "Regular comprehensive testing"
+            score: 4
+          - value: "Continuous comprehensive testing"
+            score: 5
+  
+  compliance:
+    weight: 20
+    factors:
+      - name: "Regulatory Compliance"
+        description: "Compliance with applicable regulations"
+        weight: 5
+        values:
+          - value: "Non-compliant"
+            score: 0
+          - value: "Partially compliant"
+            score: 2
+          - value: "Mostly compliant"
+            score: 3
+          - value: "Fully compliant"
+            score: 5
+      
+      - name: "Policy Compliance"
+        description: "Compliance with Industriverse policies"
+        weight: 5
+        values:
+          - value: "Multiple violations"
+            score: 0
+          - value: "Single violation"
+            score: 1
+          - value: "No violations"
+            score: 5
+      
+      - name: "Audit Results"
+        description: "Results of compliance audits"
+        weight: 4
+        values:
+          - value: "Failed"
+            score: 0
+          - value: "Conditional pass"
+            score: 2
+          - value: "Passed with findings"
+            score: 3
+          - value: "Passed with no findings"
+            score: 5
+      
+      - name: "Documentation"
+        description: "Completeness and quality of documentation"
+        weight: 3
+        values:
+          - value: "None"
+            score: 0
+          - value: "Minimal"
+            score: 1
+          - value: "Adequate"
+            score: 3
+          - value: "Comprehensive"
+            score: 5
+      
+      - name: "Certification Status"
+        description: "Status of relevant certifications"
+        weight: 3
+        values:
+          - value: "None"
+            score: 0
+          - value: "In progress"
+            score: 2
+          - value: "Basic certifications"
+            score: 3
+          - value: "Advanced certifications"
+            score: 5
+
+# Trust context modifiers
+context_modifiers:
+  - name: "Emergency Situation"
+    description: "During declared emergencies"
+    factor_adjustments:
+      - factor: "identity_verification"
+        adjustment: -5
+      - factor: "behavioral_analysis"
+        adjustment: +5
+  
+  - name: "High-Risk Operation"
+    description: "During high-risk operations"
+    factor_adjustments:
+      - factor: "technical_security"
+        adjustment: +10
+      - factor: "compliance"
+        adjustment: +5
+      - factor: "reputation"
+        adjustment: -5
+  
+  - name: "New Deployment"
+    description: "During initial deployment period"
+    factor_adjustments:
+      - factor: "behavioral_analysis"
+        adjustment: -5
+      - factor: "reputation"
+        adjustment: -5
+      - factor: "technical_security"
+        adjustment: +5
+  
+  - name: "Maintenance Mode"
+    description: "During scheduled maintenance"
+    factor_adjustments:
+      - factor: "behavioral_analysis"
+        adjustment: -10
+      - factor: "technical_security"
+        adjustment: +5
+
+# Trust delegation policies
+delegation_policies:
+  - name: "Standard Delegation"
+    description: "Standard trust delegation between entities"
+    rules:
+      - "Delegator must have trust level >= 3"
+      - "Delegatee cannot exceed delegator's trust level"
+      - "Delegation expires after 24 hours"
+      - "Delegation must be explicitly approved"
+      - "Delegation must be logged and auditable"
+  
+  - name: "Emergency Delegation"
+    description: "Emergency trust delegation during incidents"
+    rules:
+      - "Delegator must have trust level >= 4"
+      - "Delegatee cannot exceed delegator's trust level"
+      - "Delegation expires after 4 hours"
+      - "Delegation must be logged and auditable"
+      - "Post-delegation review required"
+  
+  - name: "Service Delegation"
+    description: "Delegation to service accounts"
+    rules:
+      - "Delegator must have trust level >= 3"
+      - "Delegatee limited to specific service functions"
+      - "Delegation expires after 7 days"
+      - "Delegation must be logged and auditable"
+
+# Trust elevation policies
+elevation_policies:
+  - name: "Standard Elevation"
+    description: "Standard process for trust level elevation"
+    requirements:
+      - "Minimum 30 days at current trust level"
+      - "No security incidents in past 90 days"
+      - "Approval from entity with trust level >= 4"
+      - "Additional verification factors"
+      - "Documentation of business need"
+  
+  - name: "Emergency Elevation"
+    description: "Emergency process for trust level elevation"
+    requirements:
+      - "Declaration of emergency situation"
+      - "Approval from two entities with trust level >= 4"
+      - "Maximum duration of 24 hours"
+      - "Enhanced monitoring during elevation"
+      - "Post-elevation review required"
+  
+  - name: "Temporary Elevation"
+    description: "Temporary elevation for specific tasks"
+    requirements:
+      - "Specific task identification"
+      - "Approval from entity with trust level >= 3"
+      - "Maximum duration of 4 hours"
+      - "Limited to specific capabilities"
+      - "Enhanced monitoring during elevation"
+
+# Trust revocation policies
+revocation_policies:
+  - name: "Standard Revocation"
+    description: "Standard process for trust revocation"
+    triggers:
+      - "Security incident"
+      - "Compliance violation"
+      - "Suspicious behavior"
+      - "Request from authorized entity"
+    process:
+      - "Immediate suspension of privileges"
+      - "Investigation within 24 hours"
+      - "Documentation of findings"
+      - "Decision on permanent revocation"
+      - "Appeal process available"
+  
+  - name: "Emergency Revocation"
+    description: "Emergency process for trust revocation"
+    triggers:
+      - "Critical security incident"
+      - "Detected breach"
+      - "Imminent threat"
+    process:
+      - "Immediate revocation of all privileges"
+      - "Isolation of affected systems"
+      - "Emergency response team notification"
+      - "Investigation within 1 hour"
+      - "No appeal during emergency phase"
+  
+  - name: "Automated Revocation"
+    description: "Automated revocation based on triggers"
+    triggers:
+      - "Trust score drops below threshold"
+      - "Detection of malicious behavior"
+      - "Multiple failed authentication attempts"
+      - "Violation of usage policies"
+    process:
+      - "Automated suspension of privileges"
+      - "Notification to security team"
+      - "Investigation within 4 hours"
+      - "Automated or manual reinstatement"
+
+# Entity-specific trust policies
+entity_policies:
+  users:
+    base_trust_level: 1
+    elevation_path: "Standard"
+    required_factors:
+      - "identity_verification"
+      - "behavioral_analysis"
+      - "reputation"
+  
+  services:
+    base_trust_level: 2
+    elevation_path: "Service"
+    required_factors:
+      - "technical_security"
+      - "compliance"
+      - "behavioral_analysis"
+  
+  capsules:
+    base_trust_level: 1
+    elevation_path: "Capsule"
+    required_factors:
+      - "technical_security"
+      - "compliance"
+      - "creator_trust_level"
+  
+  agents:
+    base_trust_level: 2
+    elevation_path: "Agent"
+    required_factors:
+      - "technical_security"
+      - "behavioral_analysis"
+      - "creator_trust_level"
+      - "compliance"
+  
+  devices:
+    base_trust_level: 1
+    elevation_path: "Device"
+    required_factors:
+      - "technical_security"
+      - "behavioral_analysis"
+      - "owner_trust_level"
+
+# Crypto-based trust modifiers
+crypto_trust_modifiers:
+  - algorithm_type: "classical"
+    strength: "weak"
+    trust_adjustment: -20
+  
+  - algorithm_type: "classical"
+    strength: "standard"
+    trust_adjustment: 0
+  
+  - algorithm_type: "classical"
+    strength: "strong"
+    trust_adjustment: +5
+  
+  - algorithm_type: "post-quantum"
+    strength: "any"
+    trust_adjustment: +10
+  
+  - algorithm_type: "hybrid"
+    strength: "any"
+    trust_adjustment: +15
+
+# Trust budget configuration
+trust_budget:
+  enabled: true
+  budget_calculation:
+    base_amount: 100
+    trust_level_multiplier: 25
+    usage_history_factor: 0.1
+    compliance_bonus: 50
+  
+  consumption_rates:
+    standard_operation: 1
+    elevated_privilege: 5
+    critical_operation: 10
+    override_operation: 25
+  
+  replenishment:
+    rate: 10
+    period: "daily"
+    maximum: "trust_level_based"
+  
+  overdraft:
+    allowed: true
+    maximum: 50
+    penalty: "temporary_trust_reduction"
+
+# Trust economy configuration
+trust_economy:
+  enabled: true
+  
+  trust_tokens:
+    issuance:
+      method: "proof_of_trust"
+      minimum_trust_level: 3
+    
+    transfer:
+      allowed: true
+      restrictions:
+        - "Cannot exceed recipient's maximum trust budget"
+        - "Sender must maintain minimum trust level"
+        - "Transfer must be approved by both parties"
+    
+    expiration:
+      enabled: true
+      period: "90d"
+  
+  trust_rewards:
+    positive_actions:
+      - action: "Vulnerability reporting"
+        reward: 50
+      - action: "Security improvement"
+        reward: 30
+      - action: "Compliance enhancement"
+        reward: 25
+      - action: "Threat detection"
+        reward: 20
+    
+    negative_actions:
+      - action: "Policy violation"
+        penalty: 30
+      - action: "Failed security test"
+        penalty: 25
+      - action: "Incident causation"
+        penalty: 50
+      - action: "Unauthorized access attempt"
+        penalty: 40

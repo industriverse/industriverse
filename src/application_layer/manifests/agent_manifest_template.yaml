@@ -1,0 +1,136 @@
+apiVersion: v1
+kind: AgentManifest
+metadata:
+  name: application-layer-manifest
+  version: "1.0.0"
+spec:
+  agent_id: "application-coordinator-agent"
+  layer_designation: "application_layer"
+  capabilities:
+    - name: "user_journey_orchestration"
+      description: "Orchestrates user journeys across the application"
+      input_schema:
+        type: "object"
+        properties:
+          journey_type:
+            type: "string"
+            enum: ["onboarding", "workflow_execution", "configuration", "troubleshooting"]
+          user_id:
+            type: "string"
+          context:
+            type: "object"
+      output_schema:
+        type: "object"
+        properties:
+          journey_id:
+            type: "string"
+          status:
+            type: "string"
+            enum: ["started", "active", "completed", "failed"]
+          next_steps:
+            type: "array"
+            items:
+              type: "object"
+    - name: "cross_layer_coordination"
+      description: "Coordinates interactions between different IFF layers"
+      input_schema:
+        type: "object"
+        properties:
+          target_layer:
+            type: "string"
+            enum: ["data_layer", "core_ai_layer", "generative_layer"]
+          operation:
+            type: "string"
+          parameters:
+            type: "object"
+      output_schema:
+        type: "object"
+        properties:
+          status:
+            type: "string"
+            enum: ["success", "failure", "pending"]
+          result:
+            type: "object"
+    - name: "universal_skin_management"
+      description: "Manages the Universal Skin / Dynamic Agent Capsules UX"
+      input_schema:
+        type: "object"
+        properties:
+          operation:
+            type: "string"
+            enum: ["create_capsule", "update_capsule", "delete_capsule", "pin_capsule", "unpin_capsule"]
+          parameters:
+            type: "object"
+      output_schema:
+        type: "object"
+        properties:
+          status:
+            type: "string"
+            enum: ["success", "failure"]
+          capsule_id:
+            type: "string"
+          result:
+            type: "object"
+  supported_mcp_events:
+    - "observe"
+    - "simulate"
+    - "recommend"
+    - "act"
+    - "application/user_journey"
+    - "application_health/predict_issue"
+    - "application/self_optimization"
+  supported_trust_modes:
+    - "passive"
+    - "approval"
+    - "autonomous"
+  protocol_hooks:
+    mcp:
+      - "application_layer/init/bootstrap"
+      - "application_layer/observe/status"
+      - "application_layer/simulate/workflow"
+      - "application_layer/recommend/optimization"
+      - "application_layer/act/execute"
+    a2a:
+      - "task_submission"
+      - "task_status_update"
+      - "task_completion"
+      - "agent_discovery"
+  application_type: "coordinator"
+  application_role: "orchestrator"
+  resilience_mode: "redundant_pair"
+  mesh_coordination_role: "leader"
+  avatar_representation:
+    layer_avatar: "application_layer"
+    avatar_states: ["idle", "working", "alert", "success"]
+    avatar_expressions: ["neutral", "focused", "concerned", "satisfied"]
+    avatar_interaction_modes: ["chat", "command", "gesture", "ambient"]
+    avatar_deployment_targets: ["web", "desktop", "mobile", "ar_hud"]
+  universal_skin_support:
+    capsule_types: ["task", "workflow", "alert", "status", "decision"]
+    pin_modes: ["os_desktop", "browser", "mobile_bar", "ar_space"]
+    interaction_modes: ["expand", "collapse", "drag", "pin", "configure"]
+    context_awareness: true
+    ambient_intelligence: true
+  cross_layer_coordination:
+    data_layer_protocols: ["mcp", "a2a", "data_mesh"]
+    core_ai_layer_protocols: ["mcp", "a2a", "inference_stream"]
+    generative_layer_protocols: ["mcp", "a2a", "template_stream"]
+    coordination_patterns: ["request_response", "event_stream", "pub_sub"]
+  mesh_lifecycle_hooks:
+    - on_init: application_layer/init/bootstrap_mesh
+    - on_failure: application_layer/failover/trigger_chain
+    - on_quorum_violation: consensus_resolver_agent/resolve_with_fallback
+  context_window:
+    max_history_depth: 20
+    user_journey_context_tokens: 4096
+    cross_layer_memory_reference: "digital_twin_coordinator"
+  upgrade_mode: "rolling"
+  state_cache_transfer: true
+  blue_green_deploy: supported
+  extensibility:
+    plugin_support: true
+    custom_protocol_extensions: true
+    third_party_integration: true
+    custom_avatar_expressions: true
+    custom_capsule_types: true
+    industry_module_extensions: true

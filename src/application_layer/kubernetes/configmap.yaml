@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: industriverse-application-layer-config
+  labels:
+    app: industriverse-application-layer
+data:
+  config.json: |
+    {
+      "agent_core": {
+        "agent_id": "industriverse-application-layer",
+        "agent_name": "Industriverse Application Layer",
+        "agent_version": "1.0.0",
+        "log_level": "info"
+      },
+      "api_server": {
+        "host": "0.0.0.0",
+        "port": 8000,
+        "cors_origins": ["*"]
+      },
+      "protocol_handlers": {
+        "mcp": {
+          "enabled": true,
+          "event_buffer_size": 1000,
+          "event_retention_seconds": 3600
+        },
+        "a2a": {
+          "enabled": true,
+          "capability_discovery": true,
+          "industry_tags": ["manufacturing", "energy", "healthcare", "transportation", "agriculture", "defense"]
+        }
+      },
+      "universal_skin": {
+        "enabled": true,
+        "default_theme": "industrial",
+        "animation_enabled": true,
+        "cross_platform": {
+          "web": true,
+          "desktop": true,
+          "mobile": true,
+          "ar": true
+        }
+      },
+      "avatar_interface": {
+        "enabled": true,
+        "default_avatars": {
+          "data_layer": {
+            "name": "Data Layer Avatar",
+            "personality": "analytical",
+            "appearance": {
+              "color": "#2196f3",
+              "icon": "database"
+            }
+          },
+          "core_ai_layer": {
+            "name": "Core AI Layer Avatar",
+            "personality": "intelligent",
+            "appearance": {
+              "color": "#4caf50",
+              "icon": "brain"
+            }
+          },
+          "generative_layer": {
+            "name": "Generative Layer Avatar",
+            "personality": "creative",
+            "appearance": {
+              "color": "#ff9800",
+              "icon": "brush"
+            }
+          },
+          "application_layer": {
+            "name": "Application Layer Avatar",
+            "personality": "helpful",
+            "appearance": {
+              "color": "#9c27b0",
+              "icon": "apps"
+            }
+          }
+        }
+      },
+      "digital_twin": {
+        "enabled": true,
+        "telemetry_buffer_size": 10000,
+        "telemetry_retention_seconds": 86400,
+        "visualization_enabled": true
+      },
+      "industry_modules": {
+        "enabled": true,
+        "default_modules": ["manufacturing", "energy", "healthcare"],
+        "module_auto_discovery": true
+      },
+      "workflow_orchestration": {
+        "enabled": true,
+        "max_concurrent_workflows": 100,
+        "execution_timeout_seconds": 3600,
+        "retry_failed_tasks": true,
+        "max_retries": 3
+      },
+      "omniverse_integration": {
+        "enabled": true,
+        "connection_timeout_seconds": 30,
+        "scene_cache_size": 10
+      },
+      "cross_layer_integration": {
+        "data_layer": {
+          "service": "industriverse-data-layer.default.svc.cluster.local",
+          "port": 8000,
+          "protocol": "http"
+        },
+        "core_ai_layer": {
+          "service": "industriverse-core-ai-layer.default.svc.cluster.local",
+          "port": 8000,
+          "protocol": "http"
+        },
+        "generative_layer": {
+          "service": "industriverse-generative-layer.default.svc.cluster.local",
+          "port": 8000,
+          "protocol": "http"
+        }
+      },
+      "security": {
+        "authentication_required": true,
+        "authorization_enabled": true,
+        "encryption_enabled": true,
+        "audit_logging": true,
+        "compliance_mode": "standard"
+      }
+    }

@@ -1,0 +1,2769 @@
+apiVersion: industriverse.io/v1
+kind: IndustriversePlatform
+metadata:
+  name: industriverse
+  version: "1.0.0"
+  description: "Unified Industriverse Platform Manifest"
+spec:
+  # Global platform configuration
+  global:
+    trustDomain: "industriverse.io"
+    defaultNamespace: "industriverse-system"
+    platformVersion: "1.0.0"
+    deploymentMode: "production"
+    highAvailability: true
+    edgeCompatible: true
+    
+  # Layer definitions and configurations
+  layers:
+    # 1. Data Layer
+    dataLayer:
+      version: "1.0.0"
+      enabled: true
+      priority: 10 # Deployment priority (lower numbers deploy first)
+      components:
+        - name: "data-ingestion"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies: []
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "data-access-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "data-ingestion-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/data/ingest"
+                - "/api/v1/data/validate"
+              consumers:
+                - "coreAiLayer.model-training"
+                - "applicationLayer.digital-twins"
+                - "workflowLayer.data-processors"
+        
+        - name: "data-processing"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "2"
+            memory: "4Gi"
+          dependencies:
+            - "dataLayer.data-ingestion"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "data-processing-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "data-processing-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/data/process"
+                - "/api/v1/data/transform"
+              consumers:
+                - "coreAiLayer.inference-engine"
+                - "generativeLayer.content-generator"
+                - "applicationLayer.analytics-dashboard"
+        
+        - name: "data-storage"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "2"
+            memory: "8Gi"
+            storage: "100Gi"
+          dependencies:
+            - "dataLayer.data-processing"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "data-storage-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "data-storage-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/data/store"
+                - "/api/v1/data/retrieve"
+                - "/api/v1/data/query"
+              consumers:
+                - "coreAiLayer.model-training"
+                - "applicationLayer.digital-twins"
+                - "workflowLayer.data-processors"
+                - "securityLayer.audit-service"
+      
+      # Protocol bridges for Data Layer
+      protocolBridges:
+        - name: "data-mcp-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "mcp"
+          messageFormats:
+            - "data-ingest-format"
+            - "data-query-format"
+            - "data-result-format"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 5000
+        
+        - name: "data-a2a-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "a2a"
+          messageFormats:
+            - "agent-data-request"
+            - "agent-data-response"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 5000
+      
+      # Trust policies for Data Layer
+      trustPolicies:
+        - name: "data-access-policy"
+          version: "1.0.0"
+          description: "Controls access to data resources"
+          rules:
+            - resource: "raw-data"
+              actions: ["read", "write"]
+              subjects:
+                - "dataLayer.data-ingestion"
+                - "dataLayer.data-processing"
+                - "securityLayer.audit-service"
+            - resource: "processed-data"
+              actions: ["read"]
+              subjects:
+                - "coreAiLayer.model-training"
+                - "coreAiLayer.inference-engine"
+                - "applicationLayer.digital-twins"
+                - "workflowLayer.data-processors"
+        
+        - name: "data-lineage-policy"
+          version: "1.0.0"
+          description: "Ensures data lineage tracking"
+          rules:
+            - resource: "data-lineage"
+              actions: ["record", "read"]
+              subjects:
+                - "dataLayer.data-processing"
+                - "securityLayer.audit-service"
+                - "overseerSystem.monitoring-service"
+      
+      # Deployment configuration for Data Layer
+      deployment:
+        kubernetes:
+          namespace: "industriverse-data"
+          serviceAccount: "data-layer-sa"
+          nodeSelector:
+            diskType: "ssd"
+          tolerations:
+            - key: "data-processing"
+              operator: "Exists"
+              effect: "NoSchedule"
+        helm:
+          chart: "data-layer"
+          version: "1.0.0"
+          values:
+            persistence: true
+            monitoring: true
+            backup:
+              enabled: true
+              schedule: "0 2 * * *"
+        healthChecks:
+          liveness:
+            path: "/health/live"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readiness:
+            path: "/health/ready"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+    # 2. Core AI Layer
+    coreAiLayer:
+      version: "1.0.0"
+      enabled: true
+      priority: 20
+      components:
+        - name: "model-training"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "4"
+            memory: "16Gi"
+            gpu: "2"
+          dependencies:
+            - "dataLayer.data-storage"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "model-training-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "model-training-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/ai/train"
+                - "/api/v1/ai/validate"
+              consumers:
+                - "generativeLayer.model-adapter"
+                - "overseerSystem.ai-monitor"
+        
+        - name: "inference-engine"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "2"
+            memory: "8Gi"
+            gpu: "1"
+          dependencies:
+            - "coreAiLayer.model-training"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "inference-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "inference-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/ai/infer"
+                - "/api/v1/ai/explain"
+              consumers:
+                - "generativeLayer.content-generator"
+                - "applicationLayer.digital-twins"
+                - "workflowLayer.decision-engine"
+        
+        - name: "model-registry"
+          version: "1.0.0"
+          replicas: 1
+          resources:
+            cpu: "1"
+            memory: "4Gi"
+            storage: "50Gi"
+          dependencies: []
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "model-registry-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "model-registry-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/ai/models/register"
+                - "/api/v1/ai/models/retrieve"
+                - "/api/v1/ai/models/version"
+              consumers:
+                - "coreAiLayer.model-training"
+                - "coreAiLayer.inference-engine"
+                - "generativeLayer.model-adapter"
+                - "overseerSystem.ai-monitor"
+      
+      # Protocol bridges for Core AI Layer
+      protocolBridges:
+        - name: "ai-mcp-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "mcp"
+          messageFormats:
+            - "model-training-request"
+            - "model-inference-request"
+            - "model-registry-request"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 10000
+        
+        - name: "ai-a2a-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "a2a"
+          messageFormats:
+            - "agent-model-request"
+            - "agent-inference-response"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 5000
+      
+      # Trust policies for Core AI Layer
+      trustPolicies:
+        - name: "model-training-policy"
+          version: "1.0.0"
+          description: "Controls access to model training resources"
+          rules:
+            - resource: "training-data"
+              actions: ["read"]
+              subjects:
+                - "coreAiLayer.model-training"
+            - resource: "model-artifacts"
+              actions: ["write"]
+              subjects:
+                - "coreAiLayer.model-training"
+        
+        - name: "inference-policy"
+          version: "1.0.0"
+          description: "Controls access to inference resources"
+          rules:
+            - resource: "model-artifacts"
+              actions: ["read"]
+              subjects:
+                - "coreAiLayer.inference-engine"
+            - resource: "inference-results"
+              actions: ["write"]
+              subjects:
+                - "coreAiLayer.inference-engine"
+                - "generativeLayer.content-generator"
+                - "applicationLayer.digital-twins"
+      
+      # Deployment configuration for Core AI Layer
+      deployment:
+        kubernetes:
+          namespace: "industriverse-ai"
+          serviceAccount: "core-ai-layer-sa"
+          nodeSelector:
+            accelerator: "gpu"
+          tolerations:
+            - key: "ai-workload"
+              operator: "Exists"
+              effect: "NoSchedule"
+        helm:
+          chart: "core-ai-layer"
+          version: "1.0.0"
+          values:
+            persistence: true
+            monitoring: true
+            scaling:
+              enabled: true
+              minReplicas: 1
+              maxReplicas: 5
+              targetCPUUtilization: 70
+        healthChecks:
+          liveness:
+            path: "/health/live"
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          readiness:
+            path: "/health/ready"
+            initialDelaySeconds: 60
+            periodSeconds: 15
+
+    # 3. Generative Layer
+    generativeLayer:
+      version: "1.0.0"
+      enabled: true
+      priority: 30
+      components:
+        - name: "content-generator"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "2"
+            memory: "8Gi"
+            gpu: "1"
+          dependencies:
+            - "coreAiLayer.inference-engine"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "content-generation-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "content-generator-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/generate/content"
+                - "/api/v1/generate/validate"
+              consumers:
+                - "applicationLayer.ui-components"
+                - "workflowLayer.content-workflow"
+        
+        - name: "template-engine"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "4Gi"
+          dependencies: []
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "template-engine-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "template-engine-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/templates/render"
+                - "/api/v1/templates/manage"
+              consumers:
+                - "generativeLayer.content-generator"
+                - "applicationLayer.ui-components"
+                - "workflowLayer.content-workflow"
+        
+        - name: "model-adapter"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "4Gi"
+          dependencies:
+            - "coreAiLayer.model-registry"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "model-adapter-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "model-adapter-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/models/adapt"
+                - "/api/v1/models/configure"
+              consumers:
+                - "generativeLayer.content-generator"
+                - "applicationLayer.digital-twins"
+      
+      # Protocol bridges for Generative Layer
+      protocolBridges:
+        - name: "generative-mcp-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "mcp"
+          messageFormats:
+            - "content-generation-request"
+            - "template-render-request"
+            - "model-adaptation-request"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 8000
+        
+        - name: "generative-a2a-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "a2a"
+          messageFormats:
+            - "agent-generation-request"
+            - "agent-generation-response"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 5000
+      
+      # Trust policies for Generative Layer
+      trustPolicies:
+        - name: "content-generation-policy"
+          version: "1.0.0"
+          description: "Controls access to content generation resources"
+          rules:
+            - resource: "generation-models"
+              actions: ["read"]
+              subjects:
+                - "generativeLayer.content-generator"
+            - resource: "generated-content"
+              actions: ["write"]
+              subjects:
+                - "generativeLayer.content-generator"
+                - "securityLayer.content-filter"
+        
+        - name: "content-safety-policy"
+          version: "1.0.0"
+          description: "Ensures content safety and compliance"
+          rules:
+            - resource: "generated-content"
+              actions: ["filter", "audit"]
+              subjects:
+                - "securityLayer.content-filter"
+                - "securityLayer.audit-service"
+      
+      # Deployment configuration for Generative Layer
+      deployment:
+        kubernetes:
+          namespace: "industriverse-generative"
+          serviceAccount: "generative-layer-sa"
+          nodeSelector:
+            workloadType: "ai"
+          tolerations:
+            - key: "generative-workload"
+              operator: "Exists"
+              effect: "NoSchedule"
+        helm:
+          chart: "generative-layer"
+          version: "1.0.0"
+          values:
+            contentSafety: true
+            monitoring: true
+            scaling:
+              enabled: true
+              minReplicas: 1
+              maxReplicas: 5
+              targetCPUUtilization: 70
+        healthChecks:
+          liveness:
+            path: "/health/live"
+            initialDelaySeconds: 45
+            periodSeconds: 15
+          readiness:
+            path: "/health/ready"
+            initialDelaySeconds: 45
+            periodSeconds: 15
+
+    # 4. Application Layer
+    applicationLayer:
+      version: "1.0.0"
+      enabled: true
+      priority: 40
+      components:
+        - name: "digital-twins"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "2"
+            memory: "8Gi"
+          dependencies:
+            - "dataLayer.data-storage"
+            - "coreAiLayer.inference-engine"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "digital-twin-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "digital-twin-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/twins/create"
+                - "/api/v1/twins/update"
+                - "/api/v1/twins/query"
+              consumers:
+                - "uiLayer.twin-visualizer"
+                - "workflowLayer.twin-workflow"
+                - "overseerSystem.twin-monitor"
+        
+        - name: "industry-apps"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "2"
+            memory: "4Gi"
+          dependencies:
+            - "applicationLayer.digital-twins"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "industry-app-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "industry-app-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/apps/manufacturing"
+                - "/api/v1/apps/energy"
+                - "/api/v1/apps/datacenter"
+              consumers:
+                - "uiLayer.app-interface"
+                - "workflowLayer.app-workflow"
+        
+        - name: "analytics-dashboard"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "4Gi"
+          dependencies:
+            - "dataLayer.data-processing"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "analytics-dashboard-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "analytics-dashboard-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/analytics/dashboard"
+                - "/api/v1/analytics/reports"
+              consumers:
+                - "uiLayer.dashboard-viewer"
+                - "overseerSystem.analytics-monitor"
+        
+        - name: "ui-components"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "generativeLayer.template-engine"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "ui-component-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "ui-component-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/ui/components"
+                - "/api/v1/ui/themes"
+              consumers:
+                - "uiLayer.component-system"
+                - "uiLayer.universal-skin"
+      
+      # Protocol bridges for Application Layer
+      protocolBridges:
+        - name: "application-mcp-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "mcp"
+          messageFormats:
+            - "twin-operation-request"
+            - "app-operation-request"
+            - "analytics-request"
+            - "ui-component-request"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 5000
+        
+        - name: "application-a2a-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "a2a"
+          messageFormats:
+            - "agent-twin-request"
+            - "agent-app-request"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 5000
+      
+      # Trust policies for Application Layer
+      trustPolicies:
+        - name: "digital-twin-policy"
+          version: "1.0.0"
+          description: "Controls access to digital twin resources"
+          rules:
+            - resource: "twin-definitions"
+              actions: ["read", "write"]
+              subjects:
+                - "applicationLayer.digital-twins"
+                - "workflowLayer.twin-workflow"
+            - resource: "twin-state"
+              actions: ["read"]
+              subjects:
+                - "uiLayer.twin-visualizer"
+                - "overseerSystem.twin-monitor"
+        
+        - name: "industry-app-policy"
+          version: "1.0.0"
+          description: "Controls access to industry application resources"
+          rules:
+            - resource: "app-functions"
+              actions: ["execute"]
+              subjects:
+                - "applicationLayer.industry-apps"
+                - "workflowLayer.app-workflow"
+            - resource: "app-data"
+              actions: ["read", "write"]
+              subjects:
+                - "applicationLayer.industry-apps"
+                - "dataLayer.data-storage"
+      
+      # Deployment configuration for Application Layer
+      deployment:
+        kubernetes:
+          namespace: "industriverse-application"
+          serviceAccount: "application-layer-sa"
+          nodeSelector:
+            workloadType: "application"
+          tolerations:
+            - key: "application-workload"
+              operator: "Exists"
+              effect: "NoSchedule"
+        helm:
+          chart: "application-layer"
+          version: "1.0.0"
+          values:
+            persistence: true
+            monitoring: true
+            scaling:
+              enabled: true
+              minReplicas: 1
+              maxReplicas: 5
+              targetCPUUtilization: 70
+        healthChecks:
+          liveness:
+            path: "/health/live"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readiness:
+            path: "/health/ready"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+    # 5. Protocol Layer
+    protocolLayer:
+      version: "1.0.0"
+      enabled: true
+      priority: 15 # Higher priority than Data Layer to ensure protocols are available
+      components:
+        - name: "mcp-service"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies: []
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "mcp-service-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "mcp-service-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/mcp/message"
+                - "/api/v1/mcp/context"
+              consumers:
+                - "all"
+        
+        - name: "a2a-service"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies: []
+          protocols:
+            - name: "a2a"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "a2a-service-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "a2a-service-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/a2a/discover"
+                - "/api/v1/a2a/message"
+                - "/api/v1/a2a/task"
+              consumers:
+                - "all"
+        
+        - name: "protocol-bridge"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "protocolLayer.mcp-service"
+            - "protocolLayer.a2a-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "protocol-bridge-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "protocol-bridge-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/protocol/translate"
+                - "/api/v1/protocol/validate"
+              consumers:
+                - "all"
+        
+        - name: "discovery-service"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies: []
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "discovery-service-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "discovery-service-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/discovery/register"
+                - "/api/v1/discovery/discover"
+                - "/api/v1/discovery/health"
+              consumers:
+                - "all"
+      
+      # Protocol definitions
+      protocols:
+        - name: "mcp"
+          version: "1.0.0"
+          description: "Model Context Protocol"
+          messageFormats:
+            - name: "mcp-message"
+              version: "1.0.0"
+              schema: "schemas/mcp-message-schema.json"
+            - name: "mcp-context"
+              version: "1.0.0"
+              schema: "schemas/mcp-context-schema.json"
+          errorCodes:
+            - code: "MCP-001"
+              description: "Invalid message format"
+              severity: "error"
+            - code: "MCP-002"
+              description: "Context not found"
+              severity: "error"
+            - code: "MCP-003"
+              description: "Permission denied"
+              severity: "error"
+          versionCompatibility:
+            minVersion: "1.0.0"
+            maxVersion: "1.1.0"
+            upgradePolicy: "backward-compatible"
+        
+        - name: "a2a"
+          version: "1.0.0"
+          description: "Agent to Agent Protocol"
+          messageFormats:
+            - name: "agent-card"
+              version: "1.0.0"
+              schema: "schemas/agent-card-schema.json"
+            - name: "agent-task"
+              version: "1.0.0"
+              schema: "schemas/agent-task-schema.json"
+            - name: "agent-message"
+              version: "1.0.0"
+              schema: "schemas/agent-message-schema.json"
+          errorCodes:
+            - code: "A2A-001"
+              description: "Agent not found"
+              severity: "error"
+            - code: "A2A-002"
+              description: "Task creation failed"
+              severity: "error"
+            - code: "A2A-003"
+              description: "Message delivery failed"
+              severity: "error"
+          versionCompatibility:
+            minVersion: "1.0.0"
+            maxVersion: "1.1.0"
+            upgradePolicy: "backward-compatible"
+          industryExtensions:
+            - name: "manufacturing"
+              schema: "schemas/a2a-manufacturing-ext.json"
+            - name: "energy"
+              schema: "schemas/a2a-energy-ext.json"
+            - name: "datacenter"
+              schema: "schemas/a2a-datacenter-ext.json"
+      
+      # Trust policies for Protocol Layer
+      trustPolicies:
+        - name: "protocol-access-policy"
+          version: "1.0.0"
+          description: "Controls access to protocol services"
+          rules:
+            - resource: "mcp-service"
+              actions: ["use"]
+              subjects:
+                - "all"
+            - resource: "a2a-service"
+              actions: ["use"]
+              subjects:
+                - "all"
+        
+        - name: "protocol-admin-policy"
+          version: "1.0.0"
+          description: "Controls administrative access to protocol services"
+          rules:
+            - resource: "protocol-configuration"
+              actions: ["read", "write"]
+              subjects:
+                - "protocolLayer.protocol-bridge"
+                - "securityLayer.policy-service"
+                - "overseerSystem.protocol-monitor"
+      
+      # Deployment configuration for Protocol Layer
+      deployment:
+        kubernetes:
+          namespace: "industriverse-protocol"
+          serviceAccount: "protocol-layer-sa"
+          nodeSelector:
+            workloadType: "infrastructure"
+          tolerations:
+            - key: "infrastructure-workload"
+              operator: "Exists"
+              effect: "NoSchedule"
+        helm:
+          chart: "protocol-layer"
+          version: "1.0.0"
+          values:
+            highAvailability: true
+            monitoring: true
+            scaling:
+              enabled: true
+              minReplicas: 2
+              maxReplicas: 5
+              targetCPUUtilization: 70
+        healthChecks:
+          liveness:
+            path: "/health/live"
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readiness:
+            path: "/health/ready"
+            initialDelaySeconds: 20
+            periodSeconds: 10
+
+    # 6. Workflow Automation Layer
+    workflowLayer:
+      version: "1.0.0"
+      enabled: true
+      priority: 50
+      components:
+        - name: "workflow-engine"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "2"
+            memory: "4Gi"
+          dependencies:
+            - "protocolLayer.mcp-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "workflow-engine-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "workflow-engine-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/workflow/create"
+                - "/api/v1/workflow/execute"
+                - "/api/v1/workflow/status"
+              consumers:
+                - "applicationLayer.industry-apps"
+                - "uiLayer.workflow-ui"
+                - "overseerSystem.workflow-monitor"
+        
+        - name: "n8n-integration"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "4Gi"
+          dependencies:
+            - "workflowLayer.workflow-engine"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "n8n-integration-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "n8n-integration-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/n8n/workflow"
+                - "/api/v1/n8n/execute"
+              consumers:
+                - "workflowLayer.workflow-engine"
+                - "uiLayer.workflow-ui"
+        
+        - name: "task-manager"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "workflowLayer.workflow-engine"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "task-manager-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "task-manager-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/tasks/create"
+                - "/api/v1/tasks/assign"
+                - "/api/v1/tasks/complete"
+              consumers:
+                - "workflowLayer.workflow-engine"
+                - "applicationLayer.industry-apps"
+                - "uiLayer.task-ui"
+        
+        - name: "workflow-agents"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "workflowLayer.task-manager"
+            - "protocolLayer.a2a-service"
+          protocols:
+            - name: "a2a"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "workflow-agent-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "workflow-agent-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/agents/trigger"
+                - "/api/v1/agents/optimize"
+                - "/api/v1/agents/analyze"
+              consumers:
+                - "workflowLayer.workflow-engine"
+                - "applicationLayer.industry-apps"
+                - "overseerSystem.agent-monitor"
+      
+      # Protocol bridges for Workflow Automation Layer
+      protocolBridges:
+        - name: "workflow-mcp-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "mcp"
+          messageFormats:
+            - "workflow-operation-request"
+            - "task-operation-request"
+            - "n8n-operation-request"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 5000
+        
+        - name: "workflow-a2a-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "a2a"
+          messageFormats:
+            - "agent-workflow-request"
+            - "agent-task-request"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 5000
+      
+      # Trust policies for Workflow Automation Layer
+      trustPolicies:
+        - name: "workflow-execution-policy"
+          version: "1.0.0"
+          description: "Controls workflow execution permissions"
+          rules:
+            - resource: "workflows"
+              actions: ["execute"]
+              subjects:
+                - "workflowLayer.workflow-engine"
+                - "applicationLayer.industry-apps"
+            - resource: "workflow-definitions"
+              actions: ["read", "write"]
+              subjects:
+                - "workflowLayer.workflow-engine"
+                - "workflowLayer.n8n-integration"
+        
+        - name: "task-management-policy"
+          version: "1.0.0"
+          description: "Controls task management permissions"
+          rules:
+            - resource: "tasks"
+              actions: ["create", "assign", "complete"]
+              subjects:
+                - "workflowLayer.task-manager"
+                - "workflowLayer.workflow-engine"
+            - resource: "task-assignments"
+              actions: ["read"]
+              subjects:
+                - "workflowLayer.workflow-agents"
+                - "uiLayer.task-ui"
+      
+      # Deployment configuration for Workflow Automation Layer
+      deployment:
+        kubernetes:
+          namespace: "industriverse-workflow"
+          serviceAccount: "workflow-layer-sa"
+          nodeSelector:
+            workloadType: "application"
+          tolerations:
+            - key: "workflow-workload"
+              operator: "Exists"
+              effect: "NoSchedule"
+        helm:
+          chart: "workflow-layer"
+          version: "1.0.0"
+          values:
+            persistence: true
+            monitoring: true
+            n8n:
+              enabled: true
+              version: "latest"
+            scaling:
+              enabled: true
+              minReplicas: 1
+              maxReplicas: 5
+              targetCPUUtilization: 70
+        healthChecks:
+          liveness:
+            path: "/health/live"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readiness:
+            path: "/health/ready"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+    # 7. UI/UX Layer
+    uiLayer:
+      version: "1.0.0"
+      enabled: true
+      priority: 60
+      components:
+        - name: "component-system"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "applicationLayer.ui-components"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "component-system-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "component-system-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/ui/components/core"
+                - "/api/v1/ui/components/composite"
+              consumers:
+                - "uiLayer.universal-skin"
+                - "uiLayer.twin-visualizer"
+                - "uiLayer.dashboard-viewer"
+        
+        - name: "universal-skin"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "uiLayer.component-system"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "universal-skin-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "universal-skin-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/ui/skin/capsule"
+                - "/api/v1/ui/skin/avatar"
+                - "/api/v1/ui/skin/island"
+              consumers:
+                - "all"
+        
+        - name: "twin-visualizer"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "4Gi"
+          dependencies:
+            - "applicationLayer.digital-twins"
+            - "uiLayer.component-system"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "twin-visualizer-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "twin-visualizer-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/ui/twins/visualize"
+                - "/api/v1/ui/twins/interact"
+              consumers:
+                - "uiLayer.universal-skin"
+        
+        - name: "dashboard-viewer"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "applicationLayer.analytics-dashboard"
+            - "uiLayer.component-system"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "dashboard-viewer-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "dashboard-viewer-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/ui/dashboard/view"
+                - "/api/v1/ui/dashboard/interact"
+              consumers:
+                - "uiLayer.universal-skin"
+        
+        - name: "workflow-ui"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "workflowLayer.workflow-engine"
+            - "uiLayer.component-system"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "workflow-ui-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "workflow-ui-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/ui/workflow/design"
+                - "/api/v1/ui/workflow/monitor"
+              consumers:
+                - "uiLayer.universal-skin"
+        
+        - name: "task-ui"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "workflowLayer.task-manager"
+            - "uiLayer.component-system"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "task-ui-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "task-ui-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/ui/tasks/list"
+                - "/api/v1/ui/tasks/detail"
+              consumers:
+                - "uiLayer.universal-skin"
+      
+      # Protocol bridges for UI/UX Layer
+      protocolBridges:
+        - name: "ui-mcp-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "mcp"
+          messageFormats:
+            - "ui-component-request"
+            - "ui-skin-request"
+            - "ui-twin-request"
+            - "ui-dashboard-request"
+            - "ui-workflow-request"
+            - "ui-task-request"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 3000
+      
+      # State representation standards
+      stateRepresentation:
+        - name: "capsule-state"
+          version: "1.0.0"
+          states:
+            - name: "idle"
+              description: "Capsule is idle"
+              visualization: "pulse-slow"
+              color: "blue"
+            - name: "active"
+              description: "Capsule is active"
+              visualization: "pulse-medium"
+              color: "green"
+            - name: "busy"
+              description: "Capsule is busy"
+              visualization: "pulse-fast"
+              color: "yellow"
+            - name: "error"
+              description: "Capsule has an error"
+              visualization: "pulse-error"
+              color: "red"
+          transitions:
+            - from: "idle"
+              to: "active"
+              animation: "fade-in"
+              duration: 300
+            - from: "active"
+              to: "busy"
+              animation: "scale-up"
+              duration: 200
+            - from: "busy"
+              to: "active"
+              animation: "scale-down"
+              duration: 200
+            - from: "active"
+              to: "idle"
+              animation: "fade-out"
+              duration: 300
+            - from: "*"
+              to: "error"
+              animation: "shake"
+              duration: 500
+        
+        - name: "avatar-state"
+          version: "1.0.0"
+          states:
+            - name: "available"
+              description: "Avatar is available"
+              visualization: "avatar-available"
+              expression: "neutral"
+            - name: "working"
+              description: "Avatar is working"
+              visualization: "avatar-working"
+              expression: "focused"
+            - name: "thinking"
+              description: "Avatar is thinking"
+              visualization: "avatar-thinking"
+              expression: "thoughtful"
+            - name: "error"
+              description: "Avatar has an error"
+              visualization: "avatar-error"
+              expression: "concerned"
+          transitions:
+            - from: "available"
+              to: "working"
+              animation: "avatar-transition"
+              duration: 500
+            - from: "working"
+              to: "thinking"
+              animation: "avatar-transition"
+              duration: 300
+            - from: "thinking"
+              to: "working"
+              animation: "avatar-transition"
+              duration: 300
+            - from: "*"
+              to: "error"
+              animation: "avatar-error-transition"
+              duration: 500
+      
+      # Trust policies for UI/UX Layer
+      trustPolicies:
+        - name: "ui-access-policy"
+          version: "1.0.0"
+          description: "Controls access to UI resources"
+          rules:
+            - resource: "ui-components"
+              actions: ["use"]
+              subjects:
+                - "uiLayer.universal-skin"
+                - "uiLayer.twin-visualizer"
+                - "uiLayer.dashboard-viewer"
+                - "uiLayer.workflow-ui"
+                - "uiLayer.task-ui"
+            - resource: "ui-themes"
+              actions: ["use"]
+              subjects:
+                - "uiLayer.universal-skin"
+                - "uiLayer.component-system"
+        
+        - name: "ui-admin-policy"
+          version: "1.0.0"
+          description: "Controls administrative access to UI resources"
+          rules:
+            - resource: "ui-configuration"
+              actions: ["read", "write"]
+              subjects:
+                - "uiLayer.component-system"
+                - "securityLayer.policy-service"
+                - "overseerSystem.ui-monitor"
+      
+      # Deployment configuration for UI/UX Layer
+      deployment:
+        kubernetes:
+          namespace: "industriverse-ui"
+          serviceAccount: "ui-layer-sa"
+          nodeSelector:
+            workloadType: "frontend"
+          tolerations:
+            - key: "frontend-workload"
+              operator: "Exists"
+              effect: "NoSchedule"
+        helm:
+          chart: "ui-layer"
+          version: "1.0.0"
+          values:
+            persistence: false
+            monitoring: true
+            scaling:
+              enabled: true
+              minReplicas: 1
+              maxReplicas: 5
+              targetCPUUtilization: 70
+        healthChecks:
+          liveness:
+            path: "/health/live"
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readiness:
+            path: "/health/ready"
+            initialDelaySeconds: 20
+            periodSeconds: 10
+
+    # 8. Security & Compliance Layer
+    securityLayer:
+      version: "1.0.0"
+      enabled: true
+      priority: 5 # Highest priority to ensure security is established first
+      components:
+        - name: "identity-service"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies: []
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "identity-service-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "identity-service-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/identity/authenticate"
+                - "/api/v1/identity/authorize"
+                - "/api/v1/identity/token"
+              consumers:
+                - "all"
+        
+        - name: "policy-service"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "securityLayer.identity-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "policy-service-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "policy-service-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/policy/evaluate"
+                - "/api/v1/policy/manage"
+              consumers:
+                - "all"
+        
+        - name: "audit-service"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "4Gi"
+            storage: "50Gi"
+          dependencies:
+            - "securityLayer.identity-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "audit-service-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "audit-service-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/audit/log"
+                - "/api/v1/audit/query"
+              consumers:
+                - "all"
+        
+        - name: "content-filter"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "securityLayer.policy-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "content-filter-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "content-filter-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/filter/content"
+                - "/api/v1/filter/validate"
+              consumers:
+                - "generativeLayer.content-generator"
+                - "applicationLayer.ui-components"
+      
+      # Protocol bridges for Security & Compliance Layer
+      protocolBridges:
+        - name: "security-mcp-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "mcp"
+          messageFormats:
+            - "identity-request"
+            - "policy-request"
+            - "audit-request"
+            - "filter-request"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 3000
+      
+      # Trust policies for Security & Compliance Layer
+      trustPolicies:
+        - name: "security-service-policy"
+          version: "1.0.0"
+          description: "Controls access to security services"
+          rules:
+            - resource: "identity-service"
+              actions: ["authenticate", "authorize"]
+              subjects:
+                - "all"
+            - resource: "policy-service"
+              actions: ["evaluate"]
+              subjects:
+                - "all"
+            - resource: "audit-service"
+              actions: ["log"]
+              subjects:
+                - "all"
+        
+        - name: "security-admin-policy"
+          version: "1.0.0"
+          description: "Controls administrative access to security services"
+          rules:
+            - resource: "identity-configuration"
+              actions: ["read", "write"]
+              subjects:
+                - "securityLayer.policy-service"
+                - "overseerSystem.security-monitor"
+            - resource: "policy-configuration"
+              actions: ["read", "write"]
+              subjects:
+                - "securityLayer.policy-service"
+                - "overseerSystem.security-monitor"
+            - resource: "audit-configuration"
+              actions: ["read", "write"]
+              subjects:
+                - "securityLayer.policy-service"
+                - "overseerSystem.security-monitor"
+      
+      # Deployment configuration for Security & Compliance Layer
+      deployment:
+        kubernetes:
+          namespace: "industriverse-security"
+          serviceAccount: "security-layer-sa"
+          nodeSelector:
+            workloadType: "infrastructure"
+          tolerations:
+            - key: "security-workload"
+              operator: "Exists"
+              effect: "NoSchedule"
+        helm:
+          chart: "security-layer"
+          version: "1.0.0"
+          values:
+            persistence: true
+            monitoring: true
+            highAvailability: true
+            encryption:
+              enabled: true
+              keyRotation: true
+        healthChecks:
+          liveness:
+            path: "/health/live"
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readiness:
+            path: "/health/ready"
+            initialDelaySeconds: 20
+            periodSeconds: 10
+
+    # 9. Deployment Operations Layer
+    deploymentLayer:
+      version: "1.0.0"
+      enabled: true
+      priority: 1 # Highest priority to ensure deployment infrastructure is established first
+      components:
+        - name: "deployment-service"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies: []
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "deployment-service-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "deployment-service-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/deployment/deploy"
+                - "/api/v1/deployment/status"
+                - "/api/v1/deployment/rollback"
+              consumers:
+                - "overseerSystem.deployment-monitor"
+        
+        - name: "configuration-service"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "deploymentLayer.deployment-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "configuration-service-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "configuration-service-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/configuration/get"
+                - "/api/v1/configuration/set"
+                - "/api/v1/configuration/validate"
+              consumers:
+                - "all"
+        
+        - name: "monitoring-service"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "4Gi"
+            storage: "50Gi"
+          dependencies:
+            - "deploymentLayer.deployment-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "monitoring-service-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "monitoring-service-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/monitoring/metrics"
+                - "/api/v1/monitoring/alerts"
+                - "/api/v1/monitoring/logs"
+              consumers:
+                - "overseerSystem.monitoring-service"
+                - "uiLayer.dashboard-viewer"
+        
+        - name: "scaling-service"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "deploymentLayer.monitoring-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "provider"
+          trustPolicies:
+            - name: "scaling-service-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "scaling-service-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/scaling/auto"
+                - "/api/v1/scaling/manual"
+                - "/api/v1/scaling/status"
+              consumers:
+                - "overseerSystem.scaling-monitor"
+      
+      # Protocol bridges for Deployment Operations Layer
+      protocolBridges:
+        - name: "deployment-mcp-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "mcp"
+          messageFormats:
+            - "deployment-request"
+            - "configuration-request"
+            - "monitoring-request"
+            - "scaling-request"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 5000
+      
+      # Deployment handshakes
+      deploymentHandshakes:
+        - name: "layer-deployment-handshake"
+          version: "1.0.0"
+          steps:
+            - name: "pre-deployment-check"
+              description: "Verify prerequisites before deployment"
+              timeout: 60
+              retries: 3
+            - name: "deployment-execution"
+              description: "Execute deployment operations"
+              timeout: 300
+              retries: 2
+            - name: "post-deployment-verification"
+              description: "Verify deployment success"
+              timeout: 120
+              retries: 3
+          rollbackProcedure:
+            - name: "stop-deployment"
+              description: "Stop ongoing deployment"
+              timeout: 30
+            - name: "restore-previous-state"
+              description: "Restore system to previous state"
+              timeout: 300
+            - name: "verify-rollback"
+              description: "Verify rollback success"
+              timeout: 120
+        
+        - name: "component-deployment-handshake"
+          version: "1.0.0"
+          steps:
+            - name: "dependency-check"
+              description: "Verify dependencies are available"
+              timeout: 60
+              retries: 3
+            - name: "component-deployment"
+              description: "Deploy component"
+              timeout: 180
+              retries: 2
+            - name: "health-check"
+              description: "Verify component health"
+              timeout: 60
+              retries: 5
+          rollbackProcedure:
+            - name: "stop-component"
+              description: "Stop component"
+              timeout: 30
+            - name: "remove-component"
+              description: "Remove component"
+              timeout: 60
+            - name: "verify-dependencies"
+              description: "Verify dependencies are still healthy"
+              timeout: 60
+      
+      # Trust policies for Deployment Operations Layer
+      trustPolicies:
+        - name: "deployment-service-policy"
+          version: "1.0.0"
+          description: "Controls access to deployment services"
+          rules:
+            - resource: "deployment-operations"
+              actions: ["execute"]
+              subjects:
+                - "deploymentLayer.deployment-service"
+                - "overseerSystem.deployment-monitor"
+            - resource: "deployment-status"
+              actions: ["read"]
+              subjects:
+                - "all"
+        
+        - name: "configuration-service-policy"
+          version: "1.0.0"
+          description: "Controls access to configuration services"
+          rules:
+            - resource: "configuration"
+              actions: ["read"]
+              subjects:
+                - "all"
+            - resource: "configuration"
+              actions: ["write"]
+              subjects:
+                - "deploymentLayer.deployment-service"
+                - "overseerSystem.configuration-monitor"
+        
+        - name: "monitoring-service-policy"
+          version: "1.0.0"
+          description: "Controls access to monitoring services"
+          rules:
+            - resource: "metrics"
+              actions: ["read"]
+              subjects:
+                - "all"
+            - resource: "alerts"
+              actions: ["read", "write"]
+              subjects:
+                - "deploymentLayer.monitoring-service"
+                - "overseerSystem.monitoring-service"
+      
+      # Deployment configuration for Deployment Operations Layer
+      deployment:
+        kubernetes:
+          namespace: "industriverse-deployment"
+          serviceAccount: "deployment-layer-sa"
+          nodeSelector:
+            workloadType: "infrastructure"
+          tolerations:
+            - key: "deployment-workload"
+              operator: "Exists"
+              effect: "NoSchedule"
+        helm:
+          chart: "deployment-layer"
+          version: "1.0.0"
+          values:
+            persistence: true
+            monitoring: true
+            highAvailability: true
+            backup:
+              enabled: true
+              schedule: "0 1 * * *"
+        healthChecks:
+          liveness:
+            path: "/health/live"
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readiness:
+            path: "/health/ready"
+            initialDelaySeconds: 20
+            periodSeconds: 10
+
+    # 10. Overseer System (replacing Native Phone App Layer)
+    overseerSystem:
+      version: "1.0.0"
+      enabled: true
+      priority: 70 # Last to deploy as it depends on all other layers
+      components:
+        - name: "orchestration-service"
+          version: "1.0.0"
+          replicas: 3
+          resources:
+            cpu: "2"
+            memory: "4Gi"
+          dependencies:
+            - "deploymentLayer.deployment-service"
+            - "securityLayer.identity-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "orchestration-service-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "orchestration-service-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/orchestration/manage"
+                - "/api/v1/orchestration/status"
+              consumers:
+                - "uiLayer.universal-skin"
+        
+        - name: "monitoring-service"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "4Gi"
+          dependencies:
+            - "deploymentLayer.monitoring-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "overseer-monitoring-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "overseer-monitoring-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/overseer/monitor"
+                - "/api/v1/overseer/alerts"
+              consumers:
+                - "uiLayer.dashboard-viewer"
+                - "overseerSystem.orchestration-service"
+        
+        - name: "ai-monitor"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "coreAiLayer.model-registry"
+            - "coreAiLayer.inference-engine"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "ai-monitor-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "ai-monitor-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/overseer/ai/monitor"
+                - "/api/v1/overseer/ai/optimize"
+              consumers:
+                - "overseerSystem.orchestration-service"
+                - "uiLayer.dashboard-viewer"
+        
+        - name: "twin-monitor"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "applicationLayer.digital-twins"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "twin-monitor-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "twin-monitor-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/overseer/twins/monitor"
+                - "/api/v1/overseer/twins/optimize"
+              consumers:
+                - "overseerSystem.orchestration-service"
+                - "uiLayer.dashboard-viewer"
+        
+        - name: "workflow-monitor"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "workflowLayer.workflow-engine"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "workflow-monitor-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "workflow-monitor-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/overseer/workflows/monitor"
+                - "/api/v1/overseer/workflows/optimize"
+              consumers:
+                - "overseerSystem.orchestration-service"
+                - "uiLayer.dashboard-viewer"
+        
+        - name: "security-monitor"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "securityLayer.audit-service"
+            - "securityLayer.policy-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "security-monitor-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "security-monitor-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/overseer/security/monitor"
+                - "/api/v1/overseer/security/incidents"
+              consumers:
+                - "overseerSystem.orchestration-service"
+                - "uiLayer.dashboard-viewer"
+        
+        - name: "deployment-monitor"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "deploymentLayer.deployment-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "deployment-monitor-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "deployment-monitor-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/overseer/deployment/monitor"
+                - "/api/v1/overseer/deployment/manage"
+              consumers:
+                - "overseerSystem.orchestration-service"
+                - "uiLayer.dashboard-viewer"
+        
+        - name: "agent-monitor"
+          version: "1.0.0"
+          replicas: 2
+          resources:
+            cpu: "1"
+            memory: "2Gi"
+          dependencies:
+            - "workflowLayer.workflow-agents"
+            - "protocolLayer.a2a-service"
+          protocols:
+            - name: "mcp"
+              version: "1.0.0"
+              role: "consumer"
+            - name: "a2a"
+              version: "1.0.0"
+              role: "consumer"
+          trustPolicies:
+            - name: "agent-monitor-policy"
+              version: "1.0.0"
+              scope: "platform"
+          capsuleRoutes:
+            - name: "agent-monitor-route"
+              version: "1.0.0"
+              endpoints:
+                - "/api/v1/overseer/agents/monitor"
+                - "/api/v1/overseer/agents/manage"
+              consumers:
+                - "overseerSystem.orchestration-service"
+                - "uiLayer.dashboard-viewer"
+      
+      # Protocol bridges for Overseer System
+      protocolBridges:
+        - name: "overseer-mcp-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "mcp"
+          messageFormats:
+            - "orchestration-request"
+            - "monitoring-request"
+            - "ai-monitor-request"
+            - "twin-monitor-request"
+            - "workflow-monitor-request"
+            - "security-monitor-request"
+            - "deployment-monitor-request"
+            - "agent-monitor-request"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 5000
+        
+        - name: "overseer-a2a-bridge"
+          version: "1.0.0"
+          sourceProtocol: "internal"
+          targetProtocol: "a2a"
+          messageFormats:
+            - "agent-orchestration-request"
+            - "agent-monitoring-request"
+          errorHandling:
+            retryPolicy: "exponential-backoff"
+            maxRetries: 3
+            timeoutMs: 5000
+      
+      # Trust policies for Overseer System
+      trustPolicies:
+        - name: "orchestration-service-policy"
+          version: "1.0.0"
+          description: "Controls access to orchestration services"
+          rules:
+            - resource: "orchestration-commands"
+              actions: ["execute"]
+              subjects:
+                - "overseerSystem.orchestration-service"
+            - resource: "orchestration-status"
+              actions: ["read"]
+              subjects:
+                - "uiLayer.universal-skin"
+                - "uiLayer.dashboard-viewer"
+        
+        - name: "overseer-monitoring-policy"
+          version: "1.0.0"
+          description: "Controls access to overseer monitoring services"
+          rules:
+            - resource: "system-metrics"
+              actions: ["read"]
+              subjects:
+                - "overseerSystem.monitoring-service"
+                - "overseerSystem.orchestration-service"
+            - resource: "system-alerts"
+              actions: ["read", "write"]
+              subjects:
+                - "overseerSystem.monitoring-service"
+                - "uiLayer.dashboard-viewer"
+      
+      # High availability configuration
+      highAvailability:
+        - name: "overseer-ha-config"
+          version: "1.0.0"
+          mode: "active-active"
+          regions: ["primary", "secondary"]
+          failoverStrategy: "automatic"
+          syncStrategy: "real-time"
+          recoveryProcedure:
+            - name: "detect-failure"
+              description: "Detect component failure"
+              timeout: 30
+            - name: "activate-standby"
+              description: "Activate standby component"
+              timeout: 60
+            - name: "verify-activation"
+              description: "Verify standby activation"
+              timeout: 30
+            - name: "restore-state"
+              description: "Restore system state"
+              timeout: 120
+      
+      # Deployment configuration for Overseer System
+      deployment:
+        kubernetes:
+          namespace: "industriverse-overseer"
+          serviceAccount: "overseer-system-sa"
+          nodeSelector:
+            workloadType: "infrastructure"
+          tolerations:
+            - key: "overseer-workload"
+              operator: "Exists"
+              effect: "NoSchedule"
+        helm:
+          chart: "overseer-system"
+          version: "1.0.0"
+          values:
+            persistence: true
+            monitoring: true
+            highAvailability: true
+            backup:
+              enabled: true
+              schedule: "0 0 * * *"
+        healthChecks:
+          liveness:
+            path: "/health/live"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readiness:
+            path: "/health/ready"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+  # Cross-layer integration configuration
+  integration:
+    # Protocol standardization
+    protocolStandards:
+      - name: "message-format-standard"
+        version: "1.0.0"
+        description: "Standardized message format for all protocols"
+        schema: "schemas/standard-message-format.json"
+        versioningStrategy: "semantic"
+        errorHandling:
+          standardCodes: true
+          retryPolicies: true
+          timeoutHandling: true
+      
+      - name: "error-handling-standard"
+        version: "1.0.0"
+        description: "Standardized error handling for all protocols"
+        schema: "schemas/standard-error-handling.json"
+        errorCategories:
+          - name: "validation"
+            codes: ["VAL-001", "VAL-002", "VAL-003"]
+          - name: "authentication"
+            codes: ["AUTH-001", "AUTH-002", "AUTH-003"]
+          - name: "authorization"
+            codes: ["AUTHZ-001", "AUTHZ-002", "AUTHZ-003"]
+          - name: "resource"
+            codes: ["RES-001", "RES-002", "RES-003"]
+          - name: "system"
+            codes: ["SYS-001", "SYS-002", "SYS-003"]
+    
+    # Trust policy standardization
+    trustStandards:
+      - name: "acl-format-standard"
+        version: "1.0.0"
+        description: "Standardized ACL format for all trust policies"
+        schema: "schemas/standard-acl-format.json"
+        enforcementPoints:
+          - "securityLayer.identity-service"
+          - "securityLayer.policy-service"
+          - "protocolLayer.mcp-service"
+          - "protocolLayer.a2a-service"
+      
+      - name: "trust-verification-standard"
+        version: "1.0.0"
+        description: "Standardized trust verification for all layers"
+        schema: "schemas/standard-trust-verification.json"
+        verificationMethods:
+          - name: "token-based"
+            implementation: "securityLayer.identity-service"
+          - name: "certificate-based"
+            implementation: "securityLayer.identity-service"
+          - name: "policy-based"
+            implementation: "securityLayer.policy-service"
+    
+    # State representation standardization
+    stateStandards:
+      - name: "state-transition-standard"
+        version: "1.0.0"
+        description: "Standardized state transition patterns for all components"
+        schema: "schemas/standard-state-transition.json"
+        stateCategories:
+          - name: "operational"
+            states: ["initializing", "ready", "active", "paused", "stopping", "stopped"]
+          - name: "health"
+            states: ["healthy", "degraded", "unhealthy", "failed"]
+          - name: "processing"
+            states: ["idle", "processing", "waiting", "completed", "failed"]
+      
+      - name: "error-state-standard"
+        version: "1.0.0"
+        description: "Standardized error state handling for all components"
+        schema: "schemas/standard-error-state.json"
+        errorCategories:
+          - name: "transient"
+            states: ["retrying", "backing-off", "recovering"]
+          - name: "persistent"
+            states: ["failed", "crashed", "deadlocked"]
+          - name: "security"
+            states: ["unauthorized", "forbidden", "compromised"]
+    
+    # Deployment standardization
+    deploymentStandards:
+      - name: "deployment-sequence-standard"
+        version: "1.0.0"
+        description: "Standardized deployment sequences for all layers"
+        schema: "schemas/standard-deployment-sequence.json"
+        phases:
+          - name: "pre-deployment"
+            steps: ["dependency-check", "resource-check", "backup"]
+          - name: "deployment"
+            steps: ["apply-resources", "wait-for-readiness", "verify-health"]
+          - name: "post-deployment"
+            steps: ["integration-test", "performance-test", "security-scan"]
+      
+      - name: "rollback-standard"
+        version: "1.0.0"
+        description: "Standardized rollback procedures for all layers"
+        schema: "schemas/standard-rollback-procedure.json"
+        phases:
+          - name: "pre-rollback"
+            steps: ["stop-deployment", "assess-impact", "notify"]
+          - name: "rollback"
+            steps: ["restore-backup", "apply-previous-version", "wait-for-readiness"]
+          - name: "post-rollback"
+            steps: ["verify-health", "integration-test", "notify-completion"]
+
+  # Edge deployment configuration
+  edgeDeployment:
+    enabled: true
+    edgeTypes:
+      - name: "industrial-edge"
+        description: "Edge deployment for industrial environments"
+        minimumResources:
+          cpu: "4"
+          memory: "8Gi"
+          storage: "100Gi"
+        requiredLayers:
+          - "dataLayer"
+          - "coreAiLayer"
+          - "applicationLayer"
+          - "protocolLayer"
+          - "securityLayer"
+        optionalLayers:
+          - "generativeLayer"
+          - "workflowLayer"
+          - "uiLayer"
+      
+      - name: "lightweight-edge"
+        description: "Lightweight edge deployment for constrained environments"
+        minimumResources:
+          cpu: "2"
+          memory: "4Gi"
+          storage: "50Gi"
+        requiredLayers:
+          - "dataLayer"
+          - "applicationLayer"
+          - "protocolLayer"
+          - "securityLayer"
+        optionalLayers:
+          - "workflowLayer"
+    
+    synchronization:
+      mode: "periodic"
+      interval: "3600" # seconds
+      priorityData:
+        - "configuration"
+        - "model-updates"
+        - "security-policies"
+      conflictResolution: "cloud-wins"
+    
+    offlineOperation:
+      enabled: true
+      capabilities:
+        - "data-collection"
+        - "local-processing"
+        - "basic-analytics"
+        - "local-decision-making"
+      storagePolicy:
+        maxBufferSize: "10Gi"
+        dataRetention: "7d"
+        prioritization: "time-based"
+
+  # Industry-specific adaptations
+  industryAdaptations:
+    - name: "manufacturing"
+      description: "Adaptations for manufacturing industry"
+      components:
+        - layer: "dataLayer"
+          adaptations:
+            - "manufacturing-specific data schemas"
+            - "machine data connectors"
+            - "production data models"
+        - layer: "applicationLayer"
+          adaptations:
+            - "manufacturing dashboards"
+            - "production planning applications"
+            - "quality control applications"
+        - layer: "workflowLayer"
+          adaptations:
+            - "production workflows"
+            - "maintenance workflows"
+            - "quality assurance workflows"
+    
+    - name: "energy"
+      description: "Adaptations for energy industry"
+      components:
+        - layer: "dataLayer"
+          adaptations:
+            - "energy-specific data schemas"
+            - "grid data connectors"
+            - "consumption data models"
+        - layer: "applicationLayer"
+          adaptations:
+            - "energy dashboards"
+            - "grid management applications"
+            - "demand response applications"
+        - layer: "workflowLayer"
+          adaptations:
+            - "energy distribution workflows"
+            - "maintenance workflows"
+            - "outage management workflows"
+    
+    - name: "datacenter"
+      description: "Adaptations for data center industry"
+      components:
+        - layer: "dataLayer"
+          adaptations:
+            - "datacenter-specific data schemas"
+            - "infrastructure data connectors"
+            - "resource utilization models"
+        - layer: "applicationLayer"
+          adaptations:
+            - "datacenter dashboards"
+            - "capacity planning applications"
+            - "cooling optimization applications"
+        - layer: "workflowLayer"
+          adaptations:
+            - "resource allocation workflows"
+            - "maintenance workflows"
+            - "incident response workflows"
+
+  # Kubernetes deployment configuration
+  kubernetes:
+    version: "1.25+"
+    clusterType: "production"
+    namespaces:
+      - name: "industriverse-system"
+        description: "System namespace for shared resources"
+        resourceQuota:
+          cpu: "4"
+          memory: "8Gi"
+        networkPolicies:
+          - name: "default-deny"
+            description: "Default deny all ingress and egress"
+          - name: "allow-system"
+            description: "Allow communication within system namespace"
+      - name: "industriverse-data"
+        description: "Namespace for Data Layer"
+        resourceQuota:
+          cpu: "8"
+          memory: "16Gi"
+          storage: "100Gi"
+      - name: "industriverse-ai"
+        description: "Namespace for Core AI Layer"
+        resourceQuota:
+          cpu: "16"
+          memory: "64Gi"
+          gpu: "4"
+      - name: "industriverse-generative"
+        description: "Namespace for Generative Layer"
+        resourceQuota:
+          cpu: "8"
+          memory: "32Gi"
+          gpu: "2"
+      - name: "industriverse-application"
+        description: "Namespace for Application Layer"
+        resourceQuota:
+          cpu: "8"
+          memory: "16Gi"
+      - name: "industriverse-protocol"
+        description: "Namespace for Protocol Layer"
+        resourceQuota:
+          cpu: "4"
+          memory: "8Gi"
+      - name: "industriverse-workflow"
+        description: "Namespace for Workflow Automation Layer"
+        resourceQuota:
+          cpu: "8"
+          memory: "16Gi"
+      - name: "industriverse-ui"
+        description: "Namespace for UI/UX Layer"
+        resourceQuota:
+          cpu: "4"
+          memory: "8Gi"
+      - name: "industriverse-security"
+        description: "Namespace for Security & Compliance Layer"
+        resourceQuota:
+          cpu: "4"
+          memory: "8Gi"
+      - name: "industriverse-deployment"
+        description: "Namespace for Deployment Operations Layer"
+        resourceQuota:
+          cpu: "4"
+          memory: "8Gi"
+      - name: "industriverse-overseer"
+        description: "Namespace for Overseer System"
+        resourceQuota:
+          cpu: "8"
+          memory: "16Gi"
+    
+    serviceAccounts:
+      - name: "industriverse-admin-sa"
+        description: "Admin service account for Industriverse"
+        namespace: "industriverse-system"
+        clusterRoles:
+          - "cluster-admin"
+      - name: "data-layer-sa"
+        description: "Service account for Data Layer"
+        namespace: "industriverse-data"
+        roles:
+          - "data-layer-role"
+      - name: "core-ai-layer-sa"
+        description: "Service account for Core AI Layer"
+        namespace: "industriverse-ai"
+        roles:
+          - "core-ai-layer-role"
+      - name: "generative-layer-sa"
+        description: "Service account for Generative Layer"
+        namespace: "industriverse-generative"
+        roles:
+          - "generative-layer-role"
+      - name: "application-layer-sa"
+        description: "Service account for Application Layer"
+        namespace: "industriverse-application"
+        roles:
+          - "application-layer-role"
+      - name: "protocol-layer-sa"
+        description: "Service account for Protocol Layer"
+        namespace: "industriverse-protocol"
+        roles:
+          - "protocol-layer-role"
+      - name: "workflow-layer-sa"
+        description: "Service account for Workflow Automation Layer"
+        namespace: "industriverse-workflow"
+        roles:
+          - "workflow-layer-role"
+      - name: "ui-layer-sa"
+        description: "Service account for UI/UX Layer"
+        namespace: "industriverse-ui"
+        roles:
+          - "ui-layer-role"
+      - name: "security-layer-sa"
+        description: "Service account for Security & Compliance Layer"
+        namespace: "industriverse-security"
+        roles:
+          - "security-layer-role"
+      - name: "deployment-layer-sa"
+        description: "Service account for Deployment Operations Layer"
+        namespace: "industriverse-deployment"
+        roles:
+          - "deployment-layer-role"
+      - name: "overseer-system-sa"
+        description: "Service account for Overseer System"
+        namespace: "industriverse-overseer"
+        roles:
+          - "overseer-system-role"
+    
+    storage:
+      - name: "industriverse-data-storage"
+        description: "Storage for Data Layer"
+        type: "persistent"
+        size: "100Gi"
+        accessModes:
+          - "ReadWriteMany"
+        storageClass: "standard"
+      - name: "industriverse-model-storage"
+        description: "Storage for AI models"
+        type: "persistent"
+        size: "50Gi"
+        accessModes:
+          - "ReadWriteMany"
+        storageClass: "standard"
+      - name: "industriverse-audit-storage"
+        description: "Storage for audit logs"
+        type: "persistent"
+        size: "50Gi"
+        accessModes:
+          - "ReadWriteMany"
+        storageClass: "standard"
+    
+    ingress:
+      enabled: true
+      className: "nginx"
+      annotations:
+        "kubernetes.io/ingress.class": "nginx"
+        "nginx.ingress.kubernetes.io/ssl-redirect": "true"
+      tls:
+        enabled: true
+        secretName: "industriverse-tls"
+      hosts:
+        - host: "industriverse.example.com"
+          paths:
+            - path: "/"
+              pathType: "Prefix"
+              service: "industriverse-ui"
+              port: 80
+        - host: "api.industriverse.example.com"
+          paths:
+            - path: "/api/v1"
+              pathType: "Prefix"
+              service: "industriverse-api-gateway"
+              port: 80
+
+  # Helm configuration
+  helm:
+    repositories:
+      - name: "industriverse"
+        url: "https://charts.industriverse.io"
+    charts:
+      - name: "industriverse"
+        version: "1.0.0"
+        description: "Umbrella chart for Industriverse"
+        dependencies:
+          - name: "data-layer"
+            version: "1.0.0"
+            repository: "https://charts.industriverse.io"
+          - name: "core-ai-layer"
+            version: "1.0.0"
+            repository: "https://charts.industriverse.io"
+          - name: "generative-layer"
+            version: "1.0.0"
+            repository: "https://charts.industriverse.io"
+          - name: "application-layer"
+            version: "1.0.0"
+            repository: "https://charts.industriverse.io"
+          - name: "protocol-layer"
+            version: "1.0.0"
+            repository: "https://charts.industriverse.io"
+          - name: "workflow-layer"
+            version: "1.0.0"
+            repository: "https://charts.industriverse.io"
+          - name: "ui-layer"
+            version: "1.0.0"
+            repository: "https://charts.industriverse.io"
+          - name: "security-layer"
+            version: "1.0.0"
+            repository: "https://charts.industriverse.io"
+          - name: "deployment-layer"
+            version: "1.0.0"
+            repository: "https://charts.industriverse.io"
+          - name: "overseer-system"
+            version: "1.0.0"
+            repository: "https://charts.industriverse.io"

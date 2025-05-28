@@ -1,0 +1,144 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "n8n-integration.fullname" . }}
+  labels:
+    {{- include "n8n-integration.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "n8n-integration.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: {{ .Values.deploymentStrategy.type }}
+    {{- if eq .Values.deploymentStrategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.deploymentStrategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.deploymentStrategy.rollingUpdate.maxUnavailable }}
+    {{- end }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        {{- include "n8n-integration.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "n8n-integration.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+            - name: webhook
+              containerPort: {{ .Values.webhook.port }}
+              protocol: TCP
+          env:
+            - name: LOG_LEVEL
+              value: {{ .Values.logLevel | quote }}
+            - name: N8N_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "n8n-integration.fullname" . }}-config
+                  key: n8nApiUrl
+            - name: N8N_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "n8n-integration.fullname" . }}-credentials
+                  key: n8nApiKey
+            - name: WORKFLOW_ENGINE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "n8n-integration.fullname" . }}-config
+                  key: workflowEngineUrl
+            - name: WORKFLOW_ENGINE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "n8n-integration.fullname" . }}-credentials
+                  key: workflowEngineApiKey
+            - name: SYNC_INTERVAL
+              value: {{ .Values.syncInterval | quote }}
+            - name: WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "n8n-integration.fullname" . }}-credentials
+                  key: webhookSecret
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+            - name: workflow-templates
+              mountPath: /app/templates
+            - name: node-definitions
+              mountPath: /app/node-definitions
+            {{- if .Values.enablePersistentLogs }}
+            - name: logs
+              mountPath: /app/logs
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: http
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: http
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "n8n-integration.fullname" . }}-config
+        - name: workflow-templates
+          {{- if .Values.persistence.templates.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "n8n-integration.fullname" . }}-templates-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: node-definitions
+          {{- if .Values.persistence.nodeDefinitions.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "n8n-integration.fullname" . }}-node-definitions-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- if .Values.enablePersistentLogs }}
+        - name: logs
+          persistentVolumeClaim:
+            claimName: {{ include "n8n-integration.fullname" . }}-logs-pvc
+        {{- end }}

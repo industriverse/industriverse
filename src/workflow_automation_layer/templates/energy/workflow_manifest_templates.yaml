@@ -1,0 +1,835 @@
+# Energy Industry Workflow Manifest Templates
+# These templates define common workflow patterns for energy operations
+
+---
+# Smart Grid Management Workflow
+name: smart_grid_management
+version: "1.0"
+description: "Workflow for smart grid monitoring, optimization, and incident response"
+industry: "energy"
+category: "grid_management"
+execution_modes:
+  - name: "reactive"
+    description: "Triggered by grid events or anomalies"
+    trust_threshold: 0.7
+    confidence_required: 0.8
+    human_oversight: true
+  - name: "proactive"
+    description: "Continuous grid monitoring and optimization"
+    trust_threshold: 0.8
+    confidence_required: 0.85
+    human_oversight: true
+  - name: "autonomous"
+    description: "Fully automated grid management"
+    trust_threshold: 0.95
+    confidence_required: 0.98
+    human_oversight: false
+mesh_topology:
+  edge_capable: true
+  cloud_fallback: true
+  data_locality: "edge_preferred"
+  routing_constraints:
+    - "critical_grid_data_local_only"
+    - "real_time_edge_only"
+debug_trace:
+  enabled: true
+  detail_level: "comprehensive"
+  retention_period_days: 180
+  pattern_recognition: true
+tasks:
+  - id: "grid_monitoring"
+    name: "Monitor Grid Status"
+    description: "Monitor real-time status of the power grid"
+    timeout_seconds: 300
+    retry_count: 3
+    inputs:
+      - name: "grid_section_id"
+        type: "string"
+        required: true
+      - name: "monitoring_parameters"
+        type: "array"
+        required: true
+    outputs:
+      - name: "grid_status"
+        type: "object"
+        description: "Current status of the grid section"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "energy/schemas/grid_status.json"
+  
+  - id: "anomaly_detection"
+    name: "Detect Grid Anomalies"
+    description: "Detect anomalies in grid performance and behavior"
+    timeout_seconds: 600
+    inputs:
+      - name: "grid_status"
+        type: "object"
+        required: true
+      - name: "historical_data"
+        type: "object"
+        required: true
+    outputs:
+      - name: "anomalies"
+        type: "array"
+        description: "Detected anomalies in the grid"
+      - name: "anomaly_scores"
+        type: "object"
+        description: "Confidence scores for each anomaly"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "energy/models/grid_anomaly_detection.onnx"
+  
+  - id: "load_forecasting"
+    name: "Forecast Load"
+    description: "Forecast future load on the grid"
+    timeout_seconds: 900
+    inputs:
+      - name: "grid_status"
+        type: "object"
+        required: true
+      - name: "historical_data"
+        type: "object"
+        required: true
+      - name: "weather_forecast"
+        type: "object"
+        required: true
+    outputs:
+      - name: "load_forecast"
+        type: "object"
+        description: "Forecasted load on the grid"
+      - name: "confidence_intervals"
+        type: "object"
+        description: "Confidence intervals for the forecast"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "energy/models/load_forecasting.onnx"
+  
+  - id: "incident_classification"
+    name: "Classify Grid Incidents"
+    description: "Classify detected grid incidents by type and severity"
+    timeout_seconds: 300
+    inputs:
+      - name: "anomalies"
+        type: "array"
+        required: true
+      - name: "grid_status"
+        type: "object"
+        required: true
+    outputs:
+      - name: "classified_incidents"
+        type: "array"
+        description: "Classified grid incidents"
+      - name: "severity_levels"
+        type: "object"
+        description: "Severity levels for each incident"
+    contract:
+      verification_method: "rule_validation"
+      rules_ref: "energy/rules/incident_classification.json"
+  
+  - id: "impact_assessment"
+    name: "Assess Incident Impact"
+    description: "Assess the impact of grid incidents"
+    timeout_seconds: 600
+    inputs:
+      - name: "classified_incidents"
+        type: "array"
+        required: true
+      - name: "grid_topology"
+        type: "object"
+        required: true
+      - name: "consumer_data"
+        type: "object"
+        required: true
+    outputs:
+      - name: "impact_assessment"
+        type: "object"
+        description: "Assessment of incident impact"
+      - name: "affected_areas"
+        type: "array"
+        description: "Areas affected by the incident"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "energy/models/impact_assessment.onnx"
+  
+  - id: "response_planning"
+    name: "Plan Incident Response"
+    description: "Plan response to grid incidents"
+    timeout_seconds: 900
+    inputs:
+      - name: "classified_incidents"
+        type: "array"
+        required: true
+      - name: "impact_assessment"
+        type: "object"
+        required: true
+      - name: "available_resources"
+        type: "object"
+        required: true
+    outputs:
+      - name: "response_plan"
+        type: "object"
+        description: "Plan for responding to the incident"
+      - name: "required_actions"
+        type: "array"
+        description: "Actions required for response"
+    contract:
+      verification_method: "constraint_satisfaction"
+      constraints_ref: "energy/constraints/response_planning.json"
+  
+  - id: "human_approval"
+    name: "Get Human Approval"
+    description: "Request approval for critical grid operations"
+    timeout_seconds: 1800
+    human_in_loop: true
+    inputs:
+      - name: "response_plan"
+        type: "object"
+        required: true
+      - name: "impact_assessment"
+        type: "object"
+        required: true
+      - name: "classified_incidents"
+        type: "array"
+        required: true
+    outputs:
+      - name: "approval_status"
+        type: "string"
+        description: "Approval status (approved, rejected, modified)"
+      - name: "modified_plan"
+        type: "object"
+        description: "Modified response plan if applicable"
+    contract:
+      verification_method: "human_verification"
+      verification_ui: "energy/ui/response_approval.json"
+  
+  - id: "notification"
+    name: "Send Notifications"
+    description: "Notify stakeholders about grid incidents"
+    timeout_seconds: 300
+    inputs:
+      - name: "classified_incidents"
+        type: "array"
+        required: true
+      - name: "impact_assessment"
+        type: "object"
+        required: true
+      - name: "affected_areas"
+        type: "array"
+        required: true
+      - name: "response_plan"
+        type: "object"
+        required: true
+    outputs:
+      - name: "notification_status"
+        type: "object"
+        description: "Status of sent notifications"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "energy/schemas/notification.json"
+  
+  - id: "grid_reconfiguration"
+    name: "Reconfigure Grid"
+    description: "Reconfigure the grid to respond to incidents"
+    timeout_seconds: 1200
+    inputs:
+      - name: "response_plan"
+        type: "object"
+        required: true
+      - name: "grid_status"
+        type: "object"
+        required: true
+      - name: "grid_topology"
+        type: "object"
+        required: true
+    outputs:
+      - name: "reconfiguration_commands"
+        type: "array"
+        description: "Commands for grid reconfiguration"
+      - name: "expected_outcomes"
+        type: "object"
+        description: "Expected outcomes of reconfiguration"
+    contract:
+      verification_method: "constraint_satisfaction"
+      constraints_ref: "energy/constraints/grid_reconfiguration.json"
+  
+  - id: "command_execution"
+    name: "Execute Grid Commands"
+    description: "Execute commands on the grid"
+    timeout_seconds: 600
+    inputs:
+      - name: "reconfiguration_commands"
+        type: "array"
+        required: true
+      - name: "grid_section_id"
+        type: "string"
+        required: true
+    outputs:
+      - name: "execution_status"
+        type: "object"
+        description: "Status of command execution"
+      - name: "execution_results"
+        type: "array"
+        description: "Results of executed commands"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "energy/schemas/command_execution.json"
+  
+  - id: "verification"
+    name: "Verify Grid Status"
+    description: "Verify grid status after reconfiguration"
+    timeout_seconds: 600
+    inputs:
+      - name: "grid_section_id"
+        type: "string"
+        required: true
+      - name: "expected_outcomes"
+        type: "object"
+        required: true
+      - name: "execution_results"
+        type: "array"
+        required: true
+    outputs:
+      - name: "verification_status"
+        type: "string"
+        description: "Status of grid verification"
+      - name: "grid_metrics"
+        type: "object"
+        description: "Current grid metrics"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "energy/schemas/verification.json"
+  
+  - id: "documentation"
+    name: "Update Documentation"
+    description: "Update grid incident documentation and records"
+    timeout_seconds: 300
+    inputs:
+      - name: "grid_section_id"
+        type: "string"
+        required: true
+      - name: "classified_incidents"
+        type: "array"
+        required: true
+      - name: "response_plan"
+        type: "object"
+        required: true
+      - name: "execution_results"
+        type: "array"
+        required: true
+      - name: "verification_status"
+        type: "string"
+        required: true
+    outputs:
+      - name: "documentation_status"
+        type: "string"
+        description: "Status of documentation update"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "energy/schemas/documentation.json"
+
+workflow:
+  start: "grid_monitoring"
+  transitions:
+    - from: "grid_monitoring"
+      to: "anomaly_detection"
+      condition: "success"
+    - from: "anomaly_detection"
+      to: "load_forecasting"
+      condition: "success"
+    - from: "load_forecasting"
+      to: "incident_classification"
+      condition: "anomalies.length > 0"
+    - from: "load_forecasting"
+      to: "grid_monitoring"
+      condition: "anomalies.length == 0"
+      wait_seconds: 300
+    - from: "incident_classification"
+      to: "impact_assessment"
+      condition: "classified_incidents.length > 0"
+    - from: "incident_classification"
+      to: "grid_monitoring"
+      condition: "classified_incidents.length == 0"
+      wait_seconds: 300
+    - from: "impact_assessment"
+      to: "response_planning"
+      condition: "success"
+    - from: "response_planning"
+      to: "human_approval"
+      condition: "classified_incidents.some(i => i.severity == 'high' || i.severity == 'critical')"
+    - from: "response_planning"
+      to: "notification"
+      condition: "!classified_incidents.some(i => i.severity == 'high' || i.severity == 'critical')"
+    - from: "human_approval"
+      to: "notification"
+      condition: "approval_status == 'approved' || approval_status == 'modified'"
+    - from: "human_approval"
+      to: "response_planning"
+      condition: "approval_status == 'rejected'"
+    - from: "notification"
+      to: "grid_reconfiguration"
+      condition: "required_actions.some(a => a.type == 'reconfigure')"
+    - from: "notification"
+      to: "documentation"
+      condition: "!required_actions.some(a => a.type == 'reconfigure')"
+    - from: "grid_reconfiguration"
+      to: "command_execution"
+      condition: "success"
+    - from: "command_execution"
+      to: "verification"
+      condition: "execution_status.completed == true"
+    - from: "verification"
+      to: "documentation"
+      condition: "success"
+    - from: "documentation"
+      to: "grid_monitoring"
+      condition: "success"
+
+escalation:
+  policies:
+    - trigger: "task_timeout"
+      action: "notify_grid_operator"
+      priority: "high"
+    - trigger: "task_failure"
+      action: "retry_then_escalate"
+      retry_count: 3
+      priority: "medium"
+    - trigger: "contract_violation"
+      action: "notify_grid_engineer"
+      priority: "critical"
+    - trigger: "human_approval_timeout"
+      action: "notify_operations_director"
+      priority: "high"
+    - trigger: "critical_incident_detected"
+      action: "emergency_response_team"
+      priority: "critical"
+
+dtsl_embedding:
+  enabled: true
+  twin_source: "grid_section_digital_twin"
+  edge_execution: true
+  twin_capabilities:
+    - "status_monitoring"
+    - "anomaly_detection"
+    - "local_reconfiguration"
+  synchronization:
+    mode: "eventual_consistency"
+    priority_events:
+      - "critical_incident_detected"
+      - "grid_reconfigured"
+      - "status_alert"
+
+---
+# Renewable Energy Integration Workflow
+name: renewable_energy_integration
+version: "1.0"
+description: "Workflow for integrating and optimizing renewable energy sources"
+industry: "energy"
+category: "renewables"
+execution_modes:
+  - name: "reactive"
+    description: "Triggered by energy production or demand changes"
+    trust_threshold: 0.7
+    confidence_required: 0.8
+    human_oversight: true
+  - name: "proactive"
+    description: "Continuous renewable optimization"
+    trust_threshold: 0.8
+    confidence_required: 0.85
+    human_oversight: true
+  - name: "autonomous"
+    description: "Fully automated renewable management"
+    trust_threshold: 0.95
+    confidence_required: 0.98
+    human_oversight: false
+mesh_topology:
+  edge_capable: true
+  cloud_fallback: true
+  data_locality: "distributed"
+  routing_constraints:
+    - "production_data_local_only"
+    - "real_time_edge_only"
+debug_trace:
+  enabled: true
+  detail_level: "comprehensive"
+  retention_period_days: 90
+  pattern_recognition: true
+tasks:
+  - id: "energy_production_monitoring"
+    name: "Monitor Energy Production"
+    description: "Monitor real-time energy production from renewable sources"
+    timeout_seconds: 300
+    retry_count: 3
+    inputs:
+      - name: "source_ids"
+        type: "array"
+        required: true
+      - name: "monitoring_parameters"
+        type: "object"
+        required: true
+    outputs:
+      - name: "production_data"
+        type: "object"
+        description: "Current energy production data"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "energy/schemas/production_data.json"
+  
+  - id: "weather_forecasting"
+    name: "Forecast Weather Conditions"
+    description: "Forecast weather conditions affecting renewable energy production"
+    timeout_seconds: 900
+    inputs:
+      - name: "location_data"
+        type: "object"
+        required: true
+      - name: "historical_weather"
+        type: "object"
+        required: true
+    outputs:
+      - name: "weather_forecast"
+        type: "object"
+        description: "Weather forecast for renewable energy planning"
+      - name: "confidence_scores"
+        type: "object"
+        description: "Confidence scores for the forecast"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "energy/models/weather_forecasting.onnx"
+  
+  - id: "production_forecasting"
+    name: "Forecast Energy Production"
+    description: "Forecast future energy production from renewable sources"
+    timeout_seconds: 900
+    inputs:
+      - name: "production_data"
+        type: "object"
+        required: true
+      - name: "weather_forecast"
+        type: "object"
+        required: true
+      - name: "source_capabilities"
+        type: "object"
+        required: true
+    outputs:
+      - name: "production_forecast"
+        type: "object"
+        description: "Forecasted energy production"
+      - name: "confidence_intervals"
+        type: "object"
+        description: "Confidence intervals for the forecast"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "energy/models/production_forecasting.onnx"
+  
+  - id: "demand_forecasting"
+    name: "Forecast Energy Demand"
+    description: "Forecast future energy demand"
+    timeout_seconds: 900
+    inputs:
+      - name: "historical_demand"
+        type: "object"
+        required: true
+      - name: "weather_forecast"
+        type: "object"
+        required: true
+      - name: "event_calendar"
+        type: "object"
+        required: false
+    outputs:
+      - name: "demand_forecast"
+        type: "object"
+        description: "Forecasted energy demand"
+      - name: "confidence_intervals"
+        type: "object"
+        description: "Confidence intervals for the forecast"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "energy/models/demand_forecasting.onnx"
+  
+  - id: "gap_analysis"
+    name: "Analyze Supply-Demand Gap"
+    description: "Analyze gaps between renewable energy supply and demand"
+    timeout_seconds: 600
+    inputs:
+      - name: "production_forecast"
+        type: "object"
+        required: true
+      - name: "demand_forecast"
+        type: "object"
+        required: true
+    outputs:
+      - name: "gap_analysis"
+        type: "object"
+        description: "Analysis of supply-demand gaps"
+      - name: "critical_periods"
+        type: "array"
+        description: "Identified critical periods"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "energy/schemas/gap_analysis.json"
+  
+  - id: "storage_optimization"
+    name: "Optimize Energy Storage"
+    description: "Optimize energy storage usage"
+    timeout_seconds: 900
+    inputs:
+      - name: "gap_analysis"
+        type: "object"
+        required: true
+      - name: "storage_status"
+        type: "object"
+        required: true
+      - name: "storage_constraints"
+        type: "object"
+        required: true
+    outputs:
+      - name: "storage_plan"
+        type: "object"
+        description: "Plan for energy storage usage"
+      - name: "storage_commands"
+        type: "array"
+        description: "Commands for storage systems"
+    contract:
+      verification_method: "constraint_satisfaction"
+      constraints_ref: "energy/constraints/storage_optimization.json"
+  
+  - id: "source_optimization"
+    name: "Optimize Renewable Sources"
+    description: "Optimize configuration of renewable energy sources"
+    timeout_seconds: 900
+    inputs:
+      - name: "production_forecast"
+        type: "object"
+        required: true
+      - name: "weather_forecast"
+        type: "object"
+        required: true
+      - name: "source_capabilities"
+        type: "object"
+        required: true
+    outputs:
+      - name: "source_plan"
+        type: "object"
+        description: "Plan for renewable source optimization"
+      - name: "source_commands"
+        type: "array"
+        description: "Commands for renewable sources"
+    contract:
+      verification_method: "constraint_satisfaction"
+      constraints_ref: "energy/constraints/source_optimization.json"
+  
+  - id: "grid_integration"
+    name: "Plan Grid Integration"
+    description: "Plan integration of renewable energy with the grid"
+    timeout_seconds: 900
+    inputs:
+      - name: "production_forecast"
+        type: "object"
+        required: true
+      - name: "demand_forecast"
+        type: "object"
+        required: true
+      - name: "storage_plan"
+        type: "object"
+        required: true
+      - name: "grid_status"
+        type: "object"
+        required: true
+    outputs:
+      - name: "integration_plan"
+        type: "object"
+        description: "Plan for grid integration"
+      - name: "grid_commands"
+        type: "array"
+        description: "Commands for grid integration"
+    contract:
+      verification_method: "constraint_satisfaction"
+      constraints_ref: "energy/constraints/grid_integration.json"
+  
+  - id: "human_approval"
+    name: "Get Human Approval"
+    description: "Request approval for significant energy management changes"
+    timeout_seconds: 1800
+    human_in_loop: true
+    inputs:
+      - name: "integration_plan"
+        type: "object"
+        required: true
+      - name: "storage_plan"
+        type: "object"
+        required: true
+      - name: "source_plan"
+        type: "object"
+        required: true
+      - name: "critical_periods"
+        type: "array"
+        required: true
+    outputs:
+      - name: "approval_status"
+        type: "string"
+        description: "Approval status (approved, rejected, modified)"
+      - name: "modified_plans"
+        type: "object"
+        description: "Modified plans if applicable"
+    contract:
+      verification_method: "human_verification"
+      verification_ui: "energy/ui/renewable_approval.json"
+  
+  - id: "command_execution"
+    name: "Execute Energy Commands"
+    description: "Execute commands for energy management"
+    timeout_seconds: 600
+    inputs:
+      - name: "storage_commands"
+        type: "array"
+        required: true
+      - name: "source_commands"
+        type: "array"
+        required: true
+      - name: "grid_commands"
+        type: "array"
+        required: true
+    outputs:
+      - name: "execution_status"
+        type: "object"
+        description: "Status of command execution"
+      - name: "execution_results"
+        type: "array"
+        description: "Results of executed commands"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "energy/schemas/command_execution.json"
+  
+  - id: "verification"
+    name: "Verify Energy Management"
+    description: "Verify results of energy management actions"
+    timeout_seconds: 900
+    inputs:
+      - name: "source_ids"
+        type: "array"
+        required: true
+      - name: "integration_plan"
+        type: "object"
+        required: true
+      - name: "execution_results"
+        type: "array"
+        required: true
+    outputs:
+      - name: "verification_status"
+        type: "string"
+        description: "Status of verification"
+      - name: "energy_metrics"
+        type: "object"
+        description: "Current energy metrics"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "energy/schemas/verification.json"
+  
+  - id: "documentation"
+    name: "Update Documentation"
+    description: "Update energy management documentation and records"
+    timeout_seconds: 300
+    inputs:
+      - name: "source_ids"
+        type: "array"
+        required: true
+      - name: "integration_plan"
+        type: "object"
+        required: true
+      - name: "execution_results"
+        type: "array"
+        required: true
+      - name: "verification_status"
+        type: "string"
+        required: true
+      - name: "energy_metrics"
+        type: "object"
+        required: true
+    outputs:
+      - name: "documentation_status"
+        type: "string"
+        description: "Status of documentation update"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "energy/schemas/documentation.json"
+
+workflow:
+  start: "energy_production_monitoring"
+  transitions:
+    - from: "energy_production_monitoring"
+      to: "weather_forecasting"
+      condition: "success"
+    - from: "weather_forecasting"
+      to: "production_forecasting"
+      condition: "success"
+    - from: "production_forecasting"
+      to: "demand_forecasting"
+      condition: "success"
+    - from: "demand_forecasting"
+      to: "gap_analysis"
+      condition: "success"
+    - from: "gap_analysis"
+      to: "storage_optimization"
+      condition: "success"
+    - from: "storage_optimization"
+      to: "source_optimization"
+      condition: "success"
+    - from: "source_optimization"
+      to: "grid_integration"
+      condition: "success"
+    - from: "grid_integration"
+      to: "human_approval"
+      condition: "critical_periods.length > 0"
+    - from: "grid_integration"
+      to: "command_execution"
+      condition: "critical_periods.length == 0"
+    - from: "human_approval"
+      to: "command_execution"
+      condition: "approval_status == 'approved' || approval_status == 'modified'"
+    - from: "human_approval"
+      to: "storage_optimization"
+      condition: "approval_status == 'rejected'"
+    - from: "command_execution"
+      to: "verification"
+      condition: "execution_status.completed == true"
+    - from: "verification"
+      to: "documentation"
+      condition: "success"
+    - from: "documentation"
+      to: "energy_production_monitoring"
+      condition: "success"
+      wait_seconds: 1800
+
+escalation:
+  policies:
+    - trigger: "task_timeout"
+      action: "notify_energy_manager"
+      priority: "high"
+    - trigger: "task_failure"
+      action: "retry_then_escalate"
+      retry_count: 3
+      priority: "medium"
+    - trigger: "contract_violation"
+      action: "notify_energy_engineer"
+      priority: "critical"
+    - trigger: "human_approval_timeout"
+      action: "notify_operations_director"
+      priority: "high"
+    - trigger: "critical_energy_shortage"
+      action: "emergency_response_team"
+      priority: "critical"
+
+dtsl_embedding:
+  enabled: true
+  twin_source: "renewable_source_digital_twin"
+  edge_execution: true
+  twin_capabilities:
+    - "production_monitoring"
+    - "weather_sensing"
+    - "local_optimization"
+  synchronization:
+    mode: "eventual_consistency"
+    priority_events:
+      - "production_anomaly_detected"
+      - "configuration_changed"
+      - "weather_alert"

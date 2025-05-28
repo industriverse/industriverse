@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: core-ai-config
+  namespace: industriverse
+  labels:
+    app: core-ai-layer
+    layer: core-ai
+    part-of: industriverse
+data:
+  mesh_coordination_role: "auto"
+  edge_behavior_profile: "standard"
+  protocol_registry_url: "http://protocol-registry.industriverse.svc.cluster.local:8080"
+  data_layer_url: "http://data-layer.industriverse.svc.cluster.local:8080"
+  mesh.yaml: |
+    mesh_id: core-ai-mesh
+    discovery:
+      enabled: true
+      interval_seconds: 30
+      protocol: "mcp"
+    coordination:
+      leader_election: true
+      quorum_size: 2
+      heartbeat_interval_seconds: 5
+      timeout_seconds: 15
+    resilience:
+      failover_chains: true
+      redundant_pairs: true
+      quorum_voting: true
+    observability:
+      metrics_enabled: true
+      tracing_enabled: true
+      health_prediction_enabled: true
+  observability_thresholds.yaml: |
+    latency:
+      llm_inference:
+        warning: 200
+        critical: 500
+      ml_inference:
+        warning: 100
+        critical: 250
+    resource_utilization:
+      cpu:
+        warning: 70
+        critical: 90
+      memory:
+        warning: 75
+        critical: 95
+    error_rate:
+      inference:
+        warning: 1.0
+        critical: 5.0
+  priority_weights.yaml: |
+    default:
+      latency: 0.3
+      accuracy: 0.3
+      resource_efficiency: 0.2
+      resilience: 0.2
+    manufacturing:
+      latency: 0.4
+      accuracy: 0.3
+      resource_efficiency: 0.1
+      resilience: 0.2
+    energy:
+      latency: 0.3
+      accuracy: 0.4
+      resource_efficiency: 0.2
+      resilience: 0.1

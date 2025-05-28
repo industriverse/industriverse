@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: workflow-data-pvc
+  namespace: industriverse
+  labels:
+    app: workflow-automation-layer
+    layer: workflow-automation
+    part-of: industriverse
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: managed-premium

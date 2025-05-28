@@ -1,0 +1,284 @@
+# Default values for workflow-layer.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: industriverse/workflow-automation-layer
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8080
+  apiPort: 8080
+  metricsPort: 9090
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Workflow Automation Layer specific configuration
+workflowAutomationLayer:
+  # API configuration
+  api:
+    enabled: true
+    port: 8080
+    cors:
+      enabled: true
+      allowedOrigins: ["*"]
+    rateLimit:
+      enabled: true
+      requestsPerMinute: 100
+  
+  # Workflow engine configuration
+  workflowEngine:
+    executionModes:
+      autonomous:
+        enabled: true
+        trustThreshold: 0.8
+      supervised:
+        enabled: true
+        trustThreshold: 0.6
+      collaborative:
+        enabled: true
+        trustThreshold: 0.4
+      assistive:
+        enabled: true
+        trustThreshold: 0.2
+      manual:
+        enabled: true
+        trustThreshold: 0.0
+    meshTopology:
+      defaultType: "hybrid"
+      edgeEnabled: true
+    telemetry:
+      enabled: true
+      retentionDays: 30
+  
+  # Agent framework configuration
+  agentFramework:
+    agents:
+      workflowTrigger:
+        enabled: true
+        replicas: 1
+      workflowContract:
+        enabled: true
+        replicas: 1
+      humanIntervention:
+        enabled: true
+        replicas: 1
+      capsuleWorkflow:
+        enabled: true
+        replicas: 1
+      n8nSync:
+        enabled: true
+        replicas: 1
+      workflowOptimizer:
+        enabled: true
+        replicas: 1
+      workflowFeedback:
+        enabled: true
+        replicas: 1
+      taskContractVersioning:
+        enabled: true
+        replicas: 1
+      distributedWorkflowSplitter:
+        enabled: true
+        replicas: 1
+      workflowRouter:
+        enabled: true
+        replicas: 1
+      workflowFallback:
+        enabled: true
+        replicas: 1
+      workflowFeedbackLoop:
+        enabled: true
+        replicas: 1
+      workflowChaosTester:
+        enabled: false
+        replicas: 1
+      workflowVisualizer:
+        enabled: true
+        replicas: 1
+      workflowNegotiator:
+        enabled: true
+        replicas: 1
+      n8nAdapter:
+        enabled: true
+        replicas: 1
+      workflowForensics:
+        enabled: true
+        replicas: 1
+      capsuleMemoryManager:
+        enabled: true
+        replicas: 1
+      workflowEvolution:
+        enabled: true
+        replicas: 1
+  
+  # n8n integration configuration
+  n8nIntegration:
+    enabled: true
+    url: "http://n8n-service:5678"
+    apiKey: ""
+    webhookBaseUrl: ""
+    syncInterval: 60
+  
+  # Security configuration
+  security:
+    ekisIntegration:
+      enabled: true
+      url: "http://ekis-service:8080"
+    zkAttestation:
+      enabled: true
+    trustPathwayManager:
+      enabled: true
+    multiTenantIsolation:
+      enabled: true
+    adaptiveTrustPolicy:
+      enabled: true
+  
+  # Mobile and edge support
+  mobileEdgeSupport:
+    enabled: true
+    mobileAppProtocolBridge:
+      enabled: true
+    edgeProtocolCompression:
+      enabled: true
+      compressionLevel: 6
+  
+  # UI components
+  ui:
+    enabled: true
+    dynamicAgentCapsules:
+      enabled: true
+    workflowCanvas:
+      enabled: true
+    workflowDashboard:
+      enabled: true
+    workflowDebugPanel:
+      enabled: true
+    capsuleMemoryViewer:
+      enabled: true
+  
+  # Database configuration
+  database:
+    type: "postgresql"
+    host: "postgresql"
+    port: 5432
+    database: "workflow_automation"
+    username: "postgres"
+    existingSecret: ""
+    existingSecretPasswordKey: "postgresql-password"
+  
+  # Redis configuration for caching and pub/sub
+  redis:
+    enabled: true
+    host: "redis"
+    port: 6379
+    existingSecret: ""
+    existingSecretPasswordKey: "redis-password"
+  
+  # Logging configuration
+  logging:
+    level: "info"
+    format: "json"
+  
+  # Metrics and monitoring
+  metrics:
+    enabled: true
+    prometheus:
+      enabled: true
+      port: 9090
+  
+  # Debug and development settings
+  debug:
+    enabled: false
+    verboseLogging: false
+    capsuleDebugTrace:
+      enabled: true
+      level: "standard"
+  
+  # Cross-layer integration
+  crossLayerIntegration:
+    protocolLayer:
+      enabled: true
+      url: "http://protocol-layer-service:8080"
+    dataLayer:
+      enabled: true
+      url: "http://data-layer-service:8080"
+    coreAiLayer:
+      enabled: true
+      url: "http://core-ai-layer-service:8080"
+    generativeLayer:
+      enabled: true
+      url: "http://generative-layer-service:8080"
+    applicationLayer:
+      enabled: true
+      url: "http://application-layer-service:8080"

@@ -1,0 +1,43 @@
+{{/* Service account for workflow-templates */}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "workflow-templates.serviceAccountName" . }}
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+{{/* RBAC role for workflow-templates */}}
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "workflow-templates.fullname" . }}-role
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  {{- if .Values.rbac.extraRules }}
+  {{- toYaml .Values.rbac.extraRules | nindent 2 }}
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "workflow-templates.fullname" . }}-rolebinding
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "workflow-templates.fullname" . }}-role
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "workflow-templates.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

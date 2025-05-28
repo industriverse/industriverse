@@ -1,0 +1,163 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: core-ai-layer
+  namespace: industriverse
+  labels:
+    app: core-ai-layer
+    layer: core-ai
+    part-of: industriverse
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: core-ai-layer
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: core-ai-layer
+        layer: core-ai
+        part-of: industriverse
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: core-ai-service-account
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: core-ai-layer
+        image: ${REGISTRY}/industriverse/core-ai-layer:${VERSION}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 9090
+          name: grpc
+        - containerPort: 8081
+          name: metrics
+        env:
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: MESH_COORDINATION_ROLE
+          valueFrom:
+            configMapKeyRef:
+              name: core-ai-config
+              key: mesh_coordination_role
+        - name: EDGE_BEHAVIOR_PROFILE
+          valueFrom:
+            configMapKeyRef:
+              name: core-ai-config
+              key: edge_behavior_profile
+        - name: PROTOCOL_REGISTRY_URL
+          valueFrom:
+            configMapKeyRef:
+              name: core-ai-config
+              key: protocol_registry_url
+        - name: DATA_LAYER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: core-ai-config
+              key: data_layer_url
+        envFrom:
+        - secretRef:
+            name: core-ai-secrets
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "4"
+            memory: "8Gi"
+        volumeMounts:
+        - name: core-ai-config
+          mountPath: /app/config
+        - name: core-ai-models
+          mountPath: /app/models
+        - name: core-ai-cache
+          mountPath: /app/cache
+        - name: core-ai-ledger
+          mountPath: /app/ledger
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health/startup
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 12
+      - name: observability-sidecar
+        image: ${REGISTRY}/industriverse/core-ai-observability:${VERSION}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+          name: metrics
+        env:
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: METRICS_PORT
+          value: "8081"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        volumeMounts:
+        - name: core-ai-config
+          mountPath: /app/config
+          readOnly: true
+        - name: observability-data
+          mountPath: /app/data
+      volumes:
+      - name: core-ai-config
+        configMap:
+          name: core-ai-config
+      - name: core-ai-models
+        persistentVolumeClaim:
+          claimName: core-ai-models-pvc
+      - name: core-ai-cache
+        emptyDir: {}
+      - name: core-ai-ledger
+        persistentVolumeClaim:
+          claimName: core-ai-ledger-pvc
+      - name: observability-data
+        emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - core-ai-layer
+              topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 60

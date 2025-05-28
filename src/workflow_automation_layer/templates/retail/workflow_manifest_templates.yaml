@@ -1,0 +1,863 @@
+# Retail Industry Workflow Manifest Templates
+# These templates define common workflow patterns for retail operations
+
+---
+# Inventory Management Workflow
+name: retail_inventory_management
+version: "1.0"
+description: "Workflow for retail inventory management and optimization"
+industry: "retail"
+category: "inventory"
+execution_modes:
+  - name: "reactive"
+    description: "Triggered by inventory events"
+    trust_threshold: 0.7
+    confidence_required: 0.8
+    human_oversight: true
+  - name: "proactive"
+    description: "Scheduled inventory optimization"
+    trust_threshold: 0.8
+    confidence_required: 0.85
+    human_oversight: true
+  - name: "autonomous"
+    description: "Fully automated inventory management"
+    trust_threshold: 0.95
+    confidence_required: 0.98
+    human_oversight: false
+mesh_topology:
+  edge_capable: true
+  cloud_fallback: true
+  data_locality: "distributed"
+  routing_constraints:
+    - "sales_data_privacy"
+    - "store_specific_data_local"
+debug_trace:
+  enabled: true
+  detail_level: "comprehensive"
+  retention_period_days: 90
+  pattern_recognition: true
+tasks:
+  - id: "inventory_monitoring"
+    name: "Monitor Inventory Levels"
+    description: "Monitor real-time inventory levels across stores"
+    timeout_seconds: 300
+    retry_count: 3
+    inputs:
+      - name: "store_ids"
+        type: "array"
+        required: true
+      - name: "product_categories"
+        type: "array"
+        required: false
+    outputs:
+      - name: "inventory_levels"
+        type: "object"
+        description: "Current inventory levels by store and product"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/inventory_levels.json"
+  
+  - id: "sales_analysis"
+    name: "Analyze Sales Patterns"
+    description: "Analyze historical sales patterns and trends"
+    timeout_seconds: 600
+    inputs:
+      - name: "sales_data"
+        type: "object"
+        required: true
+      - name: "time_period"
+        type: "string"
+        required: true
+    outputs:
+      - name: "sales_patterns"
+        type: "object"
+        description: "Identified sales patterns and trends"
+      - name: "seasonality_factors"
+        type: "object"
+        description: "Seasonality factors affecting sales"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "retail/models/sales_pattern_analysis.onnx"
+  
+  - id: "demand_forecasting"
+    name: "Forecast Demand"
+    description: "Forecast future product demand"
+    timeout_seconds: 900
+    inputs:
+      - name: "sales_patterns"
+        type: "object"
+        required: true
+      - name: "seasonality_factors"
+        type: "object"
+        required: true
+      - name: "external_factors"
+        type: "object"
+        required: false
+    outputs:
+      - name: "demand_forecast"
+        type: "object"
+        description: "Forecasted product demand"
+      - name: "confidence_intervals"
+        type: "object"
+        description: "Confidence intervals for the forecast"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "retail/models/demand_forecasting.onnx"
+  
+  - id: "stock_level_optimization"
+    name: "Optimize Stock Levels"
+    description: "Determine optimal stock levels based on demand forecast"
+    timeout_seconds: 600
+    inputs:
+      - name: "demand_forecast"
+        type: "object"
+        required: true
+      - name: "inventory_levels"
+        type: "object"
+        required: true
+      - name: "storage_constraints"
+        type: "object"
+        required: true
+    outputs:
+      - name: "optimal_stock_levels"
+        type: "object"
+        description: "Calculated optimal stock levels"
+      - name: "reorder_recommendations"
+        type: "array"
+        description: "Recommendations for reordering"
+    contract:
+      verification_method: "constraint_satisfaction"
+      constraints_ref: "retail/constraints/stock_optimization.json"
+  
+  - id: "replenishment_planning"
+    name: "Plan Replenishment"
+    description: "Plan inventory replenishment based on recommendations"
+    timeout_seconds: 900
+    inputs:
+      - name: "reorder_recommendations"
+        type: "array"
+        required: true
+      - name: "supplier_data"
+        type: "object"
+        required: true
+      - name: "logistics_constraints"
+        type: "object"
+        required: true
+    outputs:
+      - name: "replenishment_plan"
+        type: "object"
+        description: "Plan for inventory replenishment"
+      - name: "purchase_orders"
+        type: "array"
+        description: "Generated purchase orders"
+    contract:
+      verification_method: "constraint_satisfaction"
+      constraints_ref: "retail/constraints/replenishment_planning.json"
+  
+  - id: "human_approval"
+    name: "Get Human Approval"
+    description: "Request approval for large purchase orders"
+    timeout_seconds: 3600
+    human_in_loop: true
+    inputs:
+      - name: "purchase_orders"
+        type: "array"
+        required: true
+      - name: "replenishment_plan"
+        type: "object"
+        required: true
+      - name: "cost_analysis"
+        type: "object"
+        required: true
+    outputs:
+      - name: "approval_status"
+        type: "string"
+        description: "Approval status (approved, rejected, modified)"
+      - name: "modified_orders"
+        type: "array"
+        description: "Modified purchase orders if applicable"
+    contract:
+      verification_method: "human_verification"
+      verification_ui: "retail/ui/order_approval.json"
+  
+  - id: "order_placement"
+    name: "Place Orders"
+    description: "Place approved purchase orders with suppliers"
+    timeout_seconds: 600
+    inputs:
+      - name: "purchase_orders"
+        type: "array"
+        required: true
+      - name: "supplier_data"
+        type: "object"
+        required: true
+    outputs:
+      - name: "order_status"
+        type: "object"
+        description: "Status of placed orders"
+      - name: "order_confirmations"
+        type: "array"
+        description: "Order confirmations from suppliers"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/order_status.json"
+  
+  - id: "delivery_scheduling"
+    name: "Schedule Deliveries"
+    description: "Schedule deliveries for placed orders"
+    timeout_seconds: 900
+    inputs:
+      - name: "order_confirmations"
+        type: "array"
+        required: true
+      - name: "store_capacity"
+        type: "object"
+        required: true
+      - name: "logistics_constraints"
+        type: "object"
+        required: true
+    outputs:
+      - name: "delivery_schedule"
+        type: "object"
+        description: "Schedule for deliveries"
+      - name: "resource_allocations"
+        type: "object"
+        description: "Resource allocations for deliveries"
+    contract:
+      verification_method: "constraint_satisfaction"
+      constraints_ref: "retail/constraints/delivery_scheduling.json"
+  
+  - id: "notification"
+    name: "Send Notifications"
+    description: "Notify store managers about upcoming deliveries"
+    timeout_seconds: 300
+    inputs:
+      - name: "delivery_schedule"
+        type: "object"
+        required: true
+      - name: "store_contacts"
+        type: "object"
+        required: true
+    outputs:
+      - name: "notification_status"
+        type: "object"
+        description: "Status of sent notifications"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/notification.json"
+  
+  - id: "receipt_verification"
+    name: "Verify Receipt"
+    description: "Verify receipt of delivered inventory"
+    timeout_seconds: 1800
+    inputs:
+      - name: "delivery_schedule"
+        type: "object"
+        required: true
+      - name: "store_ids"
+        type: "array"
+        required: true
+    outputs:
+      - name: "receipt_status"
+        type: "object"
+        description: "Status of inventory receipt"
+      - name: "discrepancies"
+        type: "array"
+        description: "Identified discrepancies in delivery"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/receipt_verification.json"
+  
+  - id: "inventory_update"
+    name: "Update Inventory"
+    description: "Update inventory records with received items"
+    timeout_seconds: 600
+    inputs:
+      - name: "receipt_status"
+        type: "object"
+        required: true
+      - name: "store_ids"
+        type: "array"
+        required: true
+    outputs:
+      - name: "update_status"
+        type: "string"
+        description: "Status of inventory update"
+      - name: "updated_inventory"
+        type: "object"
+        description: "Updated inventory levels"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/inventory_update.json"
+  
+  - id: "documentation"
+    name: "Update Documentation"
+    description: "Update inventory management documentation and records"
+    timeout_seconds: 300
+    inputs:
+      - name: "store_ids"
+        type: "array"
+        required: true
+      - name: "replenishment_plan"
+        type: "object"
+        required: true
+      - name: "receipt_status"
+        type: "object"
+        required: true
+      - name: "updated_inventory"
+        type: "object"
+        required: true
+    outputs:
+      - name: "documentation_status"
+        type: "string"
+        description: "Status of documentation update"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/documentation.json"
+
+workflow:
+  start: "inventory_monitoring"
+  transitions:
+    - from: "inventory_monitoring"
+      to: "sales_analysis"
+      condition: "success"
+    - from: "sales_analysis"
+      to: "demand_forecasting"
+      condition: "success"
+    - from: "demand_forecasting"
+      to: "stock_level_optimization"
+      condition: "success"
+    - from: "stock_level_optimization"
+      to: "replenishment_planning"
+      condition: "reorder_recommendations.length > 0"
+    - from: "stock_level_optimization"
+      to: "inventory_monitoring"
+      condition: "reorder_recommendations.length == 0"
+      wait_seconds: 86400
+    - from: "replenishment_planning"
+      to: "human_approval"
+      condition: "purchase_orders.some(o => o.total_cost > 10000)"
+    - from: "replenishment_planning"
+      to: "order_placement"
+      condition: "!purchase_orders.some(o => o.total_cost > 10000)"
+    - from: "human_approval"
+      to: "order_placement"
+      condition: "approval_status == 'approved' || approval_status == 'modified'"
+    - from: "human_approval"
+      to: "replenishment_planning"
+      condition: "approval_status == 'rejected'"
+    - from: "order_placement"
+      to: "delivery_scheduling"
+      condition: "order_status.all_confirmed == true"
+    - from: "delivery_scheduling"
+      to: "notification"
+      condition: "success"
+    - from: "notification"
+      to: "receipt_verification"
+      condition: "success"
+    - from: "receipt_verification"
+      to: "inventory_update"
+      condition: "success"
+    - from: "inventory_update"
+      to: "documentation"
+      condition: "success"
+    - from: "documentation"
+      to: "inventory_monitoring"
+      condition: "success"
+
+escalation:
+  policies:
+    - trigger: "task_timeout"
+      action: "notify_inventory_manager"
+      priority: "high"
+    - trigger: "task_failure"
+      action: "retry_then_escalate"
+      retry_count: 3
+      priority: "medium"
+    - trigger: "contract_violation"
+      action: "notify_operations_manager"
+      priority: "critical"
+    - trigger: "human_approval_timeout"
+      action: "notify_purchasing_director"
+      priority: "high"
+    - trigger: "stock_out_risk"
+      action: "emergency_procurement"
+      priority: "critical"
+
+dtsl_embedding:
+  enabled: true
+  twin_source: "store_digital_twin"
+  edge_execution: true
+  twin_capabilities:
+    - "inventory_tracking"
+    - "sales_monitoring"
+    - "local_reordering"
+  synchronization:
+    mode: "eventual_consistency"
+    priority_events:
+      - "low_stock_alert"
+      - "delivery_received"
+      - "sales_spike_detected"
+
+---
+# Customer Experience Workflow
+name: customer_experience_management
+version: "1.0"
+description: "Workflow for managing and optimizing customer experience in retail"
+industry: "retail"
+category: "customer_experience"
+execution_modes:
+  - name: "reactive"
+    description: "Triggered by customer interactions"
+    trust_threshold: 0.7
+    confidence_required: 0.8
+    human_oversight: true
+  - name: "proactive"
+    description: "Continuous customer experience optimization"
+    trust_threshold: 0.8
+    confidence_required: 0.85
+    human_oversight: true
+  - name: "autonomous"
+    description: "Fully automated customer experience management"
+    trust_threshold: 0.95
+    confidence_required: 0.98
+    human_oversight: false
+mesh_topology:
+  edge_capable: true
+  cloud_fallback: true
+  data_locality: "distributed"
+  routing_constraints:
+    - "customer_data_privacy"
+    - "personalization_edge_only"
+debug_trace:
+  enabled: true
+  detail_level: "comprehensive"
+  retention_period_days: 90
+  pattern_recognition: true
+tasks:
+  - id: "customer_interaction_monitoring"
+    name: "Monitor Customer Interactions"
+    description: "Monitor customer interactions across channels"
+    timeout_seconds: 300
+    retry_count: 3
+    inputs:
+      - name: "channel_ids"
+        type: "array"
+        required: true
+      - name: "time_period"
+        type: "string"
+        required: true
+    outputs:
+      - name: "interaction_data"
+        type: "object"
+        description: "Data on customer interactions"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/interaction_data.json"
+  
+  - id: "sentiment_analysis"
+    name: "Analyze Customer Sentiment"
+    description: "Analyze sentiment in customer interactions"
+    timeout_seconds: 600
+    inputs:
+      - name: "interaction_data"
+        type: "object"
+        required: true
+    outputs:
+      - name: "sentiment_analysis"
+        type: "object"
+        description: "Analysis of customer sentiment"
+      - name: "sentiment_trends"
+        type: "object"
+        description: "Trends in customer sentiment"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "retail/models/sentiment_analysis.onnx"
+  
+  - id: "customer_segmentation"
+    name: "Segment Customers"
+    description: "Segment customers based on behavior and preferences"
+    timeout_seconds: 900
+    inputs:
+      - name: "customer_data"
+        type: "object"
+        required: true
+      - name: "interaction_data"
+        type: "object"
+        required: true
+      - name: "purchase_history"
+        type: "object"
+        required: true
+    outputs:
+      - name: "customer_segments"
+        type: "object"
+        description: "Identified customer segments"
+      - name: "segment_profiles"
+        type: "array"
+        description: "Profiles for each customer segment"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "retail/models/customer_segmentation.onnx"
+  
+  - id: "personalization_engine"
+    name: "Generate Personalized Recommendations"
+    description: "Generate personalized product recommendations"
+    timeout_seconds: 900
+    inputs:
+      - name: "customer_segments"
+        type: "object"
+        required: true
+      - name: "product_catalog"
+        type: "object"
+        required: true
+      - name: "inventory_levels"
+        type: "object"
+        required: true
+    outputs:
+      - name: "recommendations"
+        type: "object"
+        description: "Personalized product recommendations"
+      - name: "recommendation_scores"
+        type: "object"
+        description: "Confidence scores for recommendations"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "retail/models/recommendation_engine.onnx"
+  
+  - id: "journey_mapping"
+    name: "Map Customer Journeys"
+    description: "Map and analyze customer journeys"
+    timeout_seconds: 900
+    inputs:
+      - name: "interaction_data"
+        type: "object"
+        required: true
+      - name: "customer_segments"
+        type: "object"
+        required: true
+      - name: "touchpoint_data"
+        type: "object"
+        required: true
+    outputs:
+      - name: "journey_maps"
+        type: "object"
+        description: "Mapped customer journeys"
+      - name: "friction_points"
+        type: "array"
+        description: "Identified friction points in journeys"
+    contract:
+      verification_method: "ml_validation"
+      model_ref: "retail/models/journey_mapping.onnx"
+  
+  - id: "experience_optimization"
+    name: "Optimize Customer Experience"
+    description: "Develop strategies to optimize customer experience"
+    timeout_seconds: 1200
+    inputs:
+      - name: "journey_maps"
+        type: "object"
+        required: true
+      - name: "friction_points"
+        type: "array"
+        required: true
+      - name: "sentiment_analysis"
+        type: "object"
+        required: true
+    outputs:
+      - name: "optimization_strategies"
+        type: "array"
+        description: "Strategies for experience optimization"
+      - name: "expected_impact"
+        type: "object"
+        description: "Expected impact of strategies"
+    contract:
+      verification_method: "rule_validation"
+      rules_ref: "retail/rules/experience_optimization.json"
+  
+  - id: "human_review"
+    name: "Human Review"
+    description: "Request human review for experience optimization strategies"
+    timeout_seconds: 3600
+    human_in_loop: true
+    inputs:
+      - name: "optimization_strategies"
+        type: "array"
+        required: true
+      - name: "expected_impact"
+        type: "object"
+        required: true
+      - name: "journey_maps"
+        type: "object"
+        required: true
+    outputs:
+      - name: "review_status"
+        type: "string"
+        description: "Review status (approved, rejected, modified)"
+      - name: "modified_strategies"
+        type: "array"
+        description: "Modified strategies if applicable"
+    contract:
+      verification_method: "human_verification"
+      verification_ui: "retail/ui/strategy_review.json"
+  
+  - id: "campaign_creation"
+    name: "Create Marketing Campaigns"
+    description: "Create personalized marketing campaigns"
+    timeout_seconds: 1200
+    inputs:
+      - name: "customer_segments"
+        type: "object"
+        required: true
+      - name: "recommendations"
+        type: "object"
+        required: true
+      - name: "optimization_strategies"
+        type: "array"
+        required: true
+    outputs:
+      - name: "campaigns"
+        type: "array"
+        description: "Created marketing campaigns"
+      - name: "campaign_assets"
+        type: "object"
+        description: "Assets for each campaign"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/marketing_campaigns.json"
+  
+  - id: "channel_orchestration"
+    name: "Orchestrate Communication Channels"
+    description: "Orchestrate customer communication across channels"
+    timeout_seconds: 900
+    inputs:
+      - name: "campaigns"
+        type: "array"
+        required: true
+      - name: "customer_segments"
+        type: "object"
+        required: true
+      - name: "channel_preferences"
+        type: "object"
+        required: true
+    outputs:
+      - name: "channel_plan"
+        type: "object"
+        description: "Plan for channel orchestration"
+      - name: "message_schedule"
+        type: "array"
+        description: "Schedule for messages across channels"
+    contract:
+      verification_method: "constraint_satisfaction"
+      constraints_ref: "retail/constraints/channel_orchestration.json"
+  
+  - id: "content_personalization"
+    name: "Personalize Content"
+    description: "Personalize content for different customer segments"
+    timeout_seconds: 900
+    inputs:
+      - name: "customer_segments"
+        type: "object"
+        required: true
+      - name: "campaigns"
+        type: "array"
+        required: true
+      - name: "content_templates"
+        type: "object"
+        required: true
+    outputs:
+      - name: "personalized_content"
+        type: "object"
+        description: "Personalized content for each segment"
+      - name: "content_variants"
+        type: "array"
+        description: "Variants of content for testing"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/personalized_content.json"
+  
+  - id: "campaign_execution"
+    name: "Execute Campaigns"
+    description: "Execute marketing campaigns across channels"
+    timeout_seconds: 1800
+    inputs:
+      - name: "campaigns"
+        type: "array"
+        required: true
+      - name: "channel_plan"
+        type: "object"
+        required: true
+      - name: "personalized_content"
+        type: "object"
+        required: true
+    outputs:
+      - name: "execution_status"
+        type: "object"
+        description: "Status of campaign execution"
+      - name: "delivery_metrics"
+        type: "object"
+        description: "Metrics on campaign delivery"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/campaign_execution.json"
+  
+  - id: "performance_tracking"
+    name: "Track Campaign Performance"
+    description: "Track and analyze campaign performance"
+    timeout_seconds: 1200
+    inputs:
+      - name: "campaigns"
+        type: "array"
+        required: true
+      - name: "execution_status"
+        type: "object"
+        required: true
+      - name: "interaction_data"
+        type: "object"
+        required: true
+    outputs:
+      - name: "performance_metrics"
+        type: "object"
+        description: "Campaign performance metrics"
+      - name: "roi_analysis"
+        type: "object"
+        description: "Return on investment analysis"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/performance_metrics.json"
+  
+  - id: "feedback_collection"
+    name: "Collect Customer Feedback"
+    description: "Collect and process customer feedback"
+    timeout_seconds: 1800
+    inputs:
+      - name: "customer_segments"
+        type: "object"
+        required: true
+      - name: "campaigns"
+        type: "array"
+        required: true
+      - name: "feedback_channels"
+        type: "array"
+        required: true
+    outputs:
+      - name: "feedback_data"
+        type: "object"
+        description: "Collected customer feedback"
+      - name: "feedback_summary"
+        type: "object"
+        description: "Summary of feedback themes"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/feedback_data.json"
+  
+  - id: "documentation"
+    name: "Update Documentation"
+    description: "Update customer experience documentation and records"
+    timeout_seconds: 300
+    inputs:
+      - name: "customer_segments"
+        type: "object"
+        required: true
+      - name: "optimization_strategies"
+        type: "array"
+        required: true
+      - name: "performance_metrics"
+        type: "object"
+        required: true
+      - name: "feedback_summary"
+        type: "object"
+        required: true
+    outputs:
+      - name: "documentation_status"
+        type: "string"
+        description: "Status of documentation update"
+    contract:
+      verification_method: "schema_validation"
+      schema_ref: "retail/schemas/documentation.json"
+
+workflow:
+  start: "customer_interaction_monitoring"
+  transitions:
+    - from: "customer_interaction_monitoring"
+      to: "sentiment_analysis"
+      condition: "success"
+    - from: "sentiment_analysis"
+      to: "customer_segmentation"
+      condition: "success"
+    - from: "customer_segmentation"
+      to: "personalization_engine"
+      condition: "success"
+    - from: "personalization_engine"
+      to: "journey_mapping"
+      condition: "success"
+    - from: "journey_mapping"
+      to: "experience_optimization"
+      condition: "success"
+    - from: "experience_optimization"
+      to: "human_review"
+      condition: "optimization_strategies.some(s => s.impact == 'high')"
+    - from: "experience_optimization"
+      to: "campaign_creation"
+      condition: "!optimization_strategies.some(s => s.impact == 'high')"
+    - from: "human_review"
+      to: "campaign_creation"
+      condition: "review_status == 'approved' || review_status == 'modified'"
+    - from: "human_review"
+      to: "experience_optimization"
+      condition: "review_status == 'rejected'"
+    - from: "campaign_creation"
+      to: "channel_orchestration"
+      condition: "success"
+    - from: "channel_orchestration"
+      to: "content_personalization"
+      condition: "success"
+    - from: "content_personalization"
+      to: "campaign_execution"
+      condition: "success"
+    - from: "campaign_execution"
+      to: "performance_tracking"
+      condition: "execution_status.completed == true"
+    - from: "performance_tracking"
+      to: "feedback_collection"
+      condition: "success"
+    - from: "feedback_collection"
+      to: "documentation"
+      condition: "success"
+    - from: "documentation"
+      to: "customer_interaction_monitoring"
+      condition: "success"
+      wait_seconds: 604800
+
+escalation:
+  policies:
+    - trigger: "task_timeout"
+      action: "notify_marketing_manager"
+      priority: "high"
+    - trigger: "task_failure"
+      action: "retry_then_escalate"
+      retry_count: 3
+      priority: "medium"
+    - trigger: "contract_violation"
+      action: "notify_cx_director"
+      priority: "critical"
+    - trigger: "human_review_timeout"
+      action: "notify_marketing_director"
+      priority: "high"
+    - trigger: "negative_sentiment_spike"
+      action: "crisis_management_team"
+      priority: "critical"
+
+dtsl_embedding:
+  enabled: true
+  twin_source: "customer_digital_twin"
+  edge_execution: true
+  twin_capabilities:
+    - "preference_tracking"
+    - "interaction_history"
+    - "personalization_engine"
+  synchronization:
+    mode: "eventual_consistency"
+    priority_events:
+      - "customer_complaint"
+      - "high_value_interaction"
+      - "churn_risk_detected"

@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ui-ux-layer
+  labels:
+    app: ui-ux-layer
+    layer: ui-ux
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  - port: 443
+    targetPort: https
+    protocol: TCP
+    name: https
+  - port: 9090
+    targetPort: metrics
+    protocol: TCP
+    name: metrics
+  selector:
+    app: ui-ux-layer

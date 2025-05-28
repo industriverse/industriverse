@@ -1,0 +1,43 @@
+{{/* Service account for n8n-integration */}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "n8n-integration.serviceAccountName" . }}
+  labels:
+    {{- include "n8n-integration.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+{{/* RBAC role for n8n-integration */}}
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "n8n-integration.fullname" . }}-role
+  labels:
+    {{- include "n8n-integration.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  {{- if .Values.rbac.extraRules }}
+  {{- toYaml .Values.rbac.extraRules | nindent 2 }}
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "n8n-integration.fullname" . }}-rolebinding
+  labels:
+    {{- include "n8n-integration.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "n8n-integration.fullname" . }}-role
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "n8n-integration.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

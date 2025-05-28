@@ -1,0 +1,797 @@
+crypto_algorithms:
+  # Post-Quantum Cryptography (PQC) algorithms
+  pqc:
+    # Key Encapsulation Mechanisms (KEMs)
+    key_encapsulation:
+      - name: "kyber-512"
+        strength: "AES-128 equivalent"
+        status: "NIST standardized"
+        priority: 1
+        description: "CRYSTALS-Kyber with parameter set 512"
+      - name: "kyber-768"
+        strength: "AES-192 equivalent"
+        status: "NIST standardized"
+        priority: 2
+        description: "CRYSTALS-Kyber with parameter set 768"
+      - name: "kyber-1024"
+        strength: "AES-256 equivalent"
+        status: "NIST standardized"
+        priority: 3
+        description: "CRYSTALS-Kyber with parameter set 1024"
+      - name: "bike-level1"
+        strength: "AES-128 equivalent"
+        status: "NIST round 4"
+        priority: 4
+        description: "Bit Flipping Key Encapsulation - Level 1"
+      - name: "hqc-128"
+        strength: "AES-128 equivalent"
+        status: "NIST round 4"
+        priority: 5
+        description: "Hamming Quasi-Cyclic - 128 bit security"
+    
+    # Digital Signatures
+    signatures:
+      - name: "dilithium-2"
+        strength: "AES-128 equivalent"
+        status: "NIST standardized"
+        priority: 1
+        description: "CRYSTALS-Dilithium with parameter set 2"
+      - name: "dilithium-3"
+        strength: "AES-192 equivalent"
+        status: "NIST standardized"
+        priority: 2
+        description: "CRYSTALS-Dilithium with parameter set 3"
+      - name: "dilithium-5"
+        strength: "AES-256 equivalent"
+        status: "NIST standardized"
+        priority: 3
+        description: "CRYSTALS-Dilithium with parameter set 5"
+      - name: "falcon-512"
+        strength: "AES-128 equivalent"
+        status: "NIST standardized"
+        priority: 4
+        description: "Falcon with parameter set 512"
+      - name: "falcon-1024"
+        strength: "AES-256 equivalent"
+        status: "NIST standardized"
+        priority: 5
+        description: "Falcon with parameter set 1024"
+      - name: "sphincs+-128s"
+        strength: "AES-128 equivalent"
+        status: "NIST standardized"
+        priority: 6
+        description: "SPHINCS+ small parameter set for 128-bit security"
+    
+    # Hash-based Signatures (for long-term integrity)
+    hash_based_signatures:
+      - name: "xmss-sha2_10_256"
+        strength: "AES-128 equivalent"
+        status: "RFC 8391"
+        priority: 1
+        description: "eXtended Merkle Signature Scheme with SHA-256, height 10"
+      - name: "lms-sha256-m32-h10"
+        strength: "AES-128 equivalent"
+        status: "RFC 8554"
+        priority: 2
+        description: "Leighton-Micali Signature with SHA-256, m=32, h=10"
+
+  # Traditional cryptography (for hybrid approaches)
+  traditional:
+    # Symmetric encryption
+    symmetric:
+      - name: "aes-256-gcm"
+        strength: "256-bit"
+        status: "FIPS 197"
+        priority: 1
+        description: "AES in GCM mode with 256-bit key"
+      - name: "chacha20-poly1305"
+        strength: "256-bit"
+        status: "RFC 8439"
+        priority: 2
+        description: "ChaCha20 stream cipher with Poly1305 authenticator"
+    
+    # Asymmetric encryption
+    asymmetric:
+      - name: "rsa-3072"
+        strength: "128-bit equivalent"
+        status: "FIPS 186-4"
+        priority: 1
+        description: "RSA with 3072-bit key"
+      - name: "rsa-4096"
+        strength: "150-bit equivalent"
+        status: "FIPS 186-4"
+        priority: 2
+        description: "RSA with 4096-bit key"
+    
+    # Digital signatures
+    signatures:
+      - name: "ecdsa-p256"
+        strength: "128-bit equivalent"
+        status: "FIPS 186-4"
+        priority: 1
+        description: "ECDSA with NIST P-256 curve"
+      - name: "ecdsa-p384"
+        strength: "192-bit equivalent"
+        status: "FIPS 186-4"
+        priority: 2
+        description: "ECDSA with NIST P-384 curve"
+      - name: "ed25519"
+        strength: "128-bit equivalent"
+        status: "RFC 8032"
+        priority: 3
+        description: "Edwards-curve Digital Signature Algorithm with Curve25519"
+    
+    # Key exchange
+    key_exchange:
+      - name: "ecdh-p256"
+        strength: "128-bit equivalent"
+        status: "NIST SP 800-56A"
+        priority: 1
+        description: "Elliptic Curve Diffie-Hellman with NIST P-256 curve"
+      - name: "ecdh-p384"
+        strength: "192-bit equivalent"
+        status: "NIST SP 800-56A"
+        priority: 2
+        description: "Elliptic Curve Diffie-Hellman with NIST P-384 curve"
+      - name: "x25519"
+        strength: "128-bit equivalent"
+        status: "RFC 7748"
+        priority: 3
+        description: "Elliptic Curve Diffie-Hellman with Curve25519"
+
+  # Hash functions
+  hash:
+    - name: "sha-256"
+      strength: "128-bit"
+      status: "FIPS 180-4"
+      priority: 1
+      description: "SHA-2 with 256-bit output"
+    - name: "sha-384"
+      strength: "192-bit"
+      status: "FIPS 180-4"
+      priority: 2
+      description: "SHA-2 with 384-bit output"
+    - name: "sha-512"
+      strength: "256-bit"
+      status: "FIPS 180-4"
+      priority: 3
+      description: "SHA-2 with 512-bit output"
+    - name: "sha3-256"
+      strength: "128-bit"
+      status: "FIPS 202"
+      priority: 4
+      description: "SHA-3 with 256-bit output"
+    - name: "sha3-384"
+      strength: "192-bit"
+      status: "FIPS 202"
+      priority: 5
+      description: "SHA-3 with 384-bit output"
+    - name: "sha3-512"
+      strength: "256-bit"
+      status: "FIPS 202"
+      priority: 6
+      description: "SHA-3 with 512-bit output"
+
+# Crypto zone definitions for different layers and components
+crypto_zones:
+  # Data Layer crypto zone
+  data_layer:
+    name: "Data Layer Crypto Zone"
+    description: "Cryptographic controls for the Data Layer"
+    default_security_level: "enhanced"
+    algorithms:
+      key_encapsulation: ["kyber-768", "kyber-1024"]
+      signatures: ["dilithium-3", "dilithium-5"]
+      symmetric: ["aes-256-gcm", "chacha20-poly1305"]
+      hash: ["sha-384", "sha3-384"]
+    security_levels:
+      standard:
+        key_encapsulation: "kyber-512"
+        signatures: "dilithium-2"
+        symmetric: "aes-256-gcm"
+        hash: "sha-256"
+      enhanced:
+        key_encapsulation: "kyber-768"
+        signatures: "dilithium-3"
+        symmetric: "aes-256-gcm"
+        hash: "sha-384"
+      high:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-384"
+      critical:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-512"
+        additional: ["hash_based_signatures"]
+    components:
+      data_storage:
+        description: "Data at rest encryption"
+        default_security_level: "enhanced"
+        override_algorithms:
+          symmetric: ["aes-256-gcm"]
+      data_transit:
+        description: "Data in transit encryption"
+        default_security_level: "enhanced"
+        override_algorithms:
+          key_encapsulation: ["kyber-768", "x25519"]  # Hybrid approach
+      data_processing:
+        description: "Secure data processing"
+        default_security_level: "enhanced"
+        override_algorithms:
+          signatures: ["dilithium-3"]
+      homomorphic_operations:
+        description: "Homomorphic encryption operations"
+        default_security_level: "high"
+        override_algorithms:
+          key_encapsulation: ["kyber-1024"]
+      secure_mpc:
+        description: "Secure multi-party computation"
+        default_security_level: "high"
+        override_algorithms:
+          signatures: ["dilithium-5"]
+
+  # Core AI Layer crypto zone
+  core_ai_layer:
+    name: "Core AI Layer Crypto Zone"
+    description: "Cryptographic controls for the Core AI Layer"
+    default_security_level: "enhanced"
+    algorithms:
+      key_encapsulation: ["kyber-768"]
+      signatures: ["dilithium-3"]
+      symmetric: ["aes-256-gcm"]
+      hash: ["sha-384"]
+    security_levels:
+      standard:
+        key_encapsulation: "kyber-512"
+        signatures: "dilithium-2"
+        symmetric: "aes-256-gcm"
+        hash: "sha-256"
+      enhanced:
+        key_encapsulation: "kyber-768"
+        signatures: "dilithium-3"
+        symmetric: "aes-256-gcm"
+        hash: "sha-384"
+      high:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-384"
+      critical:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-512"
+        additional: ["hash_based_signatures"]
+    components:
+      model_security:
+        description: "AI model security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          signatures: ["dilithium-3", "ecdsa-p384"]  # Hybrid approach
+      inference_security:
+        description: "Inference security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          key_encapsulation: ["kyber-768"]
+      training_security:
+        description: "Training security"
+        default_security_level: "high"
+        override_algorithms:
+          signatures: ["dilithium-5"]
+
+  # Generative Layer crypto zone
+  generative_layer:
+    name: "Generative Layer Crypto Zone"
+    description: "Cryptographic controls for the Generative Layer"
+    default_security_level: "enhanced"
+    algorithms:
+      key_encapsulation: ["kyber-768"]
+      signatures: ["dilithium-3"]
+      symmetric: ["aes-256-gcm"]
+      hash: ["sha-384"]
+    security_levels:
+      standard:
+        key_encapsulation: "kyber-512"
+        signatures: "dilithium-2"
+        symmetric: "aes-256-gcm"
+        hash: "sha-256"
+      enhanced:
+        key_encapsulation: "kyber-768"
+        signatures: "dilithium-3"
+        symmetric: "aes-256-gcm"
+        hash: "sha-384"
+      high:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-384"
+      critical:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-512"
+        additional: ["hash_based_signatures"]
+    components:
+      generation_security:
+        description: "Content generation security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          signatures: ["dilithium-3"]
+      content_validation:
+        description: "Generated content validation"
+        default_security_level: "enhanced"
+        override_algorithms:
+          hash: ["sha3-384"]
+
+  # Application Layer crypto zone
+  application_layer:
+    name: "Application Layer Crypto Zone"
+    description: "Cryptographic controls for the Application Layer"
+    default_security_level: "enhanced"
+    algorithms:
+      key_encapsulation: ["kyber-768"]
+      signatures: ["dilithium-3"]
+      symmetric: ["aes-256-gcm"]
+      hash: ["sha-384"]
+    security_levels:
+      standard:
+        key_encapsulation: "kyber-512"
+        signatures: "dilithium-2"
+        symmetric: "aes-256-gcm"
+        hash: "sha-256"
+      enhanced:
+        key_encapsulation: "kyber-768"
+        signatures: "dilithium-3"
+        symmetric: "aes-256-gcm"
+        hash: "sha-384"
+      high:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-384"
+      critical:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-512"
+        additional: ["hash_based_signatures"]
+    components:
+      application_security:
+        description: "Application security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          signatures: ["dilithium-3"]
+      api_security:
+        description: "API security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          key_encapsulation: ["kyber-768"]
+
+  # Protocol Layer crypto zone
+  protocol_layer:
+    name: "Protocol Layer Crypto Zone"
+    description: "Cryptographic controls for the Protocol Layer"
+    default_security_level: "enhanced"
+    algorithms:
+      key_encapsulation: ["kyber-768"]
+      signatures: ["dilithium-3"]
+      symmetric: ["aes-256-gcm"]
+      hash: ["sha-384"]
+    security_levels:
+      standard:
+        key_encapsulation: "kyber-512"
+        signatures: "dilithium-2"
+        symmetric: "aes-256-gcm"
+        hash: "sha-256"
+      enhanced:
+        key_encapsulation: "kyber-768"
+        signatures: "dilithium-3"
+        symmetric: "aes-256-gcm"
+        hash: "sha-384"
+      high:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-384"
+      critical:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-512"
+        additional: ["hash_based_signatures"]
+    components:
+      protocol_security:
+        description: "Protocol security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          signatures: ["dilithium-3"]
+      message_security:
+        description: "Message security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          key_encapsulation: ["kyber-768"]
+      mcp_protocol:
+        description: "MCP protocol security"
+        default_security_level: "high"
+        override_algorithms:
+          signatures: ["dilithium-5"]
+      a2a_protocol:
+        description: "A2A protocol security"
+        default_security_level: "high"
+        override_algorithms:
+          signatures: ["dilithium-5"]
+
+  # Workflow Layer crypto zone
+  workflow_layer:
+    name: "Workflow Layer Crypto Zone"
+    description: "Cryptographic controls for the Workflow Layer"
+    default_security_level: "enhanced"
+    algorithms:
+      key_encapsulation: ["kyber-768"]
+      signatures: ["dilithium-3"]
+      symmetric: ["aes-256-gcm"]
+      hash: ["sha-384"]
+    security_levels:
+      standard:
+        key_encapsulation: "kyber-512"
+        signatures: "dilithium-2"
+        symmetric: "aes-256-gcm"
+        hash: "sha-256"
+      enhanced:
+        key_encapsulation: "kyber-768"
+        signatures: "dilithium-3"
+        symmetric: "aes-256-gcm"
+        hash: "sha-384"
+      high:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-384"
+      critical:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-512"
+        additional: ["hash_based_signatures"]
+    components:
+      workflow_security:
+        description: "Workflow security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          signatures: ["dilithium-3"]
+      execution_security:
+        description: "Execution security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          key_encapsulation: ["kyber-768"]
+
+  # UI/UX Layer crypto zone
+  ui_ux_layer:
+    name: "UI/UX Layer Crypto Zone"
+    description: "Cryptographic controls for the UI/UX Layer"
+    default_security_level: "enhanced"
+    algorithms:
+      key_encapsulation: ["kyber-768"]
+      signatures: ["dilithium-3"]
+      symmetric: ["aes-256-gcm"]
+      hash: ["sha-384"]
+    security_levels:
+      standard:
+        key_encapsulation: "kyber-512"
+        signatures: "dilithium-2"
+        symmetric: "aes-256-gcm"
+        hash: "sha-256"
+      enhanced:
+        key_encapsulation: "kyber-768"
+        signatures: "dilithium-3"
+        symmetric: "aes-256-gcm"
+        hash: "sha-384"
+      high:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-384"
+      critical:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-512"
+        additional: ["hash_based_signatures"]
+    components:
+      ui_security:
+        description: "UI security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          signatures: ["dilithium-3"]
+      interaction_security:
+        description: "Interaction security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          key_encapsulation: ["kyber-768"]
+
+  # Security & Compliance Layer crypto zone
+  security_layer:
+    name: "Security & Compliance Layer Crypto Zone"
+    description: "Cryptographic controls for the Security & Compliance Layer"
+    default_security_level: "high"
+    algorithms:
+      key_encapsulation: ["kyber-1024"]
+      signatures: ["dilithium-5"]
+      symmetric: ["aes-256-gcm"]
+      hash: ["sha3-384"]
+    security_levels:
+      standard:
+        key_encapsulation: "kyber-768"
+        signatures: "dilithium-3"
+        symmetric: "aes-256-gcm"
+        hash: "sha-384"
+      enhanced:
+        key_encapsulation: "kyber-768"
+        signatures: "dilithium-3"
+        symmetric: "aes-256-gcm"
+        hash: "sha-384"
+      high:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-384"
+      critical:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-512"
+        additional: ["hash_based_signatures"]
+    components:
+      identity_trust:
+        description: "Identity and trust"
+        default_security_level: "high"
+        override_algorithms:
+          signatures: ["dilithium-5"]
+      access_control:
+        description: "Access control"
+        default_security_level: "high"
+        override_algorithms:
+          key_encapsulation: ["kyber-1024"]
+      data_security:
+        description: "Data security"
+        default_security_level: "high"
+        override_algorithms:
+          symmetric: ["aes-256-gcm"]
+      protocol_security:
+        description: "Protocol security"
+        default_security_level: "high"
+        override_algorithms:
+          signatures: ["dilithium-5"]
+      policy_governance:
+        description: "Policy governance"
+        default_security_level: "high"
+        override_algorithms:
+          hash: ["sha3-384"]
+
+  # Edge device crypto zone
+  edge_devices:
+    name: "Edge Device Crypto Zone"
+    description: "Cryptographic controls for edge devices"
+    default_security_level: "enhanced"
+    algorithms:
+      key_encapsulation: ["kyber-768"]
+      signatures: ["dilithium-3"]
+      symmetric: ["aes-256-gcm", "chacha20-poly1305"]  # ChaCha20-Poly1305 is more efficient on constrained devices
+      hash: ["sha-384"]
+    security_levels:
+      standard:
+        key_encapsulation: "kyber-512"
+        signatures: "dilithium-2"
+        symmetric: "chacha20-poly1305"
+        hash: "sha-256"
+      enhanced:
+        key_encapsulation: "kyber-768"
+        signatures: "dilithium-3"
+        symmetric: "chacha20-poly1305"
+        hash: "sha-384"
+      high:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-384"
+      critical:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-512"
+        additional: ["hash_based_signatures"]
+    components:
+      edge_security:
+        description: "Edge device security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          signatures: ["dilithium-3"]
+      edge_communication:
+        description: "Edge device communication"
+        default_security_level: "enhanced"
+        override_algorithms:
+          key_encapsulation: ["kyber-768"]
+      edge_storage:
+        description: "Edge device storage"
+        default_security_level: "enhanced"
+        override_algorithms:
+          symmetric: ["chacha20-poly1305"]
+
+  # Capsule crypto zone
+  capsules:
+    name: "Capsule Crypto Zone"
+    description: "Cryptographic controls for capsules"
+    default_security_level: "enhanced"
+    algorithms:
+      key_encapsulation: ["kyber-768"]
+      signatures: ["dilithium-3"]
+      symmetric: ["aes-256-gcm"]
+      hash: ["sha-384"]
+    security_levels:
+      standard:
+        key_encapsulation: "kyber-512"
+        signatures: "dilithium-2"
+        symmetric: "aes-256-gcm"
+        hash: "sha-256"
+      enhanced:
+        key_encapsulation: "kyber-768"
+        signatures: "dilithium-3"
+        symmetric: "aes-256-gcm"
+        hash: "sha-384"
+      high:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-384"
+      critical:
+        key_encapsulation: "kyber-1024"
+        signatures: "dilithium-5"
+        symmetric: "aes-256-gcm"
+        hash: "sha3-512"
+        additional: ["hash_based_signatures"]
+    components:
+      capsule_security:
+        description: "Capsule security"
+        default_security_level: "enhanced"
+        override_algorithms:
+          signatures: ["dilithium-3"]
+      capsule_communication:
+        description: "Capsule communication"
+        default_security_level: "enhanced"
+        override_algorithms:
+          key_encapsulation: ["kyber-768"]
+      capsule_storage:
+        description: "Capsule storage"
+        default_security_level: "enhanced"
+        override_algorithms:
+          symmetric: ["aes-256-gcm"]
+      capsule_attestation:
+        description: "Capsule attestation"
+        default_security_level: "high"
+        override_algorithms:
+          signatures: ["dilithium-5"]
+
+# Regional crypto policy overrides
+regional_overrides:
+  eu:
+    name: "European Union"
+    description: "Crypto policy overrides for EU region"
+    algorithms:
+      key_encapsulation: ["kyber-768", "kyber-1024"]  # ANSSI recommended
+      signatures: ["dilithium-3", "dilithium-5"]  # ANSSI recommended
+    components:
+      data_storage:
+        description: "Data at rest encryption for EU region"
+        override_algorithms:
+          symmetric: ["aes-256-gcm"]  # GDPR compliant
+      data_transit:
+        description: "Data in transit encryption for EU region"
+        override_algorithms:
+          key_encapsulation: ["kyber-768"]  # ANSSI recommended
+  
+  us:
+    name: "United States"
+    description: "Crypto policy overrides for US region"
+    algorithms:
+      key_encapsulation: ["kyber-768", "kyber-1024"]  # NSA Suite B compliant
+      signatures: ["dilithium-3", "dilithium-5"]  # NSA Suite B compliant
+    components:
+      data_storage:
+        description: "Data at rest encryption for US region"
+        override_algorithms:
+          symmetric: ["aes-256-gcm"]  # FIPS 140-2 compliant
+      data_transit:
+        description: "Data in transit encryption for US region"
+        override_algorithms:
+          key_encapsulation: ["kyber-768"]  # NSA recommended
+  
+  asia_pacific:
+    name: "Asia Pacific"
+    description: "Crypto policy overrides for Asia Pacific region"
+    algorithms:
+      key_encapsulation: ["kyber-768", "kyber-1024"]
+      signatures: ["dilithium-3", "dilithium-5"]
+    components:
+      data_storage:
+        description: "Data at rest encryption for Asia Pacific region"
+        override_algorithms:
+          symmetric: ["aes-256-gcm"]
+      data_transit:
+        description: "Data in transit encryption for Asia Pacific region"
+        override_algorithms:
+          key_encapsulation: ["kyber-768"]
+
+# Crypto transition policy
+transition_policy:
+  name: "Crypto Transition Policy"
+  description: "Policy for transitioning to quantum-resistant cryptography"
+  phases:
+    - name: "Phase 1: Hybrid Deployment"
+      description: "Deploy hybrid cryptography (traditional + PQC)"
+      timeline: "2025-2026"
+      actions:
+        - "Deploy hybrid key encapsulation (traditional + PQC)"
+        - "Deploy hybrid signatures (traditional + PQC)"
+        - "Update crypto libraries and dependencies"
+    - name: "Phase 2: PQC Preference"
+      description: "Prefer PQC algorithms with traditional fallback"
+      timeline: "2026-2027"
+      actions:
+        - "Set PQC as primary algorithms"
+        - "Keep traditional algorithms as fallback"
+        - "Begin deprecation of traditional-only systems"
+    - name: "Phase 3: PQC Requirement"
+      description: "Require PQC algorithms for all new systems"
+      timeline: "2027-2028"
+      actions:
+        - "Require PQC for all new systems"
+        - "Complete migration of existing systems"
+        - "Deprecate traditional-only cryptography"
+  emergency_actions:
+    - name: "Quantum Breakthrough Response"
+      description: "Actions to take in case of significant quantum computing breakthrough"
+      trigger: "Announcement of quantum computer capable of breaking RSA-2048 or ECC P-256"
+      actions:
+        - "Immediately disable vulnerable traditional algorithms"
+        - "Force transition to PQC-only mode"
+        - "Initiate emergency key rotation for all systems"
+        - "Deploy quantum-resistant VPNs for all communications"
+
+# Trust score modifiers based on crypto usage
+trust_score_modifiers:
+  algorithms:
+    # PQC algorithms generally increase trust score
+    kyber-512: 0.05
+    kyber-768: 0.1
+    kyber-1024: 0.15
+    dilithium-2: 0.05
+    dilithium-3: 0.1
+    dilithium-5: 0.15
+    
+    # Traditional algorithms may decrease trust score
+    rsa-2048: -0.2  # Considered weak against quantum computers
+    rsa-3072: -0.1
+    rsa-4096: -0.05
+    ecdsa-p256: -0.1
+    ecdsa-p384: -0.05
+    
+    # Symmetric algorithms
+    aes-256-gcm: 0.05
+    chacha20-poly1305: 0.05
+  
+  practices:
+    hybrid_encryption: 0.1  # Using both traditional and PQC
+    regular_key_rotation: 0.15
+    quantum_resistant_only: 0.2
+    weak_algorithm_usage: -0.3
+    outdated_crypto_library: -0.25
+    missing_integrity_protection: -0.2
+    
+  compliance:
+    fips_140_2: 0.1
+    fips_140_3: 0.15
+    common_criteria: 0.1
+    pqc_certified: 0.2

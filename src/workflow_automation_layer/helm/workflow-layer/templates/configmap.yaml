@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "workflow-layer.fullname" . }}-config
+  labels:
+    {{- include "workflow-layer.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    apiVersion: v1
+    kind: WorkflowLayerConfig
+    metadata:
+      name: {{ .Release.Name }}-config
+    spec:
+      logLevel: {{ .Values.logLevel }}
+      executionMode: {{ .Values.executionMode }}
+      meshTopology: {{ .Values.meshTopology }}
+      enableCapsuleDebug: {{ .Values.enableCapsuleDebug | quote }}
+      enableZkAttestation: {{ .Values.enableZkAttestation | quote }}
+      enableDistributedMode: {{ .Values.enableDistributedMode | quote }}
+      n8nApiUrl: {{ .Values.n8n.apiUrl }}
+      ekisApiUrl: {{ .Values.ekis.apiUrl }}
+      trustScoreThresholds:
+        autonomous: {{ .Values.trustScoreThresholds.autonomous }}
+        supervised: {{ .Values.trustScoreThresholds.supervised }}
+        collaborative: {{ .Values.trustScoreThresholds.collaborative }}
+        assistive: {{ .Values.trustScoreThresholds.assistive }}
+      escalationLevels:
+        level1Threshold: {{ .Values.escalationLevels.level1Threshold }}
+        level2Threshold: {{ .Values.escalationLevels.level2Threshold }}
+        level3Threshold: {{ .Values.escalationLevels.level3Threshold }}
+        level4Threshold: {{ .Values.escalationLevels.level4Threshold }}
+      agentMeshConfig:
+        discoveryMode: {{ .Values.agentMeshConfig.discoveryMode }}
+        heartbeatInterval: {{ .Values.agentMeshConfig.heartbeatInterval }}
+        maxReconnectAttempts: {{ .Values.agentMeshConfig.maxReconnectAttempts }}
+      capsuleDebugConfig:
+        traceLevel: {{ .Values.capsuleDebugConfig.traceLevel }}
+        retentionDays: {{ .Values.capsuleDebugConfig.retentionDays }}
+        enableForensics: {{ .Values.capsuleDebugConfig.enableForensics | quote }}
+  n8nApiUrl: {{ .Values.n8n.apiUrl | quote }}
+  ekisApiUrl: {{ .Values.ekis.apiUrl | quote }}

@@ -1,0 +1,879 @@
+# Capsule ACL Policies
+
+# This document defines the access control policies for capsules in the Industriverse platform
+
+version: "1.0.0"
+last_updated: "2025-05-24"
+maintainer: "Security & Compliance Team"
+
+# Global ACL settings
+global_settings:
+  default_policy: "deny"
+  policy_evaluation_order: "specific-to-general"
+  policy_conflict_resolution: "most-restrictive"
+  policy_caching_enabled: true
+  policy_cache_ttl: "5m"
+  policy_enforcement_mode: "enforcing" # Options: enforcing, permissive, monitoring
+  policy_update_propagation_delay: "1m"
+  policy_version_tracking: true
+  policy_audit_logging: true
+
+# Role definitions
+roles:
+  - id: "system_administrator"
+    name: "System Administrator"
+    description: "Full system administration privileges"
+    priority: 100
+    
+  - id: "security_administrator"
+    name: "Security Administrator"
+    description: "Security administration privileges"
+    priority: 90
+    
+  - id: "compliance_officer"
+    name: "Compliance Officer"
+    description: "Compliance monitoring and reporting privileges"
+    priority: 80
+    
+  - id: "developer"
+    name: "Developer"
+    description: "Development and testing privileges"
+    priority: 70
+    
+  - id: "operator"
+    name: "Operator"
+    description: "Operational privileges"
+    priority: 60
+    
+  - id: "auditor"
+    name: "Auditor"
+    description: "Audit and review privileges"
+    priority: 50
+    
+  - id: "user"
+    name: "User"
+    description: "Standard user privileges"
+    priority: 40
+    
+  - id: "guest"
+    name: "Guest"
+    description: "Limited guest privileges"
+    priority: 30
+    
+  - id: "service_account"
+    name: "Service Account"
+    description: "Automated service privileges"
+    priority: 20
+    
+  - id: "capsule"
+    name: "Capsule"
+    description: "Capsule-to-capsule interaction privileges"
+    priority: 10
+
+# Permission definitions
+permissions:
+  - id: "capsule_create"
+    name: "Create Capsule"
+    description: "Permission to create new capsules"
+    
+  - id: "capsule_read"
+    name: "Read Capsule"
+    description: "Permission to read capsule metadata and content"
+    
+  - id: "capsule_update"
+    name: "Update Capsule"
+    description: "Permission to update existing capsules"
+    
+  - id: "capsule_delete"
+    name: "Delete Capsule"
+    description: "Permission to delete capsules"
+    
+  - id: "capsule_execute"
+    name: "Execute Capsule"
+    description: "Permission to execute capsules"
+    
+  - id: "capsule_suspend"
+    name: "Suspend Capsule"
+    description: "Permission to suspend capsule execution"
+    
+  - id: "capsule_resume"
+    name: "Resume Capsule"
+    description: "Permission to resume suspended capsules"
+    
+  - id: "capsule_migrate"
+    name: "Migrate Capsule"
+    description: "Permission to migrate capsules between environments"
+    
+  - id: "capsule_clone"
+    name: "Clone Capsule"
+    description: "Permission to create copies of capsules"
+    
+  - id: "capsule_inspect"
+    name: "Inspect Capsule"
+    description: "Permission to inspect capsule internals"
+    
+  - id: "capsule_configure"
+    name: "Configure Capsule"
+    description: "Permission to configure capsule settings"
+    
+  - id: "capsule_monitor"
+    name: "Monitor Capsule"
+    description: "Permission to monitor capsule activity"
+    
+  - id: "capsule_audit"
+    name: "Audit Capsule"
+    description: "Permission to audit capsule operations"
+    
+  - id: "capsule_attest"
+    name: "Attest Capsule"
+    description: "Permission to create attestations for capsules"
+    
+  - id: "capsule_verify"
+    name: "Verify Capsule"
+    description: "Permission to verify capsule attestations"
+
+# Role-permission assignments
+role_permissions:
+  - role: "system_administrator"
+    permissions:
+      - "capsule_create"
+      - "capsule_read"
+      - "capsule_update"
+      - "capsule_delete"
+      - "capsule_execute"
+      - "capsule_suspend"
+      - "capsule_resume"
+      - "capsule_migrate"
+      - "capsule_clone"
+      - "capsule_inspect"
+      - "capsule_configure"
+      - "capsule_monitor"
+      - "capsule_audit"
+      - "capsule_attest"
+      - "capsule_verify"
+    
+  - role: "security_administrator"
+    permissions:
+      - "capsule_read"
+      - "capsule_update"
+      - "capsule_suspend"
+      - "capsule_resume"
+      - "capsule_inspect"
+      - "capsule_configure"
+      - "capsule_monitor"
+      - "capsule_audit"
+      - "capsule_attest"
+      - "capsule_verify"
+    
+  - role: "compliance_officer"
+    permissions:
+      - "capsule_read"
+      - "capsule_inspect"
+      - "capsule_monitor"
+      - "capsule_audit"
+      - "capsule_verify"
+    
+  - role: "developer"
+    permissions:
+      - "capsule_create"
+      - "capsule_read"
+      - "capsule_update"
+      - "capsule_execute"
+      - "capsule_clone"
+      - "capsule_inspect"
+      - "capsule_configure"
+      - "capsule_monitor"
+    
+  - role: "operator"
+    permissions:
+      - "capsule_read"
+      - "capsule_execute"
+      - "capsule_suspend"
+      - "capsule_resume"
+      - "capsule_migrate"
+      - "capsule_monitor"
+    
+  - role: "auditor"
+    permissions:
+      - "capsule_read"
+      - "capsule_inspect"
+      - "capsule_monitor"
+      - "capsule_audit"
+      - "capsule_verify"
+    
+  - role: "user"
+    permissions:
+      - "capsule_read"
+      - "capsule_execute"
+      - "capsule_monitor"
+    
+  - role: "guest"
+    permissions:
+      - "capsule_read"
+    
+  - role: "service_account"
+    permissions:
+      - "capsule_read"
+      - "capsule_execute"
+      - "capsule_monitor"
+    
+  - role: "capsule"
+    permissions:
+      - "capsule_read"
+      - "capsule_execute"
+
+# Capsule security classifications
+security_classifications:
+  - id: "public"
+    name: "Public"
+    description: "Publicly accessible capsules"
+    default_access: "read"
+    
+  - id: "internal"
+    name: "Internal"
+    description: "Internally accessible capsules"
+    default_access: "none"
+    
+  - id: "confidential"
+    name: "Confidential"
+    description: "Confidential capsules with restricted access"
+    default_access: "none"
+    
+  - id: "restricted"
+    name: "Restricted"
+    description: "Highly restricted capsules"
+    default_access: "none"
+    
+  - id: "critical"
+    name: "Critical"
+    description: "Critical system capsules"
+    default_access: "none"
+
+# Capsule type definitions
+capsule_types:
+  - id: "data_processing"
+    name: "Data Processing"
+    description: "Capsules for data processing operations"
+    security_classification: "internal"
+    
+  - id: "ai_inference"
+    name: "AI Inference"
+    description: "Capsules for AI inference operations"
+    security_classification: "internal"
+    
+  - id: "workflow_automation"
+    name: "Workflow Automation"
+    description: "Capsules for workflow automation"
+    security_classification: "internal"
+    
+  - id: "user_interface"
+    name: "User Interface"
+    description: "Capsules for user interface components"
+    security_classification: "public"
+    
+  - id: "system_service"
+    name: "System Service"
+    description: "Capsules for system services"
+    security_classification: "restricted"
+    
+  - id: "security_service"
+    name: "Security Service"
+    description: "Capsules for security services"
+    security_classification: "critical"
+    
+  - id: "integration_service"
+    name: "Integration Service"
+    description: "Capsules for integration services"
+    security_classification: "confidential"
+    
+  - id: "analytics_service"
+    name: "Analytics Service"
+    description: "Capsules for analytics services"
+    security_classification: "confidential"
+
+# Access control policies
+policies:
+  # Default policies by security classification
+  - id: "public_default"
+    name: "Public Default Policy"
+    description: "Default policy for public capsules"
+    capsule_selector:
+      security_classification: "public"
+    rules:
+      - effect: "allow"
+        subjects: ["*"]
+        actions: ["capsule_read", "capsule_execute"]
+        conditions:
+          authentication_required: false
+      
+      - effect: "allow"
+        subjects: ["user", "developer", "operator", "system_administrator", "security_administrator"]
+        actions: ["capsule_monitor"]
+        conditions:
+          authentication_required: true
+  
+  - id: "internal_default"
+    name: "Internal Default Policy"
+    description: "Default policy for internal capsules"
+    capsule_selector:
+      security_classification: "internal"
+    rules:
+      - effect: "allow"
+        subjects: ["user", "developer", "operator", "system_administrator", "security_administrator", "service_account", "capsule"]
+        actions: ["capsule_read", "capsule_execute", "capsule_monitor"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+      
+      - effect: "allow"
+        subjects: ["developer", "operator", "system_administrator", "security_administrator"]
+        actions: ["capsule_inspect", "capsule_configure"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          audit_logging: true
+  
+  - id: "confidential_default"
+    name: "Confidential Default Policy"
+    description: "Default policy for confidential capsules"
+    capsule_selector:
+      security_classification: "confidential"
+    rules:
+      - effect: "allow"
+        subjects: ["developer", "operator", "system_administrator", "security_administrator", "compliance_officer", "auditor"]
+        actions: ["capsule_read", "capsule_execute", "capsule_monitor"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          multi_factor_authentication: true
+          audit_logging: true
+      
+      - effect: "allow"
+        subjects: ["service_account", "capsule"]
+        actions: ["capsule_read", "capsule_execute"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          service_account_verification: true
+          audit_logging: true
+  
+  - id: "restricted_default"
+    name: "Restricted Default Policy"
+    description: "Default policy for restricted capsules"
+    capsule_selector:
+      security_classification: "restricted"
+    rules:
+      - effect: "allow"
+        subjects: ["system_administrator", "security_administrator"]
+        actions: ["capsule_read", "capsule_execute", "capsule_monitor", "capsule_inspect", "capsule_configure"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          multi_factor_authentication: true
+          privileged_access_management: true
+          audit_logging: true
+      
+      - effect: "allow"
+        subjects: ["compliance_officer", "auditor"]
+        actions: ["capsule_read", "capsule_monitor", "capsule_audit"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          multi_factor_authentication: true
+          audit_logging: true
+  
+  - id: "critical_default"
+    name: "Critical Default Policy"
+    description: "Default policy for critical capsules"
+    capsule_selector:
+      security_classification: "critical"
+    rules:
+      - effect: "allow"
+        subjects: ["system_administrator", "security_administrator"]
+        actions: ["capsule_read", "capsule_execute", "capsule_monitor", "capsule_inspect", "capsule_configure", "capsule_suspend", "capsule_resume"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          multi_factor_authentication: true
+          privileged_access_management: true
+          just_in_time_access: true
+          approval_required: true
+          audit_logging: true
+  
+  # Specific policies by capsule type
+  - id: "data_processing_policy"
+    name: "Data Processing Capsule Policy"
+    description: "Policy for data processing capsules"
+    capsule_selector:
+      capsule_type: "data_processing"
+    rules:
+      - effect: "allow"
+        subjects: ["developer", "operator", "system_administrator", "security_administrator", "service_account", "capsule"]
+        actions: ["capsule_read", "capsule_execute", "capsule_monitor"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          data_classification_check: true
+          audit_logging: true
+      
+      - effect: "allow"
+        subjects: ["compliance_officer", "auditor"]
+        actions: ["capsule_read", "capsule_monitor", "capsule_audit"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          audit_logging: true
+  
+  - id: "ai_inference_policy"
+    name: "AI Inference Capsule Policy"
+    description: "Policy for AI inference capsules"
+    capsule_selector:
+      capsule_type: "ai_inference"
+    rules:
+      - effect: "allow"
+        subjects: ["developer", "operator", "system_administrator", "security_administrator", "service_account", "capsule"]
+        actions: ["capsule_read", "capsule_execute", "capsule_monitor"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          model_access_check: true
+          audit_logging: true
+      
+      - effect: "allow"
+        subjects: ["compliance_officer", "auditor"]
+        actions: ["capsule_read", "capsule_monitor", "capsule_audit"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          audit_logging: true
+  
+  - id: "workflow_automation_policy"
+    name: "Workflow Automation Capsule Policy"
+    description: "Policy for workflow automation capsules"
+    capsule_selector:
+      capsule_type: "workflow_automation"
+    rules:
+      - effect: "allow"
+        subjects: ["developer", "operator", "system_administrator", "security_administrator", "service_account", "capsule"]
+        actions: ["capsule_read", "capsule_execute", "capsule_monitor"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          workflow_access_check: true
+          audit_logging: true
+      
+      - effect: "allow"
+        subjects: ["compliance_officer", "auditor"]
+        actions: ["capsule_read", "capsule_monitor", "capsule_audit"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          audit_logging: true
+  
+  - id: "security_service_policy"
+    name: "Security Service Capsule Policy"
+    description: "Policy for security service capsules"
+    capsule_selector:
+      capsule_type: "security_service"
+    rules:
+      - effect: "allow"
+        subjects: ["system_administrator", "security_administrator"]
+        actions: ["capsule_read", "capsule_execute", "capsule_monitor", "capsule_inspect", "capsule_configure", "capsule_suspend", "capsule_resume"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          multi_factor_authentication: true
+          privileged_access_management: true
+          just_in_time_access: true
+          approval_required: true
+          audit_logging: true
+      
+      - effect: "allow"
+        subjects: ["service_account", "capsule"]
+        actions: ["capsule_read", "capsule_execute"]
+        conditions:
+          authentication_required: true
+          authorization_required: true
+          service_account_verification: true
+          security_service_verification: true
+          audit_logging: true
+
+# Condition definitions
+conditions:
+  - id: "authentication_required"
+    name: "Authentication Required"
+    description: "Requires the subject to be authenticated"
+    implementation: "core/access_control/conditions/authentication_required.py"
+    
+  - id: "authorization_required"
+    name: "Authorization Required"
+    description: "Requires the subject to be authorized"
+    implementation: "core/access_control/conditions/authorization_required.py"
+    
+  - id: "multi_factor_authentication"
+    name: "Multi-Factor Authentication"
+    description: "Requires the subject to be authenticated with multiple factors"
+    implementation: "core/access_control/conditions/multi_factor_authentication.py"
+    
+  - id: "privileged_access_management"
+    name: "Privileged Access Management"
+    description: "Requires the access to be managed through a privileged access management system"
+    implementation: "core/access_control/conditions/privileged_access_management.py"
+    
+  - id: "just_in_time_access"
+    name: "Just-in-Time Access"
+    description: "Requires the access to be granted just in time"
+    implementation: "core/access_control/conditions/just_in_time_access.py"
+    
+  - id: "approval_required"
+    name: "Approval Required"
+    description: "Requires the access to be approved"
+    implementation: "core/access_control/conditions/approval_required.py"
+    
+  - id: "audit_logging"
+    name: "Audit Logging"
+    description: "Requires the access to be logged for audit purposes"
+    implementation: "core/access_control/conditions/audit_logging.py"
+    
+  - id: "data_classification_check"
+    name: "Data Classification Check"
+    description: "Checks if the subject has access to the data classification"
+    implementation: "core/access_control/conditions/data_classification_check.py"
+    
+  - id: "model_access_check"
+    name: "Model Access Check"
+    description: "Checks if the subject has access to the AI model"
+    implementation: "core/access_control/conditions/model_access_check.py"
+    
+  - id: "workflow_access_check"
+    name: "Workflow Access Check"
+    description: "Checks if the subject has access to the workflow"
+    implementation: "core/access_control/conditions/workflow_access_check.py"
+    
+  - id: "service_account_verification"
+    name: "Service Account Verification"
+    description: "Verifies the service account"
+    implementation: "core/access_control/conditions/service_account_verification.py"
+    
+  - id: "security_service_verification"
+    name: "Security Service Verification"
+    description: "Verifies the security service"
+    implementation: "core/access_control/conditions/security_service_verification.py"
+
+# Integration with other Industriverse layers
+layer_integrations:
+  - layer: "data_layer"
+    components:
+      - component: "data_security"
+        integration_points:
+          - "Data classification enforcement"
+          - "Data access control"
+          - "Data lineage tracking"
+    
+  - layer: "core_ai_layer"
+    components:
+      - component: "model_security"
+        integration_points:
+          - "Model access control"
+          - "Inference authorization"
+          - "Training data access control"
+    
+  - layer: "generative_layer"
+    components:
+      - component: "code_generation_security"
+        integration_points:
+          - "Generated code access control"
+          - "Code security verification"
+          - "Generation authorization"
+    
+  - layer: "application_layer"
+    components:
+      - component: "api_security"
+        integration_points:
+          - "API access control"
+          - "API authorization"
+          - "API audit logging"
+    
+  - layer: "protocol_layer"
+    components:
+      - component: "protocol_security"
+        integration_points:
+          - "Protocol access control"
+          - "Message authorization"
+          - "Protocol audit logging"
+    
+  - layer: "workflow_layer"
+    components:
+      - component: "workflow_security"
+        integration_points:
+          - "Workflow access control"
+          - "Step authorization"
+          - "Workflow audit logging"
+    
+  - layer: "ui_ux_layer"
+    components:
+      - component: "ui_security"
+        integration_points:
+          - "UI access control"
+          - "Component authorization"
+          - "UI audit logging"
+
+# Policy enforcement points
+enforcement_points:
+  - id: "capsule_creation_pep"
+    name: "Capsule Creation PEP"
+    description: "Policy enforcement point for capsule creation"
+    implementation: "core/access_control/enforcement/capsule_creation_pep.py"
+    
+  - id: "capsule_access_pep"
+    name: "Capsule Access PEP"
+    description: "Policy enforcement point for capsule access"
+    implementation: "core/access_control/enforcement/capsule_access_pep.py"
+    
+  - id: "capsule_execution_pep"
+    name: "Capsule Execution PEP"
+    description: "Policy enforcement point for capsule execution"
+    implementation: "core/access_control/enforcement/capsule_execution_pep.py"
+    
+  - id: "capsule_modification_pep"
+    name: "Capsule Modification PEP"
+    description: "Policy enforcement point for capsule modification"
+    implementation: "core/access_control/enforcement/capsule_modification_pep.py"
+    
+  - id: "capsule_lifecycle_pep"
+    name: "Capsule Lifecycle PEP"
+    description: "Policy enforcement point for capsule lifecycle operations"
+    implementation: "core/access_control/enforcement/capsule_lifecycle_pep.py"
+
+# Policy decision points
+decision_points:
+  - id: "capsule_pdp"
+    name: "Capsule PDP"
+    description: "Policy decision point for capsule operations"
+    implementation: "core/access_control/decision/capsule_pdp.py"
+    
+  - id: "identity_pdp"
+    name: "Identity PDP"
+    description: "Policy decision point for identity verification"
+    implementation: "core/access_control/decision/identity_pdp.py"
+    
+  - id: "authorization_pdp"
+    name: "Authorization PDP"
+    description: "Policy decision point for authorization decisions"
+    implementation: "core/access_control/decision/authorization_pdp.py"
+    
+  - id: "condition_pdp"
+    name: "Condition PDP"
+    description: "Policy decision point for condition evaluation"
+    implementation: "core/access_control/decision/condition_pdp.py"
+
+# Policy information points
+information_points:
+  - id: "identity_pip"
+    name: "Identity PIP"
+    description: "Policy information point for identity information"
+    implementation: "core/access_control/information/identity_pip.py"
+    
+  - id: "role_pip"
+    name: "Role PIP"
+    description: "Policy information point for role information"
+    implementation: "core/access_control/information/role_pip.py"
+    
+  - id: "capsule_pip"
+    name: "Capsule PIP"
+    description: "Policy information point for capsule information"
+    implementation: "core/access_control/information/capsule_pip.py"
+    
+  - id: "context_pip"
+    name: "Context PIP"
+    description: "Policy information point for context information"
+    implementation: "core/access_control/information/context_pip.py"
+
+# Policy administration points
+administration_points:
+  - id: "policy_pap"
+    name: "Policy PAP"
+    description: "Policy administration point for policy management"
+    implementation: "core/access_control/administration/policy_pap.py"
+    
+  - id: "role_pap"
+    name: "Role PAP"
+    description: "Policy administration point for role management"
+    implementation: "core/access_control/administration/role_pap.py"
+    
+  - id: "permission_pap"
+    name: "Permission PAP"
+    description: "Policy administration point for permission management"
+    implementation: "core/access_control/administration/permission_pap.py"
+
+# Audit and monitoring
+audit:
+  enabled: true
+  log_level: "info"
+  log_format: "json"
+  log_storage_duration: "1y"
+  
+  events:
+    - id: "policy_decision"
+      name: "Policy Decision"
+      description: "Log policy decisions"
+      attributes:
+        - "timestamp"
+        - "subject_id"
+        - "subject_type"
+        - "resource_id"
+        - "resource_type"
+        - "action"
+        - "decision"
+        - "policy_id"
+        - "rule_id"
+    
+    - id: "policy_enforcement"
+      name: "Policy Enforcement"
+      description: "Log policy enforcement"
+      attributes:
+        - "timestamp"
+        - "subject_id"
+        - "subject_type"
+        - "resource_id"
+        - "resource_type"
+        - "action"
+        - "enforcement_point"
+        - "decision"
+        - "policy_id"
+        - "rule_id"
+    
+    - id: "policy_administration"
+      name: "Policy Administration"
+      description: "Log policy administration"
+      attributes:
+        - "timestamp"
+        - "administrator_id"
+        - "action"
+        - "policy_id"
+        - "policy_version"
+        - "change_description"
+    
+    - id: "authentication"
+      name: "Authentication"
+      description: "Log authentication events"
+      attributes:
+        - "timestamp"
+        - "subject_id"
+        - "subject_type"
+        - "authentication_method"
+        - "authentication_result"
+        - "authentication_factors"
+    
+    - id: "authorization"
+      name: "Authorization"
+      description: "Log authorization events"
+      attributes:
+        - "timestamp"
+        - "subject_id"
+        - "subject_type"
+        - "resource_id"
+        - "resource_type"
+        - "action"
+        - "authorization_result"
+        - "authorization_context"
+
+# Performance and scaling
+performance:
+  caching:
+    enabled: true
+    cache_duration: "5m"
+    max_cache_size: "1GB"
+    distributed_cache: true
+  
+  decision_optimization:
+    enabled: true
+    decision_caching: true
+    parallel_evaluation: true
+    rule_indexing: true
+  
+  scaling:
+    horizontal_scaling: true
+    auto_scaling: true
+    min_instances: 3
+    max_instances: 20
+    scaling_metrics:
+      - "request_rate"
+      - "decision_time"
+      - "cache_hit_ratio"
+
+# Monitoring and alerting
+monitoring:
+  metrics:
+    - name: "decision_time"
+      description: "Time taken to make a policy decision"
+      unit: "milliseconds"
+      thresholds:
+        warning: 50
+        critical: 100
+    
+    - name: "enforcement_time"
+      description: "Time taken to enforce a policy decision"
+      unit: "milliseconds"
+      thresholds:
+        warning: 100
+        critical: 200
+    
+    - name: "cache_hit_ratio"
+      description: "Ratio of cache hits to total requests"
+      unit: "percentage"
+      thresholds:
+        warning: 70
+        critical: 50
+    
+    - name: "decision_count"
+      description: "Number of policy decisions made"
+      unit: "count"
+      thresholds:
+        warning: 1000
+        critical: 5000
+    
+    - name: "denial_rate"
+      description: "Rate of access denials"
+      unit: "percentage"
+      thresholds:
+        warning: 20
+        critical: 40
+  
+  alerting:
+    channels:
+      - "email"
+      - "slack"
+      - "pagerduty"
+      - "dashboard"
+    
+    rules:
+      - name: "high_denial_rate"
+        description: "High rate of access denials"
+        condition: "denial_rate > 20 for 5m"
+        severity: "warning"
+      
+      - name: "critical_denial_rate"
+        description: "Critical rate of access denials"
+        condition: "denial_rate > 40 for 5m"
+        severity: "critical"
+      
+      - name: "slow_decision_time"
+        description: "Slow policy decision time"
+        condition: "decision_time > 50 for 5m"
+        severity: "warning"
+      
+      - name: "very_slow_decision_time"
+        description: "Very slow policy decision time"
+        condition: "decision_time > 100 for 5m"
+        severity: "critical"
+      
+      - name: "low_cache_hit_ratio"
+        description: "Low cache hit ratio"
+        condition: "cache_hit_ratio < 70 for 5m"
+        severity: "warning"
+      
+      - name: "very_low_cache_hit_ratio"
+        description: "Very low cache hit ratio"
+        condition: "cache_hit_ratio < 50 for 5m"
+        severity: "critical"

@@ -1,0 +1,246 @@
+{
+  "telemetry_version": "1.0.0",
+  "timestamp": "2025-05-24T07:10:45Z",
+  "capsule_crypto_metrics": {
+    "algorithm_usage": {
+      "key_encapsulation": {
+        "kyber-512": {
+          "count": 12,
+          "success_rate": 0.98,
+          "average_execution_time_ms": 4.2,
+          "memory_usage_kb": 128
+        },
+        "kyber-768": {
+          "count": 45,
+          "success_rate": 0.99,
+          "average_execution_time_ms": 6.8,
+          "memory_usage_kb": 192
+        },
+        "kyber-1024": {
+          "count": 18,
+          "success_rate": 1.0,
+          "average_execution_time_ms": 9.5,
+          "memory_usage_kb": 256
+        },
+        "rsa-3072": {
+          "count": 8,
+          "success_rate": 0.95,
+          "average_execution_time_ms": 12.3,
+          "memory_usage_kb": 384,
+          "deprecation_warning": true
+        }
+      },
+      "signatures": {
+        "dilithium-2": {
+          "count": 15,
+          "success_rate": 0.97,
+          "average_execution_time_ms": 5.1,
+          "memory_usage_kb": 160
+        },
+        "dilithium-3": {
+          "count": 52,
+          "success_rate": 0.99,
+          "average_execution_time_ms": 7.6,
+          "memory_usage_kb": 224
+        },
+        "dilithium-5": {
+          "count": 23,
+          "success_rate": 1.0,
+          "average_execution_time_ms": 10.2,
+          "memory_usage_kb": 320
+        },
+        "ecdsa-p384": {
+          "count": 6,
+          "success_rate": 0.96,
+          "average_execution_time_ms": 3.8,
+          "memory_usage_kb": 96,
+          "deprecation_warning": true
+        }
+      },
+      "symmetric": {
+        "aes-256-gcm": {
+          "count": 128,
+          "success_rate": 1.0,
+          "average_execution_time_ms": 0.8,
+          "memory_usage_kb": 32
+        },
+        "chacha20-poly1305": {
+          "count": 64,
+          "success_rate": 0.99,
+          "average_execution_time_ms": 0.7,
+          "memory_usage_kb": 24
+        }
+      },
+      "hash": {
+        "sha-256": {
+          "count": 96,
+          "success_rate": 1.0,
+          "average_execution_time_ms": 0.3,
+          "memory_usage_kb": 16
+        },
+        "sha-384": {
+          "count": 72,
+          "success_rate": 1.0,
+          "average_execution_time_ms": 0.4,
+          "memory_usage_kb": 24
+        },
+        "sha3-384": {
+          "count": 48,
+          "success_rate": 1.0,
+          "average_execution_time_ms": 0.5,
+          "memory_usage_kb": 32
+        }
+      }
+    },
+    "security_level_distribution": {
+      "standard": 0.15,
+      "enhanced": 0.65,
+      "high": 0.15,
+      "critical": 0.05
+    },
+    "quantum_readiness": {
+      "fully_quantum_resistant": 0.75,
+      "hybrid_implementation": 0.20,
+      "traditional_only": 0.05
+    },
+    "rekey_operations": {
+      "total": 28,
+      "successful": 26,
+      "failed": 2,
+      "by_trigger": {
+        "policy_expiry": 12,
+        "algorithm_deprecation": 8,
+        "threat_radar": 2,
+        "emergency": 1,
+        "manual": 3,
+        "scheduled": 2
+      },
+      "average_duration_ms": 245
+    },
+    "trust_score_impact": {
+      "average_before_pqc": 0.72,
+      "average_after_pqc": 0.86,
+      "improvement": 0.14
+    }
+  },
+  "layer_specific_metrics": {
+    "data_layer": {
+      "homomorphic_operations": {
+        "count": 18,
+        "success_rate": 0.94,
+        "average_execution_time_ms": 320,
+        "quantum_resistant": true
+      },
+      "secure_mpc": {
+        "count": 12,
+        "success_rate": 0.92,
+        "average_execution_time_ms": 480,
+        "quantum_resistant": true
+      }
+    },
+    "core_ai_layer": {
+      "model_security": {
+        "count": 24,
+        "success_rate": 0.98,
+        "average_execution_time_ms": 12,
+        "quantum_resistant": true
+      },
+      "inference_security": {
+        "count": 86,
+        "success_rate": 0.99,
+        "average_execution_time_ms": 8,
+        "quantum_resistant": true
+      }
+    },
+    "protocol_layer": {
+      "mcp_protocol": {
+        "count": 156,
+        "success_rate": 0.99,
+        "average_execution_time_ms": 4,
+        "quantum_resistant": true
+      },
+      "a2a_protocol": {
+        "count": 92,
+        "success_rate": 0.98,
+        "average_execution_time_ms": 6,
+        "quantum_resistant": true
+      }
+    }
+  },
+  "regional_compliance": {
+    "eu": {
+      "gdpr_compliant": true,
+      "anssi_compliant": true,
+      "algorithm_overrides": 8
+    },
+    "us": {
+      "fips_140_2_compliant": true,
+      "nist_sp_800_131a_compliant": true,
+      "algorithm_overrides": 6
+    },
+    "asia_pacific": {
+      "algorithm_overrides": 4
+    }
+  },
+  "blockchain_anchoring": {
+    "total_anchors": 42,
+    "by_type": {
+      "capsule_attestation": 18,
+      "pqc_compliance": 12,
+      "override_certificate": 8,
+      "trust_score_update": 4
+    },
+    "average_confirmation_time_ms": 2450
+  },
+  "edge_device_metrics": {
+    "total_edge_devices": 24,
+    "pqc_enabled": 20,
+    "offline_validation_success_rate": 0.96,
+    "average_crypto_operation_time_ms": 8.2,
+    "memory_constrained_optimizations": 16
+  },
+  "failure_analysis": {
+    "total_failures": 12,
+    "by_category": {
+      "algorithm_incompatibility": 4,
+      "key_generation_failure": 2,
+      "memory_constraint": 3,
+      "timeout": 2,
+      "unknown": 1
+    },
+    "most_common_remediation": "algorithm_downgrade"
+  },
+  "business_model_metrics": {
+    "regulatory_premium_usage": 0.18,
+    "trust_budget_tier_distribution": {
+      "basic": 0.25,
+      "standard": 0.45,
+      "premium": 0.30
+    },
+    "caas_tier_distribution": {
+      "standard": 0.60,
+      "hardened": 0.30,
+      "geofenced": 0.10
+    },
+    "saas_module_usage": {
+      "capsule_rotation": 0.22,
+      "zk_key_policies": 0.18,
+      "threat_model_adaptation": 0.15
+    },
+    "pqc_licensing_active": 0.35,
+    "capsule_insurance_active": 0.12,
+    "regional_franchise_distribution": {
+      "north_america": 0.45,
+      "europe": 0.30,
+      "asia_pacific": 0.20,
+      "other": 0.05
+    }
+  },
+  "ai_feedback_loop": {
+    "total_telemetry_points": 1248,
+    "algorithm_improvements_suggested": 8,
+    "policy_adjustments_suggested": 5,
+    "threat_model_updates_suggested": 3,
+    "performance_optimizations_suggested": 12
+  }
+}

@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: protocol-layer-config
+  namespace: industriverse-protocol
+data:
+  protocol_layer.yaml: |
+    # Main configuration for Industriverse Protocol Layer
+    version: "1.0.0"
+    environment: "production"
+    
+    # Core settings
+    core:
+      log_level: "info"
+      main_port: 8080
+      metrics_port: 9090
+      admin_port: 8081
+      discovery_enabled: true
+      self_healing_enabled: true
+      pki_enabled: true
+      federation_enabled: true
+      genetic_algo_enabled: true
+      dtsl_enabled: true
+      ekis_enabled: true
+      alphaevolve_enabled: true
+    
+    # Component configurations
+    components:
+      protocol_kernel_intelligence:
+        enabled: true
+        config_file: "protocol_kernel_intelligence.yaml"
+      
+      self_healing_fabric:
+        enabled: true
+        config_file: "self_healing_fabric.yaml"
+      
+      digital_twin_swarm_language:
+        enabled: true
+        config_file: "digital_twin_swarm_language.yaml"
+      
+      cross_mesh_federation:
+        enabled: true
+        config_file: "cross_mesh_federation.yaml"
+      
+      pk_alpha:
+        enabled: true
+        config_file: "pk_alpha.yaml"
+      
+      alphaevolve_integration:
+        enabled: true
+        config_file: "alphaevolve_integration.yaml"
+      
+      protocol_handlers:
+        enabled: true
+        config_file: "protocol_handlers.yaml"
+      
+      industrial_adapters:
+        enabled: true
+        config_file: "industrial_adapters.yaml"
+      
+      blockchain_connectors:
+        enabled: true
+        config_file: "blockchain_connectors.yaml"
+      
+      mobile_components:
+        enabled: true
+        config_file: "mobile_components.yaml"
+      
+      simulation_lab:
+        enabled: true
+        config_file: "simulation_lab.yaml"
+      
+      ekis_security:
+        enabled: true
+        config_file: "ekis_security.yaml"
+    
+    # Kubernetes integration
+    kubernetes:
+      namespace: "industriverse-protocol"
+      service_account: "protocol-layer-sa"
+      resource_limits:
+        cpu: "2"
+        memory: "4Gi"
+      resource_requests:
+        cpu: "500m"
+        memory: "1Gi"
+    
+    # Monitoring and metrics
+    monitoring:
+      prometheus_enabled: true
+      grafana_enabled: true
+      alert_manager_enabled: true
+      log_aggregation_enabled: true
+      distributed_tracing_enabled: true
+    
+    # Security settings
+    security:
+      tls_enabled: true
+      mtls_enabled: true
+      cert_manager_enabled: true
+      rbac_enabled: true
+      network_policies_enabled: true
+      pod_security_policies_enabled: true
+      secret_management_enabled: true
+    
+    # Integration points
+    integrations:
+      data_layer:
+        enabled: true
+        endpoint: "http://industriverse-data-layer-service:8080"
+      
+      core_ai_layer:
+        enabled: true
+        endpoint: "http://industriverse-core-ai-layer-service:8080"
+      
+      generative_layer:
+        enabled: true
+        endpoint: "http://industriverse-generative-layer-service:8080"
+      
+      application_layer:
+        enabled: true
+        endpoint: "http://industriverse-application-layer-service:8080"

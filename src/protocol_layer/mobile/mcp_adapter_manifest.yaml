@@ -1,0 +1,257 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mcp-adapter-manifest
+  namespace: industriverse-protocol
+data:
+  version: "1.0.0"
+  description: "MCP (Mesh Communication Protocol) Adapter Manifest for Mobile and Edge Devices"
+  
+  # Core Configuration
+  core:
+    protocol_version: "2.0.0"
+    compatibility_mode: "true"
+    edge_optimized: "true"
+    compression_enabled: "true"
+    encryption_required: "true"
+    
+  # Adapter Types
+  adapter_types:
+    - name: "mobile_mcp_adapter"
+      description: "MCP Adapter for mobile devices"
+      platforms:
+        - "android"
+        - "ios"
+        - "flutter"
+        - "react-native"
+      capabilities:
+        - "message_routing"
+        - "intent_resolution"
+        - "semantic_compression"
+        - "offline_operation"
+        - "sync_on_reconnect"
+        - "background_processing"
+        - "push_notification_integration"
+        - "battery_optimization"
+      
+    - name: "edge_mcp_adapter"
+      description: "MCP Adapter for edge devices"
+      platforms:
+        - "raspberry-pi"
+        - "arduino"
+        - "esp32"
+        - "nvidia-jetson"
+        - "industrial-plc"
+      capabilities:
+        - "message_routing"
+        - "intent_resolution"
+        - "semantic_compression"
+        - "offline_operation"
+        - "sync_on_reconnect"
+        - "low_power_mode"
+        - "real_time_processing"
+        - "hardware_acceleration"
+        
+    - name: "wearable_mcp_adapter"
+      description: "MCP Adapter for wearable devices"
+      platforms:
+        - "watchos"
+        - "wearos"
+        - "tizen"
+      capabilities:
+        - "message_routing"
+        - "intent_resolution"
+        - "semantic_compression"
+        - "offline_operation"
+        - "sync_on_reconnect"
+        - "ultra_low_power_mode"
+        - "gesture_integration"
+        - "health_sensor_integration"
+  
+  # Transport Configurations
+  transport_configs:
+    - name: "websocket_transport"
+      description: "WebSocket transport for MCP"
+      config:
+        reconnect_strategy: "exponential_backoff"
+        max_reconnect_attempts: "10"
+        initial_reconnect_delay_ms: "500"
+        max_reconnect_delay_ms: "30000"
+        ping_interval_ms: "30000"
+        
+    - name: "mqtt_transport"
+      description: "MQTT transport for MCP"
+      config:
+        qos_level: "1"
+        clean_session: "true"
+        keep_alive_interval_s: "60"
+        reconnect_strategy: "exponential_backoff"
+        max_reconnect_attempts: "10"
+        
+    - name: "ble_transport"
+      description: "Bluetooth Low Energy transport for MCP"
+      config:
+        service_uuid: "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
+        rx_characteristic_uuid: "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
+        tx_characteristic_uuid: "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
+        mtu_size: "512"
+        
+    - name: "http_long_poll_transport"
+      description: "HTTP Long Polling transport for MCP"
+      config:
+        poll_interval_ms: "1000"
+        max_poll_interval_ms: "30000"
+        adaptive_polling: "true"
+  
+  # Message Formats
+  message_formats:
+    - name: "compact_binary"
+      description: "Compact binary format for resource-constrained devices"
+      mime_type: "application/x-mcp-binary"
+      schema_url: "https://industriverse.io/schemas/mcp/compact-binary-v1.0.0.json"
+      
+    - name: "json"
+      description: "JSON format for debugging and development"
+      mime_type: "application/json"
+      schema_url: "https://industriverse.io/schemas/mcp/json-v1.0.0.json"
+      
+    - name: "protobuf"
+      description: "Protocol Buffers format for efficient serialization"
+      mime_type: "application/x-protobuf"
+      schema_url: "https://industriverse.io/schemas/mcp/protobuf-v1.0.0.proto"
+  
+  # Security Configurations
+  security_configs:
+    - name: "tpm_integration"
+      description: "TPM/HSE integration for secure key storage"
+      config:
+        key_storage: "tpm"
+        attestation_enabled: "true"
+        secure_boot_verification: "true"
+        
+    - name: "ekis_integration"
+      description: "EKIS security framework integration"
+      config:
+        audit_logging: "true"
+        zkp_enabled: "true"
+        identity_verification: "true"
+        
+    - name: "oauth2_integration"
+      description: "OAuth 2.0 integration for authentication"
+      config:
+        grant_type: "authorization_code"
+        pkce_enabled: "true"
+        token_refresh_enabled: "true"
+  
+  # Optimization Profiles
+  optimization_profiles:
+    - name: "ultra_low_power"
+      description: "Ultra low power profile for battery-constrained devices"
+      config:
+        message_batching: "true"
+        batch_size: "10"
+        batch_interval_ms: "5000"
+        compression_level: "high"
+        keep_alive_interval_s: "300"
+        background_sync_interval_min: "30"
+        
+    - name: "balanced"
+      description: "Balanced profile for most mobile devices"
+      config:
+        message_batching: "true"
+        batch_size: "5"
+        batch_interval_ms: "2000"
+        compression_level: "medium"
+        keep_alive_interval_s: "60"
+        background_sync_interval_min: "15"
+        
+    - name: "high_performance"
+      description: "High performance profile for edge gateways"
+      config:
+        message_batching: "false"
+        compression_level: "low"
+        keep_alive_interval_s: "30"
+        background_sync_interval_min: "5"
+  
+  # Protocol Extensions
+  protocol_extensions:
+    - name: "agent_reflex_timers"
+      description: "Agent Reflex Timers (ART) extension"
+      config:
+        enabled: "true"
+        default_timeout_ms: "5000"
+        escalation_path_enabled: "true"
+        
+    - name: "intent_routing"
+      description: "Intent-aware routing extension"
+      config:
+        enabled: "true"
+        intent_cache_size: "100"
+        intent_cache_ttl_s: "300"
+        
+    - name: "semantic_compression"
+      description: "Semantic compression extension"
+      config:
+        enabled: "true"
+        compression_level: "adaptive"
+        dictionary_size: "1000"
+        
+    - name: "offline_operations"
+      description: "Offline operations extension"
+      config:
+        enabled: "true"
+        storage_limit_mb: "50"
+        operation_ttl_h: "72"
+        conflict_resolution: "last_writer_wins"
+  
+  # Integration Points
+  integration_points:
+    - name: "a2a_protocol"
+      description: "Integration with A2A Protocol"
+      config:
+        enabled: "true"
+        translation_layer: "native"
+        capability_mapping: "true"
+        
+    - name: "udep_protocol"
+      description: "Integration with UDEP Protocol"
+      config:
+        enabled: "true"
+        agent_transfer_enabled: "true"
+        
+    - name: "native_bridge"
+      description: "Integration with Native App Bridge"
+      config:
+        enabled: "true"
+        event_synchronization: "true"
+        
+    - name: "industrial_adapters"
+      description: "Integration with Industrial Protocol Adapters"
+      config:
+        enabled: "true"
+        adapter_discovery: "true"
+  
+  # Deployment Configurations
+  deployment_configs:
+    - name: "android_deployment"
+      description: "Deployment configuration for Android"
+      config:
+        min_sdk_version: "24"
+        target_sdk_version: "33"
+        background_service: "true"
+        notification_channel: "industriverse_protocol"
+        
+    - name: "ios_deployment"
+      description: "Deployment configuration for iOS"
+      config:
+        min_ios_version: "13.0"
+        background_fetch: "true"
+        push_notification_enabled: "true"
+        
+    - name: "edge_deployment"
+      description: "Deployment configuration for edge devices"
+      config:
+        systemd_service: "true"
+        auto_restart: "true"
+        watchdog_enabled: "true"
+        update_mechanism: "ota"

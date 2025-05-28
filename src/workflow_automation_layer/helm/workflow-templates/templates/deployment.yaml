@@ -1,0 +1,175 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "workflow-templates.fullname" . }}
+  labels:
+    {{- include "workflow-templates.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "workflow-templates.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: {{ .Values.deploymentStrategy.type }}
+    {{- if eq .Values.deploymentStrategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.deploymentStrategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.deploymentStrategy.rollingUpdate.maxUnavailable }}
+    {{- end }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        {{- include "workflow-templates.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "workflow-templates.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+            - name: LOG_LEVEL
+              value: {{ .Values.logLevel | quote }}
+            - name: WORKFLOW_ENGINE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "workflow-templates.fullname" . }}-config
+                  key: workflowEngineUrl
+            - name: WORKFLOW_ENGINE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "workflow-templates.fullname" . }}-credentials
+                  key: workflowEngineApiKey
+            - name: TEMPLATE_SYNC_INTERVAL
+              value: {{ .Values.templateSyncInterval | quote }}
+            - name: ENABLE_TEMPLATE_VERSIONING
+              value: {{ .Values.enableTemplateVersioning | quote }}
+            - name: ENABLE_TEMPLATE_EVOLUTION
+              value: {{ .Values.enableTemplateEvolution | quote }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+            - name: templates-manufacturing
+              mountPath: /app/templates/manufacturing
+            - name: templates-logistics
+              mountPath: /app/templates/logistics
+            - name: templates-energy
+              mountPath: /app/templates/energy
+            - name: templates-retail
+              mountPath: /app/templates/retail
+            - name: task-contracts
+              mountPath: /app/templates/task-contracts
+            - name: dtsl-workflows
+              mountPath: /app/templates/dtsl-workflows
+            - name: escalation-protocols
+              mountPath: /app/templates/escalation-protocols
+            {{- if .Values.enablePersistentLogs }}
+            - name: logs
+              mountPath: /app/logs
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: http
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: http
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "workflow-templates.fullname" . }}-config
+        - name: templates-manufacturing
+          {{- if .Values.persistence.manufacturing.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "workflow-templates.fullname" . }}-manufacturing-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: templates-logistics
+          {{- if .Values.persistence.logistics.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "workflow-templates.fullname" . }}-logistics-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: templates-energy
+          {{- if .Values.persistence.energy.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "workflow-templates.fullname" . }}-energy-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: templates-retail
+          {{- if .Values.persistence.retail.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "workflow-templates.fullname" . }}-retail-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: task-contracts
+          {{- if .Values.persistence.taskContracts.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "workflow-templates.fullname" . }}-task-contracts-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: dtsl-workflows
+          {{- if .Values.persistence.dtslWorkflows.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "workflow-templates.fullname" . }}-dtsl-workflows-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: escalation-protocols
+          {{- if .Values.persistence.escalationProtocols.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "workflow-templates.fullname" . }}-escalation-protocols-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- if .Values.enablePersistentLogs }}
+        - name: logs
+          persistentVolumeClaim:
+            claimName: {{ include "workflow-templates.fullname" . }}-logs-pvc
+        {{- end }}

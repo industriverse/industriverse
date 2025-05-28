@@ -1,0 +1,940 @@
+# Compliance Frameworks
+
+# This document defines the compliance frameworks, controls, and mappings
+# for the Industriverse platform
+
+version: "1.0.0"
+last_updated: "2025-05-24"
+maintainer: "Security & Compliance Team"
+
+# Supported compliance frameworks
+frameworks:
+  - id: "ISO27001"
+    name: "ISO/IEC 27001"
+    version: "2022"
+    description: "Information security management system standard"
+    scope: "Global"
+    type: "Information Security"
+    documentation_url: "https://www.iso.org/standard/27001"
+    
+    domains:
+      - id: "A5"
+        name: "Information Security Policies"
+        controls:
+          - id: "A5.1"
+            name: "Management direction for information security"
+            description: "To provide management direction and support for information security in accordance with business requirements and relevant laws and regulations."
+      
+      - id: "A6"
+        name: "Organization of Information Security"
+        controls:
+          - id: "A6.1"
+            name: "Internal organization"
+            description: "To establish a management framework to initiate and control the implementation and operation of information security within the organization."
+          - id: "A6.2"
+            name: "Mobile devices and teleworking"
+            description: "To ensure the security of teleworking and use of mobile devices."
+      
+      - id: "A7"
+        name: "Human Resource Security"
+        controls:
+          - id: "A7.1"
+            name: "Prior to employment"
+            description: "To ensure that employees and contractors understand their responsibilities and are suitable for the roles for which they are considered."
+          - id: "A7.2"
+            name: "During employment"
+            description: "To ensure that employees and contractors are aware of and fulfil their information security responsibilities."
+          - id: "A7.3"
+            name: "Termination and change of employment"
+            description: "To protect the organization's interests as part of the process of changing or terminating employment."
+      
+      - id: "A8"
+        name: "Asset Management"
+        controls:
+          - id: "A8.1"
+            name: "Responsibility for assets"
+            description: "To identify organizational assets and define appropriate protection responsibilities."
+          - id: "A8.2"
+            name: "Information classification"
+            description: "To ensure that information receives an appropriate level of protection in accordance with its importance to the organization."
+          - id: "A8.3"
+            name: "Media handling"
+            description: "To prevent unauthorized disclosure, modification, removal or destruction of information stored on media."
+      
+      - id: "A9"
+        name: "Access Control"
+        controls:
+          - id: "A9.1"
+            name: "Business requirements of access control"
+            description: "To limit access to information and information processing facilities."
+          - id: "A9.2"
+            name: "User access management"
+            description: "To ensure authorized user access and to prevent unauthorized access to systems and services."
+          - id: "A9.3"
+            name: "User responsibilities"
+            description: "To make users accountable for safeguarding their authentication information."
+          - id: "A9.4"
+            name: "System and application access control"
+            description: "To prevent unauthorized access to systems and applications."
+      
+      - id: "A10"
+        name: "Cryptography"
+        controls:
+          - id: "A10.1"
+            name: "Cryptographic controls"
+            description: "To ensure proper and effective use of cryptography to protect the confidentiality, authenticity and/or integrity of information."
+      
+      - id: "A11"
+        name: "Physical and Environmental Security"
+        controls:
+          - id: "A11.1"
+            name: "Secure areas"
+            description: "To prevent unauthorized physical access, damage and interference to the organization's information and information processing facilities."
+          - id: "A11.2"
+            name: "Equipment"
+            description: "To prevent loss, damage, theft or compromise of assets and interruption to the organization's operations."
+      
+      - id: "A12"
+        name: "Operations Security"
+        controls:
+          - id: "A12.1"
+            name: "Operational procedures and responsibilities"
+            description: "To ensure correct and secure operations of information processing facilities."
+          - id: "A12.2"
+            name: "Protection from malware"
+            description: "To ensure that information and information processing facilities are protected against malware."
+          - id: "A12.3"
+            name: "Backup"
+            description: "To protect against loss of data."
+          - id: "A12.4"
+            name: "Logging and monitoring"
+            description: "To record events and generate evidence."
+          - id: "A12.5"
+            name: "Control of operational software"
+            description: "To ensure the integrity of operational systems."
+          - id: "A12.6"
+            name: "Technical vulnerability management"
+            description: "To prevent exploitation of technical vulnerabilities."
+          - id: "A12.7"
+            name: "Information systems audit considerations"
+            description: "To minimize the impact of audit activities on operational systems."
+      
+      - id: "A13"
+        name: "Communications Security"
+        controls:
+          - id: "A13.1"
+            name: "Network security management"
+            description: "To ensure the protection of information in networks and its supporting information processing facilities."
+          - id: "A13.2"
+            name: "Information transfer"
+            description: "To maintain the security of information transferred within an organization and with any external entity."
+      
+      - id: "A14"
+        name: "System Acquisition, Development and Maintenance"
+        controls:
+          - id: "A14.1"
+            name: "Security requirements of information systems"
+            description: "To ensure that information security is an integral part of information systems across the entire lifecycle."
+          - id: "A14.2"
+            name: "Security in development and support processes"
+            description: "To ensure that information security is designed and implemented within the development lifecycle of information systems."
+          - id: "A14.3"
+            name: "Test data"
+            description: "To ensure the protection of data used for testing."
+      
+      - id: "A15"
+        name: "Supplier Relationships"
+        controls:
+          - id: "A15.1"
+            name: "Information security in supplier relationships"
+            description: "To ensure protection of the organization's assets that are accessible by suppliers."
+          - id: "A15.2"
+            name: "Supplier service delivery management"
+            description: "To maintain an agreed level of information security and service delivery in line with supplier agreements."
+      
+      - id: "A16"
+        name: "Information Security Incident Management"
+        controls:
+          - id: "A16.1"
+            name: "Management of information security incidents and improvements"
+            description: "To ensure a consistent and effective approach to the management of information security incidents, including communication on security events and weaknesses."
+      
+      - id: "A17"
+        name: "Information Security Aspects of Business Continuity Management"
+        controls:
+          - id: "A17.1"
+            name: "Information security continuity"
+            description: "To ensure information security continuity is embedded in the organization's business continuity management systems."
+          - id: "A17.2"
+            name: "Redundancies"
+            description: "To ensure availability of information processing facilities."
+      
+      - id: "A18"
+        name: "Compliance"
+        controls:
+          - id: "A18.1"
+            name: "Compliance with legal and contractual requirements"
+            description: "To avoid breaches of legal, statutory, regulatory or contractual obligations related to information security and of any security requirements."
+          - id: "A18.2"
+            name: "Information security reviews"
+            description: "To ensure that information security is implemented and operated in accordance with the organizational policies and procedures."
+  
+  - id: "NIST800-53"
+    name: "NIST Special Publication 800-53"
+    version: "Rev. 5"
+    description: "Security and Privacy Controls for Information Systems and Organizations"
+    scope: "US Federal"
+    type: "Information Security"
+    documentation_url: "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+    
+    domains:
+      - id: "AC"
+        name: "Access Control"
+        controls:
+          - id: "AC-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain access control policy and procedures."
+          - id: "AC-2"
+            name: "Account Management"
+            description: "Establish and administer user accounts, including group and role memberships."
+          - id: "AC-3"
+            name: "Access Enforcement"
+            description: "Enforce approved authorizations for logical access to information and system resources."
+          - id: "AC-4"
+            name: "Information Flow Enforcement"
+            description: "Enforce approved authorizations for controlling the flow of information within the system and between connected systems."
+      
+      - id: "AT"
+        name: "Awareness and Training"
+        controls:
+          - id: "AT-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain security awareness and training policy and procedures."
+          - id: "AT-2"
+            name: "Awareness Training"
+            description: "Provide basic security awareness training to system users."
+          - id: "AT-3"
+            name: "Role-Based Training"
+            description: "Provide role-based security training to personnel with assigned security roles and responsibilities."
+      
+      - id: "AU"
+        name: "Audit and Accountability"
+        controls:
+          - id: "AU-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain audit and accountability policy and procedures."
+          - id: "AU-2"
+            name: "Event Logging"
+            description: "Identify the types of events that the system is capable of logging in support of the audit function."
+          - id: "AU-3"
+            name: "Content of Audit Records"
+            description: "Ensure that audit records contain information that establishes what type of event occurred, when the event occurred, where the event occurred, the source of the event, the outcome of the event, and the identity of any individuals or subjects associated with the event."
+      
+      - id: "CA"
+        name: "Assessment, Authorization, and Monitoring"
+        controls:
+          - id: "CA-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain assessment, authorization, and monitoring policy and procedures."
+          - id: "CA-2"
+            name: "Control Assessments"
+            description: "Develop a control assessment plan; assess the security controls in the system and its environment of operation; and produce an assessment report that documents the results of the control assessment."
+          - id: "CA-3"
+            name: "Information Exchange"
+            description: "Approve and manage the exchange of information between the system and other systems."
+      
+      - id: "CM"
+        name: "Configuration Management"
+        controls:
+          - id: "CM-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain configuration management policy and procedures."
+          - id: "CM-2"
+            name: "Baseline Configuration"
+            description: "Develop, document, and maintain under configuration control, a current baseline configuration of the system."
+          - id: "CM-3"
+            name: "Configuration Change Control"
+            description: "Document and control changes to the system; review proposed configuration-controlled changes; document configuration change decisions; implement approved configuration-controlled changes; retain records of configuration-controlled changes; audit and review activities associated with configuration-controlled changes; and coordinate and provide oversight for configuration change control activities."
+      
+      - id: "CP"
+        name: "Contingency Planning"
+        controls:
+          - id: "CP-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain contingency planning policy and procedures."
+          - id: "CP-2"
+            name: "Contingency Plan"
+            description: "Develop a contingency plan for the system that identifies essential mission and business functions and associated contingency requirements."
+          - id: "CP-3"
+            name: "Contingency Training"
+            description: "Provide contingency training to system users consistent with assigned roles and responsibilities."
+      
+      - id: "IA"
+        name: "Identification and Authentication"
+        controls:
+          - id: "IA-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain identification and authentication policy and procedures."
+          - id: "IA-2"
+            name: "Identification and Authentication (Organizational Users)"
+            description: "Uniquely identify and authenticate organizational users and associate that unique identification with processes acting on behalf of those users."
+          - id: "IA-3"
+            name: "Device Identification and Authentication"
+            description: "Uniquely identify and authenticate devices before establishing a local, remote, or network connection."
+      
+      - id: "IR"
+        name: "Incident Response"
+        controls:
+          - id: "IR-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain incident response policy and procedures."
+          - id: "IR-2"
+            name: "Incident Response Training"
+            description: "Provide incident response training to system users consistent with assigned roles and responsibilities."
+          - id: "IR-3"
+            name: "Incident Response Testing"
+            description: "Test the effectiveness of the incident response capability for the system."
+      
+      - id: "MA"
+        name: "Maintenance"
+        controls:
+          - id: "MA-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain maintenance policy and procedures."
+          - id: "MA-2"
+            name: "Controlled Maintenance"
+            description: "Schedule, document, and review records of maintenance, repair, and replacement activities for the system."
+          - id: "MA-3"
+            name: "Maintenance Tools"
+            description: "Approve, control, and monitor the use of system maintenance tools."
+      
+      - id: "MP"
+        name: "Media Protection"
+        controls:
+          - id: "MP-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain media protection policy and procedures."
+          - id: "MP-2"
+            name: "Media Access"
+            description: "Restrict access to digital and non-digital media to authorized individuals."
+          - id: "MP-3"
+            name: "Media Marking"
+            description: "Mark system media indicating the distribution limitations, handling caveats, and applicable security markings (if any) of the information."
+      
+      - id: "PE"
+        name: "Physical and Environmental Protection"
+        controls:
+          - id: "PE-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain physical and environmental protection policy and procedures."
+          - id: "PE-2"
+            name: "Physical Access Authorizations"
+            description: "Develop, approve, and maintain a list of individuals with authorized access to the facility where the system resides."
+          - id: "PE-3"
+            name: "Physical Access Control"
+            description: "Enforce physical access authorizations at entry and exit points to the facility where the system resides."
+      
+      - id: "PL"
+        name: "Planning"
+        controls:
+          - id: "PL-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain planning policy and procedures."
+          - id: "PL-2"
+            name: "System Security Plan"
+            description: "Develop a security plan for the system that describes the security requirements in place or planned for the system."
+          - id: "PL-3"
+            name: "System Security Plan Update"
+            description: "Review the security plan for the system on an organization-defined frequency."
+      
+      - id: "PS"
+        name: "Personnel Security"
+        controls:
+          - id: "PS-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain personnel security policy and procedures."
+          - id: "PS-2"
+            name: "Position Risk Designation"
+            description: "Assign a risk designation to all organizational positions."
+          - id: "PS-3"
+            name: "Personnel Screening"
+            description: "Screen individuals prior to authorizing access to the system."
+      
+      - id: "RA"
+        name: "Risk Assessment"
+        controls:
+          - id: "RA-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain risk assessment policy and procedures."
+          - id: "RA-2"
+            name: "Security Categorization"
+            description: "Categorize the system and information it processes, stores, and transmits."
+          - id: "RA-3"
+            name: "Risk Assessment"
+            description: "Conduct a risk assessment for the system and the information it processes, stores, and transmits."
+      
+      - id: "SA"
+        name: "System and Services Acquisition"
+        controls:
+          - id: "SA-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain system and services acquisition policy and procedures."
+          - id: "SA-2"
+            name: "Allocation of Resources"
+            description: "Determine the high-level information security requirements for the system or system service in mission and business process planning."
+          - id: "SA-3"
+            name: "System Development Life Cycle"
+            description: "Manage the system using a system development life cycle that incorporates information security and privacy considerations."
+      
+      - id: "SC"
+        name: "System and Communications Protection"
+        controls:
+          - id: "SC-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain system and communications protection policy and procedures."
+          - id: "SC-2"
+            name: "Separation of System and User Functionality"
+            description: "Separate user functionality from system management functionality."
+          - id: "SC-3"
+            name: "Security Function Isolation"
+            description: "Isolate security functions from nonsecurity functions."
+      
+      - id: "SI"
+        name: "System and Information Integrity"
+        controls:
+          - id: "SI-1"
+            name: "Policy and Procedures"
+            description: "Establish and maintain system and information integrity policy and procedures."
+          - id: "SI-2"
+            name: "Flaw Remediation"
+            description: "Identify, report, and correct system flaws."
+          - id: "SI-3"
+            name: "Malicious Code Protection"
+            description: "Implement malicious code protection mechanisms at system entry and exit points to detect and eradicate malicious code."
+  
+  - id: "IEC62443"
+    name: "IEC 62443"
+    version: "2020"
+    description: "Industrial Automation and Control Systems Security"
+    scope: "Industrial"
+    type: "Industrial Control Systems Security"
+    documentation_url: "https://www.isa.org/standards-and-publications/isa-standards/isa-standards-committees/isa99"
+    
+    domains:
+      - id: "FR1"
+        name: "Identification and Authentication Control"
+        controls:
+          - id: "IAC-1"
+            name: "Human user identification and authentication"
+            description: "Identify and authenticate all human users according to a defined policy."
+          - id: "IAC-2"
+            name: "Software process and device identification and authentication"
+            description: "Identify and authenticate all software processes and devices according to a defined policy."
+          - id: "IAC-3"
+            name: "Account management"
+            description: "Manage and protect all identities and credentials used for access to the IACS."
+          - id: "IAC-4"
+            name: "Identifier management"
+            description: "Manage identifiers for users, software processes and devices according to a defined policy."
+      
+      - id: "FR2"
+        name: "Use Control"
+        controls:
+          - id: "UC-1"
+            name: "Authorization enforcement"
+            description: "Enforce authorizations for all users to perform actions on specific IACS resources according to a defined policy."
+          - id: "UC-2"
+            name: "Wireless use control"
+            description: "Establish usage requirements for portable and mobile devices."
+          - id: "UC-3"
+            name: "Mobile code"
+            description: "Control the use of mobile code."
+          - id: "UC-4"
+            name: "Session lock"
+            description: "Provide the capability to temporarily disable user interaction with the IACS."
+      
+      - id: "FR3"
+        name: "System Integrity"
+        controls:
+          - id: "SI-1"
+            name: "Communication integrity"
+            description: "Protect the integrity of information being exchanged on a communication channel."
+          - id: "SI-2"
+            name: "Malicious code protection"
+            description: "Detect, prevent, and protect against malicious code."
+          - id: "SI-3"
+            name: "Security functionality verification"
+            description: "Verify the intended operation of security functions and report when anomalies are discovered."
+          - id: "SI-4"
+            name: "Information input validation"
+            description: "Check the validity of information inputs."
+      
+      - id: "FR4"
+        name: "Data Confidentiality"
+        controls:
+          - id: "DC-1"
+            name: "Information confidentiality"
+            description: "Protect the confidentiality of information at rest and in transit."
+          - id: "DC-2"
+            name: "Information persistence"
+            description: "Protect the confidentiality of information after it is no longer actively used."
+          - id: "DC-3"
+            name: "Use of cryptography"
+            description: "Determine if cryptography is required and which algorithms and methods are appropriate."
+      
+      - id: "FR5"
+        name: "Restricted Data Flow"
+        controls:
+          - id: "RDF-1"
+            name: "Network segmentation"
+            description: "Segment the control system network from other networks according to a defined policy."
+          - id: "RDF-2"
+            name: "Zone boundary protection"
+            description: "Monitor and control communications at zone boundaries to enforce the compartmentalization defined in the risk management strategy."
+          - id: "RDF-3"
+            name: "General purpose person-to-person communication restrictions"
+            description: "Require explicit approval for the use of general purpose person-to-person communication mechanisms."
+          - id: "RDF-4"
+            name: "Application partitioning"
+            description: "Separate user functionality from IACS management functionality."
+      
+      - id: "FR6"
+        name: "Timely Response to Events"
+        controls:
+          - id: "TRE-1"
+            name: "Audit log accessibility"
+            description: "Provide the capability to retrieve audit logs on a selective basis to support event analysis requirements."
+          - id: "TRE-2"
+            name: "Continuous monitoring"
+            description: "Continuously monitor the IACS to identify abnormal activity and violations of security policies."
+          - id: "TRE-3"
+            name: "Forensic support"
+            description: "Provide forensic data collection capability."
+          - id: "TRE-4"
+            name: "IACS state awareness"
+            description: "Provide the capability to monitor the overall security state of the IACS."
+      
+      - id: "FR7"
+        name: "Resource Availability"
+        controls:
+          - id: "RA-1"
+            name: "Denial of service protection"
+            description: "Protect against denial of service attacks."
+          - id: "RA-2"
+            name: "Resource management"
+            description: "Manage IACS resources to maintain essential functions when faced with competing demands."
+          - id: "RA-3"
+            name: "Control system backup"
+            description: "Create and protect backups of IACS information."
+          - id: "RA-4"
+            name: "Control system recovery and reconstitution"
+            description: "Provide the capability to recover and reconstitute the IACS to a known state after a disruption or failure."
+  
+  - id: "GDPR"
+    name: "General Data Protection Regulation"
+    version: "2018"
+    description: "European Union data protection and privacy regulation"
+    scope: "EU"
+    type: "Data Protection"
+    documentation_url: "https://gdpr.eu/"
+    
+    domains:
+      - id: "CH1"
+        name: "General Provisions"
+        controls:
+          - id: "ART1"
+            name: "Subject-matter and objectives"
+            description: "This Regulation lays down rules relating to the protection of natural persons with regard to the processing of personal data and rules relating to the free movement of personal data."
+          - id: "ART2"
+            name: "Material scope"
+            description: "This Regulation applies to the processing of personal data wholly or partly by automated means and to the processing other than by automated means of personal data which form part of a filing system or are intended to form part of a filing system."
+          - id: "ART3"
+            name: "Territorial scope"
+            description: "This Regulation applies to the processing of personal data in the context of the activities of an establishment of a controller or a processor in the Union, regardless of whether the processing takes place in the Union or not."
+      
+      - id: "CH2"
+        name: "Principles"
+        controls:
+          - id: "ART5"
+            name: "Principles relating to processing of personal data"
+            description: "Personal data shall be processed lawfully, fairly and in a transparent manner; collected for specified, explicit and legitimate purposes; adequate, relevant and limited to what is necessary; accurate and kept up to date; kept in a form which permits identification of data subjects for no longer than is necessary; processed in a manner that ensures appropriate security."
+          - id: "ART6"
+            name: "Lawfulness of processing"
+            description: "Processing shall be lawful only if and to the extent that at least one of the specified conditions applies."
+          - id: "ART7"
+            name: "Conditions for consent"
+            description: "Where processing is based on consent, the controller shall be able to demonstrate that the data subject has consented to processing of his or her personal data."
+      
+      - id: "CH3"
+        name: "Rights of the Data Subject"
+        controls:
+          - id: "ART12"
+            name: "Transparent information, communication and modalities for the exercise of the rights of the data subject"
+            description: "The controller shall take appropriate measures to provide any information referred to in Articles 13 and 14 and any communication under Articles 15 to 22 and 34 relating to processing to the data subject in a concise, transparent, intelligible and easily accessible form, using clear and plain language."
+          - id: "ART13"
+            name: "Information to be provided where personal data are collected from the data subject"
+            description: "Where personal data relating to a data subject are collected from the data subject, the controller shall, at the time when personal data are obtained, provide the data subject with specified information."
+          - id: "ART15"
+            name: "Right of access by the data subject"
+            description: "The data subject shall have the right to obtain from the controller confirmation as to whether or not personal data concerning him or her are being processed, and, where that is the case, access to the personal data and specified information."
+          - id: "ART17"
+            name: "Right to erasure ('right to be forgotten')"
+            description: "The data subject shall have the right to obtain from the controller the erasure of personal data concerning him or her without undue delay and the controller shall have the obligation to erase personal data without undue delay where one of the specified grounds applies."
+      
+      - id: "CH4"
+        name: "Controller and Processor"
+        controls:
+          - id: "ART24"
+            name: "Responsibility of the controller"
+            description: "The controller shall implement appropriate technical and organisational measures to ensure and to be able to demonstrate that processing is performed in accordance with this Regulation."
+          - id: "ART25"
+            name: "Data protection by design and by default"
+            description: "The controller shall implement appropriate technical and organisational measures for ensuring that, by default, only personal data which are necessary for each specific purpose of the processing are processed."
+          - id: "ART28"
+            name: "Processor"
+            description: "Where processing is to be carried out on behalf of a controller, the controller shall use only processors providing sufficient guarantees to implement appropriate technical and organisational measures in such a manner that processing will meet the requirements of this Regulation and ensure the protection of the rights of the data subject."
+          - id: "ART30"
+            name: "Records of processing activities"
+            description: "Each controller and, where applicable, the controller's representative, shall maintain a record of processing activities under its responsibility."
+          - id: "ART32"
+            name: "Security of processing"
+            description: "The controller and the processor shall implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk."
+          - id: "ART33"
+            name: "Notification of a personal data breach to the supervisory authority"
+            description: "In the case of a personal data breach, the controller shall without undue delay and, where feasible, not later than 72 hours after having become aware of it, notify the personal data breach to the supervisory authority."
+          - id: "ART35"
+            name: "Data protection impact assessment"
+            description: "Where a type of processing is likely to result in a high risk to the rights and freedoms of natural persons, the controller shall, prior to the processing, carry out an assessment of the impact of the envisaged processing operations on the protection of personal data."
+      
+      - id: "CH5"
+        name: "Transfers of Personal Data to Third Countries or International Organisations"
+        controls:
+          - id: "ART44"
+            name: "General principle for transfers"
+            description: "Any transfer of personal data which are undergoing processing or are intended for processing after transfer to a third country or to an international organisation shall take place only if the conditions laid down in this Chapter are complied with by the controller and processor."
+          - id: "ART45"
+            name: "Transfers on the basis of an adequacy decision"
+            description: "A transfer of personal data to a third country or an international organisation may take place where the Commission has decided that the third country, a territory or one or more specified sectors within that third country, or the international organisation in question ensures an adequate level of protection."
+          - id: "ART46"
+            name: "Transfers subject to appropriate safeguards"
+            description: "In the absence of a decision pursuant to Article 45(3), a controller or processor may transfer personal data to a third country or an international organisation only if the controller or processor has provided appropriate safeguards, and on condition that enforceable data subject rights and effective legal remedies for data subjects are available."
+
+# Compliance mappings between frameworks
+mappings:
+  - source_framework: "ISO27001"
+    target_framework: "NIST800-53"
+    mappings:
+      - source: "A5.1"
+        targets: ["PL-1"]
+      - source: "A6.1"
+        targets: ["PM-2", "PM-10"]
+      - source: "A6.2"
+        targets: ["AC-17", "AC-19"]
+      - source: "A7.1"
+        targets: ["PS-3", "PS-6"]
+      - source: "A7.2"
+        targets: ["AT-2", "AT-3"]
+      - source: "A7.3"
+        targets: ["PS-4", "PS-5"]
+      - source: "A8.1"
+        targets: ["CM-8", "PM-5"]
+      - source: "A8.2"
+        targets: ["RA-2", "MP-3"]
+      - source: "A8.3"
+        targets: ["MP-2", "MP-4", "MP-6"]
+      - source: "A9.1"
+        targets: ["AC-1"]
+      - source: "A9.2"
+        targets: ["AC-2", "IA-2", "IA-4", "IA-5"]
+      - source: "A9.3"
+        targets: ["IA-5", "PL-4"]
+      - source: "A9.4"
+        targets: ["AC-3", "AC-6", "AC-11"]
+      - source: "A10.1"
+        targets: ["SC-12", "SC-13"]
+      - source: "A11.1"
+        targets: ["PE-2", "PE-3", "PE-4"]
+      - source: "A11.2"
+        targets: ["PE-6", "PE-9", "PE-15", "PE-16"]
+      - source: "A12.1"
+        targets: ["CM-1", "SA-5"]
+      - source: "A12.2"
+        targets: ["SI-3", "SI-4"]
+      - source: "A12.3"
+        targets: ["CP-9"]
+      - source: "A12.4"
+        targets: ["AU-2", "AU-3", "AU-6", "AU-12"]
+      - source: "A12.5"
+        targets: ["CM-3", "CM-5", "CM-7"]
+      - source: "A12.6"
+        targets: ["RA-3", "RA-5", "SI-2"]
+      - source: "A12.7"
+        targets: ["CA-2", "CA-7"]
+      - source: "A13.1"
+        targets: ["SC-7", "SC-8"]
+      - source: "A13.2"
+        targets: ["AC-4", "SC-16"]
+      - source: "A14.1"
+        targets: ["SA-3", "SA-4", "SA-8"]
+      - source: "A14.2"
+        targets: ["SA-3", "SA-10", "SA-11", "SA-15"]
+      - source: "A14.3"
+        targets: ["SA-15"]
+      - source: "A15.1"
+        targets: ["SA-9", "SA-12"]
+      - source: "A15.2"
+        targets: ["SA-9"]
+      - source: "A16.1"
+        targets: ["IR-1", "IR-4", "IR-6", "IR-8"]
+      - source: "A17.1"
+        targets: ["CP-1", "CP-2", "CP-4"]
+      - source: "A17.2"
+        targets: ["CP-6", "CP-7"]
+      - source: "A18.1"
+        targets: ["PL-1", "SA-9"]
+      - source: "A18.2"
+        targets: ["CA-2", "CA-7", "PL-6"]
+  
+  - source_framework: "ISO27001"
+    target_framework: "IEC62443"
+    mappings:
+      - source: "A5.1"
+        targets: ["FR1", "FR2"]
+      - source: "A6.1"
+        targets: ["FR1", "FR2"]
+      - source: "A6.2"
+        targets: ["FR1", "FR2", "FR3"]
+      - source: "A7.1"
+        targets: ["FR1"]
+      - source: "A7.2"
+        targets: ["FR1", "FR6"]
+      - source: "A7.3"
+        targets: ["FR1", "FR2"]
+      - source: "A8.1"
+        targets: ["FR2", "FR3"]
+      - source: "A8.2"
+        targets: ["FR4"]
+      - source: "A8.3"
+        targets: ["FR4"]
+      - source: "A9.1"
+        targets: ["FR1", "FR2"]
+      - source: "A9.2"
+        targets: ["FR1", "IAC-1", "IAC-2", "IAC-3"]
+      - source: "A9.3"
+        targets: ["FR1", "IAC-1"]
+      - source: "A9.4"
+        targets: ["FR1", "FR2", "UC-1"]
+      - source: "A10.1"
+        targets: ["FR4", "DC-3"]
+      - source: "A11.1"
+        targets: ["FR5"]
+      - source: "A11.2"
+        targets: ["FR7"]
+      - source: "A12.1"
+        targets: ["FR3", "FR6"]
+      - source: "A12.2"
+        targets: ["FR3", "SI-2"]
+      - source: "A12.3"
+        targets: ["FR7", "RA-3"]
+      - source: "A12.4"
+        targets: ["FR6", "TRE-1", "TRE-2"]
+      - source: "A12.5"
+        targets: ["FR3"]
+      - source: "A12.6"
+        targets: ["FR3", "SI-2"]
+      - source: "A12.7"
+        targets: ["FR6"]
+      - source: "A13.1"
+        targets: ["FR5", "RDF-1", "RDF-2"]
+      - source: "A13.2"
+        targets: ["FR4", "FR5"]
+      - source: "A14.1"
+        targets: ["FR3", "FR4"]
+      - source: "A14.2"
+        targets: ["FR3"]
+      - source: "A14.3"
+        targets: ["FR3", "FR4"]
+      - source: "A15.1"
+        targets: ["FR1", "FR2", "FR3"]
+      - source: "A15.2"
+        targets: ["FR6"]
+      - source: "A16.1"
+        targets: ["FR6", "TRE-2", "TRE-3"]
+      - source: "A17.1"
+        targets: ["FR7", "RA-3", "RA-4"]
+      - source: "A17.2"
+        targets: ["FR7", "RA-4"]
+      - source: "A18.1"
+        targets: ["FR1", "FR2", "FR3", "FR4"]
+      - source: "A18.2"
+        targets: ["FR6"]
+  
+  - source_framework: "NIST800-53"
+    target_framework: "GDPR"
+    mappings:
+      - source: "AC-1"
+        targets: ["ART24", "ART25"]
+      - source: "AC-2"
+        targets: ["ART5", "ART25"]
+      - source: "AC-3"
+        targets: ["ART5", "ART25", "ART32"]
+      - source: "AC-4"
+        targets: ["ART25", "ART32"]
+      - source: "AC-6"
+        targets: ["ART25", "ART32"]
+      - source: "AC-17"
+        targets: ["ART32"]
+      - source: "AU-2"
+        targets: ["ART30", "ART33"]
+      - source: "AU-3"
+        targets: ["ART30"]
+      - source: "AU-6"
+        targets: ["ART33", "ART35"]
+      - source: "AU-12"
+        targets: ["ART30"]
+      - source: "CA-2"
+        targets: ["ART35"]
+      - source: "CA-7"
+        targets: ["ART32", "ART35"]
+      - source: "CM-1"
+        targets: ["ART24"]
+      - source: "CP-2"
+        targets: ["ART32"]
+      - source: "IA-2"
+        targets: ["ART32"]
+      - source: "IA-5"
+        targets: ["ART32"]
+      - source: "IR-4"
+        targets: ["ART33", "ART34"]
+      - source: "IR-6"
+        targets: ["ART33", "ART34"]
+      - source: "IR-8"
+        targets: ["ART33", "ART34"]
+      - source: "MP-2"
+        targets: ["ART32"]
+      - source: "MP-3"
+        targets: ["ART32"]
+      - source: "MP-6"
+        targets: ["ART17"]
+      - source: "PE-3"
+        targets: ["ART32"]
+      - source: "PL-1"
+        targets: ["ART24"]
+      - source: "PL-2"
+        targets: ["ART24", "ART35"]
+      - source: "RA-2"
+        targets: ["ART35"]
+      - source: "RA-3"
+        targets: ["ART35"]
+      - source: "SA-3"
+        targets: ["ART25"]
+      - source: "SA-8"
+        targets: ["ART25"]
+      - source: "SC-7"
+        targets: ["ART32"]
+      - source: "SC-8"
+        targets: ["ART32"]
+      - source: "SC-12"
+        targets: ["ART32"]
+      - source: "SC-13"
+        targets: ["ART32"]
+      - source: "SI-2"
+        targets: ["ART32"]
+      - source: "SI-3"
+        targets: ["ART32"]
+      - source: "SI-4"
+        targets: ["ART32", "ART33"]
+
+# Industriverse-specific compliance configurations
+industriverse_compliance:
+  # Default compliance frameworks for different industries
+  industry_defaults:
+    manufacturing:
+      primary_frameworks: ["ISO27001", "IEC62443"]
+      secondary_frameworks: ["NIST800-53"]
+    
+    healthcare:
+      primary_frameworks: ["ISO27001", "GDPR"]
+      secondary_frameworks: ["NIST800-53"]
+    
+    finance:
+      primary_frameworks: ["ISO27001", "GDPR"]
+      secondary_frameworks: ["NIST800-53", "PCI-DSS"]
+    
+    energy:
+      primary_frameworks: ["ISO27001", "IEC62443"]
+      secondary_frameworks: ["NIST800-53"]
+    
+    government:
+      primary_frameworks: ["NIST800-53", "ISO27001"]
+      secondary_frameworks: ["IEC62443"]
+  
+  # Compliance monitoring configuration
+  monitoring:
+    continuous_assessment: true
+    assessment_frequency: "daily"
+    automated_controls_percentage: 80
+    manual_controls_review_frequency: "quarterly"
+    evidence_collection:
+      automated: true
+      retention_period: "1 year"
+    
+    alerts:
+      critical_threshold: 90
+      warning_threshold: 75
+      notification_channels: ["email", "dashboard", "incident_management"]
+  
+  # Compliance reporting configuration
+  reporting:
+    dashboard_update_frequency: "daily"
+    executive_report_frequency: "monthly"
+    detailed_report_frequency: "weekly"
+    report_formats: ["html", "pdf", "json"]
+    
+    metrics:
+      - name: "Overall Compliance Score"
+        description: "Percentage of controls in compliance"
+        calculation: "compliant_controls / total_controls * 100"
+      
+      - name: "Risk-Weighted Compliance Score"
+        description: "Compliance score weighted by control risk"
+        calculation: "sum(control_compliance * control_risk) / sum(control_risk)"
+      
+      - name: "Compliance Trend"
+        description: "Trend of compliance score over time"
+        calculation: "current_score - previous_score"
+      
+      - name: "Control Gap Count"
+        description: "Number of controls not in compliance"
+        calculation: "total_controls - compliant_controls"
+  
+  # Compliance automation configuration
+  automation:
+    remediation_workflows: true
+    evidence_collection_automation: true
+    control_testing_automation: true
+    
+    integrations:
+      - system: "SIEM"
+        controls: ["logging", "monitoring", "alerting"]
+      
+      - system: "Vulnerability Management"
+        controls: ["scanning", "patching", "risk_assessment"]
+      
+      - system: "Identity Management"
+        controls: ["authentication", "authorization", "access_review"]
+      
+      - system: "Configuration Management"
+        controls: ["baseline_management", "change_control", "drift_detection"]
+  
+  # Compliance documentation configuration
+  documentation:
+    policy_templates: true
+    procedure_templates: true
+    evidence_templates: true
+    
+    document_management:
+      version_control: true
+      approval_workflow: true
+      periodic_review: true
+      review_frequency: "annual"

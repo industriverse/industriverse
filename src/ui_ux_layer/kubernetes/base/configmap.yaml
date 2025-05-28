@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ui-ux-layer-config
+  labels:
+    app: ui-ux-layer
+    layer: ui-ux
+data:
+  config.json: |
+    {
+      "universal_skin": {
+        "theme": "industriverse-default",
+        "adaptiveMode": true,
+        "ambientIntelligenceLevel": "high",
+        "trustVisualization": true,
+        "capsuleAnimations": true,
+        "accessibilityFeatures": true
+      },
+      "context_engine": {
+        "contextUpdateFrequency": 250,
+        "priorityLevels": ["critical", "high", "medium", "low", "ambient"],
+        "contextHistoryLength": 100,
+        "spatialAwarenessEnabled": true
+      },
+      "cross_layer_integration": {
+        "realTimeSynchronization": true,
+        "eventBufferSize": 1000,
+        "reconnectStrategy": "exponential-backoff",
+        "heartbeatInterval": 30
+      },
+      "rendering_engine": {
+        "renderingQuality": "high",
+        "frameRateTarget": 60,
+        "adaptiveRendering": true,
+        "powerSavingMode": false
+      },
+      "edge_support": {
+        "offlineCapabilities": true,
+        "syncStrategy": "differential",
+        "compressionLevel": "high",
+        "edgeCacheTTL": 3600
+      }
+    }
+  context_bus_url: "http://real-time-context-bus.industriverse.svc.cluster.local:8080"
+  protocol_bridge_url: "http://protocol-bridge.industriverse.svc.cluster.local:8080"
+  data_layer_url: "http://data-layer.industriverse.svc.cluster.local:8080"
+  core_ai_layer_url: "http://core-ai-layer.industriverse.svc.cluster.local:8080"
+  generative_layer_url: "http://generative-layer.industriverse.svc.cluster.local:8080"
+  application_layer_url: "http://application-layer.industriverse.svc.cluster.local:8080"
+  protocol_layer_url: "http://protocol-layer.industriverse.svc.cluster.local:8080"
+  workflow_layer_url: "http://workflow-layer.industriverse.svc.cluster.local:8080"

@@ -1,0 +1,92 @@
+---
+# Agent Manifest Template for Industriverse Core AI Layer
+# This template follows the protocol-native architecture requirements
+
+agent_id: "core-ai-{component}-agent"  # Replace {component} with specific component name
+version: "1.0.0"
+layer_designation: "core_ai_layer"
+
+# Basic agent information
+display_name: "Core AI {Component} Agent"  # Replace {Component} with specific component name
+description: "Protocol-native {component} agent for Industriverse Core AI Layer"  # Replace {component} with specific component name
+
+# Protocol capabilities
+capabilities:
+  - name: "{capability_name}"  # Replace with specific capability
+    description: "{capability_description}"  # Replace with specific description
+    input_schema: "{input_schema}"  # Replace with JSON schema
+    output_schema: "{output_schema}"  # Replace with JSON schema
+
+# MCP protocol integration
+mcp_integration:
+  supported_event_types:
+    - observe
+    - simulate
+    - recommend
+    - act
+  trust_modes:
+    - passive
+    - approval
+    - autonomous
+
+# A2A protocol integration
+a2a_integration:
+  agent_card:
+    agent_name: "Core AI {Component}"  # Replace {Component} with specific component name
+    agent_description: "Protocol-native {component} agent for Industriverse Core AI Layer"  # Replace {component} with specific component name
+    industryTags:
+      - "manufacturing"
+      - "energy"
+      - "aerospace"
+    priority: 5  # Default priority, can be overridden by industryTags
+
+# Intelligence characteristics
+intelligence_type: "{intelligence_type}"  # analytical, predictive, generative, or explanatory
+intelligence_role: "{intelligence_role}"  # predictor, explainer, optimizer, or router
+resilience_mode: "{resilience_mode}"  # redundant_pair, failover_chain, or quorum_vote
+mesh_coordination_role: "{mesh_coordination_role}"  # leader, follower, or observer
+
+# Mesh lifecycle hooks
+mesh_lifecycle_hooks:
+  - on_init: core_ai_layer/init/bootstrap_mesh
+  - on_failure: core_ai_layer/failover/trigger_chain
+  - on_quorum_violation: consensus_resolver_agent/resolve_with_fallback
+
+# Context window configuration
+context_window:
+  max_history_depth: 15
+  short_term_strategy_tokens: 1024
+  long_term_memory_reference: "intent_overlay_agent"
+
+# Upgrade configuration
+upgrade_mode: "rolling"
+warm_cache_transfer: true
+blue_green_deploy: supported
+
+# Edge AI adaptive behavior
+edge_behavior_profile:
+  compute_fallback_mode: "approximate"
+  stream_input_window: 128
+  latency_threshold_ms: 250
+
+# Observability hooks
+observability_hooks:
+  - export_metrics: core_ai_layer/observability/export
+  - alert_thresholds: config/observability_thresholds.yaml
+
+# Resilience profile
+resilience_profile:
+  mode: "quorum_vote"
+  confidence_level: 0.97
+  fallback_chain:
+    - "core-ai-{fallback1}-agent"  # Replace with specific fallback agent
+    - "core-ai-{fallback2}-agent"  # Replace with specific fallback agent
+
+# Protocol endpoints
+endpoints:
+  well_known: "/.well-known/agent.json"
+  mcp_base: "/mcp/v1"
+  a2a_base: "/a2a/v1"
+  health: "/health"
+  metrics: "/metrics"
+  replay_ledger: "/ledger/replay_log.jsonl"

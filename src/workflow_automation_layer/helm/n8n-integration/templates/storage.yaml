@@ -1,0 +1,49 @@
+{{- if .Values.persistence.enabled }}
+{{- if .Values.persistence.templates.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "n8n-integration.fullname" . }}-templates-pvc
+  labels:
+    {{- include "n8n-integration.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.templates.accessMode }}
+  storageClassName: {{ .Values.persistence.templates.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.templates.size }}
+{{- end }}
+---
+{{- if .Values.persistence.nodeDefinitions.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "n8n-integration.fullname" . }}-node-definitions-pvc
+  labels:
+    {{- include "n8n-integration.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.nodeDefinitions.accessMode }}
+  storageClassName: {{ .Values.persistence.nodeDefinitions.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.nodeDefinitions.size }}
+{{- end }}
+---
+{{- if .Values.enablePersistentLogs }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "n8n-integration.fullname" . }}-logs-pvc
+  labels:
+    {{- include "n8n-integration.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.logs.accessMode }}
+  storageClassName: {{ .Values.persistence.logs.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.logs.size }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,424 @@
+---
+# Industriverse Data Layer - Mesh Intent Graph Configuration
+
+mesh:
+  name: industriverse-data-layer
+  version: 1.0.0
+  description: "Protocol-native industrial data layer with MCP/A2A integration"
+  
+  # Boot lifecycle configuration
+  boot:
+    timeout: 60  # seconds
+    retry_count: 3
+    retry_interval: 5  # seconds
+    initialization_sequence:
+      - governance
+      - storage
+      - catalog
+      - ingestion
+      - processing
+      - avatar
+      - test
+    
+  # Agent registry
+  agents:
+    # Avatar Interface
+    - id: data_layer_avatar
+      type: interface
+      intelligence_type: interactive
+      description: "Protocol-native avatar interface for industrial data layer"
+      priority: high
+      capabilities:
+        - data_exploration
+        - data_visualization
+        - data_processing
+        - anomaly_detection
+        - predictive_analytics
+      
+    # Data Ingestion Service
+    - id: data_ingestion_service
+      type: service
+      intelligence_type: analytical
+      description: "Industrial data ingestion service with protocol-native connectors"
+      priority: high
+      capabilities:
+        - dataset_connection
+        - data_ingestion
+        - schema_validation
+        - metadata_extraction
+      
+    # Data Processing Engine
+    - id: data_processing_engine
+      type: service
+      intelligence_type: analytical
+      description: "Industrial data processing engine with protocol-native components"
+      priority: medium
+      capabilities:
+        - data_validation
+        - data_transformation
+        - feature_engineering
+        - data_aggregation
+        - anomaly_detection
+      
+    # Storage Management System
+    - id: storage_management_system
+      type: service
+      intelligence_type: operational
+      description: "Industrial data storage management system with protocol-native components"
+      priority: high
+      capabilities:
+        - time_series_storage
+        - blob_storage
+        - metadata_storage
+        - cache_management
+        - versioning
+      
+    # Data Catalog System
+    - id: data_catalog_system
+      type: service
+      intelligence_type: informational
+      description: "Industrial data catalog system with protocol-native components"
+      priority: medium
+      capabilities:
+        - dataset_registry
+        - schema_registry
+        - lineage_tracking
+        - search_discovery
+      
+    # Data Governance System
+    - id: data_governance_system
+      type: service
+      intelligence_type: regulatory
+      description: "Industrial data governance system with protocol-native components"
+      priority: high
+      capabilities:
+        - access_control
+        - audit_logging
+        - compliance_management
+        - data_quality_management
+      
+    # Secrets Manager Agent
+    - id: secrets_manager_agent
+      type: service
+      intelligence_type: security
+      description: "Secure secrets management for industrial data layer"
+      priority: critical
+      capabilities:
+        - credential_management
+        - key_rotation
+        - secret_access
+        - audit_logging
+      
+    # Test Suite
+    - id: data_layer_test_suite
+      type: testing
+      intelligence_type: analytical
+      description: "Protocol-native test suite for industrial data layer"
+      priority: low
+      capabilities:
+        - connector_testing
+        - processing_testing
+        - performance_benchmarking
+        - security_testing
+        - protocol_simulation
+        - trust_regression_testing
+  
+  # Dataset connectors
+  connectors:
+    - id: turbofan_connector
+      type: connector
+      intelligence_type: analytical
+      description: "Turbofan engine dataset connector"
+      dataset_type: time_series
+      industry_tags:
+        - aerospace
+        - manufacturing
+        - predictive_maintenance
+      
+    - id: secom_connector
+      type: connector
+      intelligence_type: analytical
+      description: "SECOM dataset connector"
+      dataset_type: time_series
+      industry_tags:
+        - semiconductor
+        - manufacturing
+        - quality_control
+      
+    - id: steel_plates_connector
+      type: connector
+      intelligence_type: analytical
+      description: "Steel plates faults dataset connector"
+      dataset_type: tabular
+      industry_tags:
+        - steel
+        - manufacturing
+        - quality_control
+      
+    - id: hydraulic_systems_connector
+      type: connector
+      intelligence_type: analytical
+      description: "Hydraulic systems dataset connector"
+      dataset_type: time_series
+      industry_tags:
+        - hydraulic
+        - manufacturing
+        - condition_monitoring
+      
+    - id: gas_sensor_connector
+      type: connector
+      intelligence_type: analytical
+      description: "Gas sensor array dataset connector"
+      dataset_type: time_series
+      industry_tags:
+        - chemical
+        - manufacturing
+        - quality_control
+      
+    - id: steel_energy_connector
+      type: connector
+      intelligence_type: analytical
+      description: "Steel industry energy consumption dataset connector"
+      dataset_type: time_series
+      industry_tags:
+        - steel
+        - manufacturing
+        - energy_efficiency
+      
+    - id: computer_vision_connector
+      type: connector
+      intelligence_type: perceptual
+      description: "Computer vision dataset connector"
+      dataset_type: image
+      industry_tags:
+        - safety
+        - construction
+        - quality_control
+  
+  # Intent graph
+  intent_graph:
+    # User to Avatar intents
+    - source: user
+      target: data_layer_avatar
+      intents:
+        - explore_data
+        - visualize_data
+        - process_data
+        - detect_anomalies
+        - predict_trends
+    
+    # Avatar to Service intents
+    - source: data_layer_avatar
+      target: data_ingestion_service
+      intents:
+        - connect_dataset
+        - ingest_data
+        - validate_schema
+        - extract_metadata
+    
+    - source: data_layer_avatar
+      target: data_processing_engine
+      intents:
+        - validate_data
+        - transform_data
+        - engineer_features
+        - aggregate_data
+        - detect_anomalies
+    
+    - source: data_layer_avatar
+      target: storage_management_system
+      intents:
+        - store_time_series
+        - store_blob
+        - store_metadata
+        - cache_data
+        - version_data
+    
+    - source: data_layer_avatar
+      target: data_catalog_system
+      intents:
+        - register_dataset
+        - register_schema
+        - track_lineage
+        - search_data
+    
+    - source: data_layer_avatar
+      target: data_governance_system
+      intents:
+        - control_access
+        - log_audit
+        - manage_compliance
+        - manage_data_quality
+    
+    # Service to Service intents
+    - source: data_ingestion_service
+      target: storage_management_system
+      intents:
+        - store_ingested_data
+        - store_schema
+        - store_metadata
+    
+    - source: data_ingestion_service
+      target: data_catalog_system
+      intents:
+        - register_ingested_dataset
+        - register_schema
+    
+    - source: data_processing_engine
+      target: storage_management_system
+      intents:
+        - read_data
+        - store_processed_data
+    
+    - source: data_processing_engine
+      target: data_catalog_system
+      intents:
+        - register_processed_dataset
+        - track_processing_lineage
+    
+    # Test Suite intents
+    - source: data_layer_test_suite
+      target: data_ingestion_service
+      intents:
+        - test_connectors
+        - test_ingestion
+    
+    - source: data_layer_test_suite
+      target: data_processing_engine
+      intents:
+        - test_processing
+        - benchmark_performance
+    
+    - source: data_layer_test_suite
+      target: storage_management_system
+      intents:
+        - test_storage
+        - benchmark_storage
+    
+    - source: data_layer_test_suite
+      target: data_governance_system
+      intents:
+        - test_security
+        - test_compliance
+  
+  # Trust boundaries
+  trust:
+    internal_threshold: 0.9
+    external_threshold: 0.7
+    negotiation_timeout: 5  # seconds
+    boundary_definitions:
+      - name: internal
+        agents:
+          - data_layer_avatar
+          - data_ingestion_service
+          - data_processing_engine
+          - storage_management_system
+          - data_catalog_system
+          - data_governance_system
+          - secrets_manager_agent
+          - data_layer_test_suite
+        trust_level: high
+      
+      - name: microsoft_mcp
+        agents:
+          - microsoft.*
+        trust_level: medium
+        protocol: MCP
+      
+      - name: google_a2a
+        agents:
+          - google.*
+        trust_level: medium
+        protocol: A2A
+      
+      - name: third_party
+        agents:
+          - .*
+        trust_level: low
+        protocol: "*"
+    
+    certificate_authorities:
+      - name: industriverse_ca
+        path: "/etc/certs/industriverse-ca.crt"
+        trust_level: high
+      
+      - name: microsoft_ca
+        path: "/etc/certs/microsoft-ca.crt"
+        trust_level: medium
+      
+      - name: google_ca
+        path: "/etc/certs/google-ca.crt"
+        trust_level: medium
+  
+  # Protocol configuration
+  protocols:
+    mcp:
+      enabled: true
+      version: "1.0"
+      extensions:
+        - industryTags
+        - priority
+        - customPartTypes
+      endpoints:
+        - path: "/.well-known/mcp-manifest.json"
+          method: "GET"
+        - path: "/mcp/v1/intent"
+          method: "POST"
+        - path: "/mcp/v1/capabilities"
+          method: "GET"
+    
+    a2a:
+      enabled: true
+      version: "1.0"
+      extensions:
+        - industryTags
+        - priority
+        - customPartTypes
+      endpoints:
+        - path: "/.well-known/agent.json"
+          method: "GET"
+        - path: "/a2a/v1/tasks"
+          method: "POST"
+        - path: "/a2a/v1/capabilities"
+          method: "GET"
+    
+    ag_ui:
+      enabled: true
+      version: "1.0"
+      endpoints:
+        - path: "/ag-ui/v1/feedback"
+          method: "POST"
+        - path: "/ag-ui/v1/notifications"
+          method: "GET"
+        - path: "/ag-ui/v1/capsule"
+          method: "GET"
+  
+  # Mesh monitoring
+  monitoring:
+    metrics:
+      enabled: true
+      endpoint: "/metrics"
+      interval: 15  # seconds
+    
+    health:
+      enabled: true
+      endpoint: "/health"
+      interval: 30  # seconds
+    
+    logging:
+      level: "INFO"
+      format: "json"
+      destination: "stdout"
+    
+    alerts:
+      - name: "agent_down"
+        description: "Agent is down"
+        severity: "critical"
+        condition: "up == 0"
+        duration: "5m"
+      
+      - name: "high_error_rate"
+        description: "High error rate"
+        severity: "warning"
+        condition: "error_rate > 0.05"
+        duration: "5m"

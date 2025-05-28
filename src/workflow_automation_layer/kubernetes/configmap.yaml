@@ -1,0 +1,508 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: workflow-automation-config
+  namespace: industriverse
+  labels:
+    app: workflow-automation-layer
+    layer: workflow-automation
+    part-of: industriverse
+data:
+  log_level: "info"
+  execution_mode: "standard"
+  protocol_layer_url: "http://protocol-layer-service:8080"
+  n8n_api_url: "http://n8n-service:5678/api"
+  ekis_security_enabled: "true"
+  trust_threshold: "0.7"
+  confidence_threshold: "0.8"
+  db_host: "workflow-db-service"
+  db_port: "5432"
+  db_name: "workflow_automation"
+  mesh_topology_config: |
+    {
+      "mesh_type": "hybrid",
+      "edge_enabled": true,
+      "routing_constraints": {
+        "max_hops": 5,
+        "preferred_paths": ["protocol_layer", "core_ai_layer"],
+        "fallback_paths": ["direct"]
+      },
+      "trust_routing": {
+        "enabled": true,
+        "min_trust_score": 0.6,
+        "preferred_high_trust": true
+      }
+    }
+  execution_modes_config: |
+    {
+      "modes": [
+        {
+          "name": "reactive",
+          "trust_threshold": 0.5,
+          "confidence_required": 0.6,
+          "human_oversight": true,
+          "description": "Waits for explicit triggers before executing workflows"
+        },
+        {
+          "name": "proactive",
+          "trust_threshold": 0.7,
+          "confidence_required": 0.8,
+          "human_oversight": true,
+          "description": "Can initiate workflows based on predicted needs"
+        },
+        {
+          "name": "autonomous",
+          "trust_threshold": 0.9,
+          "confidence_required": 0.95,
+          "human_oversight": false,
+          "description": "Can make decisions and execute workflows independently"
+        }
+      ],
+      "default_mode": "reactive",
+      "mode_switching": {
+        "enabled": true,
+        "cool_down_period_seconds": 300
+      }
+    }
+  debug_trace_config: |
+    {
+      "enabled": true,
+      "trace_level": "detailed",
+      "retention_days": 30,
+      "pattern_detection": {
+        "enabled": true,
+        "min_confidence": 0.7
+      },
+      "forensics_engine": {
+        "enabled": true,
+        "analysis_frequency_hours": 24
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: workflow-templates-config
+  namespace: industriverse
+  labels:
+    app: workflow-automation-layer
+    layer: workflow-automation
+    part-of: industriverse
+data:
+  manufacturing_templates.yaml: |
+    # Manufacturing Industry Workflow Manifest Templates
+    templates:
+      - name: predictive_maintenance
+        description: "Predictive maintenance workflow for manufacturing equipment"
+        version: "1.0"
+        tasks:
+          - id: data_collection
+            name: "Collect Equipment Data"
+            description: "Collect sensor data from manufacturing equipment"
+            timeout_seconds: 300
+            retry_count: 3
+          - id: anomaly_detection
+            name: "Detect Anomalies"
+            description: "Analyze sensor data for anomalies"
+            timeout_seconds: 600
+            retry_count: 2
+          - id: risk_assessment
+            name: "Assess Maintenance Risk"
+            description: "Evaluate the risk level of detected anomalies"
+            timeout_seconds: 300
+            retry_count: 1
+          - id: human_approval
+            name: "Get Human Approval"
+            description: "Request approval for critical maintenance actions"
+            timeout_seconds: 86400
+            retry_count: 0
+            human_in_loop: true
+          - id: schedule_maintenance
+            name: "Schedule Maintenance"
+            description: "Schedule maintenance tasks based on risk assessment"
+            timeout_seconds: 600
+            retry_count: 2
+          - id: notify_stakeholders
+            name: "Notify Stakeholders"
+            description: "Send notifications to relevant stakeholders"
+            timeout_seconds: 300
+            retry_count: 3
+        workflow:
+          transitions:
+            - from: data_collection
+              to: anomaly_detection
+              condition: "success"
+            - from: anomaly_detection
+              to: risk_assessment
+              condition: "anomalies.length > 0"
+            - from: anomaly_detection
+              to: data_collection
+              condition: "anomalies.length == 0"
+              wait_seconds: 3600
+            - from: risk_assessment
+              to: human_approval
+              condition: "risk_level == 'high'"
+            - from: risk_assessment
+              to: schedule_maintenance
+              condition: "risk_level == 'medium' || risk_level == 'low'"
+            - from: human_approval
+              to: schedule_maintenance
+              condition: "approved == true"
+            - from: human_approval
+              to: notify_stakeholders
+              condition: "approved == false"
+            - from: schedule_maintenance
+              to: notify_stakeholders
+              condition: "success"
+            - from: notify_stakeholders
+              to: data_collection
+              condition: "success"
+              wait_seconds: 86400
+        execution_modes:
+          - name: "reactive"
+            trust_threshold: 0.5
+            confidence_required: 0.6
+            human_oversight: true
+          - name: "proactive"
+            trust_threshold: 0.7
+            confidence_required: 0.8
+            human_oversight: true
+          - name: "autonomous"
+            trust_threshold: 0.9
+            confidence_required: 0.95
+            human_oversight: false
+        mesh_topology:
+          edge_compatible: true
+          routing_constraints:
+            preferred_paths: ["local", "edge"]
+            fallback_paths: ["cloud"]
+          data_locality:
+            sensitive_data_categories: ["equipment_telemetry"]
+            edge_processing_required: true
+        dtsl_embedding:
+          enabled: true
+          twin_source_coordination: true
+          edge_autonomy: true
+          twin_types:
+            - "equipment"
+            - "production_line"
+            - "factory"
+  
+  logistics_templates.yaml: |
+    # Logistics Industry Workflow Manifest Templates
+    templates:
+      - name: supply_chain_visibility
+        description: "End-to-end supply chain visibility workflow"
+        version: "1.0"
+        tasks:
+          - id: track_shipments
+            name: "Track Shipments"
+            description: "Track location and status of shipments"
+            timeout_seconds: 300
+            retry_count: 3
+          - id: detect_delays
+            name: "Detect Delays"
+            description: "Identify potential delays in the supply chain"
+            timeout_seconds: 600
+            retry_count: 2
+          - id: impact_analysis
+            name: "Analyze Impact"
+            description: "Analyze the impact of delays on the supply chain"
+            timeout_seconds: 900
+            retry_count: 1
+          - id: generate_alternatives
+            name: "Generate Alternatives"
+            description: "Generate alternative routing or sourcing options"
+            timeout_seconds: 1200
+            retry_count: 2
+          - id: human_decision
+            name: "Human Decision"
+            description: "Get human decision on proposed alternatives"
+            timeout_seconds: 43200
+            retry_count: 0
+            human_in_loop: true
+          - id: execute_changes
+            name: "Execute Changes"
+            description: "Implement the selected alternative"
+            timeout_seconds: 1800
+            retry_count: 2
+          - id: notify_stakeholders
+            name: "Notify Stakeholders"
+            description: "Notify relevant stakeholders about changes"
+            timeout_seconds: 300
+            retry_count: 3
+        workflow:
+          transitions:
+            - from: track_shipments
+              to: detect_delays
+              condition: "success"
+            - from: detect_delays
+              to: impact_analysis
+              condition: "delays.length > 0"
+            - from: detect_delays
+              to: track_shipments
+              condition: "delays.length == 0"
+              wait_seconds: 1800
+            - from: impact_analysis
+              to: generate_alternatives
+              condition: "impact_score > 3"
+            - from: impact_analysis
+              to: notify_stakeholders
+              condition: "impact_score <= 3"
+            - from: generate_alternatives
+              to: human_decision
+              condition: "alternatives.length > 0"
+            - from: generate_alternatives
+              to: notify_stakeholders
+              condition: "alternatives.length == 0"
+            - from: human_decision
+              to: execute_changes
+              condition: "decision != null"
+            - from: execute_changes
+              to: notify_stakeholders
+              condition: "success"
+            - from: notify_stakeholders
+              to: track_shipments
+              condition: "success"
+              wait_seconds: 3600
+        execution_modes:
+          - name: "reactive"
+            trust_threshold: 0.5
+            confidence_required: 0.6
+            human_oversight: true
+          - name: "proactive"
+            trust_threshold: 0.7
+            confidence_required: 0.8
+            human_oversight: true
+          - name: "autonomous"
+            trust_threshold: 0.9
+            confidence_required: 0.95
+            human_oversight: false
+        mesh_topology:
+          edge_compatible: true
+          routing_constraints:
+            preferred_paths: ["protocol_layer", "core_ai_layer"]
+            fallback_paths: ["direct"]
+          data_locality:
+            sensitive_data_categories: ["location_data", "customer_data"]
+            edge_processing_required: false
+        dtsl_embedding:
+          enabled: true
+          twin_source_coordination: true
+          edge_autonomy: false
+          twin_types:
+            - "shipment"
+            - "vehicle"
+            - "warehouse"
+            - "supply_chain"
+  
+  energy_templates.yaml: |
+    # Energy Industry Workflow Manifest Templates
+    templates:
+      - name: smart_grid_management
+        description: "Smart grid management and optimization workflow"
+        version: "1.0"
+        tasks:
+          - id: monitor_grid
+            name: "Monitor Grid"
+            description: "Monitor smart grid status and performance"
+            timeout_seconds: 300
+            retry_count: 3
+          - id: detect_anomalies
+            name: "Detect Anomalies"
+            description: "Identify anomalies in grid performance"
+            timeout_seconds: 600
+            retry_count: 2
+          - id: forecast_demand
+            name: "Forecast Demand"
+            description: "Forecast energy demand for the next 24 hours"
+            timeout_seconds: 900
+            retry_count: 2
+          - id: optimize_distribution
+            name: "Optimize Distribution"
+            description: "Optimize energy distribution based on demand forecast"
+            timeout_seconds: 1200
+            retry_count: 1
+          - id: human_review
+            name: "Human Review"
+            description: "Get human review for critical distribution changes"
+            timeout_seconds: 1800
+            retry_count: 0
+            human_in_loop: true
+          - id: apply_changes
+            name: "Apply Changes"
+            description: "Apply distribution optimization changes"
+            timeout_seconds: 600
+            retry_count: 2
+          - id: generate_report
+            name: "Generate Report"
+            description: "Generate performance and optimization report"
+            timeout_seconds: 900
+            retry_count: 1
+        workflow:
+          transitions:
+            - from: monitor_grid
+              to: detect_anomalies
+              condition: "success"
+            - from: detect_anomalies
+              to: forecast_demand
+              condition: "success"
+            - from: forecast_demand
+              to: optimize_distribution
+              condition: "success"
+            - from: optimize_distribution
+              to: human_review
+              condition: "changes_critical == true"
+            - from: optimize_distribution
+              to: apply_changes
+              condition: "changes_critical == false"
+            - from: human_review
+              to: apply_changes
+              condition: "approved == true"
+            - from: human_review
+              to: generate_report
+              condition: "approved == false"
+            - from: apply_changes
+              to: generate_report
+              condition: "success"
+            - from: generate_report
+              to: monitor_grid
+              condition: "success"
+              wait_seconds: 3600
+        execution_modes:
+          - name: "reactive"
+            trust_threshold: 0.6
+            confidence_required: 0.7
+            human_oversight: true
+          - name: "proactive"
+            trust_threshold: 0.8
+            confidence_required: 0.85
+            human_oversight: true
+          - name: "autonomous"
+            trust_threshold: 0.95
+            confidence_required: 0.98
+            human_oversight: false
+        mesh_topology:
+          edge_compatible: true
+          routing_constraints:
+            preferred_paths: ["edge", "local"]
+            fallback_paths: ["cloud"]
+          data_locality:
+            sensitive_data_categories: ["grid_telemetry", "consumption_data"]
+            edge_processing_required: true
+        dtsl_embedding:
+          enabled: true
+          twin_source_coordination: true
+          edge_autonomy: true
+          twin_types:
+            - "grid_node"
+            - "substation"
+            - "distribution_network"
+            - "consumer_cluster"
+  
+  retail_templates.yaml: |
+    # Retail Industry Workflow Manifest Templates
+    templates:
+      - name: inventory_management
+        description: "Intelligent inventory management workflow"
+        version: "1.0"
+        tasks:
+          - id: monitor_inventory
+            name: "Monitor Inventory"
+            description: "Monitor inventory levels across stores and warehouses"
+            timeout_seconds: 300
+            retry_count: 3
+          - id: forecast_demand
+            name: "Forecast Demand"
+            description: "Forecast product demand based on historical data and trends"
+            timeout_seconds: 900
+            retry_count: 2
+          - id: identify_issues
+            name: "Identify Issues"
+            description: "Identify potential stockouts or overstock situations"
+            timeout_seconds: 600
+            retry_count: 2
+          - id: generate_recommendations
+            name: "Generate Recommendations"
+            description: "Generate inventory optimization recommendations"
+            timeout_seconds: 1200
+            retry_count: 1
+          - id: human_approval
+            name: "Human Approval"
+            description: "Get human approval for inventory adjustments"
+            timeout_seconds: 43200
+            retry_count: 0
+            human_in_loop: true
+          - id: execute_adjustments
+            name: "Execute Adjustments"
+            description: "Execute approved inventory adjustments"
+            timeout_seconds: 1800
+            retry_count: 2
+          - id: update_forecasts
+            name: "Update Forecasts"
+            description: "Update demand forecasts based on recent data"
+            timeout_seconds: 900
+            retry_count: 1
+        workflow:
+          transitions:
+            - from: monitor_inventory
+              to: forecast_demand
+              condition: "success"
+            - from: forecast_demand
+              to: identify_issues
+              condition: "success"
+            - from: identify_issues
+              to: generate_recommendations
+              condition: "issues.length > 0"
+            - from: identify_issues
+              to: update_forecasts
+              condition: "issues.length == 0"
+            - from: generate_recommendations
+              to: human_approval
+              condition: "recommendations.length > 0"
+            - from: generate_recommendations
+              to: update_forecasts
+              condition: "recommendations.length == 0"
+            - from: human_approval
+              to: execute_adjustments
+              condition: "approved == true"
+            - from: human_approval
+              to: update_forecasts
+              condition: "approved == false"
+            - from: execute_adjustments
+              to: update_forecasts
+              condition: "success"
+            - from: update_forecasts
+              to: monitor_inventory
+              condition: "success"
+              wait_seconds: 86400
+        execution_modes:
+          - name: "reactive"
+            trust_threshold: 0.5
+            confidence_required: 0.6
+            human_oversight: true
+          - name: "proactive"
+            trust_threshold: 0.75
+            confidence_required: 0.8
+            human_oversight: true
+          - name: "autonomous"
+            trust_threshold: 0.9
+            confidence_required: 0.95
+            human_oversight: false
+        mesh_topology:
+          edge_compatible: true
+          routing_constraints:
+            preferred_paths: ["local", "protocol_layer"]
+            fallback_paths: ["cloud"]
+          data_locality:
+            sensitive_data_categories: ["sales_data", "customer_data"]
+            edge_processing_required: false
+        dtsl_embedding:
+          enabled: true
+          twin_source_coordination: true
+          edge_autonomy: false
+          twin_types:
+            - "store"
+            - "warehouse"
+            - "product_category"
+            - "supply_chain"

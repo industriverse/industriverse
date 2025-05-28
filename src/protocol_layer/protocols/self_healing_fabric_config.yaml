@@ -1,0 +1,222 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: self-healing-fabric-config
+  namespace: industriverse-protocol
+data:
+  version: "1.0.0"
+  description: "Self-Healing Protocol Fabric Configuration for Industriverse Protocol Layer"
+  
+  # Core Configuration
+  core:
+    enabled: "true"
+    monitoring_interval_ms: "1000"
+    healing_threshold: "3"
+    max_consecutive_failures: "5"
+    recovery_backoff_strategy: "exponential"
+    initial_backoff_ms: "500"
+    max_backoff_ms: "30000"
+    
+  # Reflex Loop Configuration
+  reflex_loops:
+    - name: "connection_reflex"
+      description: "Connection monitoring and recovery reflex loop"
+      trigger_conditions:
+        - "connection_timeout"
+        - "connection_refused"
+        - "connection_reset"
+      actions:
+        - "reconnect_with_backoff"
+        - "notify_path_morphing"
+        - "log_connection_failure"
+      priority: "high"
+      
+    - name: "message_delivery_reflex"
+      description: "Message delivery monitoring and recovery reflex loop"
+      trigger_conditions:
+        - "message_timeout"
+        - "message_nack"
+        - "message_corruption"
+      actions:
+        - "resend_message"
+        - "notify_semantic_compressor"
+        - "log_delivery_failure"
+      priority: "medium"
+      
+    - name: "agent_health_reflex"
+      description: "Agent health monitoring and recovery reflex loop"
+      trigger_conditions:
+        - "agent_heartbeat_missing"
+        - "agent_resource_exhaustion"
+        - "agent_error_state"
+      actions:
+        - "restart_agent"
+        - "notify_agent_supervisor"
+        - "log_agent_failure"
+      priority: "high"
+      
+    - name: "protocol_performance_reflex"
+      description: "Protocol performance monitoring and optimization reflex loop"
+      trigger_conditions:
+        - "high_latency"
+        - "low_throughput"
+        - "high_error_rate"
+      actions:
+        - "adjust_protocol_parameters"
+        - "notify_performance_optimizer"
+        - "log_performance_issue"
+      priority: "low"
+  
+  # Path Morphing Configuration
+  path_morphing:
+    enabled: "true"
+    path_discovery_interval_s: "60"
+    path_evaluation_metrics:
+      - "latency"
+      - "reliability"
+      - "bandwidth"
+      - "security_level"
+    path_selection_strategy: "weighted_multi_objective"
+    path_caching_enabled: "true"
+    path_cache_ttl_s: "300"
+    dynamic_path_creation: "true"
+    
+  # Reinforcement Learning Configuration
+  reinforcement_learning:
+    enabled: "true"
+    learning_rate: "0.01"
+    discount_factor: "0.9"
+    exploration_rate: "0.1"
+    min_exploration_rate: "0.01"
+    exploration_decay_rate: "0.995"
+    batch_size: "32"
+    memory_capacity: "10000"
+    update_frequency: "10"
+    target_update_frequency: "100"
+    model_save_interval_s: "3600"
+    model_path: "/models/self_healing_rl_model"
+    
+  # Heartbeat Monitoring Configuration
+  heartbeat_monitoring:
+    enabled: "true"
+    heartbeat_interval_ms: "5000"
+    heartbeat_timeout_ms: "15000"
+    adaptive_interval: "true"
+    min_heartbeat_interval_ms: "1000"
+    max_heartbeat_interval_ms: "30000"
+    jitter_factor: "0.1"
+    
+  # Fault Detection Configuration
+  fault_detection:
+    enabled: "true"
+    detection_algorithms:
+      - "threshold_based"
+      - "anomaly_detection"
+      - "trend_analysis"
+      - "pattern_recognition"
+    anomaly_detection_sensitivity: "0.8"
+    trend_analysis_window_size: "10"
+    pattern_library_path: "/patterns/fault_patterns.json"
+    false_positive_mitigation: "true"
+    
+  # Recovery Strategies Configuration
+  recovery_strategies:
+    - name: "reconnection_strategy"
+      description: "Strategy for reconnecting failed connections"
+      steps:
+        - "verify_network_availability"
+        - "attempt_direct_reconnection"
+        - "attempt_alternative_endpoints"
+        - "attempt_protocol_downgrade"
+        - "notify_administrator"
+      max_attempts: "5"
+      
+    - name: "message_recovery_strategy"
+      description: "Strategy for recovering failed messages"
+      steps:
+        - "verify_message_integrity"
+        - "resend_original_message"
+        - "resend_with_alternative_encoding"
+        - "resend_with_reduced_payload"
+        - "notify_sender_of_failure"
+      max_attempts: "3"
+      
+    - name: "agent_recovery_strategy"
+      description: "Strategy for recovering failed agents"
+      steps:
+        - "verify_agent_state"
+        - "restart_agent_process"
+        - "restore_agent_from_checkpoint"
+        - "deploy_new_agent_instance"
+        - "notify_administrator"
+      max_attempts: "3"
+      
+    - name: "protocol_recovery_strategy"
+      description: "Strategy for recovering protocol failures"
+      steps:
+        - "verify_protocol_state"
+        - "reset_protocol_state"
+        - "switch_to_alternative_protocol"
+        - "initiate_protocol_negotiation"
+        - "notify_administrator"
+      max_attempts: "3"
+  
+  # Logging and Monitoring Configuration
+  logging_and_monitoring:
+    log_level: "info"
+    detailed_diagnostics: "true"
+    performance_metrics_enabled: "true"
+    metrics_collection_interval_s: "10"
+    metrics_retention_period_days: "30"
+    alert_thresholds:
+      high_failure_rate: "0.05"
+      high_latency_ms: "500"
+      low_throughput_mbps: "1.0"
+    alert_channels:
+      - "log"
+      - "metrics"
+      - "notification"
+    
+  # Integration Configuration
+  integrations:
+    - name: "protocol_kernel_intelligence"
+      enabled: "true"
+      interface: "intent_routing_api"
+      
+    - name: "agent_reflex_timers"
+      enabled: "true"
+      interface: "timer_management_api"
+      
+    - name: "cross_mesh_federation"
+      enabled: "true"
+      interface: "federation_api"
+      
+    - name: "ekis_security"
+      enabled: "true"
+      interface: "security_api"
+      
+    - name: "alphaevolve"
+      enabled: "true"
+      interface: "algorithm_evolution_api"
+  
+  # Advanced Features Configuration
+  advanced_features:
+    predictive_healing:
+      enabled: "true"
+      prediction_horizon_s: "60"
+      confidence_threshold: "0.8"
+      
+    autonomous_optimization:
+      enabled: "true"
+      optimization_interval_s: "3600"
+      parameter_exploration: "true"
+      
+    distributed_coordination:
+      enabled: "true"
+      consensus_algorithm: "raft"
+      coordination_interval_s: "10"
+      
+    self_documentation:
+      enabled: "true"
+      documentation_update_interval_s: "86400"
+      documentation_path: "/docs/self_healing_fabric_state.md"

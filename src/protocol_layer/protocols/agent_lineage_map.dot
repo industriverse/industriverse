@@ -1,0 +1,202 @@
+digraph AgentLineageMap {
+  // Graph settings
+  graph [rankdir=LR, fontname="Arial", fontsize=12, nodesep=0.8, ranksep=1.0];
+  node [shape=box, style="rounded,filled", fontname="Arial", fontsize=10, fillcolor=lightblue, color=navy, margin="0.2,0.1"];
+  edge [fontname="Arial", fontsize=8, color=darkgreen];
+
+  // Protocol Layer Agent Types
+  subgraph cluster_protocol_agents {
+    label="Protocol Layer Agents";
+    style=filled;
+    color=lightgrey;
+    
+    // Core Protocol Agents
+    ProtocolKernelAgent [label="Protocol Kernel Agent\n(PKI Core)", fillcolor="#a8d1ff"];
+    IntentRouterAgent [label="Intent Router Agent", fillcolor="#a8d1ff"];
+    SemanticCompressorAgent [label="Semantic Compressor Agent", fillcolor="#a8d1ff"];
+    
+    // Protocol Fabric Agents
+    SelfHealingAgent [label="Self-Healing Agent", fillcolor="#c9e1ff"];
+    PathMorphingAgent [label="Path Morphing Agent", fillcolor="#c9e1ff"];
+    ReflexLoopAgent [label="Reflex Loop Agent", fillcolor="#c9e1ff"];
+    
+    // Federation Agents
+    FederationBrokerAgent [label="Federation Broker Agent", fillcolor="#e6f0ff"];
+    TrustFabricAgent [label="Trust Fabric Agent", fillcolor="#e6f0ff"];
+    IdentityMapperAgent [label="Identity Mapper Agent", fillcolor="#e6f0ff"];
+    
+    // Protocol Evolution Agents
+    GeneticAlgorithmAgent [label="Genetic Algorithm Agent", fillcolor="#d4e5ff"];
+    AlphaEvolveAgent [label="AlphaEvolve Agent", fillcolor="#d4e5ff"];
+    AlgorithmBuilderAgent [label="Algorithm Builder Agent", fillcolor="#d4e5ff"];
+    
+    // Digital Twin Agents
+    DTSLParserAgent [label="DTSL Parser Agent", fillcolor="#b3d9ff"];
+    TwinOrchestratorAgent [label="Twin Orchestrator Agent", fillcolor="#b3d9ff"];
+    SwarmCoordinatorAgent [label="Swarm Coordinator Agent", fillcolor="#b3d9ff"];
+  }
+  
+  // Protocol Handlers
+  subgraph cluster_protocol_handlers {
+    label="Protocol Handlers";
+    style=filled;
+    color=lightgrey;
+    
+    MCPHandler [label="MCP Handler", fillcolor="#ffe6cc"];
+    A2AHandler [label="A2A Handler", fillcolor="#ffe6cc"];
+    UDEPHandler [label="UDEP Handler", fillcolor="#ffe6cc"];
+    NativeBridgeHandler [label="Native Bridge Handler", fillcolor="#ffe6cc"];
+  }
+  
+  // Industrial Adapters
+  subgraph cluster_industrial_adapters {
+    label="Industrial Adapters";
+    style=filled;
+    color=lightgrey;
+    
+    OPCUAAdapter [label="OPC-UA Adapter", fillcolor="#fff2cc"];
+    ModbusAdapter [label="Modbus Adapter", fillcolor="#fff2cc"];
+    MQTTAdapter [label="MQTT Adapter", fillcolor="#fff2cc"];
+    ProfinetAdapter [label="Profinet Adapter", fillcolor="#fff2cc"];
+    DDSAdapter [label="DDS Adapter", fillcolor="#fff2cc"];
+  }
+  
+  // Blockchain Connectors
+  subgraph cluster_blockchain_connectors {
+    label="Blockchain Connectors";
+    style=filled;
+    color=lightgrey;
+    
+    EthereumConnector [label="Ethereum Connector", fillcolor="#e6ffcc"];
+    HyperledgerConnector [label="Hyperledger Connector", fillcolor="#e6ffcc"];
+    CordaConnector [label="Corda Connector", fillcolor="#e6ffcc"];
+    QuorumConnector [label="Quorum Connector", fillcolor="#e6ffcc"];
+  }
+  
+  // Security Components
+  subgraph cluster_security_components {
+    label="Security Components";
+    style=filled;
+    color=lightgrey;
+    
+    EKISSecurityAgent [label="EKIS Security Agent", fillcolor="#ffcccc"];
+    TPMIntegrationAgent [label="TPM Integration Agent", fillcolor="#ffcccc"];
+    ZKPAgent [label="ZKP Agent", fillcolor="#ffcccc"];
+    AuditTrailAgent [label="Audit Trail Agent", fillcolor="#ffcccc"];
+  }
+  
+  // Simulation Components
+  subgraph cluster_simulation_components {
+    label="Simulation Components";
+    style=filled;
+    color=lightgrey;
+    
+    SimulationEnvironmentAgent [label="Simulation Environment Agent", fillcolor="#f9d9ff"];
+    TestingFrameworkAgent [label="Testing Framework Agent", fillcolor="#f9d9ff"];
+    SyntheticDataAgent [label="Synthetic Data Agent", fillcolor="#f9d9ff"];
+  }
+  
+  // Agent Lineage Relationships
+  
+  // Protocol Kernel Lineage
+  ProtocolKernelAgent -> IntentRouterAgent [label="specializes"];
+  ProtocolKernelAgent -> SemanticCompressorAgent [label="specializes"];
+  
+  // Self-Healing Fabric Lineage
+  SelfHealingAgent -> PathMorphingAgent [label="specializes"];
+  SelfHealingAgent -> ReflexLoopAgent [label="specializes"];
+  
+  // Federation Lineage
+  FederationBrokerAgent -> TrustFabricAgent [label="collaborates"];
+  FederationBrokerAgent -> IdentityMapperAgent [label="collaborates"];
+  
+  // Genetic Algorithm Lineage
+  GeneticAlgorithmAgent -> AlphaEvolveAgent [label="extends"];
+  AlphaEvolveAgent -> AlgorithmBuilderAgent [label="specializes"];
+  
+  // Digital Twin Lineage
+  DTSLParserAgent -> TwinOrchestratorAgent [label="feeds"];
+  TwinOrchestratorAgent -> SwarmCoordinatorAgent [label="coordinates"];
+  
+  // Protocol Handler Relationships
+  ProtocolKernelAgent -> MCPHandler [label="routes through"];
+  ProtocolKernelAgent -> A2AHandler [label="routes through"];
+  ProtocolKernelAgent -> UDEPHandler [label="routes through"];
+  ProtocolKernelAgent -> NativeBridgeHandler [label="routes through"];
+  
+  // Industrial Adapter Relationships
+  MCPHandler -> OPCUAAdapter [label="connects to"];
+  MCPHandler -> ModbusAdapter [label="connects to"];
+  MCPHandler -> MQTTAdapter [label="connects to"];
+  MCPHandler -> ProfinetAdapter [label="connects to"];
+  MCPHandler -> DDSAdapter [label="connects to"];
+  
+  // Blockchain Connector Relationships
+  TrustFabricAgent -> EthereumConnector [label="verifies with"];
+  TrustFabricAgent -> HyperledgerConnector [label="verifies with"];
+  TrustFabricAgent -> CordaConnector [label="verifies with"];
+  TrustFabricAgent -> QuorumConnector [label="verifies with"];
+  
+  // Security Component Relationships
+  EKISSecurityAgent -> TPMIntegrationAgent [label="manages"];
+  EKISSecurityAgent -> ZKPAgent [label="manages"];
+  EKISSecurityAgent -> AuditTrailAgent [label="manages"];
+  
+  // Simulation Component Relationships
+  SimulationEnvironmentAgent -> TestingFrameworkAgent [label="hosts"];
+  SimulationEnvironmentAgent -> SyntheticDataAgent [label="generates data for"];
+  
+  // Cross-Cluster Relationships
+  
+  // PKI to Self-Healing
+  ProtocolKernelAgent -> SelfHealingAgent [label="monitors"];
+  
+  // PKI to Federation
+  ProtocolKernelAgent -> FederationBrokerAgent [label="delegates"];
+  
+  // PKI to Genetic Algorithm
+  ProtocolKernelAgent -> GeneticAlgorithmAgent [label="optimizes with"];
+  
+  // PKI to Digital Twin
+  ProtocolKernelAgent -> DTSLParserAgent [label="interprets"];
+  
+  // Self-Healing to Security
+  SelfHealingAgent -> EKISSecurityAgent [label="secures with"];
+  
+  // Federation to Security
+  FederationBrokerAgent -> EKISSecurityAgent [label="authenticates with"];
+  
+  // Genetic Algorithm to Simulation
+  GeneticAlgorithmAgent -> SimulationEnvironmentAgent [label="tests in"];
+  
+  // Digital Twin to Industrial Adapters
+  TwinOrchestratorAgent -> OPCUAAdapter [label="connects via"];
+  TwinOrchestratorAgent -> ModbusAdapter [label="connects via"];
+  TwinOrchestratorAgent -> MQTTAdapter [label="connects via"];
+  TwinOrchestratorAgent -> ProfinetAdapter [label="connects via"];
+  TwinOrchestratorAgent -> DDSAdapter [label="connects via"];
+  
+  // Security to Blockchain
+  EKISSecurityAgent -> EthereumConnector [label="logs to"];
+  
+  // Simulation to Genetic Algorithm
+  SimulationEnvironmentAgent -> AlphaEvolveAgent [label="evaluates"];
+  
+  // Legend
+  subgraph cluster_legend {
+    label="Legend";
+    style=filled;
+    color=lightgrey;
+    
+    LegendNode1 [label="Core Component", fillcolor="#a8d1ff"];
+    LegendNode2 [label="Specialized Component", fillcolor="#c9e1ff"];
+    LegendNode3 [label="Integration Component", fillcolor="#ffe6cc"];
+    LegendNode4 [label="Industrial Component", fillcolor="#fff2cc"];
+    LegendNode5 [label="Security Component", fillcolor="#ffcccc"];
+    
+    LegendNode1 -> LegendNode2 [label="specializes"];
+    LegendNode2 -> LegendNode3 [label="connects to"];
+    LegendNode3 -> LegendNode4 [label="integrates with"];
+    LegendNode2 -> LegendNode5 [label="secures with"];
+  }
+}

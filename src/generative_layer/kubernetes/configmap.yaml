@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: generative-layer-config
+  namespace: industriverse
+data:
+  config.json: |
+    {
+      "agent_core": {
+        "agent_id": "generative_layer_agent",
+        "agent_name": "Industriverse Generative Layer",
+        "agent_version": "1.0.0",
+        "agent_description": "Generative Layer for Industriverse with protocol-native architecture",
+        "mcp_enabled": true,
+        "a2a_enabled": true,
+        "mesh_coordination_role": "follower",
+        "intelligence_role": "generator",
+        "resilience_mode": "active"
+      },
+      "mesh": {
+        "bootstrap_nodes": ["core_ai_layer_agent", "data_layer_agent"],
+        "discovery_interval": 30,
+        "heartbeat_interval": 10
+      },
+      "api": {
+        "host": "0.0.0.0",
+        "port": 8082,
+        "enable_http": true,
+        "enable_grpc": true
+      },
+      "storage": {
+        "path": "generative_layer_storage",
+        "persistence_enabled": true,
+        "backup_interval": 3600
+      },
+      "logging": {
+        "level": "INFO",
+        "file_enabled": true,
+        "file_path": "logs/generative_layer.log",
+        "rotation": "daily"
+      },
+      "security": {
+        "authentication_required": true,
+        "authorization_required": true,
+        "encryption_enabled": true
+      },
+      "performance": {
+        "cache_enabled": true,
+        "cache_size": 1000,
+        "cache_ttl": 3600,
+        "parallel_generation": true,
+        "max_parallel_jobs": 10
+      },
+      "edge_behavior_profile": {
+        "compute_fallback_mode": "approximate",
+        "stream_input_window": 128,
+        "latency_threshold_ms": 250
+      },
+      "ui_capsule_support": {
+        "supported_interfaces": ["web", "desktop", "mobile", "ar"],
+        "live_preview": true,
+        "editable_fields": true
+      },
+      "agent_lineage": {
+        "inheritance_behavior": "override",
+        "lineage_depth": 5
+      }
+    }
+  priority_weights.yaml: |
+    industryTags:
+      aerospace: 0.9
+      defense: 0.95
+      manufacturing: 0.8
+      energy: 0.85
+      healthcare: 0.9
+      logistics: 0.75
+      default: 0.7
+    
+    taskTypes:
+      safety_critical: 0.95
+      compliance: 0.9
+      operational: 0.8
+      reporting: 0.7
+      default: 0.75
+    
+    resourceTypes:
+      cpu: 1.0
+      memory: 1.0
+      storage: 0.8
+      network: 0.7
+      default: 0.9

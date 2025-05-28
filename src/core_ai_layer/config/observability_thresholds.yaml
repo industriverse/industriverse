@@ -1,0 +1,138 @@
+---
+# Observability Thresholds Configuration for Industriverse Core AI Layer
+# This file defines thresholds for metrics and alerts in the Core AI Layer
+
+# Latency Thresholds (in milliseconds)
+latency:
+  llm_inference:
+    warning: 200
+    critical: 500
+    p95_warning: 300
+    p95_critical: 700
+    p99_warning: 500
+    p99_critical: 1000
+  
+  ml_inference:
+    warning: 100
+    critical: 250
+    p95_warning: 150
+    p95_critical: 350
+    p99_warning: 250
+    p99_critical: 500
+  
+  explainability:
+    warning: 150
+    critical: 300
+    p95_warning: 250
+    p95_critical: 500
+    p99_warning: 400
+    p99_critical: 800
+
+# Resource Utilization Thresholds (in percentage)
+resource_utilization:
+  cpu:
+    warning: 70
+    critical: 90
+  
+  memory:
+    warning: 75
+    critical: 95
+  
+  gpu:
+    warning: 80
+    critical: 95
+
+# Token Usage Thresholds
+token_usage:
+  daily:
+    warning: 80  # Percentage of daily budget
+    critical: 95
+  
+  monthly:
+    warning: 75
+    critical: 90
+
+# Error Rate Thresholds (in percentage)
+error_rate:
+  inference:
+    warning: 1.0
+    critical: 5.0
+  
+  training:
+    warning: 2.0
+    critical: 10.0
+
+# Model Drift Thresholds
+model_drift:
+  feature_drift:
+    warning: 0.05  # KL divergence
+    critical: 0.15
+  
+  prediction_drift:
+    warning: 0.1
+    critical: 0.25
+  
+  accuracy_drop:
+    warning: 3.0  # Percentage points
+    critical: 10.0
+
+# Health Check Thresholds
+health_check:
+  response_time_ms:
+    warning: 500
+    critical: 2000
+  
+  success_rate:
+    warning: 95.0  # Percentage
+    critical: 90.0
+
+# Mesh Coordination Thresholds
+mesh_coordination:
+  consensus_time_ms:
+    warning: 300
+    critical: 1000
+  
+  quorum_failure_rate:
+    warning: 1.0  # Percentage
+    critical: 5.0
+  
+  leader_election_time_ms:
+    warning: 500
+    critical: 2000
+
+# Protocol Compliance Thresholds
+protocol_compliance:
+  mcp_compliance_score:
+    warning: 95.0  # Percentage
+    critical: 90.0
+  
+  a2a_compliance_score:
+    warning: 95.0
+    critical: 90.0
+
+# Edge Behavior Thresholds
+edge_behavior:
+  offline_mode_duration_minutes:
+    warning: 30
+    critical: 120
+  
+  sync_delay_seconds:
+    warning: 60
+    critical: 300
+  
+  cache_utilization:
+    warning: 80.0  # Percentage
+    critical: 95.0
+
+# Alert Aggregation Settings
+alert_aggregation:
+  minimum_interval_seconds: 60
+  deduplication_window_seconds: 300
+  escalation_delay_minutes: 15
+  auto_resolve_minutes: 60
+
+# Metric Export Settings
+metric_export:
+  interval_seconds: 15
+  retention_days: 30
+  batch_size: 100

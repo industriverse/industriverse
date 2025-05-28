@@ -1,0 +1,175 @@
+"""
+Priority Weights Configuration for Industriverse Core AI Layer
+
+This file defines priority weights for industry-specific task prioritization
+in the Core AI Layer.
+"""
+
+# Default priority weights
+default:
+  latency: 0.3
+  accuracy: 0.3
+  resource_efficiency: 0.2
+  resilience: 0.2
+
+# Industry-specific priority weights
+
+# Manufacturing
+manufacturing:
+  latency: 0.4        # Real-time control systems need low latency
+  accuracy: 0.3
+  resource_efficiency: 0.1
+  resilience: 0.2
+  industry_specific:
+    predictive_maintenance: 0.6
+    quality_control: 0.7
+    process_optimization: 0.5
+    inventory_management: 0.3
+
+# Energy
+energy:
+  latency: 0.3
+  accuracy: 0.4       # High accuracy for grid stability
+  resource_efficiency: 0.2
+  resilience: 0.1
+  industry_specific:
+    grid_stability: 0.8
+    demand_forecasting: 0.6
+    anomaly_detection: 0.7
+    energy_optimization: 0.5
+
+# Healthcare
+healthcare:
+  latency: 0.2
+  accuracy: 0.5       # High accuracy for patient outcomes
+  resource_efficiency: 0.1
+  resilience: 0.2
+  industry_specific:
+    diagnostic_assistance: 0.8
+    patient_monitoring: 0.7
+    medication_management: 0.6
+    treatment_planning: 0.7
+
+# Aerospace
+aerospace:
+  latency: 0.4        # Real-time systems need low latency
+  accuracy: 0.3
+  resource_efficiency: 0.1
+  resilience: 0.2
+  industry_specific:
+    flight_systems: 0.9
+    maintenance_prediction: 0.7
+    route_optimization: 0.5
+    safety_systems: 0.8
+
+# Defense
+defense:
+  latency: 0.4
+  accuracy: 0.3
+  resource_efficiency: 0.1
+  resilience: 0.2
+  industry_specific:
+    threat_detection: 0.9
+    situational_awareness: 0.8
+    logistics_optimization: 0.6
+    communications: 0.7
+
+# Data Centers
+data_centers:
+  latency: 0.3
+  accuracy: 0.2
+  resource_efficiency: 0.4  # High focus on resource efficiency
+  resilience: 0.1
+  industry_specific:
+    cooling_optimization: 0.7
+    power_management: 0.8
+    workload_balancing: 0.6
+    failure_prediction: 0.7
+
+# Edge Computing
+edge_computing:
+  latency: 0.5        # Very low latency critical for edge
+  accuracy: 0.2
+  resource_efficiency: 0.2
+  resilience: 0.1
+  industry_specific:
+    local_processing: 0.8
+    bandwidth_optimization: 0.7
+    power_conservation: 0.6
+    data_filtering: 0.5
+
+# IoT
+iot:
+  latency: 0.3
+  accuracy: 0.2
+  resource_efficiency: 0.3
+  resilience: 0.2
+  industry_specific:
+    sensor_fusion: 0.7
+    anomaly_detection: 0.6
+    device_management: 0.5
+    data_compression: 0.6
+
+# Precision Manufacturing
+precision_manufacturing:
+  latency: 0.4
+  accuracy: 0.4       # High accuracy for precision
+  resource_efficiency: 0.1
+  resilience: 0.1
+  industry_specific:
+    tolerance_control: 0.9
+    quality_assurance: 0.8
+    process_optimization: 0.7
+    material_efficiency: 0.6
+
+# Task type modifiers
+task_type_modifiers:
+  inference:
+    latency: 1.2      # Increase latency importance for inference
+    accuracy: 1.0
+    resource_efficiency: 0.8
+    resilience: 1.0
+    
+  training:
+    latency: 0.7      # Decrease latency importance for training
+    accuracy: 1.2     # Increase accuracy importance for training
+    resource_efficiency: 1.0
+    resilience: 1.1
+    
+  batch_processing:
+    latency: 0.6      # Decrease latency importance for batch
+    accuracy: 1.0
+    resource_efficiency: 1.2  # Increase resource efficiency for batch
+    resilience: 1.0
+    
+  real_time:
+    latency: 1.5      # Greatly increase latency importance for real-time
+    accuracy: 1.0
+    resource_efficiency: 0.8
+    resilience: 1.2   # Increase resilience for real-time
+
+# Criticality modifiers
+criticality_modifiers:
+  low:
+    latency: 0.8
+    accuracy: 0.9
+    resource_efficiency: 1.2
+    resilience: 0.8
+    
+  medium:
+    latency: 1.0
+    accuracy: 1.0
+    resource_efficiency: 1.0
+    resilience: 1.0
+    
+  high:
+    latency: 1.2
+    accuracy: 1.1
+    resource_efficiency: 0.8
+    resilience: 1.2
+    
+  critical:
+    latency: 1.5
+    accuracy: 1.3
+    resource_efficiency: 0.6
+    resilience: 1.5

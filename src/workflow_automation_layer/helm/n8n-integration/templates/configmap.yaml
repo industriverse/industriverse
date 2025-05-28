@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "n8n-integration.fullname" . }}-config
+  labels:
+    {{- include "n8n-integration.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    apiVersion: v1
+    kind: N8nIntegrationConfig
+    metadata:
+      name: {{ .Release.Name }}-config
+    spec:
+      logLevel: {{ .Values.logLevel }}
+      syncInterval: {{ .Values.syncInterval }}
+      n8nApiUrl: {{ .Values.n8n.apiUrl }}
+      workflowEngineUrl: {{ .Values.workflowEngine.url }}
+      webhookConfig:
+        enabled: {{ .Values.webhook.enabled | quote }}
+        port: {{ .Values.webhook.port }}
+        basePath: {{ .Values.webhook.basePath }}
+      nodeDefinitionsPath: "/app/node-definitions"
+      workflowTemplatesPath: "/app/templates"
+      enableBidirectionalSync: {{ .Values.enableBidirectionalSync | quote }}
+      enableAutoDiscovery: {{ .Values.enableAutoDiscovery | quote }}
+      enableWorkflowVersioning: {{ .Values.enableWorkflowVersioning | quote }}
+  n8nApiUrl: {{ .Values.n8n.apiUrl | quote }}
+  workflowEngineUrl: {{ .Values.workflowEngine.url | quote }}

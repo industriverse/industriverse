@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: core-ai-layer
+  namespace: industriverse
+  labels:
+    app: core-ai-layer
+    layer: core-ai
+    part-of: industriverse
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  - port: 9090
+    targetPort: 9090
+    protocol: TCP
+    name: grpc
+  - port: 8081
+    targetPort: 8081
+    protocol: TCP
+    name: metrics
+  selector:
+    app: core-ai-layer

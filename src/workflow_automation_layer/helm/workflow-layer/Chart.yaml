@@ -1,0 +1,16 @@
+apiVersion: v2
+name: workflow-layer
+description: Helm chart for the Industriverse Workflow Automation Layer
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+maintainers:
+  - name: Industriverse Team
+    email: support@industriverse.io
+keywords:
+  - workflow
+  - automation
+  - industriverse
+  - industrial
+  - foundry
+  - framework

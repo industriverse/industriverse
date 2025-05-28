@@ -1,0 +1,96 @@
+---
+# Industriverse Data Layer Agent Manifest Template
+# This template defines the standard structure for all Data Layer agent manifests
+
+agent_id: "data-layer-{component}-agent"  # Replace {component} with specific component name
+version: "1.0.0"
+layer: "data_layer"
+name: "Data Layer {Component} Agent"  # Replace {Component} with specific component name
+description: "Protocol-native agent for the {component} component of the Industriverse Data Layer"
+
+# Intelligence type classification
+intelligence_type: "stateless"  # Options: stateless, contextual, memory-aware, predictive, real-time reactive
+
+# Protocol support
+protocols:
+  mcp:
+    enabled: true
+    events:
+      - observe
+      - simulate
+      - recommend
+      - act
+    security:
+      consent_required: true
+      registry: "controlled"
+  
+  a2a:
+    enabled: true
+    discovery:
+      endpoint: ".well-known/agent.json"
+    task_lifecycle: true
+    message_parts:
+      - TextPart
+      - FilePart
+      - DataPart
+    authentication:
+      - oauth2
+      - api_key
+
+# Industry-specific extensions
+industry_extensions:
+  industryTags:
+    - "manufacturing"
+    - "energy"
+    - "logistics"
+    - "aerospace"
+  priority_levels:
+    - "critical"
+    - "high"
+    - "medium"
+    - "low"
+  custom_part_types:
+    - "IndustrialTimeSeries"
+    - "MachineState"
+    - "ProcessParameter"
+
+# Trust model
+trust:
+  modes:
+    - "passive"
+    - "approval"
+    - "autonomous"
+  threshold: 0.8
+  default_mode: "approval"
+
+# Capabilities
+capabilities:
+  - name: "capability_name"  # Replace with specific capability
+    description: "Description of the capability"
+    inputs:
+      - name: "input_parameter"
+        type: "string"
+        required: true
+        description: "Description of the input parameter"
+    outputs:
+      - name: "output_parameter"
+        type: "object"
+        description: "Description of the output parameter"
+    workflow_template: "template_name"  # Optional reference to predefined workflow
+
+# Digital twin support
+digital_twin:
+  enabled: false  # Set to true for components with digital twin capabilities
+  events:
+    - "twin/heartbeat"
+    - "twin/update"
+  sync_interval: "5s"
+
+# Edge deployment
+edge_deployment:
+  supported: true
+  minimum_requirements:
+    cpu: "1 core"
+    memory: "512MB"
+    storage: "100MB"
+  offline_mode: true
