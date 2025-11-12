@@ -40,6 +40,47 @@ from phase4.nvp.nvp_model import NVPConfig
 from phase4.nvp.trainer import Trainer, TrainingConfig, prepare_training_data
 
 
+def load_domain_sequences(
+    domain: str,
+    data_dir: Path,
+    max_sequences: int = 10
+) -> list:
+    """Load energy map sequences for a domain."""
+    loader = EnergyAtlasLoader(data_dir, neo4j_uri=None)
+
+    domain_dir = data_dir / "energy_maps" / domain
+    if not domain_dir.exists():
+        raise FileNotFoundError(f"Domain directory not found: {domain_dir}")
+
+    # Get all map files
+    map_files = sorted(domain_dir.glob("*.npy"))
+
+    if len(map_files) == 0:
+        raise ValueError(f"No maps found for domain: {domain}")
+
+    # Group into sequences of 10 timesteps
+    sequences = []
+    sequence_length = 10
+
+    for i in range(0, len(map_files), sequence_length):
+        if max_sequences and len(sequences) >= max_sequences:
+            break
+
+        seq_files = map_files[i:i+sequence_length]
+        if len(seq_files) < sequence_length:
+            break
+
+        # Load sequence
+        sequence = []
+        for f in seq_files:
+            energy_map = np.load(f)
+            sequence.append(energy_map)
+
+        sequences.append(np.stack(sequence, axis=0))
+
+    return sequences
+
+
 def parse_args():
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
@@ -348,16 +389,13 @@ def main():
 
     # Load data
     print("\nLoading energy map sequences...")
-    loader = EnergyAtlasLoader(
-        atlas_path=args.data_path if args.data_path else Path.cwd() / "data",
-        cache_size=100
-    )
+    data_dir = Path(args.data_path) if args.data_path else Path.cwd() / "data"
 
     # Load sequences for domain
-    sequences = loader.load_sequence_batch(
+    sequences = load_domain_sequences(
         domain=args.domain,
-        num_sequences=args.max_sequences,
-        window=10
+        data_dir=data_dir,
+        max_sequences=args.max_sequences if args.max_sequences else 10
     )
 
     print(f"Loaded {len(sequences)} sequences")
