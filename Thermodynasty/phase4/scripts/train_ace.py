@@ -22,6 +22,7 @@ import time
 from typing import Dict, List
 import pickle
 import json
+from flax import serialization
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -405,45 +406,75 @@ def save_checkpoint(
     agent_type = type(agent).__name__
     timestamp = time.strftime("%Y%m%d_%H%M%S")
     checkpoint_name = f"{agent_type}_{args.domain}_ep{args.epochs}_{timestamp}"
-    checkpoint_path = checkpoint_dir / f"{checkpoint_name}.pkl"
 
-    # Prepare checkpoint data
-    checkpoint_data = {
-        'agent_type': agent_type,
-        'agent_config': agent.config,
-        'model_state': agent.execution.state,  # Flax TrainState
-        'training_args': vars(args),
-        'final_metrics': final_metrics,
-        'timestamp': timestamp
+    # Get the execution layer (handle different agent types)
+    if hasattr(agent, 'execution'):
+        execution_layer = agent.execution
+    elif hasattr(agent, 'agent') and hasattr(agent.agent, 'execution'):
+        execution_layer = agent.agent.execution
+    else:
+        raise AttributeError("Cannot find execution layer in agent")
+
+    # Extract serializable state components
+    state = execution_layer.state
+    state_dict = {
+        'params': state.params,
+        'step': int(state.step),
     }
 
-    # Handle ensemble (save all model states)
-    if hasattr(agent, 'ensemble'):
-        checkpoint_data['ensemble_states'] = [
-            model.state for model in agent.ensemble.models
-        ]
+    # Add batch_stats if present
+    if hasattr(state, 'batch_stats'):
+        state_dict['batch_stats'] = state.batch_stats
 
-    # Save checkpoint
-    with open(checkpoint_path, 'wb') as f:
-        pickle.dump(checkpoint_data, f)
+    # Serialize JAX arrays using Flax serialization
+    state_bytes = serialization.to_bytes(state_dict)
 
-    # Save metadata as JSON for easy inspection
-    metadata_path = checkpoint_dir / f"{checkpoint_name}_metadata.json"
+    # Save model state (JAX arrays as bytes)
+    state_path = checkpoint_dir / f"{checkpoint_name}_state.flax"
+    with open(state_path, 'wb') as f:
+        f.write(state_bytes)
+
+    # Prepare metadata (pickleable config info)
     metadata = {
         'agent_type': agent_type,
         'domain': args.domain,
         'epochs': args.epochs,
+        'latent_dim': args.latent_dim,
+        'input_shape': execution_layer.config.input_shape,
+        'target_fidelity': args.target_fidelity,
+        'target_entropy': args.target_entropy,
+        'min_confidence': args.min_confidence,
         'final_metrics': final_metrics,
         'timestamp': timestamp
     }
+
+    # Save metadata as JSON
+    metadata_path = checkpoint_dir / f"{checkpoint_name}_metadata.json"
     with open(metadata_path, 'w') as f:
         json.dump(metadata, f, indent=2)
 
-    print(f"\n✓ Checkpoint saved:")
-    print(f"  Model: {checkpoint_path}")
-    print(f"  Metadata: {metadata_path}")
+    # Handle ensemble (save all model states)
+    if hasattr(agent, 'ensemble'):
+        for i, model in enumerate(agent.ensemble.models):
+            model_state_dict = {
+                'params': model.state.params,
+                'step': int(model.state.step),
+            }
+            if hasattr(model.state, 'batch_stats'):
+                model_state_dict['batch_stats'] = model.state.batch_stats
 
-    return checkpoint_path
+            model_bytes = serialization.to_bytes(model_state_dict)
+            model_path = checkpoint_dir / f"{checkpoint_name}_ensemble{i}_state.flax"
+            with open(model_path, 'wb') as f:
+                f.write(model_bytes)
+
+    print(f"\n✓ Checkpoint saved:")
+    print(f"  State: {state_path}")
+    print(f"  Metadata: {metadata_path}")
+    if hasattr(agent, 'ensemble'):
+        print(f"  Ensemble: {agent.ensemble.config.num_models} models")
+
+    return state_path
 
 
 def main():

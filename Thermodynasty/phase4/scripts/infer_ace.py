@@ -20,6 +20,7 @@ from jax import random
 import time
 from typing import Dict, List, Optional
 import json
+from flax import serialization
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -142,6 +143,45 @@ def parse_args():
     return parser.parse_args()
 
 
+def load_checkpoint_metadata(checkpoint_path: Path) -> Dict:
+    """Load checkpoint metadata from JSON file."""
+    # Handle both .flax and .json paths
+    if checkpoint_path.suffix == '.flax':
+        # Convert _state.flax to _metadata.json
+        metadata_path = checkpoint_path.parent / checkpoint_path.name.replace('_state.flax', '_metadata.json')
+    else:
+        # Assume it's a path without extension, look for metadata
+        metadata_path = Path(str(checkpoint_path).replace('.pkl', '_metadata.json'))
+        if not metadata_path.exists():
+            metadata_path = checkpoint_path.parent / f"{checkpoint_path.stem}_metadata.json"
+
+    if not metadata_path.exists():
+        raise FileNotFoundError(f"Metadata file not found: {metadata_path}")
+
+    with open(metadata_path, 'r') as f:
+        return json.load(f)
+
+
+def load_checkpoint_state(checkpoint_path: Path) -> Dict:
+    """Load model state from Flax checkpoint."""
+    # Handle different path formats
+    if checkpoint_path.suffix == '.flax':
+        state_path = checkpoint_path
+    else:
+        # Look for _state.flax file
+        state_path = Path(str(checkpoint_path).replace('.pkl', '_state.flax'))
+        if not state_path.exists():
+            state_path = checkpoint_path.parent / f"{checkpoint_path.stem}_state.flax"
+
+    if not state_path.exists():
+        raise FileNotFoundError(f"State file not found: {state_path}")
+
+    with open(state_path, 'rb') as f:
+        state_bytes = f.read()
+
+    return serialization.from_bytes(None, state_bytes)
+
+
 def load_ace_agent(
     args,
     input_shape: tuple
@@ -156,9 +196,32 @@ def load_ace_agent(
     Returns:
         Loaded ACE agent
     """
+    checkpoint_path = Path(args.checkpoint)
+
+    # Load metadata to get config
+    try:
+        metadata = load_checkpoint_metadata(checkpoint_path)
+        print(f"\nLoaded checkpoint metadata:")
+        print(f"  Agent: {metadata['agent_type']}")
+        print(f"  Domain: {metadata['domain']}")
+        print(f"  Epochs: {metadata['epochs']}")
+        print(f"  Final metrics:")
+        for key, val in metadata['final_metrics'].items():
+            print(f"    {key}: {val:.4f}")
+
+        # Use metadata config if available
+        latent_dim = metadata.get('latent_dim', args.latent_dim)
+        input_shape_from_meta = tuple(metadata.get('input_shape', input_shape))
+
+    except FileNotFoundError:
+        print(f"\nWarning: No metadata found, using defaults")
+        latent_dim = args.latent_dim
+        input_shape_from_meta = input_shape
+        metadata = {'agent_type': args.agent_type}
+
     # Base NVP config
     nvp_config = NVPConfig(
-        latent_dim=args.latent_dim,
+        latent_dim=latent_dim,
         encoder_features=[64, 128, 256],
         decoder_features=[256, 128, 64],
         num_scales=3
@@ -179,34 +242,41 @@ def load_ace_agent(
         ),
         execution=ExecutionConfig(
             nvp_config=nvp_config,
-            input_shape=input_shape,
+            input_shape=input_shape_from_meta,
             enforce_energy_conservation=True,
             enforce_entropy_monotonicity=True
         )
     )
 
-    checkpoint_path = Path(args.checkpoint)
-
     # Create agent based on type
-    if args.agent_type == 'ensemble':
+    agent_type = metadata.get('agent_type', args.agent_type)
+
+    if 'Ensemble' in agent_type or args.agent_type == 'ensemble':
         ensemble_config = EnsembleConfig(
             num_models=3,
             consensus_method="median",
             max_disagreement=0.2
         )
 
-        # Use provided ensemble model paths or default to single checkpoint
-        model_paths = args.ensemble_models if args.ensemble_models else None
-
         agent = EnsembleACEAgent(
             ace_config,
             ensemble_config,
-            model_paths=model_paths
+            model_paths=None  # Will load state below
         )
+
+        # Load ensemble states
+        try:
+            for i in range(3):
+                ensemble_path = checkpoint_path.parent / checkpoint_path.name.replace('_state.flax', f'_ensemble{i}_state.flax')
+                if ensemble_path.exists():
+                    state_dict = load_checkpoint_state(ensemble_path)
+                    agent.ensemble.models[i].state = agent.ensemble.models[i].state.replace(**state_dict)
+        except Exception as e:
+            print(f"Warning: Could not load ensemble states: {e}")
 
         print(f"Loaded Ensemble ACE Agent with {ensemble_config.num_models} models")
 
-    elif args.agent_type == 'socratic':
+    elif 'Socratic' in agent_type or args.agent_type == 'socratic':
         socratic_config = SocraticConfig(
             max_iterations=args.socratic_iterations,
             verbose=args.verbose
@@ -215,13 +285,29 @@ def load_ace_agent(
         agent = SocraticACEAgent(
             ace_config,
             socratic_config,
-            model_path=checkpoint_path
+            model_path=None  # Will load state below
         )
+
+        # Load state into wrapped agent
+        try:
+            state_dict = load_checkpoint_state(checkpoint_path)
+            agent.agent.execution.state = agent.agent.execution.state.replace(**state_dict)
+        except Exception as e:
+            print(f"Warning: Could not load state: {e}")
 
         print(f"Loaded Socratic ACE Agent (max iterations: {args.socratic_iterations})")
 
     else:
-        agent = ACEAgent(ace_config, model_path=checkpoint_path)
+        agent = ACEAgent(ace_config, model_path=None)
+
+        # Load state
+        try:
+            state_dict = load_checkpoint_state(checkpoint_path)
+            agent.execution.state = agent.execution.state.replace(**state_dict)
+            print("✓ Loaded model state from checkpoint")
+        except Exception as e:
+            print(f"Warning: Could not load state: {e}")
+
         print("Loaded ACE Agent")
 
     return agent
