@@ -30,6 +30,14 @@ from .shadow_ensemble import (
     EnsembleACEAgent
 )
 
+from .batch_inference import (
+    BatchInferenceEngine,
+    BatchInferenceConfig,
+    BatchResult,
+    batch_predict,
+    compare_predictions
+)
+
 __all__ = [
     # Core ACE
     'ACEAgent',
@@ -51,5 +59,11 @@ __all__ = [
     'ShadowEnsemble',
     'EnsembleConfig',
     'EnsembleResult',
-    'EnsembleACEAgent'
+    'EnsembleACEAgent',
+    # Batch Inference
+    'BatchInferenceEngine',
+    'BatchInferenceConfig',
+    'BatchResult',
+    'batch_predict',
+    'compare_predictions'
 ]
