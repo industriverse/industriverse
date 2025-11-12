@@ -20,6 +20,8 @@ import jax.numpy as jnp
 from jax import random
 import time
 from typing import Dict, List
+import pickle
+import json
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -132,7 +134,9 @@ def parse_args():
     parser.add_argument('--latent-dim', type=int, default=128,
                        help='Latent dimension')
     parser.add_argument('--checkpoint-path', type=str, default=None,
-                       help='Path to model checkpoint')
+                       help='Path to model checkpoint to load')
+    parser.add_argument('--checkpoint-dir', type=str, default='checkpoints',
+                       help='Directory to save checkpoints')
 
     # Logging
     parser.add_argument('--log-dir', type=str, default='logs',
@@ -377,6 +381,71 @@ def train_with_ace(
     return epoch_history
 
 
+def save_checkpoint(
+    agent,
+    args,
+    final_metrics: Dict,
+    checkpoint_dir: Path
+) -> Path:
+    """
+    Save trained ACE agent checkpoint.
+
+    Args:
+        agent: Trained ACE agent
+        args: Training arguments
+        final_metrics: Final training metrics
+        checkpoint_dir: Directory to save checkpoint
+
+    Returns:
+        Path to saved checkpoint
+    """
+    checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create checkpoint name
+    agent_type = type(agent).__name__
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    checkpoint_name = f"{agent_type}_{args.domain}_ep{args.epochs}_{timestamp}"
+    checkpoint_path = checkpoint_dir / f"{checkpoint_name}.pkl"
+
+    # Prepare checkpoint data
+    checkpoint_data = {
+        'agent_type': agent_type,
+        'agent_config': agent.config,
+        'model_state': agent.execution.state,  # Flax TrainState
+        'training_args': vars(args),
+        'final_metrics': final_metrics,
+        'timestamp': timestamp
+    }
+
+    # Handle ensemble (save all model states)
+    if hasattr(agent, 'ensemble'):
+        checkpoint_data['ensemble_states'] = [
+            model.state for model in agent.ensemble.models
+        ]
+
+    # Save checkpoint
+    with open(checkpoint_path, 'wb') as f:
+        pickle.dump(checkpoint_data, f)
+
+    # Save metadata as JSON for easy inspection
+    metadata_path = checkpoint_dir / f"{checkpoint_name}_metadata.json"
+    metadata = {
+        'agent_type': agent_type,
+        'domain': args.domain,
+        'epochs': args.epochs,
+        'final_metrics': final_metrics,
+        'timestamp': timestamp
+    }
+    with open(metadata_path, 'w') as f:
+        json.dump(metadata, f, indent=2)
+
+    print(f"\n✓ Checkpoint saved:")
+    print(f"  Model: {checkpoint_path}")
+    print(f"  Metadata: {metadata_path}")
+
+    return checkpoint_path
+
+
 def main():
     """Main training script."""
     args = parse_args()
@@ -451,6 +520,22 @@ def main():
 
         trainer = Trainer(config)
         history = trainer.train(train_data, verbose=args.verbose)
+
+    # Save checkpoint
+    if args.use_ace:
+        final_metrics = {
+            'confidence': history[-1]['mean_confidence'],
+            'energy_fidelity': history[-1]['mean_fidelity'],
+            'entropy_coherence': history[-1]['mean_entropy'],
+            'aspiration_rate': history[-1]['aspiration_rate']
+        }
+
+        checkpoint_path = save_checkpoint(
+            agent,
+            args,
+            final_metrics,
+            Path(args.checkpoint_dir)
+        )
 
     print("\nTraining complete!")
     print(f"Logs saved to: {args.log_dir}")
