@@ -407,32 +407,61 @@ def save_checkpoint(
     timestamp = time.strftime("%Y%m%d_%H%M%S")
     checkpoint_name = f"{agent_type}_{args.domain}_ep{args.epochs}_{timestamp}"
 
-    # Get the execution layer (handle different agent types)
-    if hasattr(agent, 'execution'):
+    # Handle different agent types
+    if hasattr(agent, 'ensemble'):
+        # EnsembleACEAgent - has ensemble instead of execution
+        print(f"\nSaving Ensemble Agent ({agent.ensemble.config.num_models} models)...")
+
+        for i, model in enumerate(agent.ensemble.models):
+            # Each model in ensemble is an ExecutionLayer with state
+            state = model.state
+            state_dict = {
+                'params': state.params,
+                'step': int(state.step),
+            }
+            if hasattr(state, 'batch_stats'):
+                state_dict['batch_stats'] = state.batch_stats
+
+            # Serialize
+            state_bytes = serialization.to_bytes(state_dict)
+
+            # Save ensemble model state
+            model_path = checkpoint_dir / f"{checkpoint_name}_ensemble{i}_state.flax"
+            with open(model_path, 'wb') as f:
+                f.write(model_bytes)
+
+            print(f"  ✓ Saved model {i+1}/{agent.ensemble.config.num_models}")
+
+        # Use first model's config for metadata
+        input_shape = list(agent.ensemble.models[0].config.input_shape)
+        state_path = checkpoint_dir / f"{checkpoint_name}_ensemble0_state.flax"
+
+    elif hasattr(agent, 'execution'):
+        # Regular ACEAgent or SocraticACEAgent
         execution_layer = agent.execution
-    elif hasattr(agent, 'agent') and hasattr(agent.agent, 'execution'):
-        execution_layer = agent.agent.execution
+        input_shape = list(execution_layer.config.input_shape)
+
+        # Extract serializable state components
+        state = execution_layer.state
+        state_dict = {
+            'params': state.params,
+            'step': int(state.step),
+        }
+
+        # Add batch_stats if present
+        if hasattr(state, 'batch_stats'):
+            state_dict['batch_stats'] = state.batch_stats
+
+        # Serialize JAX arrays using Flax serialization
+        state_bytes = serialization.to_bytes(state_dict)
+
+        # Save model state (JAX arrays as bytes)
+        state_path = checkpoint_dir / f"{checkpoint_name}_state.flax"
+        with open(state_path, 'wb') as f:
+            f.write(state_bytes)
+
     else:
-        raise AttributeError("Cannot find execution layer in agent")
-
-    # Extract serializable state components
-    state = execution_layer.state
-    state_dict = {
-        'params': state.params,
-        'step': int(state.step),
-    }
-
-    # Add batch_stats if present
-    if hasattr(state, 'batch_stats'):
-        state_dict['batch_stats'] = state.batch_stats
-
-    # Serialize JAX arrays using Flax serialization
-    state_bytes = serialization.to_bytes(state_dict)
-
-    # Save model state (JAX arrays as bytes)
-    state_path = checkpoint_dir / f"{checkpoint_name}_state.flax"
-    with open(state_path, 'wb') as f:
-        f.write(state_bytes)
+        raise AttributeError("Cannot find execution layer or ensemble in agent")
 
     # Prepare metadata (pickleable config info)
     metadata = {
@@ -440,7 +469,7 @@ def save_checkpoint(
         'domain': args.domain,
         'epochs': args.epochs,
         'latent_dim': args.latent_dim,
-        'input_shape': execution_layer.config.input_shape,
+        'input_shape': input_shape,
         'target_fidelity': args.target_fidelity,
         'target_entropy': args.target_entropy,
         'min_confidence': args.min_confidence,
@@ -448,31 +477,18 @@ def save_checkpoint(
         'timestamp': timestamp
     }
 
+    # Add ensemble info if applicable
+    if hasattr(agent, 'ensemble'):
+        metadata['num_ensemble_models'] = agent.ensemble.config.num_models
+
     # Save metadata as JSON
     metadata_path = checkpoint_dir / f"{checkpoint_name}_metadata.json"
     with open(metadata_path, 'w') as f:
         json.dump(metadata, f, indent=2)
 
-    # Handle ensemble (save all model states)
-    if hasattr(agent, 'ensemble'):
-        for i, model in enumerate(agent.ensemble.models):
-            model_state_dict = {
-                'params': model.state.params,
-                'step': int(model.state.step),
-            }
-            if hasattr(model.state, 'batch_stats'):
-                model_state_dict['batch_stats'] = model.state.batch_stats
-
-            model_bytes = serialization.to_bytes(model_state_dict)
-            model_path = checkpoint_dir / f"{checkpoint_name}_ensemble{i}_state.flax"
-            with open(model_path, 'wb') as f:
-                f.write(model_bytes)
-
     print(f"\n✓ Checkpoint saved:")
     print(f"  State: {state_path}")
     print(f"  Metadata: {metadata_path}")
-    if hasattr(agent, 'ensemble'):
-        print(f"  Ensemble: {agent.ensemble.config.num_models} models")
 
     return state_path
 

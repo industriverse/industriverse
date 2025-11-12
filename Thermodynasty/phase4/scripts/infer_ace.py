@@ -288,10 +288,11 @@ def load_ace_agent(
             model_path=None  # Will load state below
         )
 
-        # Load state into wrapped agent
+        # Load state - SocraticACEAgent inherits from ACEAgent, so has execution directly
         try:
             state_dict = load_checkpoint_state(checkpoint_path)
-            agent.agent.execution.state = agent.agent.execution.state.replace(**state_dict)
+            agent.execution.state = agent.execution.state.replace(**state_dict)
+            print("✓ Loaded model state from checkpoint")
         except Exception as e:
             print(f"Warning: Could not load state: {e}")
 
