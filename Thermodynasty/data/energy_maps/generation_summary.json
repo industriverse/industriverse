@@ -1,0 +1,62 @@
+{
+  "plasma_physics": {
+    "domain": "plasma_physics",
+    "n_sequences": 5,
+    "sequence_length": 10,
+    "total_maps": 50,
+    "pattern_type": "turbulent",
+    "size": 256,
+    "energy_mean": 0.9999999999999999,
+    "energy_std": 4.979941235384767e-16,
+    "entropy_mean": 11.039825139251667,
+    "entropy_std": 0.07804444824435176
+  },
+  "fluid_dynamics": {
+    "domain": "fluid_dynamics",
+    "n_sequences": 5,
+    "sequence_length": 10,
+    "total_maps": 50,
+    "pattern_type": "vortex",
+    "size": 256,
+    "energy_mean": 0.9999999999999997,
+    "energy_std": 4.1183139101156134e-16,
+    "entropy_mean": 10.804342924180538,
+    "entropy_std": 0.04855172122666139
+  },
+  "astrophysics": {
+    "domain": "astrophysics",
+    "n_sequences": 5,
+    "sequence_length": 10,
+    "total_maps": 50,
+    "pattern_type": "turbulent",
+    "size": 256,
+    "energy_mean": 1.0,
+    "energy_std": 4.574873319737386e-16,
+    "entropy_mean": 11.035129157395563,
+    "entropy_std": 0.07676569875789205
+  },
+  "turbulent_radiative_layer": {
+    "domain": "turbulent_radiative_layer",
+    "n_sequences": 5,
+    "sequence_length": 10,
+    "total_maps": 50,
+    "pattern_type": "turbulent",
+    "size": 256,
+    "energy_mean": 1.0,
+    "energy_std": 3.206219529471011e-16,
+    "entropy_mean": 11.03688618892022,
+    "entropy_std": 0.07896786032506671
+  },
+  "active_matter": {
+    "domain": "active_matter",
+    "n_sequences": 5,
+    "sequence_length": 10,
+    "total_maps": 50,
+    "pattern_type": "vortex",
+    "size": 256,
+    "energy_mean": 0.9999999999999999,
+    "energy_std": 3.8234249894403415e-16,
+    "entropy_mean": 10.78408095301986,
+    "entropy_std": 0.03620245572413577
+  }
+}
