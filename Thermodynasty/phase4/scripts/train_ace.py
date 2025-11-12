@@ -428,7 +428,7 @@ def save_checkpoint(
             # Save ensemble model state
             model_path = checkpoint_dir / f"{checkpoint_name}_ensemble{i}_state.flax"
             with open(model_path, 'wb') as f:
-                f.write(model_bytes)
+                f.write(state_bytes)  # Fixed: was model_bytes
 
             print(f"  ✓ Saved model {i+1}/{agent.ensemble.config.num_models}")
 
