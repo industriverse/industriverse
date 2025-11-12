@@ -44,8 +44,13 @@ def load_domain_sequences(
     domain: str,
     data_dir: Path,
     max_sequences: int = 10
-) -> list:
-    """Load energy map sequences for a domain."""
+) -> tuple:
+    """Load energy map sequences for a domain.
+
+    Returns:
+        tuple: (sequences, loader) where sequences is a list of arrays
+               and loader is the EnergyAtlasLoader instance
+    """
     loader = EnergyAtlasLoader(data_dir, neo4j_uri=None)
 
     domain_dir = data_dir / "energy_maps" / domain
@@ -78,7 +83,7 @@ def load_domain_sequences(
 
         sequences.append(np.stack(sequence, axis=0))
 
-    return sequences
+    return sequences, loader
 
 
 def parse_args():
@@ -392,7 +397,7 @@ def main():
     data_dir = Path(args.data_path) if args.data_path else Path.cwd() / "data"
 
     # Load sequences for domain
-    sequences = load_domain_sequences(
+    sequences, loader = load_domain_sequences(
         domain=args.domain,
         data_dir=data_dir,
         max_sequences=args.max_sequences if args.max_sequences else 10
@@ -406,7 +411,7 @@ def main():
 
     # Prepare training data
     print("Preparing training data (computing gradients)...")
-    train_data = prepare_training_data(sequences)
+    train_data = prepare_training_data(sequences, loader)
 
     energy_shape = train_data['energy_sequence'].shape
     print(f"Training data shape:")
