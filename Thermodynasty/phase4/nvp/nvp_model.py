@@ -13,7 +13,7 @@ Thermodynamic Principle:
     Predictions must conserve energy and respect entropy bounds.
 """
 
-from typing import Tuple, Dict, List, Optional, Callable
+from typing import Tuple, Dict, List, Optional, Callable, Any
 from dataclasses import dataclass
 import jax
 import jax.numpy as jnp
@@ -273,6 +273,9 @@ class NVPModel(nn.Module):
                 method='bilinear'
             )
 
+        # Apply softplus to ensure positive energy (energy must be >= 0)
+        mean = nn.softplus(mean)
+
         return mean, log_var
 
     def predict(
@@ -322,7 +325,7 @@ def create_train_state(
         input_shape: Spatial dimensions (H, W)
 
     Returns:
-        TrainState with initialized parameters
+        TrainState with initialized parameters and batch_stats
     """
     # Create model
     model = NVPModel(config)
@@ -332,8 +335,8 @@ def create_train_state(
     dummy_grad_x = jnp.ones((1, input_shape[0], input_shape[1], 1))
     dummy_grad_y = jnp.ones((1, input_shape[0], input_shape[1], 1))
 
-    # Initialize parameters
-    params = model.init(
+    # Initialize parameters (returns dict with 'params' and 'batch_stats' if using BatchNorm)
+    variables = model.init(
         rng,
         dummy_energy,
         dummy_grad_x,
@@ -344,11 +347,15 @@ def create_train_state(
     # Create optimizer
     tx = optax.adam(learning_rate)
 
-    # Create train state
-    state = train_state.TrainState.create(
+    # Create train state with batch_stats support
+    class TrainStateWithBatchStats(train_state.TrainState):
+        batch_stats: Any = None
+
+    state = TrainStateWithBatchStats.create(
         apply_fn=model.apply,
-        params=params,
-        tx=tx
+        params=variables['params'],
+        tx=tx,
+        batch_stats=variables.get('batch_stats')
     )
 
     return state

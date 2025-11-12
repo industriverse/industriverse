@@ -248,6 +248,32 @@ class EnergyAtlasLoader:
 
         return pyramids
 
+    def _load_energy_file(self, file_path: Path) -> np.ndarray:
+        """
+        Load energy map from .npy or .npz file.
+
+        Args:
+            file_path: Path to .npy or .npz file
+
+        Returns:
+            Energy map as numpy array
+        """
+        if file_path.suffix == '.npy':
+            return np.load(file_path)
+        elif file_path.suffix == '.npz':
+            data = np.load(file_path)
+            # Try common keys
+            for key in ['energy', 'data']:
+                if key in data:
+                    return data[key]
+            # Fall back to first key
+            keys = list(data.keys())
+            if keys:
+                return data[keys[0]]
+            raise ValueError(f"No data found in {file_path}")
+        else:
+            raise ValueError(f"Unsupported file format: {file_path.suffix}")
+
     def load_map(
         self,
         domain: str,
@@ -256,6 +282,8 @@ class EnergyAtlasLoader:
     ) -> Tuple[np.ndarray, EnergyMapMetadata]:
         """
         Load a single energy map from disk.
+
+        Supports both .npy and .npz formats.
 
         Args:
             domain: Physics domain name
@@ -274,19 +302,22 @@ class EnergyAtlasLoader:
 
         # Find map file
         if map_id is None:
-            # Load most recent
-            map_files = sorted(domain_dir.glob("*.npy"))
+            # Load most recent (try both .npy and .npz)
+            map_files = sorted(list(domain_dir.glob("*.npy")) + list(domain_dir.glob("*.npz")))
             if not map_files:
                 raise FileNotFoundError(f"No energy maps found in {domain_dir}")
             map_path = map_files[-1]
             map_id = map_path.stem
         else:
+            # Try .npy first, then .npz
             map_path = domain_dir / f"{map_id}.npy"
             if not map_path.exists():
-                raise FileNotFoundError(f"Map not found: {map_path}")
+                map_path = domain_dir / f"{map_id}.npz"
+            if not map_path.exists():
+                raise FileNotFoundError(f"Map not found: {map_id}")
 
         # Load from disk
-        energy_map = np.load(map_path)
+        energy_map = self._load_energy_file(map_path)
 
         # Validate
         self.validate_shape(energy_map)
@@ -338,8 +369,8 @@ class EnergyAtlasLoader:
         if not domain_dir.exists():
             raise FileNotFoundError(f"Domain directory not found: {domain_dir}")
 
-        # Get sorted list of map files
-        map_files = sorted(domain_dir.glob("*.npy"))
+        # Get sorted list of map files (both .npy and .npz)
+        map_files = sorted(list(domain_dir.glob("*.npy")) + list(domain_dir.glob("*.npz")))
 
         if len(map_files) < window * stride:
             raise ValueError(
@@ -352,7 +383,7 @@ class EnergyAtlasLoader:
         metadata_list = []
 
         for i in range(0, window * stride, stride):
-            energy_map = np.load(map_files[i])
+            energy_map = self._load_energy_file(map_files[i])
 
             # Resize to target scale if needed
             if max(energy_map.shape) != scale:

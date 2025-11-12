@@ -216,7 +216,7 @@ class TestTrainer:
         batch = trainer.prepare_batch(energy_sequence, gradients, batch_indices)
 
         # Compute loss
-        loss, metrics = trainer.compute_loss(
+        loss, metrics, _ = trainer.compute_loss(
             trainer.state.params,
             batch,
             training=False
@@ -378,7 +378,7 @@ class TestLossFunctions:
         batch = trainer.prepare_batch(energy_sequence, gradients, batch_indices)
 
         # Compute loss
-        loss, metrics = trainer.compute_loss(
+        loss, metrics, _ = trainer.compute_loss(
             trainer.state.params,
             batch,
             training=False
@@ -416,7 +416,7 @@ class TestLossFunctions:
         batch = trainer.prepare_batch(energy_sequence, gradients, batch_indices)
 
         # Compute loss
-        loss, metrics = trainer.compute_loss(
+        loss, metrics, _ = trainer.compute_loss(
             trainer.state.params,
             batch,
             training=False

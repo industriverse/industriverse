@@ -113,8 +113,9 @@ class Trainer:
         self,
         params: Any,
         batch: Dict[str, jnp.ndarray],
-        training: bool = True
-    ) -> Tuple[jnp.ndarray, Dict[str, jnp.ndarray]]:
+        training: bool = True,
+        batch_stats=None
+    ) -> Tuple[jnp.ndarray, Dict[str, jnp.ndarray], Any]:
         """
         Compute thermodynamic loss function.
 
@@ -124,19 +125,63 @@ class Trainer:
             params: Model parameters
             batch: Dictionary with 'energy_t', 'grad_x', 'grad_y', 'energy_target'
             training: Whether in training mode
+            batch_stats: Batch statistics for BatchNorm (if None, will use self.state.batch_stats)
 
         Returns:
             loss: Total loss (scalar)
             metrics: Dictionary of individual loss components
+            new_batch_stats: Updated batch statistics (None if not using BatchNorm)
         """
-        # Forward pass
-        mean_pred, log_var_pred = self.state.apply_fn(
-            params,
-            batch['energy_t'],
-            batch['grad_x'],
-            batch['grad_y'],
-            training=training
-        )
+        # Get batch_stats from state if not provided
+        if batch_stats is None:
+            batch_stats = getattr(self.state, 'batch_stats', None)
+
+        # Forward pass with batch_stats handling for BatchNorm
+        if batch_stats is not None:
+            if training:
+                # During training, batch_stats are mutable and dropout needs RNG
+                self.rng, dropout_rng = random.split(self.rng)
+                (mean_pred, log_var_pred), updated_vars = self.state.apply_fn(
+                    {'params': params, 'batch_stats': batch_stats},
+                    batch['energy_t'],
+                    batch['grad_x'],
+                    batch['grad_y'],
+                    training=True,
+                    mutable=['batch_stats'],
+                    rngs={'dropout': dropout_rng}
+                )
+                new_batch_stats = updated_vars['batch_stats']
+            else:
+                # During validation, use frozen batch_stats
+                mean_pred, log_var_pred = self.state.apply_fn(
+                    {'params': params, 'batch_stats': batch_stats},
+                    batch['energy_t'],
+                    batch['grad_x'],
+                    batch['grad_y'],
+                    training=False
+                )
+                new_batch_stats = None
+        else:
+            # No BatchNorm
+            if training:
+                self.rng, dropout_rng = random.split(self.rng)
+                mean_pred, log_var_pred = self.state.apply_fn(
+                    {'params': params},
+                    batch['energy_t'],
+                    batch['grad_x'],
+                    batch['grad_y'],
+                    training=True,
+                    rngs={'dropout': dropout_rng}
+                )
+            else:
+                mean_pred, log_var_pred = self.state.apply_fn(
+                    {'params': params},
+                    batch['energy_t'],
+                    batch['grad_x'],
+                    batch['grad_y'],
+                    training=False
+                )
+            new_batch_stats = None
 
         # MSE loss (reconstruction)
         mse_loss = jnp.mean((mean_pred - batch['energy_target']) ** 2)
@@ -191,7 +236,7 @@ class Trainer:
             'entropy_coherence': entropy_coherence
         }
 
-        return total_loss, metrics
+        return total_loss, metrics, new_batch_stats
 
     def train_step(
         self,
@@ -208,14 +253,26 @@ class Trainer:
         Returns:
             Updated state and metrics
         """
+        # Get batch_stats if available
+        batch_stats = getattr(state, 'batch_stats', None)
+
         def loss_fn(params):
-            return self.compute_loss(params, batch, training=True)
+            loss, metrics, new_batch_stats = self.compute_loss(
+                params, batch, training=True, batch_stats=batch_stats
+            )
+            return loss, (metrics, new_batch_stats)
 
         # Compute gradients
-        (loss, metrics), grads = jax.value_and_grad(loss_fn, has_aux=True)(state.params)
+        (loss, (metrics, new_batch_stats)), grads = jax.value_and_grad(
+            loss_fn, has_aux=True
+        )(state.params)
 
         # Update parameters
         state = state.apply_gradients(grads=grads)
+
+        # Update batch_stats if present
+        if new_batch_stats is not None:
+            state = state.replace(batch_stats=new_batch_stats)
 
         return state, metrics
 
@@ -234,7 +291,10 @@ class Trainer:
         Returns:
             Metrics dictionary
         """
-        _, metrics = self.compute_loss(state.params, batch, training=False)
+        batch_stats = getattr(state, 'batch_stats', None)
+        _, metrics, _ = self.compute_loss(
+            state.params, batch, training=False, batch_stats=batch_stats
+        )
         return metrics
 
     def prepare_batch(
@@ -327,12 +387,14 @@ class Trainer:
 
             # Training
             epoch_metrics = []
-            num_batches = N // self.config.batch_size
+            # Use smaller batch size if dataset is small
+            effective_batch_size = min(self.config.batch_size, N)
+            num_batches = max(1, N // effective_batch_size)
 
             for batch_idx in range(num_batches):
                 # Get batch indices
-                batch_start = batch_idx * self.config.batch_size
-                batch_end = batch_start + self.config.batch_size
+                batch_start = batch_idx * effective_batch_size
+                batch_end = min(batch_start + effective_batch_size, N)
                 batch_indices = perm[batch_start:batch_end]
 
                 # Prepare batch
@@ -373,11 +435,13 @@ class Trainer:
             # Validation
             if val_data is not None:
                 val_metrics_list = []
-                num_val_batches = N_val // self.config.batch_size
+                # Use smaller batch size if validation dataset is small
+                effective_val_batch_size = min(self.config.batch_size, N_val)
+                num_val_batches = max(1, N_val // effective_val_batch_size)
 
                 for batch_idx in range(num_val_batches):
-                    batch_start = batch_idx * self.config.batch_size
-                    batch_end = batch_start + self.config.batch_size
+                    batch_start = batch_idx * effective_val_batch_size
+                    batch_end = min(batch_start + effective_val_batch_size, N_val)
                     val_indices = np.arange(batch_start, batch_end)
 
                     batch = self.prepare_batch(val_energy, val_gradients, val_indices)
@@ -433,12 +497,15 @@ class Trainer:
         else:
             checkpoint_name = f"epoch_{epoch+1:04d}"
 
+        # For final checkpoint, keep more; otherwise keep last N
+        keep_count = 100 if final else self.config.keep_last_n
+
         checkpoints.save_checkpoint(
             ckpt_dir=str(checkpoint_dir),
             target=self.state,
             step=epoch,
             prefix=checkpoint_name,
-            keep=self.config.keep_last_n if not final else None
+            keep=keep_count
         )
 
         print(f"  Saved checkpoint: {checkpoint_name}")
