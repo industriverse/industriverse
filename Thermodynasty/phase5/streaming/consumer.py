@@ -36,6 +36,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from phase5.adapters.thermal_tap import ThermalTap
 from phase5.consensus.shadow_ensemble import ShadowEnsemble
 from phase5.validation.metrics import compute_energy_fidelity, compute_entropy_coherence
+from phase5.core.energy_intelligence_layer import EnergyIntelligenceLayer, EILDecision
 
 # ============================================================================
 # Configuration
@@ -47,6 +48,7 @@ class ConsumerConfig:
     INPUT_TOPIC = os.getenv("KAFKA_INPUT_TOPIC", "thermodynasty.energy_maps")
     OUTPUT_TOPIC = os.getenv("KAFKA_OUTPUT_TOPIC", "thermodynasty.predictions")
     AUDIT_TOPIC = os.getenv("KAFKA_AUDIT_TOPIC", "thermodynasty.audit")
+    REGIME_TOPIC = os.getenv("KAFKA_REGIME_TOPIC", "thermodynasty.regimes")
     DLQ_TOPIC = os.getenv("KAFKA_DLQ_TOPIC", "thermodynasty.dlq")
 
     CONSUMER_GROUP = os.getenv("KAFKA_CONSUMER_GROUP", "thermodynasty-ace-consumer")
@@ -103,6 +105,30 @@ class PredictionMessage:
     entropy_coherence: float
     consensus_achieved: bool
     proof_id: Optional[str]
+    timestamp: float
+    metadata: Dict[str, Any]
+
+@dataclass
+class RegimeMessage:
+    """Regime detection message for Kafka output"""
+    domain: str
+    cluster: str
+    node: str
+    regime: str
+    confidence: float
+    approved: bool
+    validity_score: float
+    forecast_mean: float
+    forecast_std: float
+    energy_state: float
+    entropy_rate: float
+    temperature: float
+    recommended_action: str
+    risk_level: str
+    proof_required: bool
+    statistical_regime: str
+    physics_regime: str
+    consensus: bool
     timestamp: float
     metadata: Dict[str, Any]
 
@@ -171,14 +197,32 @@ class ThermodynastyConsumer:
             else:
                 self.logger.warning(f"No checkpoints found in {checkpoint_dir}")
 
+        # Initialize Energy Intelligence Layer
+        self.eil = EnergyIntelligenceLayer(
+            regime_detector_checkpoint=None,
+            microadapt_config={
+                'hierarchy_levels': 3,
+                'window_sizes': [60, 600, 3600],
+                'max_units': 100,
+                'initial_units': 10,
+                'top_k': 5
+            }
+        )
+        self.logger.info("Energy Intelligence Layer initialized")
+
         # Metrics
         self.metrics = {
             'messages_processed': 0,
             'patches_applied': 0,
             'inferences_run': 0,
             'predictions_published': 0,
+            'regimes_detected': 0,
+            'regime_transitions': 0,
             'errors': 0
         }
+
+        # Regime tracking
+        self.last_regime = None
 
         # Batch accumulation
         self.batch_buffer = []
@@ -278,64 +322,141 @@ class ThermodynastyConsumer:
         self.logger.debug(f"Patch applied: domain={msg.domain}, bbox={bbox}, delta_norm={snapshot.delta_norm:.4f}")
 
     def _process_batch(self):
-        """Process accumulated batch with ACE inference"""
+        """Process accumulated batch with ACE inference + regime detection"""
         if not self.batch_buffer:
             return
 
         self.logger.info(f"Processing batch of {len(self.batch_buffer)} patches")
 
         try:
-            if config.ENABLE_INFERENCE and self.ensemble:
-                # Get current energy map from Thermal Tap
-                energy_map = self.thermal_tap.get_map(level=256)
+            # Get current energy map from Thermal Tap
+            energy_map = self.thermal_tap.get_map(level=256)
 
-                # Determine domain (from first message in batch)
-                domain = self.batch_buffer[0]['message'].domain
+            # Determine domain and metadata (from first message in batch)
+            first_msg = self.batch_buffer[0]['message']
+            domain = first_msg.domain
+            cluster = first_msg.metadata.get('cluster', 'default')
+            node = first_msg.metadata.get('node', 'default')
 
-                # Run ACE inference
-                start_time = time.time()
-                result = self.ensemble.predict(
-                    energy_map=energy_map,
-                    domain=domain,
-                    num_steps=10,
-                    mode='ensemble',
-                    return_confidence=True
-                )
-                inference_time = time.time() - start_time
+            # ================================================================
+            # 1. REGIME DETECTION (EIL)
+            # ================================================================
+            regime_start = time.time()
+            regime_decision = self.eil.process(
+                energy_map=energy_map,
+                domain=domain,
+                cluster=cluster,
+                node=node
+            )
+            regime_time = time.time() - regime_start
 
-                self.metrics['inferences_run'] += 1
+            self.metrics['regimes_detected'] += 1
 
-                # Create prediction message
-                pred_msg = PredictionMessage(
-                    domain=domain,
-                    predictions=result['predictions'].tolist(),
-                    confidence_map=result.get('confidence_map', [[0.99]]).tolist(),
-                    energy_fidelity=result['energy_fidelity'],
-                    entropy_coherence=result['entropy_coherence'],
-                    consensus_achieved=result.get('consensus_achieved', True),
-                    proof_id=None,  # Generated if proof economy enabled
-                    timestamp=time.time(),
-                    metadata={
-                        'batch_size': len(self.batch_buffer),
-                        'inference_time_ms': inference_time * 1000,
-                        'passing_models': result.get('passing_models', 1),
-                        'total_models': result.get('total_models', 1)
-                    }
-                )
-
-                # Publish prediction
-                self._publish_prediction(pred_msg)
-
-                # Publish proof if enabled
-                if config.ENABLE_PROOF_ECONOMY:
-                    self._publish_proof(pred_msg, result)
-
+            # Check for regime transition
+            if self.last_regime and regime_decision.regime != self.last_regime:
+                self.metrics['regime_transitions'] += 1
                 self.logger.info(
-                    f"Inference complete: "
-                    f"fidelity={result['energy_fidelity']:.4f}, "
-                    f"entropy={result['entropy_coherence']:.4f}, "
-                    f"time={inference_time*1000:.1f}ms"
+                    f"⚡ REGIME TRANSITION: {self.last_regime} → {regime_decision.regime}"
                 )
+
+            self.last_regime = regime_decision.regime
+
+            # Create regime message
+            regime_msg = RegimeMessage(
+                domain=domain,
+                cluster=cluster,
+                node=node,
+                regime=regime_decision.regime,
+                confidence=regime_decision.confidence,
+                approved=regime_decision.approved,
+                validity_score=regime_decision.validity_score,
+                forecast_mean=regime_decision.forecast_mean,
+                forecast_std=regime_decision.forecast_std,
+                energy_state=regime_decision.energy_state,
+                entropy_rate=regime_decision.entropy_rate,
+                temperature=regime_decision.temperature,
+                recommended_action=regime_decision.recommended_action,
+                risk_level=regime_decision.risk_level,
+                proof_required=regime_decision.proof_required,
+                statistical_regime=regime_decision.context.statistical_regime_id or "unknown",
+                physics_regime=regime_decision.context.physics_regime_label or "unknown",
+                consensus=regime_decision.context.consensus,
+                timestamp=regime_decision.timestamp,
+                metadata={
+                    'batch_size': len(self.batch_buffer),
+                    'regime_time_ms': regime_time * 1000,
+                    'statistical_confidence': regime_decision.context.statistical_confidence,
+                    'physics_confidence': regime_decision.context.physics_confidence
+                }
+            )
+
+            # Publish regime
+            self._publish_regime(regime_msg)
+
+            self.logger.info(
+                f"Regime detected: {regime_decision.regime} "
+                f"(confidence={regime_decision.confidence:.3f}, "
+                f"action={regime_decision.recommended_action}, "
+                f"risk={regime_decision.risk_level})"
+            )
+
+            # ================================================================
+            # 2. ACE INFERENCE (if enabled and approved by regime)
+            # ================================================================
+            if config.ENABLE_INFERENCE and self.ensemble:
+                # Check regime approval before running expensive inference
+                if not regime_decision.approved:
+                    self.logger.warning(
+                        f"Skipping inference: regime {regime_decision.regime} not approved "
+                        f"(validity={regime_decision.validity_score:.3f})"
+                    )
+                else:
+                    # Run ACE inference
+                    start_time = time.time()
+                    result = self.ensemble.predict(
+                        energy_map=energy_map,
+                        domain=domain,
+                        num_steps=10,
+                        mode='ensemble',
+                        return_confidence=True
+                    )
+                    inference_time = time.time() - start_time
+
+                    self.metrics['inferences_run'] += 1
+
+                    # Create prediction message
+                    pred_msg = PredictionMessage(
+                        domain=domain,
+                        predictions=result['predictions'].tolist(),
+                        confidence_map=result.get('confidence_map', [[0.99]]).tolist(),
+                        energy_fidelity=result['energy_fidelity'],
+                        entropy_coherence=result['entropy_coherence'],
+                        consensus_achieved=result.get('consensus_achieved', True),
+                        proof_id=None,  # Generated if proof economy enabled
+                        timestamp=time.time(),
+                        metadata={
+                            'batch_size': len(self.batch_buffer),
+                            'inference_time_ms': inference_time * 1000,
+                            'passing_models': result.get('passing_models', 1),
+                            'total_models': result.get('total_models', 1),
+                            'regime': regime_decision.regime,
+                            'regime_approved': regime_decision.approved
+                        }
+                    )
+
+                    # Publish prediction
+                    self._publish_prediction(pred_msg)
+
+                    # Publish proof if enabled
+                    if config.ENABLE_PROOF_ECONOMY:
+                        self._publish_proof(pred_msg, result)
+
+                    self.logger.info(
+                        f"Inference complete: "
+                        f"fidelity={result['energy_fidelity']:.4f}, "
+                        f"entropy={result['entropy_coherence']:.4f}, "
+                        f"time={inference_time*1000:.1f}ms"
+                    )
 
             # Clear batch buffer
             self.batch_buffer = []
@@ -343,8 +464,22 @@ class ThermodynastyConsumer:
 
         except Exception as e:
             self.logger.error(f"Batch processing error: {e}")
+            import traceback
+            traceback.print_exc()
             self.metrics['errors'] += 1
             # Don't clear buffer on error - will retry next iteration
+
+    def _publish_regime(self, regime_msg: RegimeMessage):
+        """Publish regime detection to regime topic"""
+        try:
+            future = self.producer.send(
+                config.REGIME_TOPIC,
+                value=asdict(regime_msg)
+            )
+            future.get(timeout=10)  # Block until sent
+            self.logger.debug(f"Regime published: {regime_msg.regime}")
+        except KafkaError as e:
+            self.logger.error(f"Failed to publish regime: {e}")
 
     def _publish_prediction(self, pred_msg: PredictionMessage):
         """Publish prediction to output topic"""
