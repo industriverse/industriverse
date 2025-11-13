@@ -33,6 +33,7 @@ from phase5.consensus.shadow_ensemble import ShadowEnsemble
 from phase5.adapters.thermal_tap import ThermalTap
 from phase5.validation.metrics import compute_energy_fidelity, compute_entropy_coherence
 from phase5.data.loaders import load_checkpoint
+from phase5.core.energy_intelligence_layer import EnergyIntelligenceLayer, EILDecision
 from phase4.ace import ACEAgent, ACEConfig
 
 # ============================================================================
@@ -134,6 +135,53 @@ class ValidationRequest(BaseModel):
     domain: str = Field(..., description="Physical domain")
     num_sequences: int = Field(5, ge=1, le=100, description="Number of sequences to validate")
 
+class RegimeRequest(BaseModel):
+    """Regime detection request"""
+    domain: str = Field(..., description="Physical domain (plasma_physics, fluid_dynamics, etc.)")
+    energy_map: List[List[float]] = Field(..., description="2D energy map (normalized float32)")
+    cluster: str = Field("default", description="Cluster identifier")
+    node: str = Field("default", description="Node identifier")
+
+    @validator('energy_map')
+    def validate_energy_map(cls, v):
+        if not v or not v[0]:
+            raise ValueError("energy_map cannot be empty")
+        height = len(v)
+        width = len(v[0])
+        if not all(len(row) == width for row in v):
+            raise ValueError("energy_map must be rectangular")
+        return v
+
+class RegimeResponse(BaseModel):
+    """Regime detection response"""
+    regime: str = Field(..., description="Unified regime label")
+    confidence: float = Field(..., description="Overall confidence [0-1]")
+    approved: bool = Field(..., description="Whether regime is approved for processing")
+    validity_score: float = Field(..., description="Validity score [0-1]")
+
+    # Forecasting
+    forecast_mean: float = Field(..., description="Mean forecasted energy (60 steps)")
+    forecast_std: float = Field(..., description="Forecast uncertainty")
+
+    # Thermodynamics
+    energy_state: float = Field(..., description="Current energy state")
+    entropy_rate: float = Field(..., description="Entropy rate dS/dt")
+    temperature: float = Field(..., description="Effective thermodynamic temperature")
+
+    # Policy
+    recommended_action: str = Field(..., description="proceed|monitor|investigate|alert|defer")
+    risk_level: str = Field(..., description="low|medium|high")
+    proof_required: bool = Field(..., description="Whether proof validation is required")
+
+    # Statistics
+    statistical_regime: str = Field(..., description="MicroAdapt regime ID")
+    physics_regime: str = Field(..., description="RegimeDetector label")
+    consensus: bool = Field(..., description="Whether branches agree")
+
+    # Metadata
+    processing_time_ms: float = Field(..., description="Processing time in milliseconds")
+    timestamp: float = Field(..., description="Unix timestamp")
+
 # ============================================================================
 # FastAPI Application
 # ============================================================================
@@ -153,6 +201,7 @@ class ServerState:
         self.start_time = time.time()
         self.ensemble: Optional[ShadowEnsemble] = None
         self.thermal_tap: Optional[ThermalTap] = None
+        self.eil: Optional[EnergyIntelligenceLayer] = None
         self.models_loaded = False
         self.inference_count = 0
         self.error_count = 0
@@ -200,6 +249,19 @@ async def startup_event():
             neo4j_password=config.NEO4J_PASSWORD
         )
         print(f"✓ Thermal Tap initialized: {config.PYRAMID_DIR}")
+
+        # Initialize Energy Intelligence Layer
+        state.eil = EnergyIntelligenceLayer(
+            regime_detector_checkpoint=None,  # Will use untrained model
+            microadapt_config={
+                'hierarchy_levels': 3,
+                'window_sizes': [60, 600, 3600],
+                'max_units': 100,
+                'initial_units': 10,
+                'top_k': 5
+            }
+        )
+        print(f"✓ Energy Intelligence Layer initialized")
 
         print("\nConfiguration:")
         print(f"  Beta Temperature: {config.BETA_TEMPERATURE}")
@@ -366,6 +428,63 @@ async def predict(
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Inference failed: {str(e)}")
+
+@app.post("/v1/regime", response_model=RegimeResponse)
+async def detect_regime(
+    request: RegimeRequest,
+    user: Dict = Depends(verify_token)
+):
+    """
+    Detect energy regime using parallel ensemble (MicroAdapt + RegimeDetector)
+
+    This endpoint fuses statistical time-series forecasting with physics-informed
+    regime detection to provide comprehensive energy intelligence.
+
+    Returns unified regime label, forecasting, thermodynamic metrics, and policy recommendations.
+    """
+    if not state.eil:
+        raise HTTPException(status_code=503, detail="Energy Intelligence Layer not initialized")
+
+    try:
+        # Convert energy map to numpy array
+        energy_map = np.array(request.energy_map, dtype=np.float32)
+
+        # Process through EIL
+        decision = state.eil.process(
+            energy_map=energy_map,
+            domain=request.domain,
+            cluster=request.cluster,
+            node=request.node
+        )
+
+        # Build response
+        response = RegimeResponse(
+            regime=decision.regime,
+            confidence=decision.confidence,
+            approved=decision.approved,
+            validity_score=decision.validity_score,
+            forecast_mean=decision.forecast_mean,
+            forecast_std=decision.forecast_std,
+            energy_state=decision.energy_state,
+            entropy_rate=decision.entropy_rate,
+            temperature=decision.temperature,
+            recommended_action=decision.recommended_action,
+            risk_level=decision.risk_level,
+            proof_required=decision.proof_required,
+            statistical_regime=decision.context.statistical_regime_id or "unknown",
+            physics_regime=decision.context.physics_regime_label or "unknown",
+            consensus=decision.context.consensus,
+            processing_time_ms=decision.processing_time_ms,
+            timestamp=decision.timestamp
+        )
+
+        return response
+
+    except Exception as e:
+        print(f"❌ Regime detection error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Regime detection failed: {str(e)}")
 
 @app.post("/v1/validate_hdf5")
 async def validate_hdf5(
