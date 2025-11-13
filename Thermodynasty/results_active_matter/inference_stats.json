@@ -1,0 +1,13 @@
+{
+  "total_predictions": 45,
+  "total_time": 39.2674241065979,
+  "mean_confidence": 0.9999247458246019,
+  "std_confidence": 0.0001365186050163868,
+  "mean_fidelity": 0.9999999591983161,
+  "std_fidelity": 2.408602018332732e-08,
+  "mean_entropy": 0.9724199533462524,
+  "std_entropy": 0.0025300554464025024,
+  "aspiration_rate": 1.0,
+  "mean_execution_time": 0.8715129640367296,
+  "throughput": 1.1459880810577254
+}

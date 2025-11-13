@@ -28,6 +28,8 @@ data/telemetry/**/*
 # Except catalog and summary files
 !data/catalogs/catalog.json
 !data/energy_maps/generation_summary.json
+!results_*/inference_stats.json
+!cross_domain_analysis.json
 
 # Testing
 .pytest_cache/
@@ -43,6 +45,10 @@ phase4/checkpoints/
 phase5/checkpoints/
 *.ckpt
 *.pth
+
+# Results - keep stats but ignore large prediction files
+results_*/*.npz
+results_*/predictions_*.npz
 
 # Neo4j
 .neo4j/
