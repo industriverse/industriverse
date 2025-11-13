@@ -119,9 +119,66 @@ config:
     inputTopic: "thermodynasty.energy_maps"
     outputTopic: "thermodynasty.predictions"
     auditTopic: "thermodynasty.audit"
+    regimeTopic: "thermodynasty.regimes"
+    proofTopic: "thermodynasty.proofs"
     consumerGroup: "thermodynasty-ace-consumer"
     batchSize: "10"
     batchTimeoutMs: "5000"
+
+  # Energy Intelligence Layer (EIL) - Phase 5
+  eil:
+    enabled: "true"
+    # RegimeDetector configuration
+    regimeDetector:
+      checkpointPath: "/models/regime_detector.pkl"
+      entropyRateMin: "0.001"
+      entropyRateMax: "0.1"
+      temperatureStableMax: "1.5"
+      temperatureChaoticMin: "3.0"
+    # MicroAdapt configuration
+    microadapt:
+      maxModelUnits: "100"
+      initialModelUnits: "10"
+      topK: "5"
+      hierarchyLevels: "3"
+      windowSizes: "60,600,3600"  # 1min, 10min, 1hr
+      fitnessThreshold: "0.5"
+      replacementRate: "0.1"
+    # Decision fusion
+    fusion:
+      statisticalWeight: "0.40"
+      physicsWeight: "0.60"
+      consensusThreshold: "0.85"
+    # Regime-gated inference
+    regimeGating:
+      enabled: "true"
+      skipOnUnapproved: "true"
+      minConfidence: "0.75"
+
+  # Proof Validator - Tri-check validation
+  proofValidator:
+    enabled: "true"
+    energyTolerance: "0.01"        # 1% energy error
+    entropyThreshold: "0.90"       # 90% entropy coherence
+    spectralThreshold: "0.85"      # 85% spectral similarity
+
+  # Market Engine - CEU/PFT pricing
+  marketEngine:
+    enabled: "true"
+    initialCeuReserve: "1000000.0"
+    initialPftReserve: "100000.0"
+    ceuPriceUsd: "0.001"
+    pftPriceUsd: "1.0"
+    baseCeuPerEnergy: "10.0"
+    basePftReward: "1.0"
+
+  # Feedback Trainer - Online learning
+  feedbackTrainer:
+    enabled: "true"
+    learningRate: "0.01"
+    adaptationThreshold: "0.7"
+    calibrationWindow: "100"
+    enableOnlineLearning: "true"
 
   # Neo4j (optional)
   neo4j:

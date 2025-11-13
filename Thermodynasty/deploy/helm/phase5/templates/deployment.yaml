@@ -68,8 +68,89 @@ spec:
           value: {{ .Values.config.kafka.outputTopic | quote }}
         - name: KAFKA_AUDIT_TOPIC
           value: {{ .Values.config.kafka.auditTopic | quote }}
+        - name: KAFKA_REGIME_TOPIC
+          value: {{ .Values.config.kafka.regimeTopic | quote }}
+        - name: KAFKA_PROOF_TOPIC
+          value: {{ .Values.config.kafka.proofTopic | quote }}
         - name: KAFKA_CONSUMER_GROUP
           value: {{ .Values.config.kafka.consumerGroup | quote }}
+        # Energy Intelligence Layer (EIL)
+        - name: EIL_ENABLED
+          value: {{ .Values.config.eil.enabled | quote }}
+        - name: REGIME_DETECTOR_CHECKPOINT
+          value: {{ .Values.config.eil.regimeDetector.checkpointPath | quote }}
+        - name: REGIME_ENTROPY_RATE_MIN
+          value: {{ .Values.config.eil.regimeDetector.entropyRateMin | quote }}
+        - name: REGIME_ENTROPY_RATE_MAX
+          value: {{ .Values.config.eil.regimeDetector.entropyRateMax | quote }}
+        - name: REGIME_TEMP_STABLE_MAX
+          value: {{ .Values.config.eil.regimeDetector.temperatureStableMax | quote }}
+        - name: REGIME_TEMP_CHAOTIC_MIN
+          value: {{ .Values.config.eil.regimeDetector.temperatureChaoticMin | quote }}
+        # MicroAdapt configuration
+        - name: MICROADAPT_MAX_UNITS
+          value: {{ .Values.config.eil.microadapt.maxModelUnits | quote }}
+        - name: MICROADAPT_INITIAL_UNITS
+          value: {{ .Values.config.eil.microadapt.initialModelUnits | quote }}
+        - name: MICROADAPT_TOP_K
+          value: {{ .Values.config.eil.microadapt.topK | quote }}
+        - name: MICROADAPT_HIERARCHY_LEVELS
+          value: {{ .Values.config.eil.microadapt.hierarchyLevels | quote }}
+        - name: MICROADAPT_WINDOW_SIZES
+          value: {{ .Values.config.eil.microadapt.windowSizes | quote }}
+        - name: MICROADAPT_FITNESS_THRESHOLD
+          value: {{ .Values.config.eil.microadapt.fitnessThreshold | quote }}
+        - name: MICROADAPT_REPLACEMENT_RATE
+          value: {{ .Values.config.eil.microadapt.replacementRate | quote }}
+        # Decision fusion
+        - name: EIL_FUSION_STATISTICAL_WEIGHT
+          value: {{ .Values.config.eil.fusion.statisticalWeight | quote }}
+        - name: EIL_FUSION_PHYSICS_WEIGHT
+          value: {{ .Values.config.eil.fusion.physicsWeight | quote }}
+        - name: EIL_FUSION_CONSENSUS_THRESHOLD
+          value: {{ .Values.config.eil.fusion.consensusThreshold | quote }}
+        # Regime-gated inference
+        - name: REGIME_GATING_ENABLED
+          value: {{ .Values.config.eil.regimeGating.enabled | quote }}
+        - name: REGIME_SKIP_UNAPPROVED
+          value: {{ .Values.config.eil.regimeGating.skipOnUnapproved | quote }}
+        - name: REGIME_MIN_CONFIDENCE
+          value: {{ .Values.config.eil.regimeGating.minConfidence | quote }}
+        # Proof Validator
+        - name: PROOF_VALIDATOR_ENABLED
+          value: {{ .Values.config.proofValidator.enabled | quote }}
+        - name: PROOF_ENERGY_TOLERANCE
+          value: {{ .Values.config.proofValidator.energyTolerance | quote }}
+        - name: PROOF_ENTROPY_THRESHOLD
+          value: {{ .Values.config.proofValidator.entropyThreshold | quote }}
+        - name: PROOF_SPECTRAL_THRESHOLD
+          value: {{ .Values.config.proofValidator.spectralThreshold | quote }}
+        # Market Engine
+        - name: MARKET_ENGINE_ENABLED
+          value: {{ .Values.config.marketEngine.enabled | quote }}
+        - name: MARKET_INITIAL_CEU_RESERVE
+          value: {{ .Values.config.marketEngine.initialCeuReserve | quote }}
+        - name: MARKET_INITIAL_PFT_RESERVE
+          value: {{ .Values.config.marketEngine.initialPftReserve | quote }}
+        - name: MARKET_CEU_PRICE_USD
+          value: {{ .Values.config.marketEngine.ceuPriceUsd | quote }}
+        - name: MARKET_PFT_PRICE_USD
+          value: {{ .Values.config.marketEngine.pftPriceUsd | quote }}
+        - name: MARKET_BASE_CEU_PER_ENERGY
+          value: {{ .Values.config.marketEngine.baseCeuPerEnergy | quote }}
+        - name: MARKET_BASE_PFT_REWARD
+          value: {{ .Values.config.marketEngine.basePftReward | quote }}
+        # Feedback Trainer
+        - name: FEEDBACK_TRAINER_ENABLED
+          value: {{ .Values.config.feedbackTrainer.enabled | quote }}
+        - name: FEEDBACK_LEARNING_RATE
+          value: {{ .Values.config.feedbackTrainer.learningRate | quote }}
+        - name: FEEDBACK_ADAPTATION_THRESHOLD
+          value: {{ .Values.config.feedbackTrainer.adaptationThreshold | quote }}
+        - name: FEEDBACK_CALIBRATION_WINDOW
+          value: {{ .Values.config.feedbackTrainer.calibrationWindow | quote }}
+        - name: FEEDBACK_ONLINE_LEARNING
+          value: {{ .Values.config.feedbackTrainer.enableOnlineLearning | quote }}
         # Neo4j (optional)
         {{- if .Values.config.neo4j.enabled }}
         - name: NEO4J_URI
@@ -96,6 +177,9 @@ spec:
           mountPath: /data/pyramids
         - name: tmp
           mountPath: /tmp
+        - name: eil-config
+          mountPath: /etc/eil
+          readOnly: true
       volumes:
       - name: models
         {{- if .Values.persistence.models.enabled }}
@@ -113,6 +197,9 @@ spec:
         {{- end }}
       - name: tmp
         emptyDir: {}
+      - name: eil-config
+        configMap:
+          name: {{ include "thermodynasty-ace.fullname" . }}-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
