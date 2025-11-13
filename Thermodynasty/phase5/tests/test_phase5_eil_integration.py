@@ -42,9 +42,7 @@ class TestPhase5EILIntegration:
                 'top_k': 3,
                 'hierarchy_levels': 3,
                 'window_sizes': [60, 600, 3600]
-            },
-            fusion_weights={'statistical': 0.40, 'physics': 0.60},
-            enable_regime_gating=True
+            }
         )
         return eil
 
@@ -61,8 +59,8 @@ class TestPhase5EILIntegration:
     def market_engine(self):
         """Initialize Market Engine"""
         return MarketEngine(
-            initial_ceu_reserve=1000000.0,
-            initial_pft_reserve=100000.0
+            initial_ceu_supply=1000000.0,
+            initial_pft_supply=100000.0
         )
 
     @pytest.fixture
