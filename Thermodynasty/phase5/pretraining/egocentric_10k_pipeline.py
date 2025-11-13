@@ -19,12 +19,26 @@ Usage for EIL pretraining:
 
 import numpy as np
 from typing import Iterator, Dict, Any, List, Optional, Tuple
-from datasets import load_dataset, IterableDataset
-import cv2
 from pathlib import Path
 import json
 from dataclasses import dataclass
 import warnings
+
+# Import datasets with fallback
+try:
+    from datasets import load_dataset, IterableDataset
+    DATASETS_AVAILABLE = True
+except ImportError:
+    DATASETS_AVAILABLE = False
+    warnings.warn("HuggingFace datasets not installed. Will use simulated data.")
+
+# Import cv2 with fallback
+try:
+    import cv2
+    CV2_AVAILABLE = True
+except ImportError:
+    CV2_AVAILABLE = False
+    warnings.warn("OpenCV (cv2) not installed. Some features will be limited.")
 
 
 @dataclass
@@ -69,6 +83,11 @@ class EgocentricDataLoader:
         Note: First call may take a few minutes to establish connection
         """
         if self._is_initialized:
+            return
+
+        if not DATASETS_AVAILABLE:
+            print(f"⚠️  HuggingFace datasets not available, using simulated data")
+            self._use_simulated_data()
             return
 
         try:
@@ -208,6 +227,11 @@ class EgocentricDataLoader:
         Returns:
             frames: [num_frames, height, width, 3]
         """
+        if not CV2_AVAILABLE:
+            # Fallback: Return dummy frames
+            warnings.warn("OpenCV not available, returning simulated frames")
+            return np.random.randint(0, 255, (30, 224, 224, 3), dtype=np.uint8)
+
         # Write to temporary file
         temp_path = "/tmp/temp_video.mp4"
         with open(temp_path, 'wb') as f:
@@ -293,26 +317,34 @@ class FactoryPhysicsExtractor:
         # Compute optical flow between consecutive frames
         flow_magnitudes = []
 
-        for i in range(len(frames) - 1):
-            gray1 = cv2.cvtColor(frames[i], cv2.COLOR_RGB2GRAY)
-            gray2 = cv2.cvtColor(frames[i + 1], cv2.COLOR_RGB2GRAY)
+        if CV2_AVAILABLE:
+            for i in range(len(frames) - 1):
+                gray1 = cv2.cvtColor(frames[i], cv2.COLOR_RGB2GRAY)
+                gray2 = cv2.cvtColor(frames[i + 1], cv2.COLOR_RGB2GRAY)
 
-            # Farneback optical flow
-            flow = cv2.calcOpticalFlowFarneback(
-                gray1, gray2,
-                None,
-                pyr_scale=0.5,
-                levels=3,
-                winsize=15,
-                iterations=3,
-                poly_n=5,
-                poly_sigma=1.2,
-                flags=0
-            )
+                # Farneback optical flow
+                flow = cv2.calcOpticalFlowFarneback(
+                    gray1, gray2,
+                    None,
+                    pyr_scale=0.5,
+                    levels=3,
+                    winsize=15,
+                    iterations=3,
+                    poly_n=5,
+                    poly_sigma=1.2,
+                    flags=0
+                )
 
-            # Flow magnitude
-            magnitude = np.sqrt(flow[..., 0]**2 + flow[..., 1]**2)
-            flow_magnitudes.append(np.mean(magnitude))
+                # Flow magnitude
+                magnitude = np.sqrt(flow[..., 0]**2 + flow[..., 1]**2)
+                flow_magnitudes.append(np.mean(magnitude))
+        else:
+            # Fallback: Simple frame differencing
+            for i in range(len(frames) - 1):
+                gray1 = np.mean(frames[i], axis=2)
+                gray2 = np.mean(frames[i + 1], axis=2)
+                diff = np.abs(gray2 - gray1)
+                flow_magnitudes.append(np.mean(diff))
 
         # High variance in flow = contact-rich
         flow_std = float(np.std(flow_magnitudes))
@@ -359,13 +391,23 @@ class FactoryPhysicsExtractor:
         height, width = frames[0].shape[:2]
         motion_accumulator = np.zeros((height, width))
 
-        for i in range(len(frames) - 1):
-            gray1 = cv2.cvtColor(frames[i], cv2.COLOR_RGB2GRAY)
-            gray2 = cv2.cvtColor(frames[i + 1], cv2.COLOR_RGB2GRAY)
+        if CV2_AVAILABLE:
+            for i in range(len(frames) - 1):
+                gray1 = cv2.cvtColor(frames[i], cv2.COLOR_RGB2GRAY)
+                gray2 = cv2.cvtColor(frames[i + 1], cv2.COLOR_RGB2GRAY)
 
-            # Simple frame differencing
-            diff = np.abs(gray2.astype(float) - gray1.astype(float))
-            motion_accumulator += diff
+                # Simple frame differencing
+                diff = np.abs(gray2.astype(float) - gray1.astype(float))
+                motion_accumulator += diff
+        else:
+            # Fallback: Simple grayscale differencing
+            for i in range(len(frames) - 1):
+                gray1 = np.mean(frames[i], axis=2).astype(float)
+                gray2 = np.mean(frames[i + 1], axis=2).astype(float)
+
+                # Simple frame differencing
+                diff = np.abs(gray2 - gray1)
+                motion_accumulator += diff
 
         # Downsample to grid
         cell_height = height // grid_size

@@ -173,7 +173,11 @@ class ArxivCrawler:
                 entry.find('atom:updated', namespace).text.replace('Z', '+00:00')
             )
 
-            # Filter by date
+            # Filter by date (make start_date timezone-aware)
+            from datetime import timezone
+            if start_date.tzinfo is None:
+                start_date = start_date.replace(tzinfo=timezone.utc)
+
             if published < start_date:
                 continue
 

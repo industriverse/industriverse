@@ -22,8 +22,23 @@ Integration with EIL:
 import numpy as np
 from typing import Tuple, Dict, Any, List, Optional
 from dataclasses import dataclass
-import cv2
 import warnings
+
+# Import cv2 with fallback
+try:
+    import cv2
+    CV2_AVAILABLE = True
+except ImportError:
+    CV2_AVAILABLE = False
+    warnings.warn("OpenCV (cv2) not installed. PhysWorld will use simplified implementations.")
+
+# Import open3d with fallback (optional for visualization)
+try:
+    import open3d as o3d
+    OPEN3D_AVAILABLE = True
+except ImportError:
+    OPEN3D_AVAILABLE = False
+    # This is OK - open3d is optional
 
 
 @dataclass
@@ -83,11 +98,17 @@ class DepthEstimator:
         # Placeholder: Gradient-based depth estimation
         # In production, use MiDaS, ZoeDepth, or Depth Anything
 
-        gray = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2GRAY)
+        if CV2_AVAILABLE:
+            gray = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2GRAY)
 
-        # Compute gradients
-        grad_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=5)
-        grad_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=5)
+            # Compute gradients
+            grad_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=5)
+            grad_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=5)
+        else:
+            # Fallback: Simple grayscale conversion and numpy gradients
+            gray = np.mean(rgb_image, axis=2).astype(np.float64)
+            grad_x = np.gradient(gray, axis=1)
+            grad_y = np.gradient(gray, axis=0)
 
         # Gradient magnitude as depth proxy (inverse)
         gradient_mag = np.sqrt(grad_x**2 + grad_y**2)
@@ -518,11 +539,17 @@ class PhysWorldReconstructor:
         energy_2d = np.mean(sdf_3d, axis=1)  # [grid_x, grid_z]
 
         # Resize to target grid size
-        energy_map = cv2.resize(
-            energy_2d.astype(np.float32),
-            (grid_size, grid_size),
-            interpolation=cv2.INTER_LINEAR
-        )
+        if CV2_AVAILABLE:
+            energy_map = cv2.resize(
+                energy_2d.astype(np.float32),
+                (grid_size, grid_size),
+                interpolation=cv2.INTER_LINEAR
+            )
+        else:
+            # Fallback: Simple bilinear interpolation using numpy
+            from scipy.ndimage import zoom
+            zoom_factors = (grid_size / energy_2d.shape[0], grid_size / energy_2d.shape[1])
+            energy_map = zoom(energy_2d.astype(np.float32), zoom_factors, order=1)
 
         # Add kinetic energy contribution
         energy_map = energy_map + kinetic

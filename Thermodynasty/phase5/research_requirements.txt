@@ -16,7 +16,7 @@ torchvision>=0.16.0
 # === PhysWorld & 3D Reconstruction ===
 opencv-python>=4.8.0  # Video processing and optical flow
 trimesh>=4.0.0  # 3D mesh processing
-open3d>=0.18.0  # 3D visualization and point cloud processing
+# open3d>=0.18.0  # Optional: 3D visualization (not available for Python 3.13 yet)
 # pytorch3d>=0.7.5  # Optional: Advanced 3D operations (requires manual install)
 
 # === RealDeepResearch & Paper Crawling ===

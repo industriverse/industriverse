@@ -28,21 +28,48 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from phase5.core.energy_intelligence_layer import EnergyIntelligenceLayer, EILDecision
-from phase5.detection.regime_detector import RegimeDetector
+# Note: RegimeDetector is imported via EnergyIntelligenceLayer
 
-# Import new research components
-from phase5.pretraining.lejêpa_encoder import LeJEPA, LeJEPAConfig, LeJEPATrainer
-from phase5.pretraining.egocentric_10k_pipeline import (
-    EgocentricDataLoader,
-    EgocentricConfig,
-    FactoryPhysicsExtractor
-)
-from phase5.reconstruction.physworld_4d import (
-    PhysWorldReconstructor,
-    ReconstructionConfig,
-    Scene4D
-)
-from phase5.research.realdeepresearch_crawler import ResearchIntegrator
+# Import new research components (with fallbacks)
+try:
+    from phase5.pretraining.lejêpa_encoder import LeJEPA, LeJEPAConfig, LeJEPATrainer
+    LEJÊPA_AVAILABLE = True
+except Exception as e:
+    warnings.warn(f"LeJEPA not available: {e}")
+    LEJÊPA_AVAILABLE = False
+    LeJEPA = LeJEPAConfig = LeJEPATrainer = None
+
+try:
+    from phase5.pretraining.egocentric_10k_pipeline import (
+        EgocentricDataLoader,
+        EgocentricConfig,
+        FactoryPhysicsExtractor
+    )
+    EGOCENTRIC_AVAILABLE = True
+except Exception as e:
+    warnings.warn(f"Egocentric-10K not available: {e}")
+    EGOCENTRIC_AVAILABLE = False
+    EgocentricDataLoader = EgocentricConfig = FactoryPhysicsExtractor = None
+
+try:
+    from phase5.reconstruction.physworld_4d import (
+        PhysWorldReconstructor,
+        ReconstructionConfig,
+        Scene4D
+    )
+    PHYSWORLD_AVAILABLE = True
+except Exception as e:
+    warnings.warn(f"PhysWorld not available: {e}")
+    PHYSWORLD_AVAILABLE = False
+    PhysWorldReconstructor = ReconstructionConfig = Scene4D = None
+
+try:
+    from phase5.research.realdeepresearch_crawler import ResearchIntegrator
+    RESEARCH_AVAILABLE = True
+except Exception as e:
+    warnings.warn(f"RealDeepResearch not available: {e}")
+    RESEARCH_AVAILABLE = False
+    ResearchIntegrator = None
 
 
 @dataclass
@@ -101,6 +128,10 @@ class ResearchEnhancedEIL:
 
         # 1. LeJEPA encoder
         if self.config.use_lejêpa_encoder:
+            if not LEJÊPA_AVAILABLE:
+                print(f"   ⚠️  LeJEPA not available (dependencies missing)")
+                return
+
             print(f"   ✓ Loading LeJEPA encoder...")
             lejêpa_config = self.config.lejêpa_config or LeJEPAConfig()
             self.lejêpa_trainer = LeJEPATrainer(lejêpa_config)
