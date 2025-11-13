@@ -1,0 +1,146 @@
+---
+# Service Account for ACE Server
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ace-sa
+  namespace: plan-solidify-phase5
+  labels:
+    app: thermodynasty-ace
+---
+# Role: Limited permissions for ACE operations
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ace-role
+  namespace: plan-solidify-phase5
+rules:
+# ConfigMaps (read-only for configuration)
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+# Secrets (read-only for credentials)
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+  resourceNames:
+    - "neo4j-password"
+    - "kafka-credentials"
+# Events (create for logging)
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
+---
+# RoleBinding: Bind Role to ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ace-rolebinding
+  namespace: plan-solidify-phase5
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ace-role
+subjects:
+- kind: ServiceAccount
+  name: ace-sa
+  namespace: plan-solidify-phase5
+---
+# NetworkPolicy: Restrict ACE Server network access
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ace-network-policy
+  namespace: plan-solidify-phase5
+spec:
+  podSelector:
+    matchLabels:
+      app: thermodynasty-ace
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow Istio Ingress Gateway
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: istio-system
+      ports:
+        - protocol: TCP
+          port: 8000
+    # Allow internal namespace communication
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8000
+    # Allow Prometheus scraping
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8000
+  egress:
+    # Kafka cluster
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kafka
+      ports:
+        - protocol: TCP
+          port: 9092
+    # Neo4j (optional)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: neo4j
+      ports:
+        - protocol: TCP
+          port: 7687
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # HTTPS for external APIs (OBMI, etc.)
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+---
+# Pod Security Policy (if PSP enabled in cluster)
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: ace-psp
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'runtime/default'
+    apparmor.security.beta.kubernetes.io/allowedProfileNames: 'runtime/default'
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    - ALL
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'persistentVolumeClaim'
+    - 'secret'
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+  readOnlyRootFilesystem: true

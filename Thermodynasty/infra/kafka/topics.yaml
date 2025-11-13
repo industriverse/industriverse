@@ -1,0 +1,72 @@
+---
+# Kafka Topic: Energy Maps Input
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: thermodynasty.energy-maps
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: industriverse-kafka
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 604800000  # 7 days
+    segment.ms: 3600000      # 1 hour
+    compression.type: snappy
+    min.insync.replicas: 2
+    cleanup.policy: delete
+---
+# Kafka Topic: Predictions Output
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: thermodynasty.predictions
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: industriverse-kafka
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 2592000000  # 30 days
+    segment.ms: 86400000      # 24 hours
+    compression.type: snappy
+    min.insync.replicas: 2
+    cleanup.policy: delete
+---
+# Kafka Topic: Audit/Proof Economy
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: thermodynasty.audit
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: industriverse-kafka
+spec:
+  partitions: 6
+  replicas: 3
+  config:
+    retention.ms: 31536000000  # 365 days (1 year)
+    segment.ms: 86400000        # 24 hours
+    compression.type: lz4
+    min.insync.replicas: 2
+    cleanup.policy: compact,delete
+    min.compaction.lag.ms: 86400000
+---
+# Kafka Topic: Dead Letter Queue
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: thermodynasty.dlq
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: industriverse-kafka
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: 604800000  # 7 days
+    compression.type: snappy
+    min.insync.replicas: 2
+    cleanup.policy: delete

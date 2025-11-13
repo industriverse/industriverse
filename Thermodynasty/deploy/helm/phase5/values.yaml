@@ -1,0 +1,235 @@
+# Thermodynasty ACE - Helm Values
+# Phase 5: Enterprise Integration Layer
+
+# Replicacount for ACE server
+replicaCount: 3
+
+image:
+  repository: registry.industriverse.ai/thermodynasty/ace-server
+  pullPolicy: IfNotPresent
+  tag: "1.0.0-phase5"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: "thermodynasty-ace"
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "ace-sa"
+
+# Pod Security Context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+# Container Security Context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+
+# ACE Server Service
+service:
+  type: ClusterIP
+  port: 8000
+  targetPort: 8000
+  annotations: {}
+
+# Ingress (optional - using Istio VirtualService instead)
+ingress:
+  enabled: false
+
+# Resources
+resources:
+  limits:
+    cpu: "8000m"
+    memory: "32Gi"
+    nvidia.com/gpu: "1"  # GPU for inference
+  requests:
+    cpu: "4000m"
+    memory: "16Gi"
+    nvidia.com/gpu: "1"
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+  # Custom metrics
+  metrics:
+    - type: Pods
+      pods:
+        metric:
+          name: ace_inference_latency_p95
+        target:
+          type: AverageValue
+          averageValue: "500"  # 500ms target
+
+# Node Selector (GPU nodes)
+nodeSelector:
+  nvidia.com/gpu: "true"
+  node-role.kubernetes.io/worker: "true"
+
+# Tolerations for GPU nodes
+tolerations:
+  - key: nvidia.com/gpu
+    operator: Equal
+    value: "true"
+    effect: NoSchedule
+
+# Affinity
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - thermodynasty-ace
+          topologyKey: kubernetes.io/hostname
+
+# Configuration
+config:
+  # ACE Configuration
+  ace:
+    modelDir: "/models"
+    pyramidDir: "/data/pyramids"
+    betaTemperature: "1.0"
+    enableProofEconomy: "true"
+
+  # Consensus
+  consensus:
+    pixelTolerance: "0.001"
+    energyTolerance: "0.01"
+    minVotes: "2"
+
+  # Kafka
+  kafka:
+    brokers: "kafka.kafka.svc.cluster.local:9092"
+    inputTopic: "thermodynasty.energy_maps"
+    outputTopic: "thermodynasty.predictions"
+    auditTopic: "thermodynasty.audit"
+    consumerGroup: "thermodynasty-ace-consumer"
+    batchSize: "10"
+    batchTimeoutMs: "5000"
+
+  # Neo4j (optional)
+  neo4j:
+    enabled: false
+    uri: "bolt://neo4j.neo4j.svc.cluster.local:7687"
+    user: "neo4j"
+    passwordSecretName: "neo4j-password"
+    passwordSecretKey: "password"
+
+# Persistent Volume Claims
+persistence:
+  models:
+    enabled: true
+    storageClass: "fast-ssd"
+    accessMode: ReadOnlyMany
+    size: "50Gi"
+    existingClaim: ""
+
+  pyramids:
+    enabled: true
+    storageClass: "fast-ssd"
+    accessMode: ReadWriteMany
+    size: "100Gi"
+    existingClaim: ""
+
+# Liveness and Readiness Probes
+livenessProbe:
+  httpGet:
+    path: /v1/health
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /v1/health
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 2
+
+# Service Monitor (Prometheus)
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  scrapeTimeout: 10s
+  labels:
+    prometheus: kube-prometheus
+
+# Network Policy
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: istio-system
+      ports:
+        - protocol: TCP
+          port: 8000
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: plan-solidify-phase5
+      ports:
+        - protocol: TCP
+          port: 8000
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kafka
+      ports:
+        - protocol: TCP
+          port: 9092
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: neo4j
+      ports:
+        - protocol: TCP
+          port: 7687
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Init Containers
+initContainers:
+  - name: model-loader
+    image: busybox:1.35
+    command: ['sh', '-c', 'echo "Checking models..." && ls -la /models || echo "Models volume not mounted"']
+    volumeMounts:
+      - name: models
+        mountPath: /models
+        readOnly: true
