@@ -423,7 +423,11 @@ class ResearchIntegrator:
 
         if not papers:
             print("⚠️  No new papers found")
-            return {'papers_processed': 0}
+            return {
+                'papers_processed': 0,
+                'total_papers': len(self.knowledge_base),
+                'num_clusters': len(self.clusters)
+            }
 
         # 2. Decompose into perspectives
         print(f"\n🔬 Decomposing {len(papers)} papers...")

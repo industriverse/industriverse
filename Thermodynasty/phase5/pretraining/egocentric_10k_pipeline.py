@@ -145,31 +145,55 @@ class EgocentricDataLoader:
             return
 
         count = 0
-        for sample in self.dataset['train']:
-            # Filter by factory
-            if sample.get('factory_id') != factory_id:
-                continue
+        try:
+            for sample in self.dataset['train']:
+                # Parse the JSON metadata (actual dataset format)
+                try:
+                    import json
+                    if 'json' in sample:
+                        # Dataset has nested JSON structure
+                        if isinstance(sample['json'], str):
+                            metadata = json.loads(sample['json'])
+                        else:
+                            # Already a dict
+                            metadata = sample['json']
 
-            # Filter by task type
-            if task_filter and sample.get('task_type') not in task_filter:
-                continue
+                        sample_factory_id = int(metadata.get('factory_id', 0))
+                        sample_worker_id = metadata.get('worker_id', '0')
 
-            # Decode video frames
-            frames = self._decode_video(sample['video_bytes'])
+                        # Filter by factory
+                        if sample_factory_id != factory_id:
+                            continue
 
-            yield VideoSample(
-                video_id=sample['video_id'],
-                factory_id=sample['factory_id'],
-                worker_id=sample['worker_id'],
-                task_type=sample['task_type'],
-                frames=frames,
-                timestamp=sample['timestamp'],
-                metadata=sample.get('metadata', {})
-            )
+                        # Decode video frames from mp4 binary
+                        if 'mp4' in sample:
+                            frames = self._decode_video(sample['mp4'])
+                        else:
+                            continue
 
-            count += 1
-            if num_videos and count >= num_videos:
-                break
+                        yield VideoSample(
+                            video_id=sample.get('__key__', f'video_{count}'),
+                            factory_id=sample_factory_id,
+                            worker_id=sample_worker_id,
+                            task_type='factory_task',
+                            frames=frames,
+                            timestamp=float(count),
+                            metadata=metadata
+                        )
+
+                        count += 1
+                        if num_videos and count >= num_videos:
+                            break
+
+                except (json.JSONDecodeError, KeyError, ValueError) as e:
+                    # Skip malformed samples
+                    warnings.warn(f"Skipping malformed sample: {e}")
+                    continue
+
+        except Exception as e:
+            warnings.warn(f"Error streaming from dataset: {e}")
+            # Fall back to simulated data
+            yield from self._stream_simulated_factory(factory_id, num_videos - count)
 
     def stream_all_factories(
         self,

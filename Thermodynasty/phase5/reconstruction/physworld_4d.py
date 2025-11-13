@@ -174,6 +174,14 @@ class GravityAligner:
             aligned_cloud: [num_points, 3] rotated points
             rotation_matrix: [3, 3] rotation applied
         """
+        # Normalize gravity direction to avoid numerical issues
+        gravity_norm = np.linalg.norm(gravity_dir)
+        if gravity_norm < 1e-8:
+            # Invalid gravity direction, return as-is
+            return point_cloud, np.eye(3)
+
+        gravity_dir = gravity_dir / gravity_norm
+
         # Target: align gravity_dir with [0, -1, 0] (Y-down)
         target = np.array([0.0, -1.0, 0.0])
 
@@ -182,29 +190,60 @@ class GravityAligner:
         axis_norm = np.linalg.norm(axis)
 
         if axis_norm < 1e-6:
-            # Already aligned
-            return point_cloud, np.eye(3)
+            # Already aligned (or anti-aligned)
+            dot_product = np.dot(gravity_dir, target)
+            if dot_product > 0.999:
+                # Already aligned
+                return point_cloud, np.eye(3)
+            elif dot_product < -0.999:
+                # Anti-aligned, rotate 180 degrees around X-axis
+                rotation_matrix = np.array([
+                    [1, 0, 0],
+                    [0, -1, 0],
+                    [0, 0, -1]
+                ])
+                aligned_cloud = point_cloud @ rotation_matrix.T
+                return aligned_cloud, rotation_matrix
 
         axis = axis / axis_norm
 
-        # Compute rotation angle
-        angle = np.arccos(np.clip(np.dot(gravity_dir, target), -1.0, 1.0))
+        # Compute rotation angle (clipped for numerical stability)
+        dot_product = np.clip(np.dot(gravity_dir, target), -1.0, 1.0)
+        angle = np.arccos(dot_product)
 
-        # Rodrigues' rotation formula
+        # Rodrigues' rotation formula with numerical stability
         K = np.array([
             [0, -axis[2], axis[1]],
             [axis[2], 0, -axis[0]],
             [-axis[1], axis[0], 0]
         ])
 
+        sin_angle = np.sin(angle)
+        cos_angle = np.cos(angle)
+
         rotation_matrix = (
             np.eye(3) +
-            np.sin(angle) * K +
-            (1 - np.cos(angle)) * (K @ K)
+            sin_angle * K +
+            (1 - cos_angle) * (K @ K)
         )
 
-        # Apply rotation
-        aligned_cloud = point_cloud @ rotation_matrix.T
+        # Ensure rotation matrix is valid (no NaN/Inf)
+        if np.any(~np.isfinite(rotation_matrix)):
+            warnings.warn("Invalid rotation matrix, returning identity")
+            return point_cloud, np.eye(3)
+
+        # Apply rotation with numerical safety
+        try:
+            aligned_cloud = point_cloud @ rotation_matrix.T
+
+            # Check for numerical issues in output
+            if np.any(~np.isfinite(aligned_cloud)):
+                warnings.warn("Rotation produced invalid values, returning original")
+                return point_cloud, np.eye(3)
+
+        except Exception as e:
+            warnings.warn(f"Rotation failed: {e}, returning original")
+            return point_cloud, np.eye(3)
 
         return aligned_cloud, rotation_matrix
 
