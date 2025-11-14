@@ -1,0 +1,348 @@
+# ============================================================================
+# EIL Platform Helm Chart - Default Values
+# ============================================================================
+
+# Global settings
+global:
+  environment: production
+  namespace: eil-platform
+
+# Replica count
+replicaCount: 3
+
+# Image configuration
+image:
+  repository: eil-platform/eil-api
+  pullPolicy: IfNotPresent
+  tag: "v0.5.0"
+
+imagePullSecrets: []
+
+# Service account
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: "eil-api"
+
+# Pod annotations
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "9090"
+  prometheus.io/path: "/metrics"
+
+# Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+  metricsPort: 9090
+  annotations: {}
+  sessionAffinity: ClientIP
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+  hosts:
+    - host: api.eil-platform.io
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: eil-api-tls
+      hosts:
+        - api.eil-platform.io
+
+# Resource limits and requests
+resources:
+  requests:
+    cpu: 1000m
+    memory: 2Gi
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+  scaleDownStabilization: 300
+  scaleUpStabilization: 60
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /health/live
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+startupProbe:
+  httpGet:
+    path: /health/live
+    port: 8000
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 30
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - eil-api
+          topologyKey: kubernetes.io/hostname
+
+# Topology spread constraints
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        app: eil-api
+
+# ============================================================================
+# Application Configuration
+# ============================================================================
+
+config:
+  # API settings
+  api:
+    host: "0.0.0.0"
+    port: 8000
+    workers: 4
+    timeout: 120
+
+  # Diffusion model
+  diffusion:
+    timesteps: 1000
+    noise_schedule: "boltzmann"
+    energy_tolerance: 0.01
+    temperature: 1.0
+
+  # EIL configuration
+  eil:
+    window_size: 10
+    confidence_threshold: 0.75
+    energy_guidance_scale: 1.0
+
+  # Security
+  auth:
+    access_token_expire_minutes: 30
+    refresh_token_expire_days: 7
+
+  rateLimit:
+    enabled: true
+    default_limit: 100
+    default_window: 60
+
+  # S3 configuration
+  s3:
+    bucket_name: "eil-energy-maps"
+    region: "us-east-1"
+    endpoint_url: ""
+
+  # InfluxDB configuration
+  influxdb:
+    url: "http://influxdb:8086"
+    org: "eil-platform"
+    bucket: "energy_metrics"
+
+  # Neo4j configuration
+  neo4j:
+    uri: "bolt://neo4j:7687"
+    database: "neo4j"
+    username: "neo4j"
+
+  # MQTT configuration
+  mqtt:
+    broker_host: "mqtt-broker"
+    broker_port: 1883
+    client_id: "eil_api"
+    qos: 1
+
+  # Monitoring
+  prometheus:
+    enabled: true
+    port: 9090
+
+  # Logging
+  logging:
+    level: "INFO"
+    format: "json"
+
+# ============================================================================
+# Secrets (use external secret management in production)
+# ============================================================================
+
+secrets:
+  # External secret management
+  externalSecrets:
+    enabled: false
+    backend: vault  # vault, aws-secrets-manager, azure-keyvault
+    vaultPath: "secret/eil-platform"
+
+  # Direct secret values (development only)
+  jwtSecretKey: ""
+  databaseUrl: ""
+  s3AccessKeyId: ""
+  s3SecretAccessKey: ""
+  influxdbToken: ""
+  neo4jPassword: ""
+  mqttPassword: ""
+
+# ============================================================================
+# Dependencies
+# ============================================================================
+
+# Prometheus (metrics and monitoring)
+prometheus:
+  enabled: true
+  server:
+    persistentVolume:
+      enabled: true
+      size: 50Gi
+    retention: "30d"
+  alertmanager:
+    enabled: true
+    persistentVolume:
+      enabled: true
+      size: 10Gi
+
+# Grafana (dashboards)
+grafana:
+  enabled: true
+  adminPassword: "changeme"
+  persistence:
+    enabled: true
+    size: 10Gi
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://prometheus-server
+          isDefault: true
+        - name: InfluxDB
+          type: influxdb
+          url: http://influxdb:8086
+
+# InfluxDB (time-series database)
+influxdb:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 100Gi
+  adminUser:
+    organization: "eil-platform"
+    bucket: "energy_metrics"
+    retention_policy: "30d"
+
+# Neo4j (graph database)
+neo4j:
+  enabled: true
+  neo4j:
+    password: "changeme"
+  persistence:
+    size: 50Gi
+  resources:
+    requests:
+      cpu: 500m
+      memory: 2Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+
+# ============================================================================
+# Monitoring & Observability
+# ============================================================================
+
+monitoring:
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+
+  prometheusRule:
+    enabled: true
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+
+      - alert: LowEnergyFidelity
+        expr: energy_fidelity < 0.95
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Energy fidelity below threshold"

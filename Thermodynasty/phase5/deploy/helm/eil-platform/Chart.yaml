@@ -1,0 +1,46 @@
+apiVersion: v2
+name: eil-platform
+description: Energy Intelligence Layer - Production Diffusion Substrate
+type: application
+version: 0.5.0
+appVersion: "0.5.0-alpha"
+
+keywords:
+  - energy
+  - diffusion
+  - ai
+  - physics
+  - thermodynamics
+
+home: https://github.com/industriverse/eil-platform
+sources:
+  - https://github.com/industriverse/eil-platform
+
+maintainers:
+  - name: EIL Team
+    email: team@eil-platform.io
+
+dependencies:
+  - name: prometheus
+    version: "~25.0.0"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: prometheus.enabled
+
+  - name: grafana
+    version: "~7.0.0"
+    repository: "https://grafana.github.io/helm-charts"
+    condition: grafana.enabled
+
+  - name: influxdb2
+    version: "~2.1.0"
+    repository: "https://helm.influxdata.com/"
+    condition: influxdb.enabled
+
+  - name: neo4j
+    version: "~5.0.0"
+    repository: "https://helm.releases.hashicorp.com"
+    condition: neo4j.enabled
+
+annotations:
+  category: AI/ML
+  licenses: Apache-2.0

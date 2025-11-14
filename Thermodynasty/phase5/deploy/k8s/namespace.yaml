@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eil-platform
+  labels:
+    name: eil-platform
+    environment: production
+    team: energy-intelligence

@@ -1,0 +1,78 @@
+================================================================================
+  ______ _____ _         _____  _       _    __
+ |  ____|_   _| |       |  __ \| |     | |  / _|
+ | |__    | | | |       | |__) | | __ _| |_| |_ ___  _ __ _ __ ___
+ |  __|   | | | |       |  ___/| |/ _` | __|  _/ _ \| '__| '_ ` _ \
+ | |____ _| |_| |____   | |    | | (_| | |_| || (_) | |  | | | | | |
+ |______|_____|______|  |_|    |_|\__,_|\__|_| \___/|_|  |_| |_| |_|
+
+  Energy Intelligence Layer - Production Diffusion Substrate
+  Version: {{ .Chart.AppVersion }}
+================================================================================
+
+🚀 EIL Platform has been deployed successfully!
+
+📍 Namespace: {{ .Release.Namespace }}
+📦 Release: {{ .Release.Name }}
+
+{{- if .Values.ingress.enabled }}
+🌐 API Endpoint:
+{{- range .Values.ingress.hosts }}
+  https://{{ .host }}
+{{- end }}
+{{- else }}
+⚠️  Ingress is disabled. To access the API:
+
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ include "eil-platform.name" . }}" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8000:8000
+
+  Visit http://127.0.0.1:8000
+{{- end }}
+
+📊 Monitoring:
+
+{{- if .Values.prometheus.enabled }}
+  Prometheus: http://prometheus-server.{{ .Release.Namespace }}.svc.cluster.local
+{{- end }}
+
+{{- if .Values.grafana.enabled }}
+  Grafana: http://grafana.{{ .Release.Namespace }}.svc.cluster.local
+  Username: admin
+  Password: {{ .Values.grafana.adminPassword }}
+{{- end }}
+
+📈 Metrics Endpoint:
+  http://{{ include "eil-platform.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:9090/metrics
+
+🔐 Security Notes:
+
+{{- if not .Values.secrets.externalSecrets.enabled }}
+⚠️  WARNING: External secrets management is DISABLED
+   This is NOT recommended for production environments.
+   Enable external secrets (Vault, AWS Secrets Manager, etc.)
+{{- end }}
+
+🔧 Quick Commands:
+
+  # View logs
+  kubectl logs -f deployment/{{ include "eil-platform.fullname" . }} -n {{ .Release.Namespace }}
+
+  # Get pods
+  kubectl get pods -n {{ .Release.Namespace }} -l app={{ include "eil-platform.name" . }}
+
+  # Check HPA status
+  kubectl get hpa -n {{ .Release.Namespace }}
+
+  # Port forward to API
+  kubectl port-forward svc/{{ include "eil-platform.fullname" . }} -n {{ .Release.Namespace }} 8000:80
+
+📚 Documentation:
+  https://docs.eil-platform.io
+
+💬 Support:
+  GitHub: https://github.com/industriverse/eil-platform/issues
+  Email: support@eil-platform.io
+
+================================================================================
+Thank you for using EIL Platform! 🌟
+================================================================================
