@@ -21,10 +21,13 @@ opentelemetry-instrumentation-fastapi==0.42b0
 # kafka-python==2.0.2
 # aiokafka==0.8.1
 
-# Database/Storage (optional)
-# boto3==1.29.7  # AWS S3
-# influxdb-client==1.38.0
-# neo4j==5.14.1
+# Integration Hub
+boto3==1.29.7  # S3 connector (sync)
+aioboto3==12.0.0  # S3 connector (async)
+influxdb-client==1.38.0  # InfluxDB time-series
+neo4j==5.14.1  # Neo4j graph database
+paho-mqtt==1.6.1  # MQTT for IoT devices
+bleach==6.1.0  # HTML sanitization (security middleware)
 
 # Security
 python-jose[cryptography]==3.3.0
