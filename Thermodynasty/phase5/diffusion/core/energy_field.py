@@ -298,3 +298,6 @@ class EnergyField:
             f"E_total={self.current_state.total_energy:.4f}, "
             f"S={self.current_state.entropy:.4f})"
         )
+
+# Alias for backwards compatibility
+ThermodynamicState = EnergyState
