@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: AgentManifest
+metadata:
+  name: test-agent
+  version: 1.0.0
+spec:
+  agent_info:
+    name: Test Agent
+    description: Test agent for unit testing
+    version: 1.0.0
+  context_window:
+    max_history_depth: 20
+  capabilities:
+    - capability_id: test/capability
+      name: Test Capability
+      description: A test capability
+  mcp_events:
+    - test/event
+    - test/notification
+  trust_modes:
+    - verified
+    - unverified
+  protocol_hooks:
+    on_init:
+      - initialize_components
+    on_shutdown:
+      - cleanup_resources
+  application:
+    type: test_application
+    role: testing
+  resilience:
+    mode: standard
+  mesh_coordination:
+    role: node
+  avatar:
+    type: standard
+    style: professional

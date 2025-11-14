@@ -70,29 +70,29 @@ class AgentCore:
         Initialize the Agent Core.
         """
         # Import protocol handlers
-        from .protocols.mcp_handler import MCPHandler
-        from .protocols.a2a_handler import A2AHandler
-        from .protocols.protocol_translator import ProtocolTranslator
-        from .protocols.well_known_endpoint import WellKnownEndpoint
-        
+        from .mcp_handler import MCPHandler
+        from .a2a_handler import A2AHandler
+        from .protocol_translator import ProtocolTranslator
+        from .well_known_endpoint import WellKnownEndpoint
+
         # Initialize protocol handlers
         self.mcp_handler = MCPHandler(self)
         self.a2a_handler = A2AHandler(self)
         self.protocol_translator = ProtocolTranslator(self)
         self.well_known_endpoint = WellKnownEndpoint(self)
-        
+
         # Initialize mesh lifecycle
         self._initialize_mesh_lifecycle()
-        
+
         logger.info(f"Agent Core fully initialized for agent: {self.agent_id}")
-    
+
     def _initialize_mesh_lifecycle(self):
         """
         Initialize mesh lifecycle.
         """
         # Import mesh lifecycle handler
-        from .protocols.mesh_boot_lifecycle import MeshBootLifecycle
-        
+        from .mesh_boot_lifecycle import MeshBootLifecycle
+
         # Initialize mesh lifecycle
         mesh_lifecycle = MeshBootLifecycle(self)
         

@@ -37,7 +37,7 @@ class MCPHandler:
     def _register_event_handlers(self) -> Dict[str, callable]:
         """
         Register event handlers.
-        
+
         Returns:
             Dictionary of event handlers
         """
@@ -50,7 +50,22 @@ class MCPHandler:
             "application_health/predict_issue": self._handle_predict_issue,
             "application/self_optimization": self._handle_self_optimization
         }
-    
+
+    def register_event_handler(self, event_type: str, handler: callable) -> bool:
+        """
+        Register a custom event handler.
+
+        Args:
+            event_type: Event type to handle
+            handler: Handler function to call for this event type
+
+        Returns:
+            True if successful
+        """
+        self.event_handlers[event_type] = handler
+        logger.info(f"Registered event handler for: {event_type}")
+        return True
+
     def handle_event(self, event_type: str, event_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle MCP event.

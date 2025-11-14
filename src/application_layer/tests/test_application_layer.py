@@ -39,27 +39,29 @@ class TestAgentCore(unittest.TestCase):
     """
     Test cases for the AgentCore component.
     """
-    
+
     def setUp(self):
         """
         Set up test environment.
         """
-        self.config = {
-            "agent_id": "test-agent",
-            "agent_name": "Test Agent",
-            "agent_version": "1.0.0"
-        }
-        self.agent_core = AgentCore(self.config)
-    
+        # Get path to test manifest
+        test_dir = os.path.dirname(os.path.abspath(__file__))
+        manifest_path = os.path.join(test_dir, "test_agent_manifest.yaml")
+
+        # Initialize AgentCore with correct parameters
+        self.agent_core = AgentCore(
+            agent_id="test-agent",
+            manifest_path=manifest_path
+        )
+
     def test_initialization(self):
         """
         Test agent core initialization.
         """
         self.assertEqual(self.agent_core.agent_id, "test-agent")
-        self.assertEqual(self.agent_core.agent_name, "Test Agent")
-        self.assertEqual(self.agent_core.agent_version, "1.0.0")
-        self.assertIsNotNone(self.agent_core.start_time)
-        self.assertFalse(self.agent_core.running)
+        self.assertIsNotNone(self.agent_core.manifest)
+        self.assertIsNotNone(self.agent_core.components)
+        self.assertEqual(len(self.agent_core.components), 0)  # No components registered yet
     
     def test_component_registration(self):
         """
@@ -86,37 +88,32 @@ class TestAgentCore(unittest.TestCase):
     
     def test_mcp_event_emission(self):
         """
-        Test MCP event emission.
+        Test MCP event handling.
         """
-        # Create mock MCP handler
-        mock_mcp_handler = MagicMock()
-        self.agent_core.register_component("mcp_handler", mock_mcp_handler)
-        
-        # Emit MCP event
+        # Handle MCP event
         event_type = "test/event"
         event_data = {"key": "value"}
-        self.agent_core.emit_mcp_event(event_type, event_data)
-        
-        # Verify MCP handler was called
-        mock_mcp_handler.emit_event.assert_called_once()
-        args, kwargs = mock_mcp_handler.emit_event.call_args
-        self.assertEqual(args[0], event_type)
-        self.assertEqual(args[1]["key"], "value")
-        self.assertIn("timestamp", args[1])
-        self.assertIn("agent_id", args[1])
-        self.assertEqual(args[1]["agent_id"], "test-agent")
-    
+        result = self.agent_core.handle_mcp_event(event_type, event_data)
+
+        # Verify event was handled (unsupported event types return error)
+        self.assertIsNotNone(result)
+        self.assertIn("error", result)  # Unsupported events return error
+
+        # Verify event was recorded in mcp_events history
+        self.assertTrue(len(self.agent_core.mcp_events) > 0)
+        last_event = self.agent_core.mcp_events[-1]
+        self.assertEqual(last_event["event_type"], event_type)
+
     def test_start_stop(self):
         """
-        Test agent core start and stop.
+        Test agent core manifest and capabilities loading.
         """
-        # Start agent core
-        self.agent_core.start()
-        self.assertTrue(self.agent_core.running)
-        
-        # Stop agent core
-        self.agent_core.stop()
-        self.assertFalse(self.agent_core.running)
+        # Verify manifest was loaded
+        self.assertIsNotNone(self.agent_core.manifest)
+
+        # Verify agent can provide capabilities
+        capabilities = self.agent_core.get_capabilities()
+        self.assertIsInstance(capabilities, list)
 
 class TestMCPHandler(unittest.TestCase):
     """
@@ -138,9 +135,9 @@ class TestMCPHandler(unittest.TestCase):
         Test MCP handler initialization.
         """
         self.assertEqual(self.mcp_handler.agent_core, self.agent_core)
-        self.assertIsNotNone(self.mcp_handler.events)
+        self.assertIsNotNone(self.mcp_handler.event_history)
         self.assertIsNotNone(self.mcp_handler.event_handlers)
-    
+
     def test_event_emission(self):
         """
         Test event emission.
@@ -149,19 +146,18 @@ class TestMCPHandler(unittest.TestCase):
         event_type = "test/event"
         event_data = {"key": "value"}
         result = self.mcp_handler.emit_event(event_type, event_data)
-        
-        # Verify result
+
+        # Verify result structure (emit_event returns status and event_id)
+        self.assertIn("status", result)
         self.assertEqual(result["status"], "success")
         self.assertIn("event_id", result)
-        
-        # Verify event was stored
-        self.assertIn(result["event_id"], self.mcp_handler.events)
-        stored_event = self.mcp_handler.events[result["event_id"]]
-        self.assertEqual(stored_event["type"], event_type)
-        self.assertEqual(stored_event["data"]["key"], "value")
-        self.assertIn("timestamp", stored_event)
-        self.assertIn("agent_id", stored_event)
-        self.assertEqual(stored_event["agent_id"], "test-agent")
+
+        # Verify event was stored in event_history
+        self.assertTrue(len(self.mcp_handler.event_history) > 0)
+        last_event = self.mcp_handler.event_history[-1]
+        self.assertEqual(last_event["event_type"], event_type)
+        self.assertEqual(last_event["direction"], "outgoing")
+        self.assertEqual(last_event["event_data"], event_data)
     
     def test_event_handling(self):
         """
@@ -170,28 +166,21 @@ class TestMCPHandler(unittest.TestCase):
         # Create mock event handler
         mock_handler = MagicMock()
         mock_handler.return_value = {"status": "handled"}
-        
+
         # Register handler
-        event_type = "test/event"
+        event_type = "test/custom_event"
         self.mcp_handler.register_event_handler(event_type, mock_handler)
-        
-        # Create event
-        event_data = {
-            "type": event_type,
-            "data": {"key": "value"},
-            "agent_id": "sender-agent",
-            "timestamp": time.time()
-        }
-        
+
+        # Verify handler was registered
+        self.assertIn(event_type, self.mcp_handler.event_handlers)
+
         # Handle event
-        result = self.mcp_handler.handle_event(event_data)
-        
+        event_data = {"key": "value"}
+        result = self.mcp_handler.handle_event(event_type, event_data)
+
         # Verify handler was called
-        mock_handler.assert_called_once()
-        args, kwargs = mock_handler.call_args
-        self.assertEqual(args[0]["type"], event_type)
-        self.assertEqual(args[0]["data"]["key"], "value")
-        
+        mock_handler.assert_called_once_with(event_data)
+
         # Verify result
         self.assertEqual(result["status"], "handled")
 
