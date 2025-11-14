@@ -7,18 +7,22 @@ import torch
 import numpy as np
 from pathlib import Path
 import tempfile
+import sys
 
-from diffusion.training import (
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+
+from phase5.diffusion.training import (
     DiffusionTrainer,
     TrainingConfig,
     EnergyMapDataset,
     SyntheticEnergyDataset,
     create_dataloader,
     MetricsLogger,
-    ThermodynamicValidator,
+    ThermodynamicValidatorCallback as ThermodynamicValidator,
     EarlyStopping
 )
-from diffusion import DiffusionModel, DiffusionConfig
+from phase5.diffusion import DiffusionModel, DiffusionConfig
 
 
 class TestSyntheticDataset:

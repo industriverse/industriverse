@@ -5,8 +5,13 @@ Tests for domain capsules (molecular, plasma, enterprise)
 import pytest
 import torch
 import numpy as np
+from pathlib import Path
+import sys
 
-from diffusion.domains import (
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+
+from phase5.diffusion.domains import (
     MolecularDiffusion,
     MolecularConfig,
     PlasmaDiffusion,
