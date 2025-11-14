@@ -66,6 +66,21 @@ class EnergyState:
         }
 
 
+@dataclass
+class EnergyFieldConfig:
+    """
+    Configuration for energy field validation and thermodynamics.
+
+    Attributes:
+        energy_tolerance: Maximum allowed energy drift
+        entropy_min_delta: Minimum entropy change threshold
+        temperature: Thermodynamic temperature
+    """
+    energy_tolerance: float = 0.01
+    entropy_min_delta: float = -1e-6
+    temperature: float = 1.0
+
+
 class EnergyField:
     """
     Energy field with thermodynamic operations.
