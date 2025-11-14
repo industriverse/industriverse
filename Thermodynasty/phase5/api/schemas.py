@@ -550,3 +550,160 @@ class MetricsResponse(BaseModel):
         default_factory=datetime.utcnow,
         description="Metrics timestamp"
     )
+
+
+# ============================================================================
+# Domain-Specific Schemas
+# ============================================================================
+
+class MolecularGenerateRequest(BaseModel):
+    """Request for molecular structure generation"""
+
+    num_samples: int = Field(
+        1,
+        description="Number of structures to generate",
+        ge=1,
+        le=100
+    )
+
+    num_inference_steps: int = Field(
+        100,
+        description="Number of denoising steps",
+        ge=10,
+        le=1000
+    )
+
+    seed: Optional[int] = Field(
+        None,
+        description="Random seed for reproducibility"
+    )
+
+
+class MolecularGenerateResponse(BaseModel):
+    """Response from molecular structure generation"""
+
+    num_structures: int = Field(
+        ...,
+        description="Number of structures generated"
+    )
+
+    energies: List[float] = Field(
+        ...,
+        description="Total energies of generated structures (kcal/mol)"
+    )
+
+    valid_structures: int = Field(
+        ...,
+        description="Number of thermodynamically valid structures"
+    )
+
+    processing_time_ms: float = Field(
+        ...,
+        description="Processing time in milliseconds"
+    )
+
+
+class PlasmaEquilibriumRequest(BaseModel):
+    """Request for plasma equilibrium generation"""
+
+    num_samples: int = Field(
+        1,
+        description="Number of equilibrium configurations",
+        ge=1,
+        le=50
+    )
+
+    num_inference_steps: int = Field(
+        100,
+        description="Number of denoising steps",
+        ge=10,
+        le=1000
+    )
+
+    seed: Optional[int] = Field(
+        None,
+        description="Random seed for reproducibility"
+    )
+
+
+class PlasmaEquilibriumResponse(BaseModel):
+    """Response from plasma equilibrium generation"""
+
+    num_configurations: int = Field(
+        ...,
+        description="Number of configurations generated"
+    )
+
+    confinement_times: List[float] = Field(
+        ...,
+        description="Energy confinement times (seconds)"
+    )
+
+    beta_values: List[float] = Field(
+        ...,
+        description="Plasma beta values"
+    )
+
+    stable_configurations: int = Field(
+        ...,
+        description="Number of MHD-stable configurations"
+    )
+
+    processing_time_ms: float = Field(
+        ...,
+        description="Processing time in milliseconds"
+    )
+
+
+class EnterpriseOptimizeRequest(BaseModel):
+    """Request for enterprise resource optimization"""
+
+    workload_intensity: List[List[float]] = Field(
+        ...,
+        description="Workload intensity map"
+    )
+
+    num_strategies: int = Field(
+        10,
+        description="Number of allocation strategies to evaluate",
+        ge=1,
+        le=50
+    )
+
+    num_inference_steps: int = Field(
+        50,
+        description="Optimization steps",
+        ge=10,
+        le=500
+    )
+
+
+class EnterpriseOptimizeResponse(BaseModel):
+    """Response from enterprise resource optimization"""
+
+    power_consumption_watts: float = Field(
+        ...,
+        description="Optimized total power consumption (Watts)"
+    )
+
+    fragmentation_score: float = Field(
+        ...,
+        description="Resource fragmentation score (0-1, lower is better)",
+        ge=0.0,
+        le=1.0
+    )
+
+    cost_per_hour_usd: float = Field(
+        ...,
+        description="Estimated cost per hour (USD)"
+    )
+
+    power_savings_watts: float = Field(
+        ...,
+        description="Power savings vs baseline (Watts)"
+    )
+
+    processing_time_ms: float = Field(
+        ...,
+        description="Processing time in milliseconds"
+    )

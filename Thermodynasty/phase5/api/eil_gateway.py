@@ -29,11 +29,17 @@ from phase5.api.schemas import (
     OptimizeRequest, OptimizeResponse,
     ProofRequest, ProofResponse,
     MarketPricingResponse,
-    HealthResponse, ErrorResponse, MetricsResponse
+    HealthResponse, ErrorResponse, MetricsResponse,
+    MolecularGenerateRequest, MolecularGenerateResponse,
+    PlasmaEquilibriumRequest, PlasmaEquilibriumResponse,
+    EnterpriseOptimizeRequest, EnterpriseOptimizeResponse
 )
 from phase5.diffusion import (
     EnergyField, DiffusionModel, DiffusionConfig,
-    EnergyGuidedSampler
+    EnergyGuidedSampler,
+    MolecularDiffusion, MolecularConfig,
+    PlasmaDiffusion, PlasmaConfig,
+    EnterpriseDiffusion, EnterpriseConfig
 )
 from phase5.core.energy_intelligence_layer import EnergyIntelligenceLayer
 from phase5.core.proof_validator import ProofValidator
@@ -118,6 +124,9 @@ class ApplicationState:
         self.diffusion_model: Optional[DiffusionModel] = None
         self.proof_validator: Optional[ProofValidator] = None
         self.market_engine: Optional[MarketEngine] = None
+        self.molecular_diffusion: Optional[MolecularDiffusion] = None
+        self.plasma_diffusion: Optional[PlasmaDiffusion] = None
+        self.enterprise_diffusion: Optional[EnterpriseDiffusion] = None
         self.config: dict = {}
         self.initialized = False
 
@@ -175,6 +184,12 @@ class ApplicationState:
             base_ceu_usd=self.config['market']['base_ceu_price_usd'],
             base_pft_usd=self.config['market']['base_pft_price_usd']
         )
+
+        # Initialize domain capsules
+        logger.info("Initializing Domain Capsules...")
+        self.molecular_diffusion = MolecularDiffusion(device=device)
+        self.plasma_diffusion = PlasmaDiffusion(device=device)
+        self.enterprise_diffusion = EnterpriseDiffusion(device=device)
 
         self.initialized = True
         logger.info("✅ EIL API Gateway initialized successfully")
@@ -594,6 +609,148 @@ def create_app() -> FastAPI:
         except Exception as e:
             REQUEST_COUNT.labels(endpoint='/v1/market/pricing', status='error').inc()
             logger.error(f"Market pricing error: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=str(e)
+            )
+
+    # ========================================================================
+    # Domain Capsule Endpoints
+    # ========================================================================
+
+    @app.post("/v1/domains/molecular/generate", response_model=MolecularGenerateResponse)
+    async def molecular_generate(request: MolecularGenerateRequest):
+        """Generate molecular equilibrium structures"""
+        start_time = time.time()
+
+        try:
+            if not app_state.initialized:
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Service not initialized"
+                )
+
+            # Generate molecular structures
+            result = app_state.molecular_diffusion.generate_molecular_structure(
+                num_samples=request.num_samples,
+                num_inference_steps=request.num_inference_steps,
+                seed=request.seed
+            )
+
+            # Extract results
+            energies = result['energies'].tolist()
+            valid_count = int(result['valid'].sum().item())
+
+            processing_time = (time.time() - start_time) * 1000
+
+            REQUEST_COUNT.labels(endpoint='/v1/domains/molecular/generate', status='success').inc()
+            REQUEST_DURATION.labels(endpoint='/v1/domains/molecular/generate').observe(time.time() - start_time)
+
+            return MolecularGenerateResponse(
+                num_structures=request.num_samples,
+                energies=energies,
+                valid_structures=valid_count,
+                processing_time_ms=processing_time
+            )
+
+        except Exception as e:
+            REQUEST_COUNT.labels(endpoint='/v1/domains/molecular/generate', status='error').inc()
+            logger.error(f"Molecular generation error: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=str(e)
+            )
+
+    @app.post("/v1/domains/plasma/equilibrium", response_model=PlasmaEquilibriumResponse)
+    async def plasma_equilibrium(request: PlasmaEquilibriumRequest):
+        """Generate plasma equilibrium configurations"""
+        start_time = time.time()
+
+        try:
+            if not app_state.initialized:
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Service not initialized"
+                )
+
+            # Generate plasma equilibria
+            result = app_state.plasma_diffusion.generate_equilibrium_configuration(
+                num_samples=request.num_samples,
+                num_inference_steps=request.num_inference_steps,
+                seed=request.seed
+            )
+
+            # Extract results
+            confinement_times = result['confinement_times'].tolist()
+            beta_values = result['beta_values'].tolist()
+            stable_count = int(result['stable'].sum().item())
+
+            processing_time = (time.time() - start_time) * 1000
+
+            REQUEST_COUNT.labels(endpoint='/v1/domains/plasma/equilibrium', status='success').inc()
+            REQUEST_DURATION.labels(endpoint='/v1/domains/plasma/equilibrium').observe(time.time() - start_time)
+
+            return PlasmaEquilibriumResponse(
+                num_configurations=request.num_samples,
+                confinement_times=confinement_times,
+                beta_values=beta_values,
+                stable_configurations=stable_count,
+                processing_time_ms=processing_time
+            )
+
+        except Exception as e:
+            REQUEST_COUNT.labels(endpoint='/v1/domains/plasma/equilibrium', status='error').inc()
+            logger.error(f"Plasma equilibrium error: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=str(e)
+            )
+
+    @app.post("/v1/domains/enterprise/optimize", response_model=EnterpriseOptimizeResponse)
+    async def enterprise_optimize(request: EnterpriseOptimizeRequest):
+        """Optimize enterprise resource allocation"""
+        start_time = time.time()
+
+        try:
+            if not app_state.initialized:
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Service not initialized"
+                )
+
+            # Convert workload to tensor
+            workload = torch.tensor(request.workload_intensity, dtype=torch.float32)
+
+            # Optimize resource allocation
+            result = app_state.enterprise_diffusion.optimize_resource_allocation(
+                workload_profile=workload,
+                num_samples=request.num_strategies,
+                num_inference_steps=request.num_inference_steps
+            )
+
+            # Extract results
+            best_strategy = result['all_strategies'][0]
+            power_consumption = float(best_strategy['power_consumption']['total'].item())
+            fragmentation = best_strategy['fragmentation']
+            cost_per_hour = best_strategy['cost_per_hour']
+            power_savings = float(result.get('power_savings', 0.0))
+
+            processing_time = (time.time() - start_time) * 1000
+
+            REQUEST_COUNT.labels(endpoint='/v1/domains/enterprise/optimize', status='success').inc()
+            REQUEST_DURATION.labels(endpoint='/v1/domains/enterprise/optimize').observe(time.time() - start_time)
+
+            return EnterpriseOptimizeResponse(
+                power_consumption_watts=power_consumption,
+                fragmentation_score=fragmentation,
+                cost_per_hour_usd=cost_per_hour,
+                power_savings_watts=power_savings,
+                processing_time_ms=processing_time
+            )
+
+        except Exception as e:
+            REQUEST_COUNT.labels(endpoint='/v1/domains/enterprise/optimize', status='error').inc()
+            logger.error(f"Enterprise optimization error: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=str(e)
