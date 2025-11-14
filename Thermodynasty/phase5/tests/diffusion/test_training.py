@@ -19,7 +19,7 @@ from phase5.diffusion.training import (
     SyntheticEnergyDataset,
     create_dataloader,
     MetricsLogger,
-    ThermodynamicValidatorCallback as ThermodynamicValidator,
+    ThermodynamicValidator,
     EarlyStopping
 )
 from phase5.diffusion import DiffusionModel, DiffusionConfig
