@@ -1,0 +1,362 @@
+{
+  "dashboard": {
+    "title": "EIL Platform - Energy & Diffusion Metrics",
+    "tags": ["eil", "energy", "diffusion", "physics"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "10s",
+    "time": {
+      "from": "now-30m",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Energy Fidelity",
+        "type": "gauge",
+        "gridPos": {"x": 0, "y": 0, "w": 8, "h": 8},
+        "targets": [
+          {
+            "expr": "avg(energy_fidelity{job=\"eil-api\"})",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "min": 0,
+            "max": 1,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 0.90, "color": "yellow"},
+                {"value": 0.95, "color": "green"}
+              ]
+            }
+          }
+        },
+        "alert": {
+          "name": "Low Energy Fidelity",
+          "conditions": [
+            {
+              "evaluator": {"type": "lt", "params": [0.95]},
+              "query": {"params": ["A", "5m", "now"]},
+              "type": "query"
+            }
+          ],
+          "frequency": "60s",
+          "handler": 1,
+          "message": "Energy fidelity dropped below 95%",
+          "noDataState": "no_data",
+          "executionErrorState": "alerting"
+        }
+      },
+      {
+        "id": 2,
+        "title": "Regime Confidence",
+        "type": "gauge",
+        "gridPos": {"x": 8, "y": 0, "w": 8, "h": 8},
+        "targets": [
+          {
+            "expr": "avg(regime_confidence{job=\"eil-api\"})",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "min": 0,
+            "max": 1,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 0.70, "color": "yellow"},
+                {"value": 0.85, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Diffusion Steps/sec",
+        "type": "stat",
+        "gridPos": {"x": 16, "y": 0, "w": 8, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(diffusion_steps_total{job=\"eil-api\"}[1m]))",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value",
+          "orientation": "auto",
+          "textMode": "auto"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "decimals": 2,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "blue"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Energy Conservation Over Time",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "energy_fidelity{job=\"eil-api\"}",
+            "legendFormat": "Energy Fidelity",
+            "refId": "A"
+          },
+          {
+            "expr": "0.95",
+            "legendFormat": "Threshold (95%)",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"label": "Fidelity", "format": "percentunit", "min": 0.9, "max": 1},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "nullPointMode": "connected",
+        "tooltip": {"shared": true, "sort": 2},
+        "legend": {"show": true}
+      },
+      {
+        "id": 5,
+        "title": "Regime Distribution",
+        "type": "piechart",
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(regime_detection_total{job=\"eil-api\"}) by (regime)",
+            "legendFormat": "{{regime}}",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "legend": {"displayMode": "table", "placement": "right", "values": ["value", "percent"]},
+          "pieType": "donut"
+        }
+      },
+      {
+        "id": 6,
+        "title": "Diffusion Sampling Duration (P95)",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(diffusion_sample_duration_seconds_bucket{job=\"eil-api\"}[5m])) by (le))",
+            "legendFormat": "P95 Duration",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(diffusion_sample_duration_seconds_bucket{job=\"eil-api\"}[5m])) by (le))",
+            "legendFormat": "P99 Duration",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"label": "Duration", "format": "s"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2
+      },
+      {
+        "id": 7,
+        "title": "Proof Validation Rate",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(proof_validation_total{job=\"eil-api\",status=\"valid\"}[5m]))",
+            "legendFormat": "Valid Proofs/s",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(proof_validation_total{job=\"eil-api\",status=\"invalid\"}[5m]))",
+            "legendFormat": "Invalid Proofs/s",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"label": "Proofs/sec", "format": "ops"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2
+      },
+      {
+        "id": 8,
+        "title": "Energy Metrics by Domain",
+        "type": "table",
+        "gridPos": {"x": 0, "y": 24, "w": 24, "h": 8},
+        "targets": [
+          {
+            "expr": "avg(energy_fidelity{job=\"eil-api\"}) by (domain)",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          },
+          {
+            "expr": "avg(regime_confidence{job=\"eil-api\"}) by (domain)",
+            "format": "table",
+            "instant": true,
+            "refId": "B"
+          },
+          {
+            "expr": "sum(rate(diffusion_steps_total{job=\"eil-api\"}[5m])) by (domain)",
+            "format": "table",
+            "instant": true,
+            "refId": "C"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "merge",
+            "options": {}
+          }
+        ],
+        "options": {
+          "showHeader": true,
+          "sortBy": [{"displayName": "Energy Fidelity", "desc": true}]
+        },
+        "fieldConfig": {
+          "overrides": [
+            {"matcher": {"id": "byName", "options": "domain"}, "properties": [{"id": "displayName", "value": "Domain"}]},
+            {"matcher": {"id": "byName", "options": "Value #A"}, "properties": [{"id": "displayName", "value": "Energy Fidelity"}, {"id": "unit", "value": "percentunit"}]},
+            {"matcher": {"id": "byName", "options": "Value #B"}, "properties": [{"id": "displayName", "value": "Regime Confidence"}, {"id": "unit", "value": "percentunit"}]},
+            {"matcher": {"id": "byName", "options": "Value #C"}, "properties": [{"id": "displayName", "value": "Diffusion Rate (steps/s)"}, {"id": "unit", "value": "ops"}]}
+          ]
+        }
+      },
+      {
+        "id": 9,
+        "title": "Thermodynamic Constraints Violations",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 32, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(rate(energy_conservation_violations_total{job=\"eil-api\"}[5m]))",
+            "legendFormat": "Energy Conservation Violations",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(entropy_monotonicity_violations_total{job=\"eil-api\"}[5m]))",
+            "legendFormat": "Entropy Violations",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"label": "Violations/sec", "format": "ops"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "alert": {
+          "name": "Thermodynamic Violations",
+          "conditions": [
+            {
+              "evaluator": {"type": "gt", "params": [0.01]},
+              "query": {"params": ["A", "5m", "now"]},
+              "type": "query"
+            }
+          ],
+          "frequency": "60s",
+          "handler": 1,
+          "message": "Thermodynamic constraint violations detected",
+          "noDataState": "ok",
+          "executionErrorState": "alerting"
+        }
+      },
+      {
+        "id": 10,
+        "title": "Boltzmann Weighting Distribution",
+        "type": "heatmap",
+        "gridPos": {"x": 12, "y": 32, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(increase(boltzmann_weight_bucket{job=\"eil-api\"}[5m])) by (le)",
+            "format": "heatmap",
+            "refId": "A"
+          }
+        ],
+        "dataFormat": "tsbuckets",
+        "color": {
+          "mode": "spectrum",
+          "cardColor": "#b4ff00",
+          "colorScale": "sqrt",
+          "exponent": 0.5,
+          "colorScheme": "interpolateViridis"
+        },
+        "yAxis": {
+          "format": "short"
+        }
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "datasource",
+          "type": "datasource",
+          "query": "prometheus",
+          "current": {
+            "text": "Prometheus",
+            "value": "Prometheus"
+          }
+        },
+        {
+          "name": "domain",
+          "type": "query",
+          "datasource": "$datasource",
+          "query": "label_values(energy_fidelity, domain)",
+          "current": {
+            "text": "All",
+            "value": "$__all"
+          },
+          "includeAll": true,
+          "refresh": 1
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Diffusion Model Updates",
+          "datasource": "$datasource",
+          "expr": "changes(diffusion_model_version{job=\"eil-api\"}[5m]) > 0",
+          "iconColor": "purple",
+          "tagKeys": "version"
+        }
+      ]
+    }
+  }
+}

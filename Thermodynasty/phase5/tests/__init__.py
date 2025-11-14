@@ -1,7 +1,7 @@
 """
-Phase 5 EIL Integration Tests
+EIL Platform Test Suite
 
-Test suite for Energy Intelligence Layer and Phase 0-5 convergence.
+Comprehensive testing for Energy Intelligence Layer.
 """
 
-__version__ = "1.0.0"
+__version__ = "0.5.0"

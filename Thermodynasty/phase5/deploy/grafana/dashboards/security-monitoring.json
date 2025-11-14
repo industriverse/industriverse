@@ -1,0 +1,478 @@
+{
+  "dashboard": {
+    "title": "EIL Platform - Security Monitoring",
+    "tags": ["eil", "security", "auth", "audit"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "1m",
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Authentication Success Rate",
+        "type": "gauge",
+        "gridPos": {"x": 0, "y": 0, "w": 8, "h": 6},
+        "targets": [
+          {
+            "expr": "100 * sum(rate(auth_attempts_total{job=\"eil-api\",status=\"success\"}[5m])) / sum(rate(auth_attempts_total{job=\"eil-api\"}[5m]))",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 70, "color": "yellow"},
+                {"value": 90, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Failed Login Attempts/min",
+        "type": "stat",
+        "gridPos": {"x": 8, "y": 0, "w": 8, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(rate(auth_attempts_total{job=\"eil-api\",status=\"failure\"}[1m])) * 60",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value",
+          "orientation": "auto",
+          "textMode": "auto"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 2,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 5, "color": "yellow"},
+                {"value": 10, "color": "red"}
+              ]
+            }
+          }
+        },
+        "alert": {
+          "name": "High Failed Login Rate",
+          "conditions": [
+            {
+              "evaluator": {"type": "gt", "params": [10]},
+              "query": {"params": ["A", "5m", "now"]},
+              "type": "query"
+            }
+          ],
+          "frequency": "60s",
+          "handler": 1,
+          "message": "Failed login attempts exceed threshold - possible brute force attack",
+          "noDataState": "ok",
+          "executionErrorState": "alerting"
+        }
+      },
+      {
+        "id": 3,
+        "title": "Rate Limit Hits/min",
+        "type": "stat",
+        "gridPos": {"x": 16, "y": 0, "w": 8, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(rate(rate_limit_exceeded_total{job=\"eil-api\"}[1m])) * 60",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value",
+          "orientation": "auto",
+          "textMode": "auto"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 2,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 10, "color": "yellow"},
+                {"value": 50, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Authentication Attempts Over Time",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 6, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(auth_attempts_total{job=\"eil-api\",status=\"success\"}[5m])) * 60",
+            "legendFormat": "Success",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(auth_attempts_total{job=\"eil-api\",status=\"failure\"}[5m])) * 60",
+            "legendFormat": "Failure",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"label": "Attempts/min", "format": "short"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "tooltip": {"shared": true, "sort": 2},
+        "legend": {"show": true}
+      },
+      {
+        "id": 5,
+        "title": "Rate Limit Exceeded by Endpoint",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 6, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(rate_limit_exceeded_total{job=\"eil-api\"}[5m])) by (endpoint)",
+            "legendFormat": "{{endpoint}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Rate Limits/sec", "format": "ops"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "stack": true
+      },
+      {
+        "id": 6,
+        "title": "API Key Usage",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 14, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(api_key_requests_total{job=\"eil-api\",status=\"valid\"}[5m]))",
+            "legendFormat": "Valid Keys",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(api_key_requests_total{job=\"eil-api\",status=\"invalid\"}[5m]))",
+            "legendFormat": "Invalid Keys",
+            "refId": "B"
+          },
+          {
+            "expr": "sum(rate(api_key_requests_total{job=\"eil-api\",status=\"revoked\"}[5m]))",
+            "legendFormat": "Revoked Keys",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {"label": "Requests/sec", "format": "reqps"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2
+      },
+      {
+        "id": 7,
+        "title": "Permission Denials",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 14, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(permission_denied_total{job=\"eil-api\"}[5m])) by (permission)",
+            "legendFormat": "{{permission}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Denials/sec", "format": "ops"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "stack": true
+      },
+      {
+        "id": 8,
+        "title": "Security Events Timeline",
+        "type": "table",
+        "gridPos": {"x": 0, "y": 22, "w": 24, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(increase(security_event_total{job=\"eil-api\"}[5m])) by (event_type, severity)",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {"Time": true},
+              "indexByName": {},
+              "renameByName": {
+                "event_type": "Event Type",
+                "severity": "Severity",
+                "Value": "Count (5m)"
+              }
+            }
+          }
+        ],
+        "options": {
+          "showHeader": true,
+          "sortBy": [{"displayName": "Count (5m)", "desc": true}]
+        },
+        "fieldConfig": {
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "Severity"},
+              "properties": [
+                {
+                  "id": "custom.cellOptions",
+                  "value": {
+                    "type": "color-background",
+                    "mode": "basic"
+                  }
+                },
+                {
+                  "id": "mappings",
+                  "value": [
+                    {"type": "value", "options": {"critical": {"color": "red", "index": 0}}},
+                    {"type": "value", "options": {"error": {"color": "orange", "index": 1}}},
+                    {"type": "value", "options": {"warning": {"color": "yellow", "index": 2}}},
+                    {"type": "value", "options": {"info": {"color": "green", "index": 3}}}
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 9,
+        "title": "Suspicious Activity Detections",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 30, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(rate(security_event_total{job=\"eil-api\",event_type=\"suspicious_activity\"}[5m]))",
+            "legendFormat": "Suspicious Activity",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(security_event_total{job=\"eil-api\",event_type=~\".*injection.*\"}[5m]))",
+            "legendFormat": "Injection Attempts",
+            "refId": "B"
+          },
+          {
+            "expr": "sum(rate(security_event_total{job=\"eil-api\",event_type=\"path_traversal\"}[5m]))",
+            "legendFormat": "Path Traversal",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {"label": "Events/sec", "format": "ops"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "alert": {
+          "name": "Suspicious Activity Detected",
+          "conditions": [
+            {
+              "evaluator": {"type": "gt", "params": [0.1]},
+              "query": {"params": ["A", "5m", "now"]},
+              "type": "query"
+            }
+          ],
+          "frequency": "60s",
+          "handler": 1,
+          "message": "Suspicious security activity detected",
+          "noDataState": "ok",
+          "executionErrorState": "alerting"
+        }
+      },
+      {
+        "id": 10,
+        "title": "Token Operations",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 30, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(rate(security_event_total{job=\"eil-api\",event_type=\"token_created\"}[5m]))",
+            "legendFormat": "Tokens Created",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(security_event_total{job=\"eil-api\",event_type=\"token_refreshed\"}[5m]))",
+            "legendFormat": "Tokens Refreshed",
+            "refId": "B"
+          },
+          {
+            "expr": "sum(rate(security_event_total{job=\"eil-api\",event_type=\"token_revoked\"}[5m]))",
+            "legendFormat": "Tokens Revoked",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {"label": "Operations/sec", "format": "ops"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2
+      },
+      {
+        "id": 11,
+        "title": "Top Failed Login IPs",
+        "type": "table",
+        "gridPos": {"x": 0, "y": 36, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "topk(10, sum(increase(auth_attempts_total{job=\"eil-api\",status=\"failure\"}[1h])) by (ip_address))",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {"Time": true},
+              "renameByName": {
+                "ip_address": "IP Address",
+                "Value": "Failed Attempts (1h)"
+              }
+            }
+          }
+        ],
+        "options": {
+          "showHeader": true,
+          "sortBy": [{"displayName": "Failed Attempts (1h)", "desc": true}]
+        }
+      },
+      {
+        "id": 12,
+        "title": "Rate Limited Users",
+        "type": "table",
+        "gridPos": {"x": 12, "y": 36, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "topk(10, sum(increase(rate_limit_exceeded_total{job=\"eil-api\"}[1h])) by (user_id))",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {"Time": true},
+              "renameByName": {
+                "user_id": "User ID",
+                "Value": "Rate Limit Hits (1h)"
+              }
+            }
+          }
+        ],
+        "options": {
+          "showHeader": true,
+          "sortBy": [{"displayName": "Rate Limit Hits (1h)", "desc": true}]
+        }
+      },
+      {
+        "id": 13,
+        "title": "Audit Log Events",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 44, "w": 24, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(rate(audit_events_total{job=\"eil-api\"}[5m])) by (severity)",
+            "legendFormat": "{{severity}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Events/sec", "format": "ops"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "stack": true
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "datasource",
+          "type": "datasource",
+          "query": "prometheus",
+          "current": {
+            "text": "Prometheus",
+            "value": "Prometheus"
+          }
+        },
+        {
+          "name": "time_range",
+          "type": "interval",
+          "query": "1m,5m,15m,1h,6h,24h",
+          "current": {
+            "text": "5m",
+            "value": "5m"
+          }
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Security Incidents",
+          "datasource": "$datasource",
+          "expr": "security_event_total{severity=\"critical\"}",
+          "iconColor": "red",
+          "tagKeys": "event_type"
+        },
+        {
+          "name": "Password Changes",
+          "datasource": "$datasource",
+          "expr": "changes(security_event_total{event_type=\"password_changed\"}[1m]) > 0",
+          "iconColor": "purple",
+          "tagKeys": "user_id"
+        }
+      ]
+    }
+  }
+}
