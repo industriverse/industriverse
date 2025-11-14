@@ -230,7 +230,7 @@ class EnterpriseDiffusion:
         # Initialize diffusion model
         diffusion_config = DiffusionConfig(
             timesteps=self.config.timesteps,
-            noise_schedule=self.config.noise_schedule,
+            schedule_type=self.config.noise_schedule,
             beta_start=self.config.beta_start,
             beta_end=self.config.beta_end
         )
