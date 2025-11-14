@@ -9,6 +9,7 @@ import asyncio
 from typing import Generator
 from fastapi.testclient import TestClient
 import numpy as np
+from datetime import datetime
 
 # Import application components
 import sys
@@ -129,7 +130,8 @@ def test_user():
             Permission.EIL_DIFFUSE.value,
             Permission.DATA_READ.value
         ],
-        disabled=False
+        disabled=False,
+        created_at=datetime.utcnow()
     )
 
 
@@ -138,12 +140,13 @@ def admin_user():
     """Test user with admin role"""
     return User(
         user_id="admin_user_456",
-        username="admin",
+        username="testuser",
         email="admin@eil-platform.io",
         hashed_password="$2b$12$dummy_hash",
         roles=[Role.ADMIN.value],
         permissions=[Permission.ALL.value],
-        disabled=False
+        disabled=False,
+        created_at=datetime.utcnow()
     )
 
 

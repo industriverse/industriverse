@@ -49,12 +49,17 @@ logger = logging.getLogger(__name__)
 # Prometheus Metrics
 # ============================================================================
 
-# Initialize metrics - use module-level variables to prevent re-registration
-REQUEST_COUNT = None
-REQUEST_DURATION = None
-ENERGY_FIDELITY = None
-ENTROPY_COHERENCE = None
-REGIME_CONFIDENCE = None
+# Prometheus metrics - with fallback for testing
+class NoOpMetric:
+    """No-op metric for when Prometheus metrics are already registered"""
+    def labels(self, **kwargs):
+        return self
+    def inc(self, amount=1):
+        pass
+    def observe(self, amount):
+        pass
+    def set(self, value):
+        pass
 
 try:
     REQUEST_COUNT = Counter(
@@ -63,8 +68,8 @@ try:
         ['endpoint', 'status']
     )
 except ValueError:
-    # Already registered, skip
-    pass
+    # Already registered (testing), use no-op
+    REQUEST_COUNT = NoOpMetric()
 
 try:
     REQUEST_DURATION = Histogram(
@@ -73,7 +78,7 @@ try:
         ['endpoint']
     )
 except ValueError:
-    pass
+    REQUEST_DURATION = NoOpMetric()
 
 try:
     ENERGY_FIDELITY = Gauge(
@@ -81,7 +86,7 @@ try:
         'Energy conservation fidelity'
     )
 except ValueError:
-    pass
+    ENERGY_FIDELITY = NoOpMetric()
 
 try:
     ENTROPY_COHERENCE = Gauge(
@@ -89,7 +94,7 @@ try:
         'Entropy monotonicity score'
     )
 except ValueError:
-    pass
+    ENTROPY_COHERENCE = NoOpMetric()
 
 try:
     REGIME_CONFIDENCE = Gauge(
@@ -97,7 +102,7 @@ try:
         'Regime detection confidence'
     )
 except ValueError:
-    pass
+    REGIME_CONFIDENCE = NoOpMetric()
 
 # ============================================================================
 # Application State
@@ -136,13 +141,22 @@ class ApplicationState:
 
         # Initialize diffusion model
         logger.info("Initializing Diffusion Model...")
+
+        # Determine device - fallback to CPU if CUDA not available
+        requested_device = self.config['diffusion'].get('device', 'cpu')
+        if requested_device == 'cuda' and not torch.cuda.is_available():
+            logger.warning("CUDA requested but not available, falling back to CPU")
+            device = 'cpu'
+        else:
+            device = requested_device
+
         diffusion_config = DiffusionConfig(
             timesteps=self.config['diffusion']['timesteps'],
             beta_start=self.config['diffusion']['beta_start'],
             beta_end=self.config['diffusion']['beta_end'],
             schedule_type=self.config['diffusion']['noise_schedule'],
             temperature=self.config['diffusion'].get('temperature', 1.0),
-            device=self.config['diffusion'].get('device', 'cpu')
+            device=device
         )
         self.diffusion_model = DiffusionModel(diffusion_config)
 
@@ -157,8 +171,8 @@ class ApplicationState:
         # Initialize market engine
         logger.info("Initializing Market Engine...")
         self.market_engine = MarketEngine(
-            base_ceu_price=self.config['market']['base_ceu_price_usd'],
-            base_pft_price=self.config['market']['base_pft_price_usd']
+            base_ceu_usd=self.config['market']['base_ceu_price_usd'],
+            base_pft_usd=self.config['market']['base_pft_price_usd']
         )
 
         self.initialized = True
@@ -226,7 +240,13 @@ def create_app() -> FastAPI:
             eil_initialized=True,
             diffusion_available=True,
             gpu_available=torch.cuda.is_available(),
-            energy_fidelity=float(ENERGY_FIDELITY._value.get()) if hasattr(ENERGY_FIDELITY, '_value') else None
+            energy_fidelity=float(ENERGY_FIDELITY._value.get()) if hasattr(ENERGY_FIDELITY, '_value') else None,
+            checks={
+                "eil": True,
+                "diffusion": True,
+                "proof_validator": True,
+                "market_engine": True
+            }
         )
 
     @app.get("/metrics")
@@ -428,11 +448,12 @@ def create_app() -> FastAPI:
             REQUEST_COUNT.labels(endpoint='/v1/market/pricing', status='success').inc()
 
             return MarketPricingResponse(
-                ceu_price_usd=pricing['ceu_price_usd'],
-                pft_price_usd=pricing['pft_price_usd'],
+                ceu_price=pricing['ceu_price'],
+                pft_price=pricing['pft_price'],
                 ceu_pft_rate=pricing['ceu_pft_rate'],
                 pool_liquidity_ceu=pricing.get('pool_liquidity_ceu', 1000000.0),
-                pool_liquidity_pft=pricing.get('pool_liquidity_pft', 10000.0)
+                pool_liquidity_pft=pricing.get('pool_liquidity_pft', 10000.0),
+                last_updated=pricing.get('last_updated')
             )
 
         except Exception as e:

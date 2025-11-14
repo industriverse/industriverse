@@ -316,12 +316,12 @@ class ProofResponse(BaseModel):
 class MarketPricingResponse(BaseModel):
     """Response for market pricing"""
 
-    ceu_price_usd: float = Field(
+    ceu_price: float = Field(
         ...,
         description="Current CEU price in USD"
     )
 
-    pft_price_usd: float = Field(
+    pft_price: float = Field(
         ...,
         description="Current PFT price in USD"
     )
@@ -339,6 +339,11 @@ class MarketPricingResponse(BaseModel):
     pool_liquidity_pft: float = Field(
         ...,
         description="PFT liquidity in pool"
+    )
+
+    last_updated: Optional[str] = Field(
+        None,
+        description="Last update timestamp"
     )
 
     quote: Optional[Dict[str, float]] = Field(
@@ -390,6 +395,11 @@ class HealthResponse(BaseModel):
     energy_fidelity: Optional[float] = Field(
         None,
         description="Current energy fidelity metric"
+    )
+
+    checks: Optional[Dict[str, bool]] = Field(
+        None,
+        description="Health check results"
     )
 
     timestamp: datetime = Field(

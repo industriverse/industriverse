@@ -336,6 +336,17 @@ class MarketEngine:
         self.market_state.timestamp = time.time()
         return self.market_state
 
+    def get_pricing(self) -> Dict:
+        """Get current pricing information"""
+        return {
+            'ceu_price': self.market_state.ceu_to_usd,
+            'pft_price': self.market_state.pft_to_usd,
+            'ceu_pft_rate': self.market_state.ceu_to_pft,
+            'pool_liquidity_ceu': self.market_state.ceu_supply * 0.1,  # 10% in AMM pool
+            'pool_liquidity_pft': self.market_state.pft_supply * 0.1,
+            'last_updated': datetime.fromtimestamp(self.market_state.timestamp).isoformat()
+        }
+
     def get_stats(self) -> Dict:
         """Get market statistics"""
         return {
