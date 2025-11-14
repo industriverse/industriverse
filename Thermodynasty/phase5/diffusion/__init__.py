@@ -48,6 +48,17 @@ from .training import (
     WandbLogger,
     LearningRateScheduler
 )
+from .domains import (
+    MolecularDiffusion,
+    MolecularConfig,
+    MolecularEnergyField,
+    PlasmaDiffusion,
+    PlasmaConfig,
+    PlasmaEnergyField,
+    EnterpriseDiffusion,
+    EnterpriseConfig,
+    EnterpriseEnergyField
+)
 
 __all__ = [
     # Energy representation
@@ -95,6 +106,17 @@ __all__ = [
     'GradientMonitor',
     'WandbLogger',
     'LearningRateScheduler',
+
+    # Domain capsules
+    'MolecularDiffusion',
+    'MolecularConfig',
+    'MolecularEnergyField',
+    'PlasmaDiffusion',
+    'PlasmaConfig',
+    'PlasmaEnergyField',
+    'EnterpriseDiffusion',
+    'EnterpriseConfig',
+    'EnterpriseEnergyField',
 ]
 
 __version__ = "0.5.0-alpha"
