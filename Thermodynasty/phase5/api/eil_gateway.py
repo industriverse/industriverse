@@ -35,7 +35,7 @@ from phase5.diffusion import (
     EnergyGuidedSampler
 )
 from phase5.core.energy_intelligence_layer import EnergyIntelligenceLayer
-from phase5.validation.proof_validator import ProofValidator
+from phase5.core.proof_validator import ProofValidator
 from phase5.core.market_engine import MarketEngine
 
 # Configure logging
@@ -49,32 +49,55 @@ logger = logging.getLogger(__name__)
 # Prometheus Metrics
 # ============================================================================
 
-REQUEST_COUNT = Counter(
-    'eil_api_requests_total',
-    'Total API requests',
-    ['endpoint', 'status']
-)
+# Initialize metrics - use module-level variables to prevent re-registration
+REQUEST_COUNT = None
+REQUEST_DURATION = None
+ENERGY_FIDELITY = None
+ENTROPY_COHERENCE = None
+REGIME_CONFIDENCE = None
 
-REQUEST_DURATION = Histogram(
-    'eil_api_request_duration_seconds',
-    'Request duration in seconds',
-    ['endpoint']
-)
+try:
+    REQUEST_COUNT = Counter(
+        'eil_api_requests_total',
+        'Total API requests',
+        ['endpoint', 'status']
+    )
+except ValueError:
+    # Already registered, skip
+    pass
 
-ENERGY_FIDELITY = Gauge(
-    'eil_energy_fidelity',
-    'Energy conservation fidelity'
-)
+try:
+    REQUEST_DURATION = Histogram(
+        'eil_api_request_duration_seconds',
+        'Request duration in seconds',
+        ['endpoint']
+    )
+except ValueError:
+    pass
 
-ENTROPY_COHERENCE = Gauge(
-    'eil_entropy_coherence',
-    'Entropy monotonicity score'
-)
+try:
+    ENERGY_FIDELITY = Gauge(
+        'eil_energy_fidelity',
+        'Energy conservation fidelity'
+    )
+except ValueError:
+    pass
 
-REGIME_CONFIDENCE = Gauge(
-    'eil_regime_confidence',
-    'Regime detection confidence'
-)
+try:
+    ENTROPY_COHERENCE = Gauge(
+        'eil_entropy_coherence',
+        'Entropy monotonicity score'
+    )
+except ValueError:
+    pass
+
+try:
+    REGIME_CONFIDENCE = Gauge(
+        'eil_regime_confidence',
+        'Regime detection confidence'
+    )
+except ValueError:
+    pass
 
 # ============================================================================
 # Application State

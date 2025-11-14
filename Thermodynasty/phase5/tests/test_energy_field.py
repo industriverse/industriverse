@@ -9,7 +9,7 @@ import pytest
 import numpy as np
 import torch
 
-from diffusion.core.energy_field import EnergyField, EnergyFieldConfig, ThermodynamicState
+from diffusion.core.energy_field import EnergyField, EnergyState
 
 
 @pytest.mark.unit

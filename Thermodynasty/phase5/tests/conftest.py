@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from api.eil_gateway import app
-from diffusion.core.energy_field import EnergyField, EnergyFieldConfig
+from diffusion.core.energy_field import EnergyField, EnergyState
 from diffusion.core.diffusion_dynamics import ForwardDiffusion, ReverseDiffusion, DiffusionConfig
 from security.auth import AuthManager, User
 from security.rbac import Permission, Role
@@ -50,19 +50,14 @@ def client() -> Generator:
 # ============================================================================
 
 @pytest.fixture
-def energy_field_config():
-    """Standard energy field configuration"""
-    return EnergyFieldConfig(
-        energy_tolerance=0.01,
-        entropy_min_delta=-1e-6,
-        temperature=1.0
-    )
-
-
-@pytest.fixture
-def energy_field(energy_field_config):
+def energy_field():
     """Energy field instance"""
-    return EnergyField(energy_field_config)
+    return EnergyField(
+        shape=(32, 32),
+        temperature=1.0,
+        energy_tolerance=0.01,
+        device="cpu"
+    )
 
 
 @pytest.fixture
