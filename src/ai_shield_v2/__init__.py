@@ -23,7 +23,7 @@ Copyright © 2025 Industriverse Corporation. All Rights Reserved.
 Classification: CONFIDENTIAL - PATENT PENDING
 """
 
-__version__ = "2.4.0"  # Phase 5 (5.1-5.3) complete
+__version__ = "2.5.0"  # Phase 6 (Full Hybrid Superstructure) complete
 __author__ = "Industriverse Corporation"
 
 from .mic import MathIsomorphismCore, PhysicsSignature, PhysicsDomain
@@ -56,6 +56,12 @@ from .autonomous import (
     DecisionType,
     AutonomyLevel,
     ExecutionMode
+)
+from .hybrid import (
+    HybridSuperstructure,
+    SystemRole,
+    OperationMode,
+    SuperstructureStatus
 )
 
 __all__ = [
@@ -101,5 +107,19 @@ __all__ = [
     "EnergyLayerMonitor",
     "ProofOfEnergyLedger",
     "ResourceType",
-    "TransactionType"
+    "TransactionType",
+
+    # Autonomous Operations (Phase 5)
+    "AutonomousDecisionEngine",
+    "AutomatedResponseExecutor",
+    "SelfHealingSystem",
+    "DecisionType",
+    "AutonomyLevel",
+    "ExecutionMode",
+
+    # Hybrid Superstructure (Phase 6)
+    "HybridSuperstructure",
+    "SystemRole",
+    "OperationMode",
+    "SuperstructureStatus"
 ]
