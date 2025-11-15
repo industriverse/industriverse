@@ -23,7 +23,7 @@ Copyright © 2025 Industriverse Corporation. All Rights Reserved.
 Classification: CONFIDENTIAL - PATENT PENDING
 """
 
-__version__ = "2.1.0"  # Phase 2 complete
+__version__ = "2.2.0"  # Phase 3 complete
 __author__ = "Industriverse Corporation"
 
 from .mic import MathIsomorphismCore, PhysicsSignature, PhysicsDomain
@@ -42,6 +42,12 @@ from .shadow_integration import (
     UnifiedShadowSystem,
     ConsciousnessLevel,
     ThreatDomain
+)
+from .energy import (
+    EnergyLayerMonitor,
+    ProofOfEnergyLedger,
+    ResourceType,
+    TransactionType
 )
 
 __all__ = [
@@ -81,5 +87,11 @@ __all__ = [
     # Shadow Integration (Phase 2.6)
     "UnifiedShadowSystem",
     "ConsciousnessLevel",
-    "ThreatDomain"
+    "ThreatDomain",
+
+    # Energy Layer (Phase 3)
+    "EnergyLayerMonitor",
+    "ProofOfEnergyLedger",
+    "ResourceType",
+    "TransactionType"
 ]
