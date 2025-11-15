@@ -1,0 +1,34 @@
+# AI Shield v2 - Production Dependencies
+# =======================================
+
+# Core numerical computing
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Deep learning (optional for future GPU acceleration)
+torch>=2.0.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+
+# Performance monitoring
+psutil>=5.9.0
+
+# Logging and monitoring
+structlog>=23.1.0
+
+# Data validation
+pydantic>=2.0.0
+
+# Configuration
+pyyaml>=6.0
+
+# Concurrency
+aiohttp>=3.8.0
+
+# Development dependencies
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.4.0
