@@ -38,6 +38,11 @@ from .diffusion import (
     DiffusionMode,
     SimulationDecision
 )
+from .shadow_integration import (
+    UnifiedShadowSystem,
+    ConsciousnessLevel,
+    ThreatDomain
+)
 
 __all__ = [
     # Version
@@ -71,5 +76,10 @@ __all__ = [
     "AdversarialDetector",
     "ShadowTwinSimulator",
     "DiffusionMode",
-    "SimulationDecision"
+    "SimulationDecision",
+
+    # Shadow Integration (Phase 2.6)
+    "UnifiedShadowSystem",
+    "ConsciousnessLevel",
+    "ThreatDomain"
 ]
