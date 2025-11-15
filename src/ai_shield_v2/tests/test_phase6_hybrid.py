@@ -138,15 +138,17 @@ class TestThreeRoleArchitecture:
         """Test Immune System (UPD + Fusion) role"""
         superstructure = HybridSuperstructure()
 
-        # Create test sample
+        # Create test sample and get physics signature
         sample = np.random.randn(100)
+        telemetry_data = {"data": sample.tolist()}
+        physics_signature = superstructure.mic.analyze_stream(telemetry_data)
 
-        # Detect threats through immune system
-        upd_results = superstructure.upd.detect(sample)
-        assert len(upd_results) > 0
+        # Detect threats through immune system using UPD
+        upd_result = superstructure.upd.analyze(physics_signature)
+        assert len(upd_result.detections) > 0
 
         # Fuse detections
-        fusion_result = superstructure.fusion_engine.fuse_detections(upd_results)
+        fusion_result = superstructure.fusion_engine.fuse_detections(upd_result.detections)
         assert fusion_result.threat_intelligence is not None
         assert fusion_result.threat_intelligence.ici_score is not None
 

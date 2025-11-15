@@ -332,11 +332,12 @@ class HybridSuperstructure:
         # ROLE 2: IMMUNE SYSTEM - Detect threats
         # ====================================================================
 
-        # UPD 7-domain detection
-        upd_results = self.upd.detect(sample)
+        # UPD 7-domain detection using physics signature
+        upd_result = self.upd.analyze(physics_signature)
+        upd_detections = upd_result.detections
 
         # Physics fusion with consensus
-        fusion_result = self.fusion_engine.fuse_detections(upd_results)
+        fusion_result = self.fusion_engine.fuse_detections(upd_detections)
         ici_score = fusion_result.threat_intelligence.ici_score
 
         # Classify threat level
@@ -412,7 +413,7 @@ class HybridSuperstructure:
             threat_level=threat_level,
             consciousness_level=consciousness_level,
             physics_signature=physics_signature,
-            upd_detections=upd_results,
+            upd_detections=upd_detections,
             fusion_result=fusion_result,
             autonomous_decision=autonomous_decision,
             response_executed=autonomous_decision is not None and autonomous_decision.executed if autonomous_decision else False,
