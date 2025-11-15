@@ -324,9 +324,8 @@ class HybridSuperstructure:
         telemetry_data = {"data": sample.tolist() if isinstance(sample, np.ndarray) else sample}
         physics_signature = self.mic.analyze_stream(telemetry_data)
 
-        # Get consciousness state from shadow system
-        consciousness_state = self.shadow_system.get_consciousness_state()
-        consciousness_level = consciousness_state.current_level
+        # Default consciousness level (UnifiedShadowSystem is async-based, use basic level for sync operation)
+        consciousness_level = ConsciousnessLevel.BASIC
 
         # ====================================================================
         # ROLE 2: IMMUNE SYSTEM - Detect threats
@@ -389,7 +388,7 @@ class HybridSuperstructure:
                 ici_score=ici_score.score,
                 threat_level=threat_level,
                 fusion_result=fusion_result,
-                consciousness_state=consciousness_state,
+                consciousness_level=consciousness_level,
                 energy_available=energy_state.total_energy,
                 detected_patterns=[]
             )
