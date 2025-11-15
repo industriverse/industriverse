@@ -213,7 +213,7 @@ class ICIClassifier:
             base_autonomy = AutonomyLevel.SEMI_AUTO if confidence > 0.8 else AutonomyLevel.MANUAL
         else:  # CRITICAL
             # Critical threats: full auto if high confidence + high consciousness
-            if confidence > 0.9 and consciousness_level in [ConsciousnessLevel.STRATEGIC, ConsciousnessLevel.TRANSCENDENT]:
+            if confidence > 0.9 and consciousness_level in [ConsciousnessLevel.PLANETARY, ConsciousnessLevel.UNIVERSAL]:
                 base_autonomy = AutonomyLevel.FULL_AUTO
             elif confidence > 0.7:
                 base_autonomy = AutonomyLevel.SEMI_AUTO
@@ -553,7 +553,7 @@ class AutonomousDecisionEngine:
 
         # ICI confidence from fusion
         if context.fusion_result:
-            confidence_factors.append(context.fusion_result.threat_intelligence.ici_score.confidence)
+            confidence_factors.append(context.fusion_result.threat_intelligence.ici_score.consensus_metrics.confidence)
 
         # Correlation analysis confidence
         if context.correlation_analysis and context.correlation_analysis.patterns:

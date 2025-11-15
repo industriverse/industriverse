@@ -32,6 +32,7 @@ from typing import Dict, List, Optional, Any, Callable
 from enum import Enum
 import logging
 import time
+import threading
 from collections import deque
 from threading import Lock, Thread, Event
 from queue import Queue, Empty
@@ -470,7 +471,7 @@ class AutomatedResponseExecutor:
 
     def _executor_worker(self):
         """Background worker for executing decisions"""
-        logger.info(f"Executor worker {Thread.current_thread().name} started")
+        logger.info(f"Executor worker {threading.current_thread().name} started")
 
         while self.running and not self.stop_event.is_set():
             try:
@@ -506,7 +507,7 @@ class AutomatedResponseExecutor:
             except Exception as e:
                 logger.error(f"Executor worker error: {e}")
 
-        logger.info(f"Executor worker {Thread.current_thread().name} stopped")
+        logger.info(f"Executor worker {threading.current_thread().name} stopped")
 
     def _execute_decision_actions(self, decision: AutonomousDecision) -> List[ExecutionResult]:
         """Execute all actions in a decision"""
