@@ -15,12 +15,15 @@ Components:
 - Physics Fusion Engine: 4/7 consensus + ICI scoring
 - Telemetry Pipeline: High-throughput ingestion
 - PDE-hash Validator: Canonical state identity
+- Diffusion Engine: Predictive threat simulation (Phase 2)
+- Adversarial Detector: Energy perturbation detection (Phase 2)
+- Shadow Twin Simulator: Pre-simulation for high-ICI threats (Phase 2)
 
 Copyright © 2025 Industriverse Corporation. All Rights Reserved.
 Classification: CONFIDENTIAL - PATENT PENDING
 """
 
-__version__ = "2.0.0"
+__version__ = "2.1.0"  # Phase 2 complete
 __author__ = "Industriverse Corporation"
 
 from .mic import MathIsomorphismCore, PhysicsSignature, PhysicsDomain
@@ -28,6 +31,13 @@ from .upd import UniversalPatternDetectorsSuite, ThreatLevel, ExtendedDomain
 from .fusion import PhysicsFusionEngine, ResponseAction, ConsensusType
 from .telemetry import TelemetryIngestionPipeline, TelemetrySource
 from .core import PDEHashValidator, ValidationStatus
+from .diffusion import (
+    DiffusionEngine,
+    AdversarialDetector,
+    ShadowTwinSimulator,
+    DiffusionMode,
+    SimulationDecision
+)
 
 __all__ = [
     # Version
@@ -54,5 +64,12 @@ __all__ = [
 
     # Core
     "PDEHashValidator",
-    "ValidationStatus"
+    "ValidationStatus",
+
+    # Diffusion (Phase 2)
+    "DiffusionEngine",
+    "AdversarialDetector",
+    "ShadowTwinSimulator",
+    "DiffusionMode",
+    "SimulationDecision"
 ]
