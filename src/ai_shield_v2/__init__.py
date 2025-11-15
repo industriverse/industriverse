@@ -23,7 +23,7 @@ Copyright © 2025 Industriverse Corporation. All Rights Reserved.
 Classification: CONFIDENTIAL - PATENT PENDING
 """
 
-__version__ = "2.3.0"  # Phase 4 (4.1-4.3) complete
+__version__ = "2.4.0"  # Phase 5 (5.1-5.3) complete
 __author__ = "Industriverse Corporation"
 
 from .mic import MathIsomorphismCore, PhysicsSignature, PhysicsDomain
@@ -48,6 +48,14 @@ from .energy import (
     ProofOfEnergyLedger,
     ResourceType,
     TransactionType
+)
+from .autonomous import (
+    AutonomousDecisionEngine,
+    AutomatedResponseExecutor,
+    SelfHealingSystem,
+    DecisionType,
+    AutonomyLevel,
+    ExecutionMode
 )
 
 __all__ = [
