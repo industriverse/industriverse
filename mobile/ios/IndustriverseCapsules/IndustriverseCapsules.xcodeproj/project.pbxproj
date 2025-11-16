@@ -1,0 +1,303 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1000001 /* IndustriverseCapsulesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000 /* IndustriverseCapsulesApp.swift */; };
+		A1000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002 /* ContentView.swift */; };
+		A1000005 /* CapsuleAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000004 /* CapsuleAttributes.swift */; };
+		A1000007 /* CapsulePillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000006 /* CapsulePillView.swift */; };
+		A1000009 /* CapsuleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008 /* CapsuleManager.swift */; };
+		A100000B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A100000A /* Assets.xcassets */; };
+		A100000E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A100000D /* Preview Assets.xcassets */; };
+		A1000020 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A100001F /* WidgetKit.framework */; };
+		A1000022 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000021 /* SwiftUI.framework */; };
+		A1000025 /* CapsuleWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000024 /* CapsuleWidget.swift */; };
+		A1000027 /* CapsuleWidgetLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000026 /* CapsuleWidgetLiveActivity.swift */; };
+		A1000029 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000028 /* Assets.xcassets */; };
+		A100002D /* CapsuleWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A100001D /* CapsuleWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A0FFFFFF /* IndustriverseCapsules.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IndustriverseCapsules.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1000000 /* IndustriverseCapsulesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndustriverseCapsulesApp.swift; sourceTree = "<group>"; };
+		A1000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A1000004 /* CapsuleAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleAttributes.swift; sourceTree = "<group>"; };
+		A1000006 /* CapsulePillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsulePillView.swift; sourceTree = "<group>"; };
+		A1000008 /* CapsuleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleManager.swift; sourceTree = "<group>"; };
+		A100000A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A100000D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		A100000F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1000010 /* IndustriverseCapsules.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IndustriverseCapsules.entitlements; sourceTree = "<group>"; };
+		A100001D /* CapsuleWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CapsuleWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A100001F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		A1000021 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		A1000024 /* CapsuleWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleWidget.swift; sourceTree = "<group>"; };
+		A1000026 /* CapsuleWidgetLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleWidgetLiveActivity.swift; sourceTree = "<group>"; };
+		A1000028 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A100002A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A0FFFFFE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A100001A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000022 /* SwiftUI.framework in Frameworks */,
+				A1000020 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A0FFFFFD /* IndustriverseCapsules */ = {
+			isa = PBXGroup;
+			children = (
+				A1000010 /* IndustriverseCapsules.entitlements */,
+				A1000000 /* IndustriverseCapsulesApp.swift */,
+				A1000002 /* ContentView.swift */,
+				A1000004 /* CapsuleAttributes.swift */,
+				A1000006 /* CapsulePillView.swift */,
+				A1000008 /* CapsuleManager.swift */,
+				A100000A /* Assets.xcassets */,
+				A100000F /* Info.plist */,
+				A100000C /* Preview Content */,
+			);
+			path = IndustriverseCapsules;
+			sourceTree = "<group>";
+		};
+		A100000C /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				A100000D /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		A1000023 /* CapsuleWidget */ = {
+			isa = PBXGroup;
+			children = (
+				A1000024 /* CapsuleWidget.swift */,
+				A1000026 /* CapsuleWidgetLiveActivity.swift */,
+				A1000028 /* Assets.xcassets */,
+				A100002A /* Info.plist */,
+			);
+			path = CapsuleWidget;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A0FFFFFE /* IndustriverseCapsules */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1000011 /* Build configuration list for PBXNativeTarget "IndustriverseCapsules" */;
+			buildPhases = (
+				A0FFFFFB /* Sources */,
+				A0FFFFFE /* Frameworks */,
+				A0FFFFFD /* Resources */,
+				A100002E /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A100002B /* PBXTargetDependency */,
+			);
+			name = IndustriverseCapsules;
+			productName = IndustriverseCapsules;
+			productReference = A0FFFFFF /* IndustriverseCapsules.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A100001C /* CapsuleWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1000030 /* Build configuration list for PBXNativeTarget "CapsuleWidgetExtension" */;
+			buildPhases = (
+				A1000019 /* Sources */,
+				A100001A /* Frameworks */,
+				A100001B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CapsuleWidgetExtension;
+			productName = CapsuleWidgetExtension;
+			productReference = A100001D /* CapsuleWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A0FFFFFA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					A0FFFFFE = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					A100001C = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = A0FFFFFB /* Build configuration list for PBXProject "IndustriverseCapsules" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A0FFFFF9;
+			productRefGroup = A1000000;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A0FFFFFE /* IndustriverseCapsules */,
+				A100001C /* CapsuleWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		A1000012 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = IndustriverseCapsules/IndustriverseCapsules.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"IndustriverseCapsules/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IndustriverseCapsules/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.industriverse.capsules;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A1000013 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = IndustriverseCapsules/IndustriverseCapsules.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"IndustriverseCapsules/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IndustriverseCapsules/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.industriverse.capsules;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A1000031 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CapsuleWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CapsuleWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.industriverse.capsules.CapsuleWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A1000032 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CapsuleWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CapsuleWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.industriverse.capsules.CapsuleWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+	};
+	rootObject = A0FFFFFA /* Project object */;
+}
