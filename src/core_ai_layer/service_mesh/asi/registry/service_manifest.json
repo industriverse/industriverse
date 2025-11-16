@@ -1,0 +1,33 @@
+[
+  {
+    "service_id": "obmi-aesp-v1",
+    "service_type": "grpc",
+    "endpoint": "grpc://10.244.0.157:8080",
+    "protocol": "grpc",
+    "energy_cost": 0.12,
+    "reliability": 0.98,
+    "utid_seed": "UTID:industriverse:service:obmi-aesp-v1:v1:d3e02001a1a9e2d1",
+    "capabilities": [
+      "quantum_validation",
+      "epistemic_scoring"
+    ],
+    "status": "active",
+    "metadata": {
+      "operator_type": "AESP"
+    }
+  },
+  {
+    "service_id": "obmi-test-v1",
+    "service_type": "grpc",
+    "endpoint": "grpc://localhost:8080",
+    "protocol": "grpc",
+    "energy_cost": 0.0,
+    "reliability": 1.0,
+    "utid_seed": "UTID:industriverse:service:obmi-test-v1:v1:c4b11303c4dcc412",
+    "capabilities": [
+      "validation"
+    ],
+    "status": "active",
+    "metadata": {}
+  }
+]

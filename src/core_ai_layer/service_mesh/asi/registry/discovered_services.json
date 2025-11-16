@@ -1,0 +1,116 @@
+[
+  {
+    "service_id": "azure-obmi-operators-aroe-operator-service",
+    "service_type": "grpc",
+    "endpoint": "grpc://10.0.45.123:8200",
+    "protocol": "grpc",
+    "energy_cost": 0.1,
+    "reliability": 0.8775000000000001,
+    "capabilities": [
+      "obmi_validation",
+      "aroe_operator"
+    ],
+    "metadata": {
+      "cloud": "azure",
+      "cluster": "industriverse-azure-v2",
+      "namespace": "obmi-operators",
+      "k8s_name": "aroe-operator-service",
+      "service_type": "ClusterIP",
+      "age_days": 15.5,
+      "labels": {
+        "app": "aroe",
+        "operator": "obmi"
+      }
+    }
+  },
+  {
+    "service_id": "azure-discovery-discovery-loop-v16",
+    "service_type": "http",
+    "endpoint": "http://10.0.67.89:8080",
+    "protocol": "http",
+    "energy_cost": 0.1,
+    "reliability": 0.8410000000000001,
+    "capabilities": [
+      "discovery_loop",
+      "hypothesis_generation"
+    ],
+    "metadata": {
+      "cloud": "azure",
+      "cluster": "industriverse-azure-v2",
+      "namespace": "discovery",
+      "k8s_name": "discovery-loop-v16",
+      "service_type": "ClusterIP",
+      "age_days": 8.2,
+      "labels": {
+        "app": "discovery",
+        "version": "v16"
+      }
+    }
+  },
+  {
+    "service_id": "azure-visualization-real3d-viewer",
+    "service_type": "http",
+    "endpoint": "http://20.123.45.67:80",
+    "protocol": "http",
+    "energy_cost": 0.1,
+    "reliability": 0.8600000000000001,
+    "capabilities": [
+      "visualization"
+    ],
+    "metadata": {
+      "cloud": "azure",
+      "cluster": "industriverse-azure-v2",
+      "namespace": "visualization",
+      "k8s_name": "real3d-viewer",
+      "service_type": "LoadBalancer",
+      "age_days": 12.0,
+      "labels": {
+        "app": "real3d"
+      }
+    }
+  },
+  {
+    "service_id": "aws-quantum-ops-quantum-advantage-calculator",
+    "service_type": "http",
+    "endpoint": "http://10.100.23.45:8080",
+    "protocol": "http",
+    "energy_cost": 0.1,
+    "reliability": 0.9,
+    "capabilities": [
+      "quantum_computing"
+    ],
+    "metadata": {
+      "cloud": "aws",
+      "cluster": "molecular-industrial",
+      "namespace": "quantum-ops",
+      "k8s_name": "quantum-advantage-calculator",
+      "service_type": "ClusterIP",
+      "age_days": 20.0,
+      "labels": {
+        "app": "quantum"
+      }
+    }
+  },
+  {
+    "service_id": "gcp-edge-compute-edge-agent-controller",
+    "service_type": "http",
+    "endpoint": "http://34.123.45.67:7200",
+    "protocol": "http",
+    "energy_cost": 0.1,
+    "reliability": 0.925,
+    "capabilities": [
+      "edge_computing"
+    ],
+    "metadata": {
+      "cloud": "gcp",
+      "cluster": "gke-cluster-1",
+      "namespace": "edge-compute",
+      "k8s_name": "edge-agent-controller",
+      "service_type": "LoadBalancer",
+      "age_days": 25.0,
+      "labels": {
+        "app": "edge"
+      }
+    }
+  }
+]
