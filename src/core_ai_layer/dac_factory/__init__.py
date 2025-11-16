@@ -76,3 +76,25 @@ __all__.extend([
     "BlockchainConnector",
     "BlockchainAnchor"
 ])
+
+from .proof_generator import (
+    ProofGenerator,
+    ProofGeneratorConfig,
+    Proof,
+    Circuit,
+    ProofProtocol,
+    ProofStatus,
+    ProvingKey,
+    VerificationKey
+)
+
+__all__.extend([
+    "ProofGenerator",
+    "ProofGeneratorConfig",
+    "Proof",
+    "Circuit",
+    "ProofProtocol",
+    "ProofStatus",
+    "ProvingKey",
+    "VerificationKey"
+])
