@@ -16,11 +16,26 @@ from .k8s_client_manager import (
     ClusterStatus
 )
 
+from .deploy_anywhere_integration import (
+    DeployAnywhereIntegration,
+    DeployAnywhereIntegrationConfig,
+    DeployAnywhereService,
+    DACDeployment,
+    DeploymentStatus,
+    ServiceType
+)
+
 __all__ = [
     "K8sClientManager",
     "K8sClientManagerConfig",
     "ClusterConfig",
     "ClusterHealth",
     "CloudProvider",
-    "ClusterStatus"
+    "ClusterStatus",
+    "DeployAnywhereIntegration",
+    "DeployAnywhereIntegrationConfig",
+    "DeployAnywhereService",
+    "DACDeployment",
+    "DeploymentStatus",
+    "ServiceType"
 ]
