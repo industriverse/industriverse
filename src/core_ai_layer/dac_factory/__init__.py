@@ -56,3 +56,23 @@ __all__.extend([
     "UpgradeStrategy",
     "UpgradeResult"
 ])
+
+from .utid_generator import (
+    UTIDGenerator,
+    UTIDGeneratorConfig,
+    UTID,
+    UTIDType,
+    BlockchainNetwork,
+    BlockchainConnector,
+    BlockchainAnchor
+)
+
+__all__.extend([
+    "UTIDGenerator",
+    "UTIDGeneratorConfig",
+    "UTID",
+    "UTIDType",
+    "BlockchainNetwork",
+    "BlockchainConnector",
+    "BlockchainAnchor"
+])
