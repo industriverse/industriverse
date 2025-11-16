@@ -21,6 +21,7 @@ import uvicorn
 from .database import CapsuleDatabase
 from .apns_service import APNsService
 from .redis_manager import RedisManager
+from .websocket_server import WebSocketServer
 
 
 class CapsuleState(str, Enum):
@@ -135,9 +136,7 @@ class CapsuleGatewayService:
         self.db = CapsuleDatabase()
         self.apns = APNsService()
         self.redis = RedisManager()
-        
-        # WebSocket connections (connection_id -> WebSocket)
-        self.active_connections: Dict[str, WebSocket] = {}
+        self.ws_server: Optional[WebSocketServer] = None
         
         # Setup routes
         self._setup_routes()
@@ -149,6 +148,10 @@ class CapsuleGatewayService:
         await self.db.connect()
         await self.apns.connect()
         await self.redis.connect()
+        
+        # Initialize WebSocket server
+        self.ws_server = WebSocketServer(self.redis)
+        
         print("✅ All services connected")
     
     async def shutdown(self):
@@ -486,76 +489,25 @@ class CapsuleGatewayService:
         @self.app.websocket("/ws")
         async def websocket_endpoint(websocket: WebSocket):
             """WebSocket endpoint for real-time updates"""
-            await self._handle_websocket(websocket)
+            connection_id = f"ws_{uuid.uuid4().hex[:16]}"
+            await self.ws_server.handle_connection(websocket, connection_id)
+        
+        @self.app.post("/ws/token")
+        async def generate_ws_token(user_id: str, device_token: Optional[str] = None):
+            """Generate JWT token for WebSocket authentication"""
+            token = self.ws_server.generate_jwt_token(user_id, device_token)
+            return {
+                'token': token,
+                'expires_in': 86400,
+                'timestamp': time.time()
+            }
     
-    async def _handle_websocket(self, websocket: WebSocket):
-        """Handle WebSocket connection"""
-        connection_id = f"ws_{uuid.uuid4().hex[:16]}"
-        
-        try:
-            await websocket.accept()
-            
-            # Register connection
-            self.active_connections[connection_id] = websocket
-            await self.redis.register_connection(connection_id)
-            
-            print(f"✅ WebSocket connected: {connection_id}")
-            
-            # Send welcome message
-            await websocket.send_json({
-                "type": "connected",
-                "connection_id": connection_id,
-                "timestamp": time.time()
-            })
-            
-            # Keep connection alive
-            while True:
-                try:
-                    # Receive messages from client
-                    data = await websocket.receive_text()
-                    message = json.loads(data)
-                    
-                    # Handle ping/pong
-                    if message.get("type") == "ping":
-                        await websocket.send_json({
-                            "type": "pong",
-                            "timestamp": time.time()
-                        })
-                
-                except WebSocketDisconnect:
-                    break
-                except Exception as e:
-                    print(f"❌ WebSocket error: {e}")
-                    break
-        
-        finally:
-            # Unregister connection
-            if connection_id in self.active_connections:
-                del self.active_connections[connection_id]
-            await self.redis.unregister_connection(connection_id)
-            
-            print(f"✅ WebSocket disconnected: {connection_id}")
+
     
     async def _broadcast_update(self, message: Dict):
         """Broadcast update to all WebSocket connections"""
-        if not self.active_connections:
-            return
-        
-        message_json = json.dumps(message)
-        
-        # Send to all connections
-        disconnected = []
-        for connection_id, websocket in self.active_connections.items():
-            try:
-                await websocket.send_text(message_json)
-            except Exception as e:
-                print(f"❌ Error sending to {connection_id}: {e}")
-                disconnected.append(connection_id)
-        
-        # Remove disconnected clients
-        for connection_id in disconnected:
-            del self.active_connections[connection_id]
-            await self.redis.unregister_connection(connection_id)
+        if self.ws_server:
+            await self.ws_server.broadcast_to_all(message)
     
     async def _process_action(
         self,
