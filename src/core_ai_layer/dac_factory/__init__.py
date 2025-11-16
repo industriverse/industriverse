@@ -36,3 +36,23 @@ __all__ = [
 ]
 
 __version__ = "1.0.0"
+
+from .dac_lifecycle_manager import (
+    DACLifecycleManager,
+    DACLifecycleConfig,
+    Hypothesis,
+    CapsuleVersion,
+    CapsuleStatus,
+    UpgradeStrategy,
+    UpgradeResult
+)
+
+__all__.extend([
+    "DACLifecycleManager",
+    "DACLifecycleConfig",
+    "Hypothesis",
+    "CapsuleVersion",
+    "CapsuleStatus",
+    "UpgradeStrategy",
+    "UpgradeResult"
+])
