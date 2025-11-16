@@ -1,0 +1,28 @@
+# Industriverse Project Dependencies
+# This file will be populated with all required Python packages.
+
+# Core AI & ML
+numpy
+pandas
+scikit-learn
+# torch
+# tensorflow
+
+# Web & API
+fastapi
+uvicorn
+requests
+
+# Data & Database
+sqlalchemy
+psycopg2-binary
+
+# Development & Tooling
+pytest
+black
+isort
+mypy
+pre-commit
+
+# Other
+# (Add other dependencies here)
