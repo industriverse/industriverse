@@ -12,6 +12,7 @@
  */
 
 import { useState } from 'react';
+import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,6 +21,9 @@ import { themePresets } from '@/themes/presets';
 import type { Theme } from '@/types/theme';
 
 export default function AdminPortal() {
+  // Fetch real tenant data from database
+  const { data: tenants, isLoading: tenantsLoading } = trpc.tenants.list.useQuery();
+  
   const [activeTab, setActiveTab] = useState('theme');
   const [currentTheme, setCurrentTheme] = useState<Theme>(themePresets[0].theme);
   const [widgetConfig, setWidgetConfig] = useState({
@@ -246,18 +250,12 @@ export default function AdminPortal() {
               </p>
 
               <div className="space-y-4">
-                {[
-                  { name: 'TSMC Fab 18', status: 'active', users: 1250, capsules: 3400 },
-                  { name: 'Intel Oregon', status: 'active', users: 890, capsules: 2100 },
-                  { name: 'Samsung Austin', status: 'active', users: 650, capsules: 1800 },
-                ].map((tenant) => (
+                {(tenants && tenants.length > 0) ? tenants.slice(0, 3).map((tenant) => (
                   <Card key={tenant.name} className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-lg font-medium">{tenant.name}</h3>
                         <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
-                          <span>{tenant.users} users</span>
-                          <span>{tenant.capsules} capsules</span>
                           <span className="text-status-success capitalize">{tenant.status}</span>
                         </div>
                       </div>
@@ -267,7 +265,11 @@ export default function AdminPortal() {
                       </div>
                     </div>
                   </Card>
-                ))}
+                )) : (
+                  <Card className="p-4">
+                    <p className="text-sm text-muted-foreground text-center">No tenants found. Create your first deployment!</p>
+                  </Card>
+                )}
 
                 <Button className="w-full" onClick={() => window.location.href = '/admin/feature-flags'}>
                   Manage Feature Flags
@@ -310,22 +312,23 @@ export default function AdminPortal() {
                 <div className="mt-6">
                   <h3 className="text-lg font-medium mb-4">Active Domains</h3>
                   <div className="space-y-2">
-                    {[
-                      { domain: 'tsmc-capsules.industriverse.io', status: 'active', ssl: true },
-                      { domain: 'intel-ops.industriverse.io', status: 'active', ssl: true },
-                    ].map((domain) => (
-                      <Card key={domain.domain} className="p-4">
+                    {(tenants && tenants.length > 0) ? tenants.map((tenant) => (
+                      <Card key={tenant.id} className="p-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="font-medium">{domain.domain}</div>
+                            <div className="font-medium">{tenant.customDomain || `${tenant.tenantId}.industriverse.io`}</div>
                             <div className="text-sm text-muted-foreground">
-                              {domain.ssl && '🔒 SSL Enabled'} • {domain.status}
+                              {tenant.sslEnabled && '🔒 SSL Enabled'} • {tenant.status}
                             </div>
                           </div>
                           <Button variant="outline" size="sm">Configure</Button>
                         </div>
                       </Card>
-                    ))}
+                    )) : (
+                      <Card className="p-4">
+                        <p className="text-sm text-muted-foreground text-center">No domains configured yet.</p>
+                      </Card>
+                    )}
                   </div>
                 </div>
               </div>
@@ -342,9 +345,9 @@ export default function AdminPortal() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <Card className="p-4">
-                  <div className="text-sm text-muted-foreground">Total Deployments</div>
-                  <div className="text-3xl font-bold mt-2">12</div>
-                  <div className="text-sm text-status-success mt-1">+2 this month</div>
+                  <div className="text-sm text-muted-foreground">Total Tenants</div>
+                  <div className="text-3xl font-bold mt-2">{tenantsLoading ? '...' : tenants?.length || 0}</div>
+                  <div className="text-sm text-muted-foreground mt-1">Active deployments</div>
                 </Card>
                 <Card className="p-4">
                   <div className="text-sm text-muted-foreground">Active Users</div>
