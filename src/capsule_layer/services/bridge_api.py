@@ -15,6 +15,13 @@ Provides unified REST API endpoints for:
 """
 
 import asyncio
+
+# MCP Integration - Context-Aware Ecosystem
+try:
+    from fastapi_mcp import FastApiMCP
+    MCP_AVAILABLE = True
+except ImportError:
+    MCP_AVAILABLE = False
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel, Field
 from typing import Dict, List, Optional, Any
@@ -24,9 +31,7 @@ import numpy as np
 # Import our thermodynamic services
 from src.capsule_layer.services.thermal_sampler.thermal_sampler_service import (
     create_thermal_sampler,
-    ThermalSamplerService,
-    ConstraintType,
-    SamplingResult
+    ThermalSamplerService
 )
 from src.capsule_layer.services.world_model.world_model_service import (
     create_world_model,
@@ -171,33 +176,50 @@ class BridgeAPI:
             Uses thrml library for energy-based optimization.
             """
             try:
+                # Import required types
+                from src.capsule_layer.services.thermal_sampler.thermal_sampler_service import ProblemType, Constraint
+                
                 # Convert constraints
                 constraints = []
                 for c in request.constraints:
-                    constraint_type = ConstraintType(c.get("type", "equality"))
-                    constraints.append({
-                        "type": constraint_type,
-                        "expression": c.get("expression", ""),
-                        "value": c.get("value", 0.0)
-                    })
+                    constraint = Constraint(
+                        name=c.get("name", "constraint"),
+                        type=c.get("type", "equality"),
+                        weight=c.get("weight", 1.0),
+                        function=c.get("expression", "")
+                    )
+                    constraints.append(constraint)
                 
-                # Run thermal sampling
-                result = await self.thermal_sampler.sample(
-                    problem_type=request.problem_type,
-                    variables=request.variables,
+                # Create landscape
+                landscape_id = self.thermal_sampler.create_landscape(
+                    problem_type=ProblemType(request.problem_type),
+                    dimensions=len(request.variables),
                     constraints=constraints,
-                    num_samples=request.num_samples,
-                    temperature=request.temperature
+                    bounds=[request.variables[k] for k in sorted(request.variables.keys())]
                 )
                 
+                # Run thermal sampling
+                results = await self.thermal_sampler.sample(
+                    landscape_id=landscape_id,
+                    num_samples=request.num_samples
+                )
+                
+                # Extract best solution
+                best_idx = 0
+                best_energy = results[0].energy if results else float('inf')
+                for i, r in enumerate(results):
+                    if r.energy < best_energy:
+                        best_energy = r.energy
+                        best_idx = i
+                
                 return ThermalSamplingResponse(
-                    sampling_id=result.sampling_id,
-                    solutions=[dict(s) for s in result.solutions],
-                    energies=result.energies,
-                    best_solution=dict(result.best_solution),
-                    best_energy=result.best_energy,
-                    proof_hash=result.proof_hash,
-                    timestamp=result.timestamp.isoformat()
+                    sampling_id=landscape_id,
+                    solutions=[{f"x{i}": float(v) for i, v in enumerate(r.state)} for r in results],
+                    energies=[float(r.energy) for r in results],
+                    best_solution={f"x{i}": float(v) for i, v in enumerate(results[best_idx].state)} if results else {},
+                    best_energy=float(best_energy),
+                    proof_hash=results[best_idx].proof_hash if results else "",
+                    timestamp=results[best_idx].timestamp.isoformat() if results else datetime.now().isoformat()
                 )
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
@@ -485,6 +507,42 @@ class BridgeAPI:
 # FACTORY FUNCTION
 # ============================================================================
 
-def create_bridge_api() -> BridgeAPI:
-    """Factory function to create Bridge API"""
-    return BridgeAPI()
+def create_bridge_api(enable_mcp: bool = True) -> BridgeAPI:
+    """
+    Factory function to create Bridge API with optional MCP integration
+    
+    Args:
+        enable_mcp: Enable Model Context Protocol integration for context-aware ecosystem
+    
+    Returns:
+        BridgeAPI instance with MCP integration if available
+    """
+    bridge = BridgeAPI()
+    
+    # Add MCP integration for context-aware ecosystem
+    if enable_mcp and MCP_AVAILABLE:
+        try:
+            # Create FastAPI app from router
+            from fastapi import FastAPI
+            app = FastAPI(
+                title="Industriverse Thermodynamic Bridge",
+                description="Context-aware thermodynamic computing services",
+                version="1.0.0"
+            )
+            app.include_router(bridge.router, prefix="/api/v1/thermodynamic")
+            
+            # Initialize MCP - exposes all endpoints as MCP tools
+            mcp = FastApiMCP(app)
+            mcp.mount_http()
+            
+            # Store MCP instance for later use
+            bridge._mcp = mcp
+            bridge._mcp_app = app
+            
+            print("✅ MCP integration enabled - all thermodynamic services now context-aware")
+        except Exception as e:
+            print(f"⚠️ MCP integration failed: {e}")
+    elif enable_mcp and not MCP_AVAILABLE:
+        print("⚠️ MCP not available - install fastapi-mcp to enable context-aware ecosystem")
+    
+    return bridge
