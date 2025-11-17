@@ -11,7 +11,7 @@
  * 6. Review & Deploy
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
@@ -20,6 +20,8 @@ import { featureFlags, DEFAULT_FEATURE_FLAGS } from '@/services/FeatureFlags';
 import type { Theme } from '@/types/theme';
 import type { FeatureFlag } from '@/services/FeatureFlags';
 import { toast } from 'sonner';
+import { trpc } from '@/lib/trpc';
+import { useLocation } from 'wouter';
 
 interface WizardStep {
   id: number;
@@ -81,7 +83,14 @@ const WIZARD_STEPS: WizardStep[] = [
 ];
 
 export default function DeploymentWizard() {
+  const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isDeploying, setIsDeploying] = useState(false);
+
+  // tRPC mutations
+  const createTenant = trpc.tenants.create.useMutation();
+  const createDeployment = trpc.deployments.create.useMutation();
+  const setFeatureFlag = trpc.featureFlags.set.useMutation();
   const [config, setConfig] = useState<DeploymentConfig>({
     tenantName: '',
     tenantId: '',
@@ -105,13 +114,13 @@ export default function DeploymentWizard() {
   const [isDraft, setIsDraft] = useState(false);
 
   // Initialize feature flags
-  useState(() => {
+  useEffect(() => {
     const flags: Record<string, boolean> = {};
     DEFAULT_FEATURE_FLAGS.forEach(flag => {
       flags[flag.key] = flag.enabled;
     });
     setConfig(prev => ({ ...prev, featureFlags: flags }));
-  });
+  }, []); // Run only once on mount
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
@@ -169,17 +178,56 @@ export default function DeploymentWizard() {
     }
   };
 
-  const handleDeploy = () => {
-    // Simulate deployment
-    toast.success('Deployment initiated! Your white-label instance will be ready in 5-10 minutes.');
+  const handleDeploy = async () => {
+    if (isDeploying) return;
+
+    setIsDeploying(true);
     
-    // Clear draft
-    localStorage.removeItem('deployment_draft');
-    
-    // Redirect to admin portal after short delay
-    setTimeout(() => {
-      window.location.href = '/admin';
-    }, 2000);
+    try {
+      // Step 1: Create tenant
+      const tenant = await createTenant.mutateAsync({
+        tenantId: config.tenantId,
+        name: config.tenantName,
+        contactEmail: config.contactEmail,
+        industry: config.industry,
+        theme: JSON.stringify(config.theme),
+        customDomain: config.domain || null,
+        sslEnabled: config.sslEnabled,
+        status: 'active',
+      });
+
+      // Step 2: Create deployment
+      const deployment = await createDeployment.mutateAsync({
+        tenantId: tenant.id,
+        name: `${config.tenantName} Production`,
+        widgetConfig: JSON.stringify(config.widgets),
+        status: 'active',
+      });
+
+      // Step 3: Set feature flags
+      const flagPromises = Object.entries(config.featureFlags).map(([key, enabled]) =>
+        setFeatureFlag.mutateAsync({
+          tenantId: tenant.id,
+          flagKey: key,
+          enabled,
+        })
+      );
+      await Promise.all(flagPromises);
+
+      toast.success('Deployment successful! Your white-label instance is ready.');
+      
+      // Clear draft
+      localStorage.removeItem('deployment_draft');
+      
+      // Redirect to admin portal
+      setTimeout(() => {
+        setLocation('/admin');
+      }, 1500);
+    } catch (error) {
+      console.error('Deployment failed:', error);
+      toast.error('Deployment failed. Please try again.');
+      setIsDeploying(false);
+    }
   };
 
   const renderStepContent = () => {
@@ -203,7 +251,11 @@ export default function DeploymentWizard() {
                 <input
                   type="text"
                   value={config.tenantName}
-                  onChange={(e) => setConfig({ ...config, tenantName: e.target.value })}
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    const newId = newName.toLowerCase().replace(/\s+/g, '-');
+                    setConfig({ ...config, tenantName: newName, tenantId: newId });
+                  }}
                   placeholder="e.g., TSMC Fab 18"
                   className="w-full px-3 py-2 bg-background border border-border rounded"
                 />
@@ -215,7 +267,7 @@ export default function DeploymentWizard() {
                 </label>
                 <input
                   type="text"
-                  value={config.tenantId || config.tenantName.toLowerCase().replace(/\s+/g, '-')}
+                  value={config.tenantId}
                   onChange={(e) => setConfig({ ...config, tenantId: e.target.value })}
                   placeholder="tsmc-fab-18"
                   className="w-full px-3 py-2 bg-background border border-border rounded"
@@ -633,8 +685,12 @@ export default function DeploymentWizard() {
             {currentStep < WIZARD_STEPS.length ? (
               <Button onClick={handleNext}>Next</Button>
             ) : (
-              <Button onClick={handleDeploy} className="bg-status-success hover:bg-status-success/90">
-                Deploy Now
+              <Button 
+                onClick={handleDeploy} 
+                className="bg-status-success hover:bg-status-success/90"
+                disabled={isDeploying}
+              >
+                {isDeploying ? 'Deploying...' : 'Deploy Now'}
               </Button>
             )}
           </div>

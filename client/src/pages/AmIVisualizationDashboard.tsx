@@ -13,6 +13,8 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAmiWebSocket } from '@/hooks/useAmiWebSocket';
+import { toast } from 'sonner';
 
 interface AmIMetric {
   timestamp: number;
@@ -47,57 +49,70 @@ export default function AmIVisualizationDashboard() {
   const [selectedDeployment, setSelectedDeployment] = useState<string>('all');
   const [isLive, setIsLive] = useState(true);
 
-  // Generate mock data for visualization
+  // Connect to WebSocket for real-time AmI metrics
+  const { isConnected, metrics, history } = useAmiWebSocket({
+    autoConnect: isLive,
+  });
+
+  // Show connection status
   useEffect(() => {
-    const generateMockData = (): DeploymentMetrics[] => {
-      const now = Date.now();
-      const range = TIME_RANGES.find(r => r.value === timeRange)?.minutes || 1440;
-      const points = Math.min(range / 5, 100); // Max 100 data points
-
-      const mockDeployments = [
-        { id: 'tsmc-fab-18', name: 'TSMC Fab 18' },
-        { id: 'intel-oregon', name: 'Intel Oregon' },
-        { id: 'samsung-austin', name: 'Samsung Austin' },
-      ];
-
-      return mockDeployments.map(dep => {
-        const metrics: AmIMetric[] = [];
-        for (let i = 0; i < points; i++) {
-          const timestamp = now - (points - i) * (range / points) * 60 * 1000;
-          metrics.push({
-            timestamp,
-            contextAwareness: 70 + Math.random() * 25 + Math.sin(i / 10) * 5,
-            proactivity: 65 + Math.random() * 25 + Math.cos(i / 8) * 5,
-            seamlessness: 85 + Math.random() * 12 + Math.sin(i / 12) * 3,
-            adaptivity: 75 + Math.random() * 20 + Math.cos(i / 15) * 5,
-          });
-        }
-
-        const latest = metrics[metrics.length - 1];
-        return {
-          deploymentId: dep.id,
-          deploymentName: dep.name,
-          metrics,
-          currentScore: {
-            contextAwareness: latest.contextAwareness,
-            proactivity: latest.proactivity,
-            seamlessness: latest.seamlessness,
-            adaptivity: latest.adaptivity,
-          },
-        };
+    if (isConnected) {
+      toast.success('Connected to AmI Metrics Stream', {
+        description: 'Receiving real-time data from all deployments',
       });
+    }
+  }, [isConnected]);
+
+  // Update deployments with real WebSocket data
+  useEffect(() => {
+    // Group history by deployment
+    const deploymentMap = new Map<string, typeof history>();
+    history.forEach(metric => {
+      if (!deploymentMap.has(metric.deploymentId)) {
+        deploymentMap.set(metric.deploymentId, []);
+      }
+      deploymentMap.get(metric.deploymentId)!.push(metric);
+    });
+
+    const mockDeploymentNames: Record<string, string> = {
+      'tsmc-fab18-prod': 'TSMC Fab 18',
+      'intel-oregon-prod': 'Intel Oregon',
+      'samsung-austin-prod': 'Samsung Austin',
     };
 
-    setDeployments(generateMockData());
+    const newDeployments: DeploymentMetrics[] = Array.from(deploymentMap.entries()).map(([deploymentId, depMetrics]) => {
+      // Group metrics by principle to get current scores
+      const latestByPrinciple: Record<string, number> = {};
+      depMetrics.forEach(m => {
+        latestByPrinciple[m.principle] = m.value;
+      });
 
-    // Simulate real-time updates
-    if (isLive) {
-      const interval = setInterval(() => {
-        setDeployments(generateMockData());
-      }, 5000);
-      return () => clearInterval(interval);
+      // Convert to AmIMetric format for charts
+      const chartMetrics: AmIMetric[] = depMetrics.map(m => ({
+        timestamp: new Date(m.timestamp).getTime(),
+        contextAwareness: latestByPrinciple['context'] || 0,
+        proactivity: latestByPrinciple['proactivity'] || 0,
+        seamlessness: latestByPrinciple['seamlessness'] || 0,
+        adaptivity: latestByPrinciple['adaptivity'] || 0,
+      }));
+
+      return {
+        deploymentId,
+        deploymentName: mockDeploymentNames[deploymentId] || deploymentId,
+        metrics: chartMetrics,
+        currentScore: {
+          contextAwareness: latestByPrinciple['context'] || 0,
+          proactivity: latestByPrinciple['proactivity'] || 0,
+          seamlessness: latestByPrinciple['seamlessness'] || 0,
+          adaptivity: latestByPrinciple['adaptivity'] || 0,
+        },
+      };
+    });
+
+    if (newDeployments.length > 0) {
+      setDeployments(newDeployments);
     }
-  }, [timeRange, isLive]);
+  }, [history]);
 
   const getAggregatedMetrics = () => {
     if (selectedDeployment === 'all') {
@@ -126,6 +141,16 @@ export default function AmIVisualizationDashboard() {
   };
 
   const getCurrentScores = () => {
+    if (deployments.length === 0) {
+      // Use WebSocket metrics directly if no deployment data yet
+      return {
+        contextAwareness: metrics.context,
+        proactivity: metrics.proactivity,
+        seamlessness: metrics.seamlessness,
+        adaptivity: metrics.adaptivity,
+      };
+    }
+
     if (selectedDeployment === 'all') {
       const scores = deployments.map(d => d.currentScore);
       return {
@@ -144,7 +169,7 @@ export default function AmIVisualizationDashboard() {
     }
   };
 
-  const metrics = getAggregatedMetrics();
+  const aggregatedMetrics = getAggregatedMetrics();
   const currentScores = getCurrentScores();
 
   const renderMiniChart = (data: number[], color: string) => {
@@ -276,7 +301,7 @@ export default function AmIVisualizationDashboard() {
               {currentScores.contextAwareness.toFixed(1)}%
             </div>
             {renderMiniChart(
-              metrics.map(m => m.contextAwareness),
+              aggregatedMetrics.map(m => m.contextAwareness),
               '#0ea5e9'
             )}
           </Card>
@@ -290,7 +315,7 @@ export default function AmIVisualizationDashboard() {
               {currentScores.proactivity.toFixed(1)}%
             </div>
             {renderMiniChart(
-              metrics.map(m => m.proactivity),
+              aggregatedMetrics.map(m => m.proactivity),
               '#8b5cf6'
             )}
           </Card>
@@ -304,7 +329,7 @@ export default function AmIVisualizationDashboard() {
               {currentScores.seamlessness.toFixed(1)}%
             </div>
             {renderMiniChart(
-              metrics.map(m => m.seamlessness),
+              aggregatedMetrics.map(m => m.seamlessness),
               '#10b981'
             )}
           </Card>
@@ -318,7 +343,7 @@ export default function AmIVisualizationDashboard() {
               {currentScores.adaptivity.toFixed(1)}%
             </div>
             {renderMiniChart(
-              metrics.map(m => m.adaptivity),
+              aggregatedMetrics.map(m => m.adaptivity),
               '#f59e0b'
             )}
           </Card>

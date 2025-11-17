@@ -68,10 +68,12 @@ export async function broadcastAmiMetric(metric: InsertAmiMetric) {
     // Save to database
     await db.insert(amiMetrics).values(metric);
 
-    // Broadcast to tenant room
+    // Broadcast to all connected clients (for aggregated views)
+    io.emit('ami:metric', metric);
+
+    // Also broadcast to specific rooms for filtered views
     io.to(`tenant:${metric.tenantId}`).emit('ami:metric', metric);
 
-    // Broadcast to deployment room
     if (metric.deploymentId) {
       io.to(`deployment:${metric.deploymentId}`).emit('ami:metric', metric);
     }
