@@ -276,3 +276,60 @@
 - [x] Write CDN integration documentation
 - [x] Update README with Week 8 features
 - [x] Create API documentation for widget configuration
+
+
+## Backend Integration (Post-Week 8)
+
+### Phase 1: Architecture Upgrade
+- [x] Upgrade project to web-db-user template
+- [x] Set up PostgreSQL database connection
+- [x] Configure environment variables for database
+- [x] Install required backend dependencies
+- [x] Set up Drizzle ORM
+
+### Phase 2: Database Schema
+- [x] Design tenants table schema
+- [x] Design deployments table schema
+- [x] Design feature_flags table schema
+- [x] Design ami_metrics table schema
+- [x] Design analytics_events table schema
+- [x] Create database migrations
+- [x] Run migrations and verify schema
+- [ ] Create seed data for testing
+
+### Phase 3: WebSocket Backend
+- [x] Set up WebSocket server with Socket.io
+- [x] Create AmI metrics streaming service
+- [x] Implement real-time data generation
+- [x] Add WebSocket authentication
+- [x] Create room-based broadcasting for tenants
+- [x] Test WebSocket connection and data flow
+- [x] Add reconnection logic
+
+### Phase 4: Tenant Analytics API
+- [x] Create /api/tenants endpoints (CRUD)
+- [x] Create /api/deployments endpoints (CRUD)
+- [x] Create /api/feature-flags endpoints
+- [x] Create /api/analytics endpoints
+- [x] Create /api/ami-metrics endpoints
+- [x] Add API authentication middleware
+- [x] Add input validation with Zod
+- [ ] Test all API endpoints
+
+### Phase 5: Frontend Integration
+- [ ] Replace mock data in AmI Dashboard with WebSocket
+- [ ] Connect Deployment Wizard to API
+- [ ] Connect Feature Flags Manager to API
+- [ ] Update Admin Portal with real tenant data
+- [ ] Add loading states and error handling
+- [ ] Implement optimistic UI updates
+- [ ] Test all frontend-backend integrations
+
+### Phase 6: Testing & Deployment
+- [ ] End-to-end testing of all features
+- [ ] Performance testing with multiple tenants
+- [ ] Security audit of API endpoints
+- [ ] Database backup and recovery testing
+- [ ] Load testing WebSocket connections
+- [ ] Final documentation update
+- [ ] Create deployment checkpoint
