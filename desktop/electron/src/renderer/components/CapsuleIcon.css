@@ -1,0 +1,48 @@
+/**
+ * CapsuleIcon Component Styles
+ */
+
+.capsule-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.capsule-icon-task {
+  background: rgba(0, 102, 255, 0.1);
+  color: var(--color-task);
+}
+
+.capsule-icon-alert {
+  background: rgba(255, 59, 48, 0.1);
+  color: var(--color-alert);
+}
+
+.capsule-icon-notification {
+  background: rgba(52, 199, 89, 0.1);
+  color: var(--color-notification);
+}
+
+.capsule-icon-decision {
+  background: rgba(255, 149, 0, 0.1);
+  color: var(--color-decision);
+}
+
+.capsule-icon-status {
+  background: rgba(88, 86, 214, 0.1);
+  color: var(--color-status);
+}
+
+.capsule-icon-workflow {
+  background: rgba(175, 82, 222, 0.1);
+  color: var(--color-workflow);
+}
+
+.capsule-icon-custom {
+  background: rgba(0, 102, 255, 0.1);
+  color: var(--color-accent);
+}
