@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Notification color -->
+    <color name="notification_color">#3B82F6</color>
+
+    <!-- Priority colors -->
+    <color name="priority_critical">#EF4444</color>
+    <color name="priority_high">#F59E0B</color>
+    <color name="priority_normal">#3B82F6</color>
+    <color name="priority_low">#6B7280</color>
+
+    <!-- Capsule type colors -->
+    <color name="capsule_alert">#EF4444</color>
+    <color name="capsule_task">#3B82F6</color>
+    <color name="capsule_workflow">#8B5CF6</color>
+    <color name="capsule_status">#10B981</color>
+    <color name="capsule_decision">#F59E0B</color>
+    <color name="capsule_custom">#6B7280</color>
+</resources>
