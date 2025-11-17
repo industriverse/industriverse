@@ -404,6 +404,23 @@ export default function AdminPortal() {
                 <Card className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
+                      <h3 className="text-lg font-medium">Feature Flag Analytics</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Adoption rates, usage patterns, and A/B testing insights
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={() => window.location.href = '/admin/feature-flag-analytics'}
+                    >
+                      View Analytics
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
                       <h3 className="text-lg font-medium">AmI Visualization Dashboard</h3>
                       <p className="text-sm text-muted-foreground mt-1">
                         Real-time visualization of Ambient Intelligence principles
