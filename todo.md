@@ -95,3 +95,16 @@
 - [x] Make WebSocket optional when using mock data
 - [x] Improve error messages for failed connections
 - [x] Add graceful degradation when backend is unavailable
+
+
+## Post-Week 7 Enhancements
+
+- [x] Create .env.example file with all configuration options
+- [x] Add capsule search functionality
+- [x] Add capsule filtering by status
+- [x] Add capsule filtering by priority
+- [x] Add capsule sorting options
+- [x] Create Settings page component
+- [x] Add WebSocket configuration in Settings
+- [x] Add notification preferences in Settings
+- [x] Add theme toggle in Settings

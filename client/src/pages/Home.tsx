@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import CapsulePill from '@/components/CapsulePill';
 import { Button } from '@/components/ui/button';
 import type { CapsuleData, CapsuleAction } from '@/types/capsule';
@@ -6,6 +6,8 @@ import { toast } from 'sonner';
 import { useCapsuleWebSocket } from '@/hooks/useCapsuleWebSocket';
 import { Badge } from '@/components/ui/badge';
 import { getAPI } from '@/services/CapsuleAPI';
+import CapsuleFilters, { type FilterOptions } from '@/components/CapsuleFilters';
+import { Link } from 'wouter';
 
 // Mock capsule data for demonstration
 const mockCapsules: CapsuleData[] = [
@@ -86,6 +88,13 @@ const mockCapsules: CapsuleData[] = [
 
 export default function Home() {
   const [capsules, setCapsules] = useState<CapsuleData[]>(mockCapsules);
+  const [filters, setFilters] = useState<FilterOptions>({
+    search: '',
+    status: 'all',
+    priority: 'all',
+    sortBy: 'timestamp',
+    sortOrder: 'desc'
+  });
   
   // WebSocket configuration (using mock endpoint for demo)
   const wsUrl = import.meta.env.VITE_CAPSULE_GATEWAY_WS || 'wss://capsule-gateway.industriverse.io/ws';
@@ -141,6 +150,54 @@ export default function Home() {
     onCapsuleRemoved: handleCapsuleRemoved,
     onError: handleWebSocketError
   });
+  
+  // Filter and sort capsules
+  const filteredCapsules = useMemo(() => {
+    let filtered = [...capsules];
+    
+    // Apply search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(c => 
+        c.title.toLowerCase().includes(searchLower) ||
+        c.source.toLowerCase().includes(searchLower) ||
+        c.description.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Apply status filter
+    if (filters.status !== 'all') {
+      filtered = filtered.filter(c => c.status === filters.status);
+    }
+    
+    // Apply priority filter
+    if (filters.priority !== 'all') {
+      const priorityNum = parseInt(filters.priority.substring(1));
+      filtered = filtered.filter(c => c.priority === priorityNum);
+    }
+    
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let comparison = 0;
+      
+      switch (filters.sortBy) {
+        case 'timestamp':
+          comparison = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+          break;
+        case 'priority':
+          comparison = a.priority - b.priority;
+          break;
+        case 'status':
+          const statusOrder = { critical: 0, warning: 1, active: 2, resolved: 3, dismissed: 4 };
+          comparison = statusOrder[a.status] - statusOrder[b.status];
+          break;
+      }
+      
+      return filters.sortOrder === 'asc' ? comparison : -comparison;
+    });
+    
+    return filtered;
+  }, [capsules, filters]);
   
   const handleAction = async (action: CapsuleAction, capsuleId: string) => {
     const capsule = capsules.find(c => c.id === capsuleId);
@@ -204,9 +261,11 @@ export default function Home() {
                   {connectionState}
                 </span>
               </div>
-              <Button variant="outline" size="sm">
-                Settings
-              </Button>
+              <Link href="/settings">
+                <Button variant="outline" size="sm">
+                  Settings
+                </Button>
+              </Link>
               <Button 
                 variant="default" 
                 size="sm"
@@ -250,16 +309,24 @@ export default function Home() {
             </div>
           </div>
           
+          {/* Filters */}
+          <CapsuleFilters
+            filters={filters}
+            onFiltersChange={setFilters}
+            totalCount={capsules.length}
+            filteredCount={filteredCapsules.length}
+          />
+          
           {/* Capsules List */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground">Live Capsules</h2>
               <p className="text-sm text-muted-foreground">
-                {capsules.length} total
+                {filteredCapsules.length} total
               </p>
             </div>
             
-            {capsules.map((capsule) => (
+            {filteredCapsules.map((capsule) => (
               <CapsulePill
                 key={capsule.id}
                 capsule={capsule}
