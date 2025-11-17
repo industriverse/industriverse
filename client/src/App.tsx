@@ -13,6 +13,7 @@ import AdminPortal from "./pages/AdminPortal";
 import FeatureFlagsManager from "./pages/FeatureFlagsManager";
 import DeploymentWizard from "./pages/DeploymentWizard";
 import AmIVisualizationDashboard from "./pages/AmIVisualizationDashboard";
+import FeatureFlagAnalytics from "./pages/FeatureFlagAnalytics";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -27,6 +28,7 @@ function Router() {
         <Route path="/admin/feature-flags" component={FeatureFlagsManager} />
         <Route path="/admin/deploy" component={DeploymentWizard} />
         <Route path="/admin/ami-dashboard" component={AmIVisualizationDashboard} />
+        <Route path="/admin/feature-flag-analytics" component={FeatureFlagAnalytics} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
