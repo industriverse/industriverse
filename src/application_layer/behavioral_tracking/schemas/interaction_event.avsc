@@ -1,0 +1,168 @@
+{
+  "type": "record",
+  "name": "InteractionEvent",
+  "namespace": "com.industriverse.behavioral",
+  "doc": "Schema for capsule interaction events",
+  "fields": [
+    {
+      "name": "event_id",
+      "type": "string",
+      "doc": "Unique identifier for the event"
+    },
+    {
+      "name": "timestamp",
+      "type": "string",
+      "doc": "ISO 8601 timestamp of the event"
+    },
+    {
+      "name": "event_type",
+      "type": {
+        "type": "enum",
+        "name": "InteractionType",
+        "symbols": [
+          "tap",
+          "click",
+          "expand",
+          "collapse",
+          "pin",
+          "unpin",
+          "drag",
+          "resize",
+          "action",
+          "complete",
+          "dismiss",
+          "acknowledge",
+          "decision",
+          "scroll",
+          "hover",
+          "swipe"
+        ]
+      },
+      "doc": "Type of interaction"
+    },
+    {
+      "name": "severity",
+      "type": {
+        "type": "enum",
+        "name": "EventSeverity",
+        "symbols": ["debug", "info", "warning", "error"]
+      },
+      "default": "info",
+      "doc": "Severity level of the event"
+    },
+    {
+      "name": "user_id",
+      "type": "string",
+      "default": "anonymous",
+      "doc": "User identifier"
+    },
+    {
+      "name": "session_id",
+      "type": "string",
+      "default": "",
+      "doc": "Session identifier"
+    },
+    {
+      "name": "device_id",
+      "type": "string",
+      "default": "",
+      "doc": "Device identifier"
+    },
+    {
+      "name": "device_type",
+      "type": {
+        "type": "enum",
+        "name": "DeviceType",
+        "symbols": ["web", "ios", "android", "desktop", "wearable"]
+      },
+      "default": "web",
+      "doc": "Type of device"
+    },
+    {
+      "name": "capsule_id",
+      "type": "string",
+      "default": "",
+      "doc": "Capsule identifier"
+    },
+    {
+      "name": "capsule_type",
+      "type": {
+        "type": "enum",
+        "name": "CapsuleType",
+        "symbols": ["task", "workflow", "alert", "status", "decision", "custom"]
+      },
+      "default": "status",
+      "doc": "Type of capsule"
+    },
+    {
+      "name": "capsule_category",
+      "type": "string",
+      "default": "",
+      "doc": "Category of capsule"
+    },
+    {
+      "name": "interaction_target",
+      "type": {
+        "type": "enum",
+        "name": "InteractionTarget",
+        "symbols": ["capsule", "action", "component"]
+      },
+      "default": "capsule",
+      "doc": "Target of interaction"
+    },
+    {
+      "name": "action_id",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Action identifier if target is action"
+    },
+    {
+      "name": "component_id",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Component identifier if target is component"
+    },
+    {
+      "name": "duration_ms",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Duration of interaction in milliseconds"
+    },
+    {
+      "name": "time_since_last_interaction_ms",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Time since last interaction in milliseconds"
+    },
+    {
+      "name": "interaction_data",
+      "type": {
+        "type": "map",
+        "values": "string"
+      },
+      "default": {},
+      "doc": "Additional interaction data as key-value pairs"
+    },
+    {
+      "name": "success",
+      "type": "boolean",
+      "default": true,
+      "doc": "Whether interaction was successful"
+    },
+    {
+      "name": "error_message",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Error message if interaction failed"
+    },
+    {
+      "name": "context",
+      "type": {
+        "type": "map",
+        "values": "string"
+      },
+      "default": {},
+      "doc": "Behavioral context as key-value pairs"
+    }
+  ]
+}

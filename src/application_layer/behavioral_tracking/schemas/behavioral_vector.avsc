@@ -1,0 +1,340 @@
+{
+  "type": "record",
+  "name": "BehavioralVector",
+  "namespace": "com.industriverse.behavioral",
+  "doc": "Schema for user Behavioral Vectors (BV) for adaptive UX",
+  "fields": [
+    {
+      "name": "user_id",
+      "type": "string",
+      "doc": "User identifier"
+    },
+    {
+      "name": "computed_at",
+      "type": "string",
+      "doc": "ISO 8601 timestamp when BV was computed"
+    },
+    {
+      "name": "version",
+      "type": "int",
+      "default": 1,
+      "doc": "BV schema version"
+    },
+    {
+      "name": "usage_patterns",
+      "type": {
+        "type": "record",
+        "name": "UsagePatterns",
+        "fields": [
+          {
+            "name": "total_interactions",
+            "type": "int",
+            "doc": "Total number of interactions"
+          },
+          {
+            "name": "avg_session_duration_minutes",
+            "type": "float",
+            "doc": "Average session duration in minutes"
+          },
+          {
+            "name": "interactions_per_session",
+            "type": "float",
+            "doc": "Average interactions per session"
+          },
+          {
+            "name": "capsule_type_distribution",
+            "type": {
+              "type": "map",
+              "values": "float"
+            },
+            "doc": "Distribution of interactions by capsule type (percentages)"
+          },
+          {
+            "name": "interaction_type_distribution",
+            "type": {
+              "type": "map",
+              "values": "float"
+            },
+            "doc": "Distribution of interaction types (percentages)"
+          },
+          {
+            "name": "time_of_day_distribution",
+            "type": {
+              "type": "map",
+              "values": "float"
+            },
+            "doc": "Distribution by hour of day (0-23)"
+          },
+          {
+            "name": "day_of_week_distribution",
+            "type": {
+              "type": "map",
+              "values": "float"
+            },
+            "doc": "Distribution by day of week (0=Monday, 6=Sunday)"
+          }
+        ]
+      },
+      "doc": "Usage pattern metrics"
+    },
+    {
+      "name": "preferences",
+      "type": {
+        "type": "record",
+        "name": "UserPreferences",
+        "fields": [
+          {
+            "name": "preferred_capsule_types",
+            "type": {
+              "type": "array",
+              "items": "string"
+            },
+            "doc": "Most frequently interacted capsule types (ranked)"
+          },
+          {
+            "name": "preferred_interaction_modes",
+            "type": {
+              "type": "array",
+              "items": "string"
+            },
+            "doc": "Most frequently used interaction modes (ranked)"
+          },
+          {
+            "name": "layout_preference",
+            "type": {
+              "type": "enum",
+              "name": "LayoutPreference",
+              "symbols": ["compact", "comfortable", "spacious"]
+            },
+            "default": "comfortable",
+            "doc": "Inferred layout preference"
+          },
+          {
+            "name": "density_preference",
+            "type": {
+              "type": "enum",
+              "name": "DensityPreference",
+              "symbols": ["minimal", "balanced", "detailed"]
+            },
+            "default": "balanced",
+            "doc": "Inferred information density preference"
+          },
+          {
+            "name": "animation_preference",
+            "type": {
+              "type": "enum",
+              "name": "AnimationPreference",
+              "symbols": ["none", "subtle", "full"]
+            },
+            "default": "subtle",
+            "doc": "Inferred animation preference"
+          }
+        ]
+      },
+      "doc": "User preferences inferred from behavior"
+    },
+    {
+      "name": "expertise_level",
+      "type": {
+        "type": "record",
+        "name": "ExpertiseLevel",
+        "fields": [
+          {
+            "name": "overall_score",
+            "type": "float",
+            "doc": "Overall expertise score (0.0 to 1.0)"
+          },
+          {
+            "name": "category_scores",
+            "type": {
+              "type": "map",
+              "values": "float"
+            },
+            "doc": "Expertise scores by capsule category"
+          },
+          {
+            "name": "proficiency_indicators",
+            "type": {
+              "type": "record",
+              "name": "ProficiencyIndicators",
+              "fields": [
+                {
+                  "name": "avg_interaction_duration_ms",
+                  "type": "float",
+                  "doc": "Average interaction duration (shorter = more expert)"
+                },
+                {
+                  "name": "error_rate",
+                  "type": "float",
+                  "doc": "Interaction error rate (0.0 to 1.0)"
+                },
+                {
+                  "name": "completion_rate",
+                  "type": "float",
+                  "doc": "Task/workflow completion rate (0.0 to 1.0)"
+                },
+                {
+                  "name": "advanced_feature_usage_rate",
+                  "type": "float",
+                  "doc": "Usage rate of advanced features (0.0 to 1.0)"
+                },
+                {
+                  "name": "shortcut_usage_rate",
+                  "type": "float",
+                  "doc": "Usage rate of keyboard shortcuts (0.0 to 1.0)"
+                }
+              ]
+            },
+            "doc": "Detailed proficiency indicators"
+          },
+          {
+            "name": "archetype",
+            "type": {
+              "type": "enum",
+              "name": "UserArchetype",
+              "symbols": [
+                "novice",
+                "intermediate",
+                "advanced",
+                "expert",
+                "power_user"
+              ]
+            },
+            "default": "intermediate",
+            "doc": "User archetype classification"
+          }
+        ]
+      },
+      "doc": "User expertise level metrics"
+    },
+    {
+      "name": "engagement_metrics",
+      "type": {
+        "type": "record",
+        "name": "EngagementMetrics",
+        "fields": [
+          {
+            "name": "engagement_score",
+            "type": "float",
+            "doc": "Overall engagement score (0.0 to 1.0)"
+          },
+          {
+            "name": "recency_days",
+            "type": "float",
+            "doc": "Days since last interaction"
+          },
+          {
+            "name": "frequency_per_week",
+            "type": "float",
+            "doc": "Average interactions per week"
+          },
+          {
+            "name": "session_count",
+            "type": "int",
+            "doc": "Total number of sessions"
+          },
+          {
+            "name": "retention_indicators",
+            "type": {
+              "type": "record",
+              "name": "RetentionIndicators",
+              "fields": [
+                {
+                  "name": "weekly_active",
+                  "type": "boolean",
+                  "doc": "Active in past 7 days"
+                },
+                {
+                  "name": "monthly_active",
+                  "type": "boolean",
+                  "doc": "Active in past 30 days"
+                },
+                {
+                  "name": "at_risk",
+                  "type": "boolean",
+                  "doc": "User shows signs of churn risk"
+                }
+              ]
+            },
+            "doc": "User retention indicators"
+          }
+        ]
+      },
+      "doc": "Engagement and retention metrics"
+    },
+    {
+      "name": "adaptive_ux_config",
+      "type": {
+        "type": "record",
+        "name": "AdaptiveUXConfig",
+        "fields": [
+          {
+            "name": "recommended_layout",
+            "type": "string",
+            "doc": "Recommended layout configuration"
+          },
+          {
+            "name": "recommended_density",
+            "type": "string",
+            "doc": "Recommended information density"
+          },
+          {
+            "name": "recommended_features",
+            "type": {
+              "type": "array",
+              "items": "string"
+            },
+            "doc": "Recommended features to enable"
+          },
+          {
+            "name": "recommended_shortcuts",
+            "type": {
+              "type": "array",
+              "items": "string"
+            },
+            "doc": "Recommended keyboard shortcuts to suggest"
+          },
+          {
+            "name": "capsule_priority_weights",
+            "type": {
+              "type": "map",
+              "values": "float"
+            },
+            "doc": "Priority weights for capsule types"
+          }
+        ]
+      },
+      "doc": "Adaptive UX configuration recommendations"
+    },
+    {
+      "name": "metadata",
+      "type": {
+        "type": "record",
+        "name": "BVMetadata",
+        "fields": [
+          {
+            "name": "sample_size",
+            "type": "int",
+            "doc": "Number of events used to compute BV"
+          },
+          {
+            "name": "time_window_days",
+            "type": "int",
+            "doc": "Time window used for computation (days)"
+          },
+          {
+            "name": "confidence_score",
+            "type": "float",
+            "doc": "Confidence in BV accuracy (0.0 to 1.0)"
+          },
+          {
+            "name": "last_event_timestamp",
+            "type": "string",
+            "doc": "Timestamp of last event included"
+          }
+        ]
+      },
+      "doc": "Metadata about BV computation"
+    }
+  ]
+}
