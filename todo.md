@@ -126,10 +126,10 @@
 - [x] Create `<iv-wallet-orb>` widget
 - [x] Create `<iv-proof-ticker>` widget
 - [x] Create `<iv-capsule-card>` widget
-- [ ] Create `<iv-energy-gauge>` widget
-- [ ] Create `<iv-utid-badge>` widget
-- [ ] Create `<iv-ami-pulse>` widget
-- [ ] Create `<iv-shadow-twin>` widget
+- [x] Create `<iv-energy-gauge>` widget
+- [x] Create `<iv-utid-badge>` widget
+- [x] Create `<iv-ami-pulse>` widget
+- [x] Create `<iv-shadow-twin>` widget
 - [x] Implement WebSocket integration for widgets
 - [x] Add ambient intelligence micro-animations
 - [ ] Create widget build system (Rollup)
