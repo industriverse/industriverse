@@ -7,6 +7,8 @@
 
 export type CapsuleStatus = 'active' | 'warning' | 'critical' | 'resolved' | 'dismissed';
 
+export type CapsulePriority = 'P1' | 'P2' | 'P3' | 'P4' | 'P5';
+
 export type CapsuleAction = 'mitigate' | 'inspect' | 'dismiss' | 'escalate' | 'acknowledge';
 
 export interface CapsuleData {
