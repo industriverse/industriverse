@@ -122,16 +122,16 @@
 - [x] Create theme export/import functionality
 
 ### Phase 2: Widget Architecture (Days 3-4)
-- [ ] Build custom element base class (IVWidget)
-- [ ] Create `<iv-wallet-orb>` widget
-- [ ] Create `<iv-proof-ticker>` widget
-- [ ] Create `<iv-capsule-card>` widget
+- [x] Build custom element base class (IVWidget)
+- [x] Create `<iv-wallet-orb>` widget
+- [x] Create `<iv-proof-ticker>` widget
+- [x] Create `<iv-capsule-card>` widget
 - [ ] Create `<iv-energy-gauge>` widget
 - [ ] Create `<iv-utid-badge>` widget
 - [ ] Create `<iv-ami-pulse>` widget
 - [ ] Create `<iv-shadow-twin>` widget
-- [ ] Implement WebSocket integration for widgets
-- [ ] Add ambient intelligence micro-animations
+- [x] Implement WebSocket integration for widgets
+- [x] Add ambient intelligence micro-animations
 - [ ] Create widget build system (Rollup)
 - [ ] Generate widget documentation
 
@@ -169,3 +169,18 @@
 - [ ] Create integration guide
 - [ ] Write admin portal guide
 - [ ] Create sales playbook
+
+
+### 27 Capsule Types Taxonomy (Integrated)
+- [x] Create capsule-taxonomy.ts with 27 categories
+- [x] Map categories to service families
+- [x] Define white-label widget for each category
+- [x] Add color coding by domain
+- [x] Create searchable metadata system
+- [x] Build Capsule Catalog page
+- [x] Add grid/list view modes
+- [x] Implement category filtering by service family
+- [x] Add category search functionality
+- [ ] Create specialized widgets for each of 27 categories
+- [ ] Add category-specific AmI behaviors
+- [ ] Build category analytics dashboard
