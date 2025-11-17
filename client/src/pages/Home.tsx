@@ -117,18 +117,25 @@ export default function Home() {
     });
   }, []);
   
-  const handleWebSocketError = useCallback((error: Error) => {
+  const handleWebSocketError = (error: Error) => {
     console.error('WebSocket error:', error);
-    toast.error('Connection Error', {
-      description: error.message
-    });
-  }, []);
+    
+    // Don't show toast in development mode (expected when using mock data)
+    if (!import.meta.env.DEV) {
+      toast.error('Connection Error', {
+        description: 'Failed to connect to real-time updates'
+      });
+    }
+  };
   
   // WebSocket connection (disabled for demo, will connect to real endpoint in production)
+  // Disable WebSocket in development when using mock data
+  const enableWebSocket = import.meta.env.VITE_ENABLE_WEBSOCKET === 'true';
+  
   const { connectionState, connect, disconnect, isConnected } = useCapsuleWebSocket({
     url: wsUrl,
-    authToken,
-    autoConnect: false, // Set to true when real endpoint is available
+    authToken: 'demo_token',
+    autoConnect: enableWebSocket, // Only auto-connect if explicitly enabled
     onCapsuleUpdate: handleCapsuleUpdate,
     onCapsuleNew: handleCapsuleNew,
     onCapsuleRemoved: handleCapsuleRemoved,
