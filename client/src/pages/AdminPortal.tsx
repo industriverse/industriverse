@@ -264,7 +264,12 @@ export default function AdminPortal() {
                   </Card>
                 ))}
 
-                <Button className="w-full">Add New Tenant</Button>
+                <Button className="w-full" onClick={() => window.location.href = '/admin/feature-flags'}>
+                  Manage Feature Flags
+                </Button>
+                <Button className="w-full" variant="outline" onClick={() => window.location.href = '/admin/ami-dashboard'}>
+                  View AmI Visualization Dashboard
+                </Button>
               </div>
             </Card>
           </TabsContent>
@@ -384,6 +389,39 @@ export default function AdminPortal() {
                       onClick={() => window.location.href = '/admin/feature-flags'}
                     >
                       Manage Flags
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-medium">AmI Visualization Dashboard</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Real-time visualization of Ambient Intelligence principles
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => window.location.href = '/admin/ami-dashboard'}
+                    >
+                      View Dashboard
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-medium">Deployment Wizard</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Guided onboarding for new white-label deployments
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={() => window.location.href = '/admin/deploy'}
+                    >
+                      Launch Wizard
                     </Button>
                   </div>
                 </Card>

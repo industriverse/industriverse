@@ -10,6 +10,8 @@ import CapsuleCatalog from "./pages/CapsuleCatalog";
 import Settings from "./pages/Settings";
 import AdminPortal from "./pages/AdminPortal";
 import FeatureFlagsManager from "./pages/FeatureFlagsManager";
+import DeploymentWizard from "./pages/DeploymentWizard";
+import AmIVisualizationDashboard from "./pages/AmIVisualizationDashboard";
 
 function Router() {
   return (
@@ -20,6 +22,8 @@ function Router() {
         <Route path="/settings" component={Settings} />
         <Route path="/admin" component={AdminPortal} />
         <Route path="/admin/feature-flags" component={FeatureFlagsManager} />
+        <Route path="/admin/deploy" component={DeploymentWizard} />
+        <Route path="/admin/ami-dashboard" component={AmIVisualizationDashboard} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
