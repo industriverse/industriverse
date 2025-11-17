@@ -1,0 +1,20 @@
+/**
+ * App Component Styles
+ */
+
+.app {
+  width: 400px;
+  height: 600px;
+  background: var(--color-background);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
