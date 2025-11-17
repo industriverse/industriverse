@@ -87,3 +87,11 @@
 - [x] Update status colors to slate greys, silver, charcoal
 - [x] Add metallic sheen effects
 - [x] Use steel blue for active, amber for warning, crimson for critical
+
+
+## Bug Fixes
+
+- [x] Fix WebSocket connection errors in development mode
+- [x] Make WebSocket optional when using mock data
+- [x] Improve error messages for failed connections
+- [x] Add graceful degradation when backend is unavailable

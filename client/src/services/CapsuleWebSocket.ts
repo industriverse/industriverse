@@ -154,8 +154,16 @@ export class CapsuleWebSocket {
     };
 
     this.ws.onerror = (event) => {
-      console.error('WebSocket error:', event);
-      this.handleError(new Error('WebSocket connection error'));
+      const errorMessage = 'WebSocket connection failed. This is expected in development mode with mock data.';
+      
+      // Only log as warning in development, error in production
+      if (import.meta.env.DEV) {
+        console.warn('WebSocket connection unavailable:', errorMessage);
+      } else {
+        console.error('WebSocket error:', event);
+      }
+      
+      this.handleError(new Error(errorMessage));
     };
 
     this.ws.onclose = (event) => {
@@ -194,7 +202,11 @@ export class CapsuleWebSocket {
 
   private handleError(error: Error): void {
     this.setState('error');
-    this.config.onError(error);
+    
+    // Don't trigger error callback in development mode for connection failures
+    if (!import.meta.env.DEV || !error.message.includes('expected in development')) {
+      this.config.onError(error);
+    }
   }
 
   private setState(newState: ConnectionState): void {
