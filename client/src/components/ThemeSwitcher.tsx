@@ -39,7 +39,8 @@ export function ThemeSwitcher({ onThemeChange, showPreview = true }: ThemeSwitch
       localStorage.setItem('theme-id', currentThemeId);
       onThemeChange?.(preset.theme);
     }
-  }, [currentThemeId, presets, onThemeChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentThemeId, presets]); // Removed onThemeChange from deps to prevent infinite loop
 
   const handleThemeChange = (themeId: string) => {
     setCurrentThemeId(themeId);
