@@ -248,16 +248,22 @@ class ThermalSamplerService:
         """Metropolis acceptance criterion"""
         delta_e = proposed_energy - current_energy
         
-        # Always accept if energy decreases
-        if delta_e < 0:
+        # Use jax.lax.cond for JIT compatibility
+        def accept_decrease(rng_key):
             return True, rng_key
         
-        # Probabilistic acceptance if energy increases
-        rng_key, subkey = random.split(rng_key)
-        acceptance_prob = jnp.exp(-delta_e / temperature)
-        accept = random.uniform(subkey) < acceptance_prob
+        def probabilistic_accept(rng_key):
+            rng_key, subkey = random.split(rng_key)
+            acceptance_prob = jnp.exp(-delta_e / temperature)
+            accept = random.uniform(subkey) < acceptance_prob
+            return accept, rng_key
         
-        return accept, rng_key
+        return jax.lax.cond(
+            delta_e < 0,
+            accept_decrease,
+            probabilistic_accept,
+            rng_key
+        )
     
     async def sample(
         self,
