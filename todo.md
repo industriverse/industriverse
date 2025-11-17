@@ -108,3 +108,64 @@
 - [x] Add WebSocket configuration in Settings
 - [x] Add notification preferences in Settings
 - [x] Add theme toggle in Settings
+
+
+## Week 8: White-Label Platform
+
+### Phase 1: Theme Token System (Days 1-2)
+- [x] Create CSS custom properties system (200+ tokens)
+- [x] Implement theme JSON schema with validation
+- [x] Build 3 preset themes (Cosmic-Industrial, Industrial-Chrome, Light-Portal)
+- [x] Create theme switcher React component
+- [x] Add theme preview mode
+- [x] Implement theme inheritance system (base → client overrides)
+- [x] Create theme export/import functionality
+
+### Phase 2: Widget Architecture (Days 3-4)
+- [ ] Build custom element base class (IVWidget)
+- [ ] Create `<iv-wallet-orb>` widget
+- [ ] Create `<iv-proof-ticker>` widget
+- [ ] Create `<iv-capsule-card>` widget
+- [ ] Create `<iv-energy-gauge>` widget
+- [ ] Create `<iv-utid-badge>` widget
+- [ ] Create `<iv-ami-pulse>` widget
+- [ ] Create `<iv-shadow-twin>` widget
+- [ ] Implement WebSocket integration for widgets
+- [ ] Add ambient intelligence micro-animations
+- [ ] Create widget build system (Rollup)
+- [ ] Generate widget documentation
+
+### Phase 3: Ambient Intelligence Integration (Days 5-6)
+- [ ] Create AmI context modules for DACs
+- [ ] Implement Cosmic Intelligence Fabric
+- [ ] Add federated learning coordinator
+- [ ] Build privacy-preserving pattern aggregation
+- [ ] Create widget ambient signal system
+- [ ] Add Shadow Twin trace effects
+- [ ] Implement network learning validation
+
+### Phase 4: White-Label Admin Portal (Day 7)
+- [ ] Build theme editor with live preview
+- [ ] Create widget configuration interface
+- [ ] Implement content management system
+- [ ] Add domain setup wizard
+- [ ] Create feature flag dashboard
+- [ ] Build role-based access control
+- [ ] Add multi-tenant isolation
+
+### Phase 5: Testing & Deployment
+- [ ] Test complete white-label setup flow
+- [ ] Validate multi-tenant data isolation
+- [ ] Test AmI preservation across themes
+- [ ] Performance testing (< 100ms theme switch)
+- [ ] Security audit (penetration testing)
+- [ ] Load testing (1000+ concurrent clients)
+
+### Phase 6: Documentation
+- [ ] Write technical architecture docs
+- [ ] Create API reference
+- [ ] Build widget catalog
+- [ ] Write theme specification
+- [ ] Create integration guide
+- [ ] Write admin portal guide
+- [ ] Create sales playbook
