@@ -8,6 +8,8 @@ import Home from "./pages/Home";
 import WidgetDemo from "./pages/WidgetDemo";
 import CapsuleCatalog from "./pages/CapsuleCatalog";
 import Settings from "./pages/Settings";
+import AdminPortal from "./pages/AdminPortal";
+import FeatureFlagsManager from "./pages/FeatureFlagsManager";
 
 function Router() {
   return (
@@ -15,7 +17,9 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/widgets"} component={WidgetDemo} />
       <Route path={"/catalog"} component={CapsuleCatalog} />
-      <Route path={"/settings"} component={Settings} />
+        <Route path="/settings" component={Settings} />
+        <Route path="/admin" component={AdminPortal} />
+        <Route path="/admin/feature-flags" component={FeatureFlagsManager} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
