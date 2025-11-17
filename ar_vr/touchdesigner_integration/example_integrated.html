@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ambient Intelligence - Complete Integration</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #000000;
+      color: #ffffff;
+      overflow: hidden;
+    }
+    
+    #container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    
+    #canvas {
+      width: 100%;
+      height: 100%;
+    }
+    
+    #video {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 240px;
+      height: 180px;
+      border: 2px solid #00d4ff;
+      border-radius: 8px;
+      transform: scaleX(-1);
+      z-index: 10;
+      opacity: 0.8;
+    }
+    
+    #dashboard {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.95);
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 25px;
+      min-width: 300px;
+      backdrop-filter: blur(15px);
+      z-index: 10;
+    }
+    
+    #dashboard h1 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #00d4ff;
+      border-bottom: 2px solid #00d4ff;
+      padding-bottom: 12px;
+      font-weight: 600;
+    }
+    
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .metric-card {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    
+    .metric-label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    
+    .metric-value {
+      font-size: 24px;
+      color: #00d4ff;
+      font-weight: bold;
+    }
+    
+    .metric-unit {
+      font-size: 12px;
+      color: #666;
+      margin-left: 4px;
+    }
+    
+    .status-section {
+      margin-top: 20px;
+    }
+    
+    .status-section h3 {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #222;
+    }
+    
+    .status-item:last-child {
+      border-bottom: none;
+    }
+    
+    .status-label {
+      font-size: 13px;
+      color: #ccc;
+    }
+    
+    .status-value {
+      font-size: 13px;
+      font-weight: bold;
+    }
+    
+    .status-value.active {
+      color: #00ff00;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    #info-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.95);
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(15px);
+      z-index: 10;
+    }
+    
+    #info-panel h3 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: #00d4ff;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+    
+    .info-item {
+      text-align: center;
+    }
+    
+    .info-label {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .info-value {
+      font-size: 18px;
+      color: #00d4ff;
+      font-weight: bold;
+    }
+    
+    #welcome {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.98);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    
+    #welcome-content {
+      max-width: 700px;
+      text-align: center;
+      padding: 50px;
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 212, 255, 0.05));
+      border: 2px solid #00d4ff;
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+    }
+    
+    #welcome-content h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #00d4ff, #00ff88);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    #welcome-content p {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #ccc;
+      margin-bottom: 15px;
+    }
+    
+    #welcome-content ul {
+      text-align: left;
+      margin: 30px 0;
+      padding-left: 30px;
+    }
+    
+    #welcome-content li {
+      margin-bottom: 12px;
+      color: #ccc;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    
+    #welcome-content strong {
+      color: #00d4ff;
+    }
+    
+    #btn-start {
+      padding: 15px 40px;
+      background: linear-gradient(135deg, #00d4ff, #00ff88);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 30px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    #btn-start:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 212, 255, 0.5);
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #00d4ff;
+      animation: spin 1s linear infinite;
+      margin-left: 10px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <!-- Three.js canvas -->
+    <canvas id="canvas"></canvas>
+    
+    <!-- Video feed -->
+    <video id="video" autoplay playsinline></video>
+    
+    <!-- Dashboard -->
+    <div id="dashboard">
+      <h1>🏭 Factory Metrics</h1>
+      
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-label">Temperature</div>
+          <div class="metric-value" id="temp-value">0<span class="metric-unit">°C</span></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Pressure</div>
+          <div class="metric-value" id="pressure-value">0<span class="metric-unit">PSI</span></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Vibration</div>
+          <div class="metric-value" id="vibration-value">0<span class="metric-unit">Hz</span></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Production</div>
+          <div class="metric-value" id="production-value">0<span class="metric-unit">/hr</span></div>
+        </div>
+      </div>
+      
+      <div class="status-section">
+        <h3>System Status</h3>
+        <div class="status-item">
+          <span class="status-label">Hand Tracking</span>
+          <span class="status-value" id="hand-status">Inactive</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Pose Tracking</span>
+          <span class="status-value" id="pose-status">Inactive</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">TouchDesigner</span>
+          <span class="status-value" id="td-status">Connecting...</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Audio Reactive</span>
+          <span class="status-value" id="audio-status">Inactive</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Info panel -->
+    <div id="info-panel">
+      <h3>🎯 Ambient Intelligence Status</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Hand Gesture</div>
+          <div class="info-value" id="gesture-display">None</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Body Language</div>
+          <div class="info-value" id="body-display">None</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Selected Capsule</div>
+          <div class="info-value" id="capsule-display">None</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Render FPS</div>
+          <div class="info-value" id="fps-display">0</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Welcome screen -->
+    <div id="welcome">
+      <div id="welcome-content">
+        <h1>✨ Ambient Intelligence</h1>
+        <p>Experience the future of industrial interaction with gesture-free controls and living data visualizations.</p>
+        
+        <ul>
+          <li><strong>Magic Hand:</strong> Point, pinch, and gesture to interact with capsules</li>
+          <li><strong>Body Language:</strong> Use thumbs up, wave, and natural poses for commands</li>
+          <li><strong>Living Data:</strong> Factory metrics transformed into mesmerizing generative art</li>
+          <li><strong>Audio Reactive:</strong> Machine noise becomes visual rhythm</li>
+        </ul>
+        
+        <p><em>No controllers. No touch. Just natural human interaction.</em></p>
+        
+        <button id="btn-start">Begin Experience</button>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module">
+    import * as THREE from 'three';
+    import MediaPipeHandsController from '../mediapipe_integration/MediaPipeHandsController.js';
+    import MediaPipePoseController from '../mediapipe_integration/MediaPipePoseController.js';
+    import TouchDesignerDataVisualizer from './TouchDesignerDataVisualizer.js';
+    
+    // ========================================================================
+    // Setup
+    // ========================================================================
+    
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const welcome = document.getElementById('welcome');
+    
+    let scene, camera, renderer;
+    let handsController, poseController, tdVisualizer;
+    let renderFPS = 0;
+    let lastRenderTime = 0;
+    
+    // Demo metrics (simulated factory data)
+    let demoMetrics = {
+      temperature: 45,
+      pressure: 60,
+      vibration: 30,
+      productionRate: 75,
+      noise: 50,
+      timestamp: Date.now()
+    };
+    
+    // ========================================================================
+    // Initialize Three.js Scene
+    // ========================================================================
+    
+    function initScene() {
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x000000);
+      scene.fog = new THREE.Fog(0x000000, 5, 15);
+      
+      camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(0, 1.6, 3);
+      
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      
+      // Add lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+      scene.add(ambientLight);
+      
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(5, 5, 5);
+      directionalLight.castShadow = true;
+      scene.add(directionalLight);
+      
+      // Add point lights for atmosphere
+      const pointLight1 = new THREE.PointLight(0x00d4ff, 1, 10);
+      pointLight1.position.set(-3, 2, 0);
+      scene.add(pointLight1);
+      
+      const pointLight2 = new THREE.PointLight(0x00ff88, 1, 10);
+      pointLight2.position.set(3, 2, 0);
+      scene.add(pointLight2);
+      
+      // Add grid floor
+      const gridHelper = new THREE.GridHelper(10, 20, 0x00d4ff, 0x333333);
+      gridHelper.position.y = 0;
+      scene.add(gridHelper);
+    }
+    
+    // ========================================================================
+    // Initialize Controllers
+    // ========================================================================
+    
+    async function initControllers() {
+      // Request webcam access
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+      
+      // Initialize MediaPipe Hands
+      handsController = new MediaPipeHandsController({
+        videoElement: video,
+        scene,
+        camera,
+        onHandDetected: (hand) => {
+          document.getElementById('hand-status').textContent = 'Active';
+          document.getElementById('hand-status').classList.add('active');
+        },
+        onGesture: (gesture) => {
+          document.getElementById('gesture-display').textContent = 
+            gesture.type.replace(/_/g, ' ').toUpperCase();
+        },
+        onCapsuleSelect: (capsule) => {
+          document.getElementById('capsule-display').textContent = 
+            capsule.userData.title || capsule.userData.capsuleId;
+        },
+        onCapsuleDismiss: () => {
+          document.getElementById('capsule-display').textContent = 'None';
+        }
+      });
+      
+      // Initialize MediaPipe Pose
+      poseController = new MediaPipePoseController({
+        videoElement: video,
+        onPoseDetected: (pose) => {
+          document.getElementById('pose-status').textContent = 'Active';
+          document.getElementById('pose-status').classList.add('active');
+        },
+        onBodyLanguage: (command) => {
+          document.getElementById('body-display').textContent = 
+            command.type.replace(/_/g, ' ').toUpperCase();
+        }
+      });
+      
+      // Initialize TouchDesigner Visualizer
+      tdVisualizer = new TouchDesignerDataVisualizer({
+        scene,
+        websocketUrl: 'ws://localhost:9980',
+        enableAudioReactive: true,
+        enableProceduralGeometry: true,
+        enableRealTimeTextures: true
+      });
+      
+      // Create demo capsules
+      createDemoCapsules();
+      
+      // Start controllers
+      handsController.start();
+      poseController.start();
+      
+      // Update status
+      document.getElementById('td-status').textContent = 'Connected';
+      document.getElementById('td-status').classList.add('active');
+      document.getElementById('audio-status').textContent = 'Active';
+      document.getElementById('audio-status').classList.add('active');
+    }
+    
+    // ========================================================================
+    // Create Demo Capsules
+    // ========================================================================
+    
+    function createDemoCapsules() {
+      const capsules = [
+        {
+          id: 'capsule_001',
+          status: 'critical',
+          title: 'Motor Overheating',
+          position: new THREE.Vector3(-1.5, 1.5, 0),
+          metrics: { ...demoMetrics, temperature: 85, vibration: 70 }
+        },
+        {
+          id: 'capsule_002',
+          status: 'warning',
+          title: 'Pressure Alert',
+          position: new THREE.Vector3(0, 1.5, 0),
+          metrics: { ...demoMetrics, pressure: 85 }
+        },
+        {
+          id: 'capsule_003',
+          status: 'active',
+          title: 'Production Normal',
+          position: new THREE.Vector3(1.5, 1.5, 0),
+          metrics: { ...demoMetrics }
+        }
+      ];
+      
+      capsules.forEach((capsule) => {
+        tdVisualizer.createVisualization(
+          capsule.id,
+          capsule.status,
+          capsule.metrics,
+          capsule.position
+        );
+      });
+    }
+    
+    // ========================================================================
+    // Update Demo Metrics
+    // ========================================================================
+    
+    function updateDemoMetrics() {
+      // Simulate changing factory metrics
+      demoMetrics.temperature = 40 + Math.sin(Date.now() / 5000) * 20;
+      demoMetrics.pressure = 50 + Math.cos(Date.now() / 4000) * 30;
+      demoMetrics.vibration = 20 + Math.sin(Date.now() / 3000) * 40;
+      demoMetrics.productionRate = 60 + Math.cos(Date.now() / 6000) * 30;
+      demoMetrics.noise = 40 + Math.sin(Date.now() / 2000) * 30;
+      
+      // Update UI
+      document.getElementById('temp-value').innerHTML = 
+        Math.round(demoMetrics.temperature) + '<span class="metric-unit">°C</span>';
+      document.getElementById('pressure-value').innerHTML = 
+        Math.round(demoMetrics.pressure) + '<span class="metric-unit">PSI</span>';
+      document.getElementById('vibration-value').innerHTML = 
+        Math.round(demoMetrics.vibration) + '<span class="metric-unit">Hz</span>';
+      document.getElementById('production-value').innerHTML = 
+        Math.round(demoMetrics.productionRate) + '<span class="metric-unit">/hr</span>';
+    }
+    
+    // ========================================================================
+    // Render Loop
+    // ========================================================================
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      // Calculate FPS
+      const now = performance.now();
+      if (lastRenderTime > 0) {
+        renderFPS = 1000 / (now - lastRenderTime);
+      }
+      lastRenderTime = now;
+      
+      // Update FPS display
+      document.getElementById('fps-display').textContent = renderFPS.toFixed(0);
+      
+      // Update demo metrics
+      updateDemoMetrics();
+      
+      // Update TouchDesigner visualizations
+      if (tdVisualizer) {
+        tdVisualizer.update();
+      }
+      
+      // Render scene
+      renderer.render(scene, camera);
+    }
+    
+    // ========================================================================
+    // Event Handlers
+    // ========================================================================
+    
+    document.getElementById('btn-start').addEventListener('click', async () => {
+      const button = document.getElementById('btn-start');
+      button.innerHTML = 'Initializing<span class="loading"></span>';
+      button.disabled = true;
+      
+      try {
+        await initControllers();
+        initScene();
+        animate();
+        
+        // Hide welcome screen
+        setTimeout(() => {
+          welcome.style.display = 'none';
+        }, 500);
+      } catch (error) {
+        console.error('Initialization error:', error);
+        button.innerHTML = 'Error - Try Again';
+        button.disabled = false;
+      }
+    });
+    
+    // Window resize
+    window.addEventListener('resize', () => {
+      if (camera && renderer) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+    });
+  </script>
+</body>
+</html>
