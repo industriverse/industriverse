@@ -41,14 +41,28 @@ export const appRouter = router({
       .input(z.object({
         tenantId: z.string(),
         name: z.string(),
-        email: z.string().email(),
-        contactPerson: z.string(),
+        contactEmail: z.string().email().optional(),
+        email: z.string().email().optional(),
+        contactPerson: z.string().optional(),
+        industry: z.string().optional(),
         theme: z.string().optional(),
-        customDomain: z.string().optional(),
-        sslEnabled: z.number().optional(),
+        customDomain: z.string().optional().nullable(),
+        sslEnabled: z.union([z.boolean(), z.number()]).optional(),
+        status: z.enum(["active", "suspended", "trial"]).optional(),
       }))
       .mutation(async ({ input }) => {
-        return await tenantDb.createTenant(input);
+        // Normalize email field
+        const email = input.contactEmail || input.email || '';
+        const sslEnabled = typeof input.sslEnabled === 'boolean' ? (input.sslEnabled ? 1 : 0) : input.sslEnabled;
+        
+        return await tenantDb.createTenant({
+          ...input,
+          email,
+          contactPerson: input.contactPerson || '',
+          theme: input.theme || '{}',
+          sslEnabled,
+          customDomain: input.customDomain || undefined,
+        });
       }),
     
     update: protectedProcedure
@@ -88,13 +102,25 @@ export const appRouter = router({
     
     create: protectedProcedure
       .input(z.object({
-        tenantId: z.string(),
-        deploymentId: z.string(),
+        tenantId: z.union([z.string(), z.number()]),
+        deploymentId: z.string().optional(),
         name: z.string(),
-        enabledWidgets: z.string(), // JSON array
+        enabledWidgets: z.string().optional(),
+        widgetConfig: z.string().optional(),
+        status: z.enum(["active", "inactive", "maintenance"]).optional(),
       }))
       .mutation(async ({ input }) => {
-        return await tenantDb.createDeployment(input);
+        // Normalize fields
+        const tenantId = typeof input.tenantId === 'number' ? String(input.tenantId) : input.tenantId;
+        const deploymentId = input.deploymentId || `dep_${Date.now()}`;
+        const enabledWidgets = input.widgetConfig || input.enabledWidgets || '{}';
+        
+        return await tenantDb.createDeployment({
+          tenantId,
+          deploymentId,
+          name: input.name,
+          enabledWidgets,
+        });
       }),
     
     update: protectedProcedure
@@ -126,12 +152,20 @@ export const appRouter = router({
     
     set: protectedProcedure
       .input(z.object({
-        tenantId: z.string(),
+        tenantId: z.union([z.string(), z.number()]),
         flagKey: z.string(),
-        enabled: z.number(),
+        enabled: z.union([z.boolean(), z.number()]),
       }))
       .mutation(async ({ input }) => {
-        return await tenantDb.setFeatureFlag(input);
+        // Normalize fields
+        const tenantId = typeof input.tenantId === 'number' ? String(input.tenantId) : input.tenantId;
+        const enabled = typeof input.enabled === 'boolean' ? (input.enabled ? 1 : 0) : input.enabled;
+        
+        return await tenantDb.setFeatureFlag({
+          tenantId,
+          flagKey: input.flagKey,
+          enabled,
+        });
       }),
     
     delete: protectedProcedure

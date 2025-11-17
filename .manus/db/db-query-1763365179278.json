@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as flag_count FROM feature_flags WHERE tenantId = 'final-database-test';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2QhoXWFPUc5Qzp8.root --database RhVXBaoDmRSMBbdTHiRL2J --execute SELECT COUNT(*) as flag_count FROM feature_flags WHERE tenantId = 'final-database-test';",
+  "rows": [
+    {
+      "flag_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "flag_count\n0\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}
