@@ -22,6 +22,19 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks for better caching
+          'react-vendor': ['react', 'react-dom'],
+          'ui-vendor': ['lucide-react', 'sonner']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 600,
+    // Enable minification with esbuild (faster than terser)
+    minify: 'esbuild',
+    target: 'es2020'
   },
   server: {
     port: 3000,
