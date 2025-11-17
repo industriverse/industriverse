@@ -33,8 +33,8 @@ export const tenants = mysqlTable("tenants", {
   tenantId: varchar("tenantId", { length: 64 }).notNull().unique(),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 320 }).notNull(),
-  contactPerson: varchar("contactPerson", { length: 255 }).notNull(),
-  theme: varchar("theme", { length: 64 }).default("cosmic").notNull(),
+  contactPerson: varchar("contactPerson", { length: 255 }).default(""),
+  theme: text("theme"), // JSON theme configuration
   customDomain: varchar("customDomain", { length: 255 }),
   sslEnabled: int("sslEnabled").default(1).notNull(), // 1 = true, 0 = false
   status: mysqlEnum("status", ["active", "suspended", "trial"]).default("trial").notNull(),

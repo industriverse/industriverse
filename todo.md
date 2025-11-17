@@ -335,3 +335,48 @@
 - [ ] Load testing WebSocket connections
 - [ ] Final documentation update
 - [ ] Create deployment checkpoint
+
+
+## Final Integration Phase
+
+### Phase 1: Debug Deployment API
+- [x] Investigate 400 error in tenant creation endpoint
+- [x] Check tRPC input validation schema
+- [x] Verify database schema matches API expectations
+- [x] Test API endpoint directly with curl/Postman
+- [x] Fix validation errors (schema + API normalization)
+- [x] Test successful deployment from wizard - WORKING!
+
+### Phase 2: Admin Tenant Management UI
+- [x] Create TenantManagement page component
+- [x] Build tenant data table with sorting/filtering
+- [x] Add tenant CRUD operations (Create, Read, Update, Delete)
+- [x] Implement search functionality
+- [x] Create modal dialogs for edit/delete confirmations
+- [x] Add tRPC query/mutation integration
+- [x] Test CRUD operations (Create, Read, Update verified)
+- [ ] Create deployment data table
+- [ ] Add deployment CRUD operations
+- [ ] Build feature flags management table
+- [ ] Add bulk operations (delete multiple, export)
+- [ ] Add pagination for large datasets
+
+### Phase 3: Connect Admin Portal to Database
+- [ ] Replace mock tenant data with tRPC queries
+- [ ] Update Tenants tab with live database data
+- [ ] Update Domains tab with live deployment data
+- [ ] Add real-time tenant count to dashboard
+- [ ] Show actual feature flag states from database
+- [ ] Add loading states for all queries
+- [ ] Implement error handling for failed queries
+- [ ] Add data refresh functionality
+
+### Phase 4: End-to-End Testing
+- [ ] Test complete flow: Wizard → Database → Admin Portal
+- [ ] Verify tenant creation and display
+- [ ] Test deployment management
+- [ ] Verify feature flag persistence
+- [ ] Test AmI metrics with real tenants
+- [ ] Performance testing with multiple tenants
+- [ ] Create final comprehensive test report
+- [ ] Save final production checkpoint

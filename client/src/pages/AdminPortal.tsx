@@ -235,7 +235,12 @@ export default function AdminPortal() {
           {/* Tenants Tab */}
           <TabsContent value="tenants" className="space-y-6">
             <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Multi-Tenant Management</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Multi-Tenant Management</h2>
+                <Button variant="outline" onClick={() => window.location.href = '/admin/tenants'}>
+                  Manage All Tenants
+                </Button>
+              </div>
               <p className="text-sm text-muted-foreground mb-6">
                 Manage white-label deployments for multiple clients.
               </p>
