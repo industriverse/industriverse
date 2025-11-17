@@ -13,36 +13,36 @@
 
 ## Phase 2: Implement WebSocket Service
 
-- [ ] Create CapsuleWebSocket service class
-- [ ] Implement WebSocket connection with authentication
-- [ ] Add message handling for capsule updates
-- [ ] Implement reconnection logic with exponential backoff
-- [ ] Add heartbeat mechanism to keep connection alive
-- [ ] Create React hook for WebSocket integration (useCapsuleWebSocket)
-- [ ] Handle connection states (connecting, connected, disconnected, error)
-- [ ] Add message queue for offline actions
+- [x] Create CapsuleWebSocket service class
+- [x] Implement WebSocket connection with authentication
+- [x] Add message handling for capsule updates
+- [x] Implement reconnection logic with exponential backoff
+- [x] Add heartbeat mechanism to keep connection alive
+- [x] Create React hook for WebSocket integration (useCapsuleWebSocket)
+- [x] Handle connection states (connecting, connected, disconnected, error)
+- [x] Add message queue for offline actions
 
 ## Phase 3: Configure PWA
 
-- [ ] Create manifest.json with app metadata
-- [ ] Add app icons (192x192, 512x512, maskable)
-- [ ] Create service worker for caching
-- [ ] Implement cache strategies (cache-first for static, network-first for API)
-- [ ] Add offline fallback page
-- [ ] Configure workbox for advanced caching
-- [ ] Test "Add to Home Screen" on iOS and Android
-- [ ] Add install prompt for desktop
+- [x] Create manifest.json with app metadata
+- [x] Add app icons (192x192, 512x512, maskable)
+- [x] Create service worker for caching
+- [x] Implement cache strategies (cache-first for static, network-first for API)
+- [x] Add offline fallback page
+- [x] Configure workbox for advanced caching
+- [x] Test "Add to Home Screen" on iOS and Android
+- [x] Add install prompt for desktop
 
 ## Phase 4: Add Action Handlers and API Integration
 
-- [ ] Create API service for Capsule Gateway REST endpoints
-- [ ] Implement action handlers (mitigate, inspect, dismiss, etc.)
-- [ ] Add action confirmation dialogs
-- [ ] Implement optimistic UI updates
-- [ ] Add error handling and retry logic
-- [ ] Create loading states for actions
-- [ ] Add success/error toast notifications
-- [ ] Implement action history tracking
+- [x] Create API service for Capsule Gateway REST endpoints
+- [x] Implement action handlers (mitigate, inspect, dismiss, etc.)
+- [x] Add action confirmation dialogs
+- [x] Implement optimistic UI updates
+- [x] Add error handling and retry logic
+- [x] Create loading states for actions
+- [x] Add success/error toast notifications
+- [x] Implement action history tracking
 
 ## Phase 5: Cross-Browser Testing and Optimization
 
