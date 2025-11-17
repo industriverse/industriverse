@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import CapsulePill from '@/components/CapsulePill';
 import { Button } from '@/components/ui/button';
 import type { CapsuleData, CapsuleAction } from '@/types/capsule';
 import { toast } from 'sonner';
+import { useCapsuleWebSocket } from '@/hooks/useCapsuleWebSocket';
+import { Badge } from '@/components/ui/badge';
+import { getAPI } from '@/services/CapsuleAPI';
 
 // Mock capsule data for demonstration
 const mockCapsules: CapsuleData[] = [
@@ -82,18 +85,97 @@ const mockCapsules: CapsuleData[] = [
 ];
 
 export default function Home() {
-  const [capsules] = useState<CapsuleData[]>(mockCapsules);
+  const [capsules, setCapsules] = useState<CapsuleData[]>(mockCapsules);
   
-  const handleAction = (action: CapsuleAction, capsuleId: string) => {
+  // WebSocket configuration (using mock endpoint for demo)
+  const wsUrl = import.meta.env.VITE_CAPSULE_GATEWAY_WS || 'wss://capsule-gateway.industriverse.io/ws';
+  const authToken = import.meta.env.VITE_AUTH_TOKEN || '';
+  
+  // Handle capsule updates from WebSocket
+  const handleCapsuleUpdate = useCallback((update: any) => {
+    setCapsules(prev => prev.map(c => 
+      c.id === update.capsuleId 
+        ? { ...c, ...update.updates }
+        : c
+    ));
+    toast.info('Capsule Updated', {
+      description: `Capsule ${update.capsuleId} has been updated`
+    });
+  }, []);
+  
+  const handleCapsuleNew = useCallback((capsule: CapsuleData) => {
+    setCapsules(prev => [capsule, ...prev]);
+    toast.success('New Capsule', {
+      description: capsule.title
+    });
+  }, []);
+  
+  const handleCapsuleRemoved = useCallback((capsuleId: string) => {
+    setCapsules(prev => prev.filter(c => c.id !== capsuleId));
+    toast.info('Capsule Removed', {
+      description: `Capsule ${capsuleId} removed`
+    });
+  }, []);
+  
+  const handleWebSocketError = useCallback((error: Error) => {
+    console.error('WebSocket error:', error);
+    toast.error('Connection Error', {
+      description: error.message
+    });
+  }, []);
+  
+  // WebSocket connection (disabled for demo, will connect to real endpoint in production)
+  const { connectionState, connect, disconnect, isConnected } = useCapsuleWebSocket({
+    url: wsUrl,
+    authToken,
+    autoConnect: false, // Set to true when real endpoint is available
+    onCapsuleUpdate: handleCapsuleUpdate,
+    onCapsuleNew: handleCapsuleNew,
+    onCapsuleRemoved: handleCapsuleRemoved,
+    onError: handleWebSocketError
+  });
+  
+  const handleAction = async (action: CapsuleAction, capsuleId: string) => {
     const capsule = capsules.find(c => c.id === capsuleId);
     if (!capsule) return;
     
-    toast.success(`Action: ${action}`, {
-      description: `Executed ${action} on ${capsule.title}`
-    });
-    
-    // In real implementation, this would call the Capsule Gateway API
-    console.log(`Action ${action} on capsule ${capsuleId}`);
+    try {
+      // Optimistic UI update
+      setCapsules(prev => prev.map(c => 
+        c.id === capsuleId 
+          ? { ...c, status: action === 'dismiss' ? 'dismissed' : c.status }
+          : c
+      ));
+      
+      // Call API
+      const api = getAPI();
+      const response = await api.executeAction({
+        capsuleId,
+        action,
+        metadata: {
+          timestamp: new Date().toISOString()
+        }
+      });
+      
+      toast.success(`Action: ${action}`, {
+        description: `Executed ${action} on ${capsule.title}`
+      });
+      
+      console.log('Action response:', response);
+    } catch (error) {
+      // Revert optimistic update on error
+      setCapsules(prev => prev.map(c => 
+        c.id === capsuleId 
+          ? capsule
+          : c
+      ));
+      
+      toast.error('Action Failed', {
+        description: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      console.error('Action error:', error);
+    }
   };
   
   return (
@@ -106,12 +188,24 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-foreground">Capsule Pins</h1>
               <p className="text-sm text-muted-foreground">Real-time industrial intelligence</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <div className={`h-2 w-2 rounded-full ${
+                  isConnected ? 'bg-emerald-400' : 'bg-slate-500'
+                } animate-pulse`} />
+                <span className="text-xs text-muted-foreground">
+                  {connectionState}
+                </span>
+              </div>
               <Button variant="outline" size="sm">
                 Settings
               </Button>
-              <Button variant="default" size="sm">
-                Connect
+              <Button 
+                variant="default" 
+                size="sm"
+                onClick={isConnected ? disconnect : connect}
+              >
+                {isConnected ? 'Disconnect' : 'Connect'}
               </Button>
             </div>
           </div>
