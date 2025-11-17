@@ -52,6 +52,31 @@ from src.capsule_layer.services.microadapt_edge.microadapt_service import (
     MicroAdaptEdgeService,
     ForecastResult
 )
+from src.capsule_layer.services.a2a_agent_integration import (
+    create_host_agent,
+    get_agent_registry,
+    HostAgent,
+    AgentRegistry,
+    TaskRequest,
+    TaskResult
+)
+from src.capsule_layer.services.dac_factory_orchestration import (
+    create_dac_factory_orchestrator,
+    DACFactoryOrchestrator,
+    DACSpecification,
+    DeploymentConfig,
+    ThermodynamicWorkflow,
+    CrossCloudConfig,
+    ProofType
+)
+from src.capsule_layer.services.remix_lab_service import (
+    create_remix_lab_service,
+    RemixLabService,
+    RemixComponent,
+    RemixSnapshot,
+    RemixCommit,
+    RemixEventType
+)
 
 # ============================================================================
 # REQUEST/RESPONSE MODELS
@@ -489,6 +514,245 @@ class BridgeAPI:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
         
+        # ====================================================================
+        # A2A AGENT ENDPOINTS
+        # ====================================================================
+        
+        @self.router.get("/agents")
+        async def list_agents():
+            """List all available agents (A2A discovery)"""
+            registry = get_agent_registry()
+            agents = registry.list_agents()
+            return {
+                "agents": [agent.dict() for agent in agents],
+                "count": len(agents),
+                "timestamp": datetime.now().isoformat()
+            }
+        
+        @self.router.get("/agents/{agent_id}")
+        async def get_agent(agent_id: str):
+            """Get agent card by ID (A2A discovery)"""
+            registry = get_agent_registry()
+            agent = registry.get_agent(agent_id)
+            if not agent:
+                raise HTTPException(status_code=404, detail=f"Agent {agent_id} not found")
+            return agent.dict()
+        
+        @self.router.get("/agents/skills/{skill}")
+        async def find_agents_by_skill(skill: str):
+            """Find agents by skill (A2A discovery)"""
+            registry = get_agent_registry()
+            agents = registry.find_agents_by_skill(skill)
+            return {
+                "skill": skill,
+                "agents": [agent.dict() for agent in agents],
+                "count": len(agents)
+            }
+        
+        @self.router.post("/orchestrate")
+        async def orchestrate_workflow(request: Dict[str, Any]):
+            """Orchestrate workflow across multiple agents (A2A orchestration)"""
+            host_agent = create_host_agent()
+            result = await host_agent.orchestrate_workflow(
+                workflow_description=request.get("workflow", ""),
+                input_data=request.get("input_data", {}),
+                mcp_context=request.get("mcp_context")
+            )
+            return result
+        
+        # ====================================================================
+        # DAC FACTORY ORCHESTRATION ENDPOINTS
+        # ====================================================================
+        
+        @self.router.post("/dac/create")
+        async def create_dac(spec: DACSpecification):
+            """Create new DAC from specification"""
+            orchestrator = create_dac_factory_orchestrator()
+            result = await orchestrator.create_dac(spec)
+            return result
+        
+        @self.router.post("/dac/{dac_id}/build")
+        async def build_dac(dac_id: str):
+            """Build DAC artifact"""
+            orchestrator = create_dac_factory_orchestrator()
+            result = await orchestrator.build_dac(dac_id)
+            return result
+        
+        @self.router.post("/dac/{dac_id}/deploy")
+        async def deploy_dac(dac_id: str, config: DeploymentConfig):
+            """Deploy DAC to target platform"""
+            orchestrator = create_dac_factory_orchestrator()
+            result = await orchestrator.deploy_dac(dac_id, config)
+            return result.dict()
+        
+        @self.router.post("/dac/deployment/{deployment_id}/scale")
+        async def scale_dac(deployment_id: str, target_replicas: int):
+            """Scale DAC deployment"""
+            orchestrator = create_dac_factory_orchestrator()
+            result = await orchestrator.scale_dac(deployment_id, target_replicas)
+            return result
+        
+        @self.router.post("/workflow/execute")
+        async def execute_thermodynamic_workflow(workflow: ThermodynamicWorkflow):
+            """Execute complex thermodynamic workflow"""
+            orchestrator = create_dac_factory_orchestrator()
+            result = await orchestrator.execute_workflow(workflow)
+            return result.dict()
+        
+        @self.router.post("/proof/generate")
+        async def generate_proof(request: Dict[str, Any]):
+            """Generate proof for ProofEconomy"""
+            orchestrator = create_dac_factory_orchestrator()
+            result = await orchestrator.generate_proof(
+                proof_type=ProofType(request["proof_type"]),
+                dac_id=request["dac_id"],
+                input_data=request["input_data"],
+                output_data=request["output_data"],
+                workflow_id=request.get("workflow_id")
+            )
+            return result.dict()
+        
+        @self.router.post("/dac/{dac_id}/deploy-cross-cloud")
+        async def deploy_cross_cloud(dac_id: str, cross_cloud_config: CrossCloudConfig, deployment_config: DeploymentConfig):
+            """Deploy DAC across multiple clouds"""
+            orchestrator = create_dac_factory_orchestrator()
+            results = await orchestrator.deploy_cross_cloud(dac_id, cross_cloud_config, deployment_config)
+            return {"deployments": [r.dict() for r in results]}
+        
+        @self.router.get("/dac/{dac_id}/status")
+        async def get_dac_status(dac_id: str):
+            """Get comprehensive DAC status"""
+            orchestrator = create_dac_factory_orchestrator()
+            return orchestrator.get_dac_status(dac_id)
+        
+        @self.router.get("/platform/statistics")
+        async def get_platform_statistics():
+            """Get platform-wide statistics"""
+            orchestrator = create_dac_factory_orchestrator()
+            return orchestrator.get_platform_statistics()
+        
+        # ====================================================================
+        # REMIX LAB ENDPOINTS (DAC Creation Nexus)
+        # ====================================================================
+        
+        @self.router.post("/remixlab/snapshot/create")
+        async def create_remix_snapshot(request: Dict[str, Any]):
+            """Create new remix snapshot"""
+            remix_lab = create_remix_lab_service()
+            components = [RemixComponent(**c) for c in request["components"]]
+            snapshot = await remix_lab.create_snapshot(
+                user_id=request["user_id"],
+                name=request["name"],
+                description=request["description"],
+                components=components
+            )
+            return snapshot.dict()
+        
+        @self.router.put("/remixlab/snapshot/{snapshot_id}")
+        async def update_remix_snapshot(snapshot_id: str, request: Dict[str, Any]):
+            """Update existing snapshot"""
+            remix_lab = create_remix_lab_service()
+            components = [RemixComponent(**c) for c in request.get("components", [])]
+            snapshot = await remix_lab.update_snapshot(
+                snapshot_id=snapshot_id,
+                components=components if components else None,
+                connections=request.get("connections")
+            )
+            return snapshot.dict()
+        
+        @self.router.post("/remixlab/snapshot/{snapshot_id}/simulate")
+        async def simulate_remix(snapshot_id: str, config: Optional[Dict[str, Any]] = None):
+            """Run simulation on remix snapshot"""
+            remix_lab = create_remix_lab_service()
+            results = await remix_lab.simulate_remix(snapshot_id, config)
+            return results
+        
+        @self.router.post("/remixlab/commit")
+        async def commit_remix(request: Dict[str, Any]):
+            """
+            Commit remix and generate UTID
+            
+            This is the critical operation that triggers:
+            1. UTID minting
+            2. DAC manifest creation
+            3. Event emission to DAC Orchestrator
+            4. Proof generation
+            5. Capsule registration
+            """
+            remix_lab = create_remix_lab_service()
+            commit = await remix_lab.commit_remix(
+                snapshot_id=request["snapshot_id"],
+                committed_by=request["committed_by"],
+                collaborators=request.get("collaborators")
+            )
+            return commit.dict()
+        
+        @self.router.post("/remixlab/revoke/{commit_id}")
+        async def revoke_remix(commit_id: str, request: Dict[str, Any]):
+            """Revoke committed remix"""
+            remix_lab = create_remix_lab_service()
+            result = await remix_lab.revoke_remix(
+                commit_id=commit_id,
+                revoked_by=request["revoked_by"],
+                reason=request["reason"]
+            )
+            return result
+        
+        @self.router.get("/remixlab/snapshot/{snapshot_id}")
+        async def get_remix_snapshot(snapshot_id: str):
+            """Get snapshot by ID"""
+            remix_lab = create_remix_lab_service()
+            snapshot = remix_lab.get_snapshot(snapshot_id)
+            if not snapshot:
+                raise HTTPException(status_code=404, detail=f"Snapshot {snapshot_id} not found")
+            return snapshot.dict()
+        
+        @self.router.get("/remixlab/commit/{commit_id}")
+        async def get_remix_commit(commit_id: str):
+            """Get commit by ID"""
+            remix_lab = create_remix_lab_service()
+            commit = remix_lab.get_commit(commit_id)
+            if not commit:
+                raise HTTPException(status_code=404, detail=f"Commit {commit_id} not found")
+            return commit.dict()
+        
+        @self.router.get("/remixlab/utid/{utid}")
+        async def get_utid_record(utid: str):
+            """Get UTID record"""
+            remix_lab = create_remix_lab_service()
+            record = remix_lab.get_utid_record(utid)
+            if not record:
+                raise HTTPException(status_code=404, detail=f"UTID {utid} not found")
+            return record.dict()
+        
+        @self.router.get("/remixlab/user/{user_id}/snapshots")
+        async def list_user_snapshots(user_id: str):
+            """List user's snapshots"""
+            remix_lab = create_remix_lab_service()
+            snapshots = remix_lab.list_user_snapshots(user_id)
+            return {"snapshots": [s.dict() for s in snapshots]}
+        
+        @self.router.get("/remixlab/user/{user_id}/commits")
+        async def list_user_commits(user_id: str):
+            """List user's commits"""
+            remix_lab = create_remix_lab_service()
+            commits = remix_lab.list_user_commits(user_id)
+            return {"commits": [c.dict() for c in commits]}
+        
+        @self.router.get("/remixlab/events")
+        async def get_remix_events(event_type: Optional[str] = None, limit: int = 100):
+            """Get Remix Lab events"""
+            remix_lab = create_remix_lab_service()
+            event_type_enum = RemixEventType(event_type) if event_type else None
+            events = remix_lab.get_events(event_type_enum, limit)
+            return {"events": [e.dict() for e in events]}
+        
+        @self.router.get("/remixlab/statistics")
+        async def get_remix_lab_statistics():
+            """Get Remix Lab statistics"""
+            remix_lab = create_remix_lab_service()
+            return remix_lab.get_statistics()
+        
         @self.router.get("/health")
         async def health_check():
             """Health check for all thermodynamic services"""
@@ -500,6 +764,22 @@ class BridgeAPI:
                     "simulated_snapshot": self.simulated_snapshot.get_statistics(),
                     "microadapt_edge": self.microadapt_edge.get_statistics()
                 },
+                "a2a_enabled": True,
+                "mcp_enabled": MCP_AVAILABLE,
+                "agent_count": 4,
+                "dac_factory_enabled": True,
+                "remix_lab_enabled": True,
+                "orchestration_capabilities": [
+                    "lifecycle_management",
+                    "multi_platform_deployment",
+                    "thermodynamic_workflows",
+                    "energy_atlas_integration",
+                    "proof_economy_integration",
+                    "cross_cloud_orchestration",
+                    "remix_lab_dac_creation",
+                    "utid_generation",
+                    "provenance_tracking"
+                ],
                 "timestamp": datetime.now().isoformat()
             }
 
