@@ -21,4 +21,12 @@
     <!-- Errors -->
     <string name="error_connection_failed">Connection failed</string>
     <string name="error_unknown">Unknown error occurred</string>
+
+    <!-- Widgets -->
+    <string name="compact_widget_description">Single capsule at a glance</string>
+    <string name="expanded_widget_description">View 3-4 active capsules</string>
+    <string name="full_widget_description">Full capsule launchpad</string>
+    <string name="loading_capsules">Loading capsules…</string>
+    <string name="no_active_capsules">No active capsules</string>
+    <string name="widget_tap_to_open">Tap to open</string>
 </resources>

@@ -59,7 +59,7 @@
 
         <!-- Widget Providers -->
         <receiver
-            android:name=".widget.CompactCapsuleWidgetProvider"
+            android:name=".widget.CompactWidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -70,7 +70,7 @@
         </receiver>
 
         <receiver
-            android:name=".widget.ExpandedCapsuleWidgetProvider"
+            android:name=".widget.ExpandedWidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -81,7 +81,7 @@
         </receiver>
 
         <receiver
-            android:name=".widget.FullCapsuleWidgetProvider"
+            android:name=".widget.FullWidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
