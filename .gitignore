@@ -117,6 +117,7 @@ pids
 *.pid
 *.seed
 *.pid.lock
+*.bak
 
 # Dependency directories
 jspm_packages/

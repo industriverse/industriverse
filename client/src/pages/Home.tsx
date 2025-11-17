@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
+import { useAuth } from '@/_core/hooks/useAuth';
 import CapsulePill from '@/components/CapsulePill';
 import { Button } from '@/components/ui/button';
 import type { CapsuleData, CapsuleAction } from '@/types/capsule';
@@ -87,6 +88,10 @@ const mockCapsules: CapsuleData[] = [
 ];
 
 export default function Home() {
+  // The userAuth hooks provides authentication state
+  // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
+  let { user, loading, error, isAuthenticated, logout } = useAuth();
+
   const [capsules, setCapsules] = useState<CapsuleData[]>(mockCapsules);
   const [filters, setFilters] = useState<FilterOptions>({
     search: '',
