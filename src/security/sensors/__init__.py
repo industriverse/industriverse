@@ -19,9 +19,16 @@ from .thermal_security_monitor import (
     get_thermal_security_monitor
 )
 
+from .quantum_security_sensor import (
+    QuantumSecuritySensor,
+    get_quantum_security_sensor
+)
+
 __all__ = [
     "PowerAnalysisDetector",
     "get_power_analysis_detector",
     "ThermalSecurityMonitor",
-    "get_thermal_security_monitor"
+    "get_thermal_security_monitor",
+    "QuantumSecuritySensor",
+    "get_quantum_security_sensor"
 ]
