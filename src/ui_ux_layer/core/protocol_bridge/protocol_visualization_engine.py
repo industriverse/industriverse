@@ -853,7 +853,9 @@ class ProtocolVisualizationEngine:
                 if isinstance(content_text, dict):
                     try:
                         content_text = json.dumps(content_text, indent=2)
-                    except:
+                    except (TypeError, ValueError):
+                        # TypeError: object not JSON serializable
+                        # ValueError: circular reference or invalid data
                         content_text = str(content_text)
                 
                 message_element["children"].append({

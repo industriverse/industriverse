@@ -155,7 +155,9 @@ class AgentUtils:
             # Parse JSON if possible
             try:
                 return json.loads(decoded_data)
-            except:
+            except (json.JSONDecodeError, TypeError):
+                # JSONDecodeError: invalid JSON
+                # TypeError: data is not a string
                 return decoded_data
         except Exception as e:
             logger.error(f"Error decrypting data: {e}")
@@ -220,7 +222,9 @@ class AgentUtils:
             # Parse JSON if possible
             try:
                 return json.loads(data)
-            except:
+            except (json.JSONDecodeError, TypeError):
+                # JSONDecodeError: invalid JSON
+                # TypeError: data is not a string
                 return data
         except Exception as e:
             logger.error(f"Error decompressing data: {e}")
@@ -481,7 +485,9 @@ class AgentUtils:
             # Check if already a number
             try:
                 return int(duration_str)
-            except:
+            except (ValueError, TypeError):
+                # ValueError: can't convert to int
+                # TypeError: duration_str is not a string/number
                 pass
             
             # Parse duration string
