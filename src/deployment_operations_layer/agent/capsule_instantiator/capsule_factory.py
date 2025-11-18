@@ -18,29 +18,47 @@ class CapsuleFactory:
     """
     Factory for creating capsules from blueprints and manifests.
     """
-    
-    def __init__(self):
+
+    def __init__(self, lifecycle_coordinator=None):
         """
         Initialize the Capsule Factory.
+
+        Args:
+            lifecycle_coordinator: Optional CapsuleLifecycleCoordinator for unified lifecycle management
+
+        Week 18-19 Day 3: Added coordinator integration
         """
+        self.lifecycle_coordinator = lifecycle_coordinator
+
+        # Register with lifecycle coordinator if available
+        if self.lifecycle_coordinator:
+            self.lifecycle_coordinator.register_deploy_factory(self)
+            logger.info("Capsule Factory registered with Capsule Lifecycle Coordinator")
+
         logger.info("Capsule Factory initialized")
     
-    def create_capsule(self, 
-                      blueprint: Dict[str, Any], 
-                      manifest: Dict[str, Any], 
-                      context: Dict[str, Any]) -> Dict[str, Any]:
+    def create_capsule(self,
+                      blueprint: Dict[str, Any],
+                      manifest: Dict[str, Any],
+                      context: Dict[str, Any],
+                      governance_metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Create a capsule from a blueprint and manifest.
-        
+
         Args:
             blueprint: Blueprint defining the capsule structure
             manifest: Deployment manifest with configuration
             context: Deployment context
-            
+            governance_metadata: Optional governance metadata from coordinator (Week 18-19 Day 3)
+
         Returns:
             Instantiated capsule as a dictionary
         """
         logger.info(f"Creating capsule from blueprint: {blueprint.get('name', 'unnamed')}")
+
+        # Week 18-19 Day 3: Log if governance metadata provided
+        if governance_metadata:
+            logger.info(f"Applying governance metadata from coordinator: {governance_metadata.keys()}")
         
         # Generate a unique ID for the capsule
         capsule_id = str(uuid.uuid4())
@@ -94,6 +112,17 @@ class CapsuleFactory:
                 "status": "pending_validation"
             }
         }
+
+        # Week 18-19 Day 3: Apply governance metadata from coordinator if provided
+        if governance_metadata:
+            capsule["governance"] = governance_metadata
+            # Update compliance status based on governance validation
+            if "validated_at" in governance_metadata:
+                capsule["security"]["compliance"]["status"] = "validated"
+                capsule["security"]["compliance"]["validated_at"] = governance_metadata["validated_at"]
+            # Apply trust zone from governance if provided
+            if "trust_zone" in governance_metadata:
+                capsule["security"]["trust_zone"] = governance_metadata["trust_zone"]
         
         # Initialize protocol configuration
         capsule["protocols"] = {
