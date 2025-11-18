@@ -821,12 +821,20 @@ class DataCatalogSystem:
             if dataset_path.endswith('.csv'):
                 try:
                     sample_df = pd.read_csv(dataset_path, nrows=100)
-                except:
+                except (pd.errors.ParserError, ValueError, FileNotFoundError, PermissionError):
+                    # ParserError: invalid CSV format
+                    # ValueError: encoding or parsing error
+                    # FileNotFoundError: file doesn't exist
+                    # PermissionError: can't read file
                     return "tabular"
             else:
                 try:
                     sample_df = pd.read_excel(dataset_path, nrows=100)
-                except:
+                except (pd.errors.ParserError, ValueError, FileNotFoundError, PermissionError):
+                    # ParserError: invalid Excel format
+                    # ValueError: encoding or parsing error
+                    # FileNotFoundError: file doesn't exist
+                    # PermissionError: can't read file
                     return "tabular"
             
             # Check for datetime columns
@@ -835,7 +843,10 @@ class DataCatalogSystem:
                 try:
                     pd.to_datetime(sample_df[col])
                     datetime_cols.append(col)
-                except:
+                except (ValueError, TypeError, KeyError):
+                    # ValueError: invalid date format
+                    # TypeError: incompatible type for datetime conversion
+                    # KeyError: column doesn't exist
                     pass
             
             if datetime_cols:
@@ -854,7 +865,12 @@ class DataCatalogSystem:
                     return "image"
                 else:
                     return "json"
-            except:
+            except (json.JSONDecodeError, FileNotFoundError, PermissionError, KeyError, TypeError):
+                # JSONDecodeError: invalid JSON format
+                # FileNotFoundError: file doesn't exist
+                # PermissionError: can't read file
+                # KeyError: unexpected data structure
+                # TypeError: data is not indexable
                 return "json"
         elif dataset_path.endswith('.db'):
             return "database"
@@ -886,12 +902,20 @@ class DataCatalogSystem:
                 if dataset_path.endswith('.csv'):
                     try:
                         df = pd.read_csv(dataset_path)
-                    except:
+                    except (pd.errors.ParserError, ValueError, FileNotFoundError, PermissionError):
+                        # ParserError: invalid CSV format
+                        # ValueError: encoding error
+                        # FileNotFoundError: file doesn't exist
+                        # PermissionError: can't read file
                         return metadata
                 elif dataset_path.endswith(('.xlsx', '.xls')):
                     try:
                         df = pd.read_excel(dataset_path)
-                    except:
+                    except (pd.errors.ParserError, ValueError, FileNotFoundError, PermissionError):
+                        # ParserError: invalid Excel format
+                        # ValueError: encoding error
+                        # FileNotFoundError: file doesn't exist
+                        # PermissionError: can't read file
                         return metadata
                 elif dataset_path.endswith('.db'):
                     try:
@@ -905,7 +929,10 @@ class DataCatalogSystem:
                             df = pd.read_sql(f"SELECT * FROM {table_name}", conn)
                         else:
                             return metadata
-                    except:
+                    except (sqlite3.Error, pd.errors.DatabaseError, ValueError):
+                        # sqlite3.Error: database error
+                        # DatabaseError: pandas database error
+                        # ValueError: invalid query or table
                         return metadata
                 else:
                     return metadata
@@ -948,7 +975,10 @@ class DataCatalogSystem:
                         try:
                             pd.to_datetime(df[col])
                             datetime_cols.append(col)
-                        except:
+                        except (ValueError, TypeError, KeyError):
+                            # ValueError: invalid date format
+                            # TypeError: incompatible type for datetime conversion
+                            # KeyError: column doesn't exist
                             pass
                     
                     if datetime_cols:
@@ -967,7 +997,9 @@ class DataCatalogSystem:
                             freq = pd.infer_freq(df[time_col])
                             if freq:
                                 metadata["frequency"] = freq
-                        except:
+                        except (ValueError, TypeError):
+                            # ValueError: can't infer frequency
+                            # TypeError: incompatible datetime type
                             pass
                         
                         # Extract value columns (non-datetime, non-categorical)
@@ -987,7 +1019,10 @@ class DataCatalogSystem:
                         img = Image.open(dataset_path)
                         metadata["resolution"] = f"{img.width}x{img.height}"
                         metadata["color_mode"] = img.mode
-                    except:
+                    except (IOError, OSError, AttributeError):
+                        # IOError: can't read image
+                        # OSError: file doesn't exist or permission denied
+                        # AttributeError: image doesn't have width/height/mode
                         pass
                 elif os.path.isdir(dataset_path):
                     # Directory of images
@@ -1048,7 +1083,9 @@ class DataCatalogSystem:
                             if class_cols:
                                 classes = set(df[class_cols[0]].unique())
                                 metadata["classes"] = list(classes)
-                    except:
+                    except (KeyError, AttributeError):
+                        # KeyError: column doesn't exist
+                        # AttributeError: df doesn't have expected methods
                         pass
         except Exception as e:
             logger.error(f"Error extracting metadata: {str(e)}")
@@ -1127,7 +1164,9 @@ class DataCatalogSystem:
                         try:
                             col_schema["minimum"] = float(df[col].min())
                             col_schema["maximum"] = float(df[col].max())
-                        except:
+                        except (ValueError, TypeError):
+                            # ValueError: can't convert to float
+                            # TypeError: incompatible type for min/max
                             pass
                     elif pd.api.types.is_datetime64_any_dtype(df[col]):
                         col_schema["type"] = "string"
@@ -1139,7 +1178,9 @@ class DataCatalogSystem:
                         if df[col].nunique() < 20:
                             try:
                                 col_schema["enum"] = df[col].dropna().unique().tolist()
-                            except:
+                            except (ValueError, TypeError):
+                                # ValueError: can't convert to list
+                                # TypeError: incompatible type for unique()
                                 pass
                     
                     schema["properties"]["columns"]["properties"][col] = col_schema
@@ -1659,7 +1700,9 @@ class DataCatalogSystem:
                         img = Image.open(dataset_path)
                         img.verify()
                         metrics["image_validity"] = 1.0
-                    except:
+                    except (IOError, OSError):
+                        # IOError: can't verify image
+                        # OSError: file error
                         metrics["image_validity"] = 0.0
                 
                 elif os.path.isdir(dataset_path):
@@ -1680,7 +1723,9 @@ class DataCatalogSystem:
                                 img = Image.open(os.path.join(dataset_path, f))
                                 img.verify()
                                 valid_count += 1
-                            except:
+                            except (IOError, OSError):
+                                # IOError: can't verify image
+                                # OSError: file error
                                 pass
                         
                         metrics["image_validity"] = valid_count / len(image_files[:100])

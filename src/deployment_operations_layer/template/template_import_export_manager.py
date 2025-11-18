@@ -339,7 +339,9 @@ class TemplateImportExportManager:
                         return "json"
                     elif content.strip().startswith("---") or ":" in content:
                         return "yaml"
-            except:
+            except (UnicodeDecodeError, AttributeError):
+                # UnicodeDecodeError: file is not UTF-8
+                # AttributeError: file_obj doesn't have read()
                 pass
             
             # Default to zip if can't determine
