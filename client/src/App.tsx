@@ -14,6 +14,7 @@ import FeatureFlagsManager from "./pages/FeatureFlagsManager";
 import DeploymentWizard from "./pages/DeploymentWizard";
 import AmIVisualizationDashboard from "./pages/AmIVisualizationDashboard";
 import FeatureFlagAnalytics from "./pages/FeatureFlagAnalytics";
+import ARVRDemo from "./pages/ARVRDemo";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,7 @@ function Router() {
       <Route path={"/admin/tenants"} component={TenantManagement} />
       <Route path={"/widgets"} component={WidgetDemo} />
       <Route path={"/catalog"} component={CapsuleCatalog} />
+      <Route path={"/ar-vr"} component={ARVRDemo} />
         <Route path="/settings" component={Settings} />
         <Route path="/admin" component={AdminPortal} />
         <Route path="/admin/feature-flags" component={FeatureFlagsManager} />
