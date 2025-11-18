@@ -34,8 +34,22 @@ from .thermodynamic_primitives.puf import (
     get_thermodynamic_puf
 )
 
+from .sensors.power_analysis_detector import (
+    PowerAnalysisDetector,
+    get_power_analysis_detector
+)
+
+from .security_event_registry import (
+    SecurityEventRegistry,
+    get_security_event_registry
+)
+
 __all__ = [
     "ThermodynamicPUF",
     "PUFSignature",
-    "get_thermodynamic_puf"
+    "get_thermodynamic_puf",
+    "PowerAnalysisDetector",
+    "get_power_analysis_detector",
+    "SecurityEventRegistry",
+    "get_security_event_registry"
 ]
