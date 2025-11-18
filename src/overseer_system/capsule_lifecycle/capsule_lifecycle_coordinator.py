@@ -486,12 +486,11 @@ class CapsuleLifecycleCoordinator:
         try:
             logger.info(f"Creating application instance from template: {template_id}")
 
-            # Call Application Layer factory
-            # Note: The factory will be modified in Week 18-19 Day 2 to support coordinator
-            result = await self.app_factory.create_capsule_instance(
+            # Call Application Layer factory directly (not through coordinator to avoid recursion)
+            # The create_capsule_instance method is synchronous, so we call it directly
+            result = self.app_factory.create_capsule_instance(
                 template_id=template_id,
-                instance_config=instance_config,
-                use_coordinator=False  # Direct creation for now
+                instance_config=instance_config
             )
 
             return result
