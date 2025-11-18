@@ -150,24 +150,95 @@ class DTSLHandler(ProtocolService):
 
     def load_twin_definition(self, twin_type: str, definition: Dict[str, Any]) -> bool:
         """Load or update a digital twin type definition."""
-        # TODO: Add validation against a DTSL schema
-        self.twin_definitions[twin_type] = definition
-        self.logger.info(f"Loaded definition for twin type: {twin_type}")
-        return True
+        # Validate twin definition against DTSL schema
+        from .dtsl_schema_validator import get_dtsl_schema_validator, DTSLValidationError
+
+        validator = get_dtsl_schema_validator()
+
+        try:
+            # Ensure 'type' field matches the twin_type parameter
+            if "type" not in definition:
+                definition["type"] = twin_type
+            elif definition["type"] != twin_type:
+                self.logger.error(
+                    f"Twin type mismatch: parameter '{twin_type}' != definition '{definition['type']}'"
+                )
+                return False
+
+            # Validate the definition
+            is_valid, errors = validator.validate_twin_definition(definition, raise_on_error=False)
+
+            if not is_valid:
+                self.logger.error(f"Twin definition validation failed for '{twin_type}':")
+                for error in errors:
+                    self.logger.error(f"  - {error}")
+                return False
+
+            # Validation passed, store definition
+            self.twin_definitions[twin_type] = definition
+            self.logger.info(f"Loaded and validated definition for twin type: {twin_type}")
+            return True
+
+        except DTSLValidationError as e:
+            self.logger.error(f"Twin definition validation error for '{twin_type}': {e.message}")
+            for error in e.errors:
+                self.logger.error(f"  - {error}")
+            return False
+        except Exception as e:
+            self.logger.exception(f"Unexpected error validating twin definition for '{twin_type}': {e}")
+            return False
 
     def load_swarm_definition(self, swarm_id: str, definition: Dict[str, Any]) -> bool:
         """Load or update a swarm definition."""
-        # TODO: Add validation against a DTSL schema
-        if "twins" not in definition or not isinstance(definition["twins"], list):
-            self.logger.error(f"Invalid swarm definition for {swarm_id}: missing or invalid \"twins\" list.")
+        # Validate swarm definition against DTSL schema
+        from .dtsl_schema_validator import get_dtsl_schema_validator, DTSLValidationError
+
+        validator = get_dtsl_schema_validator()
+
+        try:
+            # Ensure 'swarm_id' field matches the parameter
+            if "swarm_id" not in definition:
+                definition["swarm_id"] = swarm_id
+            elif definition["swarm_id"] != swarm_id:
+                self.logger.error(
+                    f"Swarm ID mismatch: parameter '{swarm_id}' != definition '{definition['swarm_id']}'"
+                )
+                return False
+
+            # Basic check (will be validated by schema too)
+            if "twins" not in definition or not isinstance(definition["twins"], list):
+                self.logger.error(f"Invalid swarm definition for {swarm_id}: missing or invalid \"twins\" list.")
+                return False
+
+            # Validate the definition
+            is_valid, errors = validator.validate_swarm_definition(definition, raise_on_error=False)
+
+            if not is_valid:
+                self.logger.error(f"Swarm definition validation failed for '{swarm_id}':")
+                for error in errors:
+                    self.logger.error(f"  - {error}")
+                return False
+
+            # Validation passed, store definition
+            self.swarm_definitions[swarm_id] = definition
+            self.logger.info(f"Loaded and validated definition for swarm: {swarm_id}")
+            return True
+
+        except DTSLValidationError as e:
+            self.logger.error(f"Swarm definition validation error for '{swarm_id}': {e.message}")
+            for error in e.errors:
+                self.logger.error(f"  - {error}")
             return False
-        self.swarm_definitions[swarm_id] = definition
-        self.logger.info(f"Loaded definition for swarm: {swarm_id}")
-        return True
+        except Exception as e:
+            self.logger.exception(f"Unexpected error validating swarm definition for '{swarm_id}': {e}")
+            return False
 
     def parse_dtsl_file(self, file_path: str) -> Optional[Dict[str, Any]]:
         """Parse a DTSL file (assuming YAML or JSON)."""
+        from .dtsl_schema_validator import get_dtsl_schema_validator, DTSLValidationError
+
         try:
+            # Parse file based on extension
             with open(file_path, \"r\") as f:
                 if file_path.endswith(\".yaml\") or file_path.endswith(\".yml\"):
                     content = yaml.safe_load(f)
@@ -176,10 +247,32 @@ class DTSLHandler(ProtocolService):
                 else:
                     self.logger.error(f"Unsupported file type for DTSL: {file_path}")
                     return None
-            # TODO: Validate content against DTSL schema
+
+            if not content:
+                self.logger.error(f"Empty DTSL file: {file_path}")
+                return None
+
+            # Validate content against DTSL file schema
+            validator = get_dtsl_schema_validator()
+
+            is_valid, errors = validator.validate_dtsl_file(content, raise_on_error=False)
+
+            if not is_valid:
+                self.logger.error(f"DTSL file validation failed for '{file_path}':")
+                for error in errors:
+                    self.logger.error(f"  - {error}")
+                return None
+
+            self.logger.info(f"Successfully parsed and validated DTSL file: {file_path}")
             return content
+
         except FileNotFoundError:
             self.logger.error(f"DTSL file not found: {file_path}")
+            return None
+        except DTSLValidationError as e:
+            self.logger.error(f"DTSL file validation error for '{file_path}': {e.message}")
+            for error in e.errors:
+                self.logger.error(f"  - {error}")
             return None
         except Exception as e:
             self.logger.exception(f"Error parsing DTSL file {file_path}: {e}")
