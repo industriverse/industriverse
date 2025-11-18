@@ -730,7 +730,8 @@ class AWSDeploymentHandler:
                     desiredCount=spec.get("desired_count", 1),
                     forceNewDeployment=spec.get("force_new_deployment", True)
                 )
-            except:
+            except self.ecs_client.exceptions.ServiceNotFoundException:
+                # ServiceNotFoundException: service doesn't exist, create new one
                 # Create new service
                 service_response = ecs.create_service(
                     cluster=cluster_name,
@@ -975,8 +976,10 @@ class AWSDeploymentHandler:
                     )
                 
                 operation = "update"
-            except:
-                # Create new stack
+            except self.cf_client.exceptions.ClientError as e:
+                # ClientError: stack doesn't exist or can't be updated
+                if 'does not exist' in str(e):
+                    # Create new stack
                 if template_body:
                     response = cfn.create_stack(
                         StackName=stack_name,

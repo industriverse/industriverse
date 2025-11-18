@@ -248,7 +248,9 @@ class AzureResourceManager:
         try:
             self.resource_client.resource_groups.get(resource_group_name)
             return True
-        except:
+        except Exception:
+            # Azure exception: resource group doesn't exist or permission denied
+            # Note: azure.core.exceptions could be more specific but Exception is safe here
             return False
     
     def _provision_virtual_machines(self, specs: Dict[str, Any]) -> Dict[str, Any]:
