@@ -588,13 +588,12 @@ class CapsuleLifecycleCoordinator:
                 "permissions": deployment_context.get("permissions", [])
             }
 
-            # Call Deployment Operations Layer factory
-            # Note: The factory will be modified in Week 18-19 Day 3 to support governance_metadata
+            # Call Deployment Operations Layer factory with governance metadata (Week 18-19 Day 3)
             capsule = self.deploy_factory.create_capsule(
                 blueprint=blueprint,
                 manifest=manifest,
-                context=deployment_context
-                # governance_metadata will be added in Day 3
+                context=deployment_context,
+                governance_metadata=context.governance_metadata  # NEW: Pass governance metadata
             )
 
             return capsule
