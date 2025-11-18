@@ -59,7 +59,7 @@ export class CapsuleGatewayServer {
     console.log('[CapsuleGateway] WebSocket server created');
 
     // Handle connections
-    this.wss.on('connection', (ws, request) => {
+    this.wss.on('connection', (ws: WebSocket, request: any) => {
       this.handleConnection(ws, request);
     });
 
@@ -84,7 +84,7 @@ export class CapsuleGatewayServer {
     this.clients.set(ws, client);
 
     // Handle messages
-    ws.on('message', (data) => {
+    ws.on('message', (data: WebSocket.Data) => {
       this.handleMessage(ws, data);
     });
 
@@ -95,7 +95,7 @@ export class CapsuleGatewayServer {
     });
 
     // Handle error
-    ws.on('error', (error) => {
+    ws.on('error', (error: Error) => {
       console.error(`[CapsuleGateway] WebSocket error:`, error);
       this.clients.delete(ws);
     });
