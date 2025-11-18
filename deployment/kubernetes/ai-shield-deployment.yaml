@@ -1,0 +1,433 @@
+---
+# AI Shield v2 Kubernetes Deployment Manifest
+# Production-ready deployment for thermodynamic cybersecurity platform
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ai-shield
+  labels:
+    name: ai-shield
+    environment: production
+
+---
+# PostgreSQL Database for Security Events
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ai-shield-postgres
+  namespace: ai-shield
+spec:
+  serviceName: ai-shield-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-shield-postgres
+  template:
+    metadata:
+      labels:
+        app: ai-shield-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16-alpine
+        env:
+        - name: POSTGRES_DB
+          value: "ai_shield"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: ai-shield-secrets
+              key: postgres-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ai-shield-secrets
+              key: postgres-password
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 100Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-shield-postgres
+  namespace: ai-shield
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  clusterIP: None
+  selector:
+    app: ai-shield-postgres
+
+---
+# Redis for Real-time Caching
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-shield-redis
+  namespace: ai-shield
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-shield-redis
+  template:
+    metadata:
+      labels:
+        app: ai-shield-redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+          name: redis
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-shield-redis
+  namespace: ai-shield
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: ai-shield-redis
+
+---
+# SOC Dashboard API
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-shield-soc-api
+  namespace: ai-shield
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ai-shield-soc-api
+  template:
+    metadata:
+      labels:
+        app: ai-shield-soc-api
+    spec:
+      containers:
+      - name: soc-api
+        image: industriverse/ai-shield-soc-api:latest
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ai-shield-secrets
+              key: database-url
+        - name: REDIS_URL
+          value: "redis://ai-shield-redis:6379"
+        - name: ENVIRONMENT
+          value: "production"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-shield-soc-api
+  namespace: ai-shield
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8000
+    name: http
+  selector:
+    app: ai-shield-soc-api
+
+---
+# Security Sensors (DaemonSet - runs on every node)
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ai-shield-sensors
+  namespace: ai-shield
+spec:
+  selector:
+    matchLabels:
+      app: ai-shield-sensors
+  template:
+    metadata:
+      labels:
+        app: ai-shield-sensors
+    spec:
+      hostNetwork: true
+      hostPID: true
+      containers:
+      - name: sensors
+        image: industriverse/ai-shield-sensors:latest
+        securityContext:
+          privileged: true  # Required for hardware sensor access
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ai-shield-secrets
+              key: database-url
+        - name: REDIS_URL
+          value: "redis://ai-shield-redis:6379"
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+        - name: dev
+          mountPath: /dev
+          readOnly: true
+        - name: sys
+          mountPath: /sys
+          readOnly: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: dev
+        hostPath:
+          path: /dev
+      - name: sys
+        hostPath:
+          path: /sys
+
+---
+# Compliance Monitor
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-shield-compliance
+  namespace: ai-shield
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-shield-compliance
+  template:
+    metadata:
+      labels:
+        app: ai-shield-compliance
+    spec:
+      containers:
+      - name: compliance
+        image: industriverse/ai-shield-compliance:latest
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ai-shield-secrets
+              key: database-url
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+---
+# AI Safety Monitor
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-shield-ai-safety
+  namespace: ai-shield
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ai-shield-ai-safety
+  template:
+    metadata:
+      labels:
+        app: ai-shield-ai-safety
+    spec:
+      containers:
+      - name: ai-safety
+        image: industriverse/ai-shield-ai-safety:latest
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ai-shield-secrets
+              key: database-url
+        - name: MAX_POWER_WATTS
+          value: "500"
+        - name: MAX_TEMPERATURE_CELSIUS
+          value: "85"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+
+---
+# Horizontal Pod Autoscaler for SOC API
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ai-shield-soc-api-hpa
+  namespace: ai-shield
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ai-shield-soc-api
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# ConfigMap for Application Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-shield-config
+  namespace: ai-shield
+data:
+  # Security thresholds
+  power_analysis_threshold: "0.7"
+  thermal_cooling_rate_threshold: "-10.0"
+  entropy_anomaly_threshold: "3.0"
+
+  # Monitoring intervals
+  sensor_polling_interval: "1.0"
+  compliance_check_interval: "300"
+
+  # Feature flags
+  enable_quantum_monitoring: "true"
+  enable_grid_validation: "true"
+  enable_financial_fraud: "true"
+  enable_swarm_monitoring: "true"
+
+---
+# Service Monitor for Prometheus
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ai-shield-soc-api
+  namespace: ai-shield
+spec:
+  selector:
+    matchLabels:
+      app: ai-shield-soc-api
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+
+---
+# Network Policy for Security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ai-shield-network-policy
+  namespace: ai-shield
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ai-shield
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: ai-shield
+  - to:
+    - namespaceSelector: {}
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+
+---
+# PodDisruptionBudget for High Availability
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ai-shield-soc-api-pdb
+  namespace: ai-shield
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: ai-shield-soc-api
