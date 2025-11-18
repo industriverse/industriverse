@@ -2,9 +2,19 @@
  * Capsule Creation Engine
  * 
  * Transforms sensor readings into actionable capsules using rules
+ * Integrated with Shadow Twin Consensus for distributed validation
  */
 
 import type { SensorReading } from '../types/sensor';
+import type { ConsensusResult, Prediction } from '../../client/src/services/ShadowTwinConsensusClient';
+
+// Simplified Hypothesis for capsule validation
+interface Hypothesis {
+  id: string;
+  type: string;
+  data: Record<string, any>;
+  timestamp: string;
+}
 // Using client types for now - should be moved to shared/types
 interface CapsuleData {
   id: string;
@@ -18,6 +28,8 @@ interface CapsuleData {
   actions: string[];
   metrics?: Record<string, any>;
   metadata?: Record<string, any>;
+  consensusResult?: ConsensusResult; // Shadow Twin consensus validation
+  consensusApproved?: boolean; // Quick access to consensus decision
 }
 
 export interface CapsuleRule {
@@ -46,15 +58,19 @@ export class CapsuleCreationEngine {
   private rules: Map<string, CapsuleRule> = new Map();
   private sensorHistory: Map<string, SensorReading[]> = new Map();
   private activeCapsules: Map<string, CapsuleData> = new Map();
+  private pendingConsensus: Map<string, CapsuleData> = new Map(); // Capsules awaiting consensus
   private onCapsuleCreated: (capsule: CapsuleData) => void;
   private onCapsuleUpdated: (capsuleId: string, updates: Partial<CapsuleData>) => void;
+  private consensusEnabled: boolean = true; // Enable/disable consensus validation
 
   constructor(
     onCapsuleCreated: (capsule: CapsuleData) => void,
-    onCapsuleUpdated: (capsuleId: string, updates: Partial<CapsuleData>) => void
+    onCapsuleUpdated: (capsuleId: string, updates: Partial<CapsuleData>) => void,
+    consensusEnabled: boolean = true
   ) {
     this.onCapsuleCreated = onCapsuleCreated;
     this.onCapsuleUpdated = onCapsuleUpdated;
+    this.consensusEnabled = consensusEnabled;
   }
 
   /**
@@ -254,9 +270,17 @@ export class CapsuleCreationEngine {
         },
       };
 
-      this.activeCapsules.set(capsule.id, capsule);
-      this.onCapsuleCreated(capsule);
-      console.log(`[CapsuleEngine] Created capsule: ${capsule.title}`);
+      // If consensus is enabled, validate before creating
+      if (this.consensusEnabled) {
+        this.pendingConsensus.set(capsule.id, capsule);
+        this.validateCapsuleWithConsensus(capsule);
+        console.log(`[CapsuleEngine] Capsule pending consensus validation: ${capsule.title}`);
+      } else {
+        // No consensus required, create immediately
+        this.activeCapsules.set(capsule.id, capsule);
+        this.onCapsuleCreated(capsule);
+        console.log(`[CapsuleEngine] Created capsule: ${capsule.title}`);
+      }
     }
   }
 
@@ -326,6 +350,126 @@ export class CapsuleCreationEngine {
       activeCapsules: capsules.length,
       capsulesByStatus,
     };
+  }
+
+  /**
+   * Validate capsule with Shadow Twin Consensus
+   */
+  private async validateCapsuleWithConsensus(capsule: CapsuleData): Promise<void> {
+    try {
+      // Create hypothesis from capsule data
+      const hypothesis: Hypothesis = {
+        id: capsule.id,
+        type: 'capsule_validation',
+        data: {
+          title: capsule.title,
+          description: capsule.description,
+          status: capsule.status,
+          priority: capsule.priority,
+          metrics: capsule.metrics,
+          metadata: capsule.metadata,
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      // Call Shadow Twin Consensus (using mock for now - will be replaced with actual client)
+      const consensusResult = await this.mockConsensusValidation(hypothesis);
+
+      // Update capsule with consensus result
+      const updatedCapsule: CapsuleData = {
+        ...capsule,
+        consensusResult,
+        consensusApproved: consensusResult.consensus,
+        metadata: {
+          ...capsule.metadata,
+          consensusPCT: consensusResult.pct,
+          consensusApproved: consensusResult.consensus,
+          consensusTimestamp: consensusResult.timestamp,
+        },
+      };
+
+      // Remove from pending
+      this.pendingConsensus.delete(capsule.id);
+
+      if (consensusResult.consensus) {
+        // Consensus approved - create capsule
+        this.activeCapsules.set(updatedCapsule.id, updatedCapsule);
+        this.onCapsuleCreated(updatedCapsule);
+        console.log(`[CapsuleEngine] Capsule approved by consensus (PCT: ${consensusResult.pct.toFixed(2)}%): ${capsule.title}`);
+      } else {
+        // Consensus rejected - log and discard
+        console.warn(`[CapsuleEngine] Capsule rejected by consensus (PCT: ${consensusResult.pct.toFixed(2)}%): ${capsule.title}`);
+        // Could store rejected capsules for review
+      }
+
+    } catch (error) {
+      console.error(`[CapsuleEngine] Consensus validation failed:`, error);
+      // On error, remove from pending and don't create capsule
+      this.pendingConsensus.delete(capsule.id);
+    }
+  }
+
+  /**
+   * Mock consensus validation (will be replaced with actual Shadow Twin Consensus Client)
+   */
+  private async mockConsensusValidation(hypothesis: Hypothesis): Promise<ConsensusResult> {
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Mock consensus result with high PCT (≥90% threshold)
+    const mockPredictions: Prediction[] = [
+      {
+        predictor_id: 'primary',
+        predictor_name: 'integration-bridge',
+        validity_score: 0.95,
+        confidence: 0.98,
+        weight: 1.5,
+        status: 'success',
+      },
+      {
+        predictor_id: 'controller',
+        predictor_name: 'shadow-twin-controller',
+        validity_score: 0.93,
+        confidence: 0.96,
+        weight: 0.8,
+        status: 'success',
+      },
+    ];
+
+    // Calculate PCT (simplified)
+    const values = mockPredictions.map((p) => p.validity_score);
+    const mean = values.reduce((a, b) => a + b, 0) / values.length;
+    const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+    const stdev = Math.sqrt(variance);
+    const pct = 1.0 - stdev / mean; // PCT as decimal (0.0-1.0)
+
+    // Calculate weighted score
+    const totalWeight = mockPredictions.reduce((sum, p) => sum + p.weight, 0);
+    const weighted_score = mockPredictions.reduce((sum, p) => sum + p.validity_score * p.weight, 0) / totalWeight;
+
+    return {
+      consensus: pct >= 0.90, // 90% threshold
+      pct,
+      weighted_score,
+      avg_score: mean,
+      predictions: mockPredictions,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Get pending consensus capsules
+   */
+  getPendingConsensusCapsules(): CapsuleData[] {
+    return Array.from(this.pendingConsensus.values());
+  }
+
+  /**
+   * Enable or disable consensus validation
+   */
+  setConsensusEnabled(enabled: boolean): void {
+    this.consensusEnabled = enabled;
+    console.log(`[CapsuleEngine] Consensus validation ${enabled ? 'enabled' : 'disabled'}`);
   }
 
   /**

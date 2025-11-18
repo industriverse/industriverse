@@ -1,0 +1,425 @@
+# Kubernetes Deployment for DAC Factory
+# Week 16: Production-Ready Deployment
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dac-factory
+
+---
+# PostgreSQL StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: dac-factory
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16-alpine
+        env:
+        - name: POSTGRES_DB
+          value: capsule_pins
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: dac-factory-secrets
+              key: db-username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: dac-factory-secrets
+              key: db-password
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - capsule_admin
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - capsule_admin
+          initialDelaySeconds: 5
+          periodSeconds: 5
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: dac-factory
+spec:
+  selector:
+    app: postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+  clusterIP: None
+
+---
+# MQTT Broker Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-broker
+  namespace: dac-factory
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-broker
+  template:
+    metadata:
+      labels:
+        app: mqtt-broker
+    spec:
+      containers:
+      - name: mosquitto
+        image: eclipse-mosquitto:2.0
+        ports:
+        - containerPort: 1883
+          name: mqtt
+        - containerPort: 9001
+          name: websocket
+        volumeMounts:
+        - name: mqtt-config
+          mountPath: /mosquitto/config
+        - name: mqtt-data
+          mountPath: /mosquitto/data
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: mqtt-config
+        configMap:
+          name: mqtt-config
+      - name: mqtt-data
+        persistentVolumeClaim:
+          claimName: mqtt-data-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mqtt-broker
+  namespace: dac-factory
+spec:
+  selector:
+    app: mqtt-broker
+  ports:
+  - port: 1883
+    targetPort: 1883
+    name: mqtt
+  - port: 9001
+    targetPort: 9001
+    name: websocket
+  type: ClusterIP
+
+---
+# Redis Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: dac-factory
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        command:
+        - redis-server
+        - --appendonly
+        - "yes"
+        - --requirepass
+        - "$(REDIS_PASSWORD)"
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: dac-factory-secrets
+              key: redis-password
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        - name: redis-storage
+          mountPath: /data
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: redis-storage
+        persistentVolumeClaim:
+          claimName: redis-data-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: dac-factory
+spec:
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+  type: ClusterIP
+
+---
+# Capsule Pins PWA Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: capsule-pins-app
+  namespace: dac-factory
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: capsule-pins-app
+  template:
+    metadata:
+      labels:
+        app: capsule-pins-app
+    spec:
+      containers:
+      - name: app
+        image: capsule-pins-pwa:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: dac-factory-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: dac-factory-secrets
+              key: redis-url
+        - name: MQTT_BROKER_URL
+          value: "mqtt://mqtt-broker:1883"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: dac-factory-secrets
+              key: jwt-secret
+        - name: ENABLE_CONSENSUS_VALIDATION
+          value: "true"
+        - name: ENABLE_AR_VR_MODE
+          value: "true"
+        ports:
+        - containerPort: 3000
+          name: http
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/uploads
+        - name: logs
+          mountPath: /app/logs
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: uploads-pvc
+      - name: logs
+        persistentVolumeClaim:
+          claimName: logs-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: capsule-pins-app
+  namespace: dac-factory
+spec:
+  selector:
+    app: capsule-pins-app
+  ports:
+  - port: 3000
+    targetPort: 3000
+  type: ClusterIP
+
+---
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dac-factory-ingress
+  namespace: dac-factory
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - capsule-pins.example.com
+    secretName: dac-factory-tls
+  rules:
+  - host: capsule-pins.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: capsule-pins-app
+            port:
+              number: 3000
+
+---
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: capsule-pins-app-hpa
+  namespace: dac-factory
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: capsule-pins-app
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# PersistentVolumeClaims
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mqtt-data-pvc
+  namespace: dac-factory
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data-pvc
+  namespace: dac-factory
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+  namespace: dac-factory
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: logs-pvc
+  namespace: dac-factory
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
