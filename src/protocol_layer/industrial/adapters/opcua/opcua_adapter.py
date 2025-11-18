@@ -457,12 +457,16 @@ class OPCUAAdapter(ProtocolComponent):
                 # Get additional properties
                 try:
                     result["timestamp"] = await node.get_value_timestamp()
-                except:
+                except (AttributeError, asyncio.TimeoutError) as e:
+                    # AttributeError: node doesn't support timestamps
+                    # TimeoutError: request timed out
                     pass
                     
                 try:
                     result["description"] = (await node.get_description()).Text
-                except:
+                except (AttributeError, asyncio.TimeoutError) as e:
+                    # AttributeError: node doesn't have description
+                    # TimeoutError: request timed out
                     pass
             
             return result

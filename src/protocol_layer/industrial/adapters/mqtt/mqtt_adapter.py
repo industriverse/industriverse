@@ -636,7 +636,10 @@ class MQTTAdapter(ProtocolComponent):
             # Try to unsubscribe
             try:
                 await self.unsubscribe(subscription_id)
-            except:
+            except (KeyError, asyncio.TimeoutError, ConnectionError):
+                # KeyError: subscription doesn't exist
+                # TimeoutError: unsubscribe timed out
+                # ConnectionError: not connected to broker
                 pass
                 
             return []
