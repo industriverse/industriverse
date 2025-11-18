@@ -20,6 +20,11 @@ from .unified_capsule_registry import (
     get_unified_capsule_registry
 )
 
+from .registry_protocol_connector import (
+    RegistryProtocolConnector,
+    get_registry_protocol_connector
+)
+
 __all__ = [
     "CapsuleLifecycleCoordinator",
     "CapsuleLifecycleStage",
@@ -28,5 +33,7 @@ __all__ = [
     "get_capsule_lifecycle_coordinator",
     "UnifiedCapsuleRegistry",
     "RegistrySearchField",
-    "get_unified_capsule_registry"
+    "get_unified_capsule_registry",
+    "RegistryProtocolConnector",
+    "get_registry_protocol_connector"
 ]

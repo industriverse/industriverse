@@ -72,6 +72,7 @@ class IntegrationOrchestrator:
         # Week 17-19 Components
         self.capsule_coordinator = None
         self.unified_registry = None
+        self.registry_protocol_connector = None  # Day 9: MCP/A2A registry integration
         self.behavioral_client = None
         self.task_execution_engine = None
         self.dtsl_validator = None
@@ -217,7 +218,8 @@ class IntegrationOrchestrator:
             # Import Week 17-19 components
             from ..capsule_lifecycle import (
                 get_capsule_lifecycle_coordinator,
-                get_unified_capsule_registry
+                get_unified_capsule_registry,
+                get_registry_protocol_connector  # Day 9: CRITICAL MCP/A2A integration
             )
             from .ar_vr_integration_adapter import get_ar_vr_integration_adapter
 
@@ -236,6 +238,20 @@ class IntegrationOrchestrator:
                 self.capsule_coordinator.register_unified_registry(self.unified_registry)
 
             logger.info("Capsule lifecycle coordinator and registry connected")
+
+            # Day 9: Initialize Registry Protocol Connector (CRITICAL per user feedback)
+            # Connects registry to MCP and A2A protocols as requested
+            self.registry_protocol_connector = get_registry_protocol_connector(
+                unified_registry=self.unified_registry,
+                mcp_bridge=self.mcp_bridge,
+                a2a_bridge=self.a2a_bridge,
+                event_bus=self.event_bus
+            )
+
+            # Initialize protocol connections
+            if self.registry_protocol_connector:
+                await self.registry_protocol_connector.initialize()
+                logger.info("Registry Protocol Connector initialized - MCP/A2A connected to registry")
 
             # Get AR/VR adapter
             self.ar_vr_adapter = get_ar_vr_integration_adapter(
