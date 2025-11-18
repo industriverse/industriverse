@@ -14,7 +14,14 @@ from .power_analysis_detector import (
     get_power_analysis_detector
 )
 
+from .thermal_security_monitor import (
+    ThermalSecurityMonitor,
+    get_thermal_security_monitor
+)
+
 __all__ = [
     "PowerAnalysisDetector",
-    "get_power_analysis_detector"
+    "get_power_analysis_detector",
+    "ThermalSecurityMonitor",
+    "get_thermal_security_monitor"
 ]

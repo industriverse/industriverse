@@ -39,6 +39,16 @@ from .sensors.power_analysis_detector import (
     get_power_analysis_detector
 )
 
+from .sensors.thermal_security_monitor import (
+    ThermalSecurityMonitor,
+    get_thermal_security_monitor
+)
+
+from .analyzers.information_leakage_analyzer import (
+    InformationLeakageAnalyzer,
+    get_information_leakage_analyzer
+)
+
 from .security_event_registry import (
     SecurityEventRegistry,
     get_security_event_registry
@@ -50,6 +60,10 @@ __all__ = [
     "get_thermodynamic_puf",
     "PowerAnalysisDetector",
     "get_power_analysis_detector",
+    "ThermalSecurityMonitor",
+    "get_thermal_security_monitor",
+    "InformationLeakageAnalyzer",
+    "get_information_leakage_analyzer",
     "SecurityEventRegistry",
     "get_security_event_registry"
 ]
