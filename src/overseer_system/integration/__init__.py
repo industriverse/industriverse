@@ -34,10 +34,26 @@ PACKAGE_METADATA = {
     ]
 }
 
+# Week 18-19: Export unified architecture components
+from .integration_orchestrator import (
+    IntegrationOrchestrator,
+    get_integration_orchestrator
+)
+
+from .ar_vr_integration_adapter import (
+    ARVRIntegrationAdapter,
+    get_ar_vr_integration_adapter
+)
+
 # Export public API
 __all__ = [
     "PACKAGE_METADATA",
     "integration_manager",
     "base_integration_adapter",
-    "protocol_bridge"
+    "protocol_bridge",
+    # Week 18-19 additions
+    "IntegrationOrchestrator",
+    "get_integration_orchestrator",
+    "ARVRIntegrationAdapter",
+    "get_ar_vr_integration_adapter"
 ]
