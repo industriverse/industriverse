@@ -790,7 +790,9 @@ class GCPDeploymentHandler:
                 operation = run_client.update_service(
                     service=service
                 )
-            except:
+            except Exception:
+                # Google API exception: service doesn't exist
+                # Note: google.api_core.exceptions.NotFound would be more specific
                 # Create new service
                 service = run_v2.Service(
                     template=run_v2.RevisionTemplate(
@@ -1083,7 +1085,9 @@ class GCPDeploymentHandler:
                 operation = functions_client.update_function(
                     function=function
                 )
-            except:
+            except Exception:
+                # Google API exception: function doesn't exist
+                # Note: google.api_core.exceptions.NotFound would be more specific
                 # Create new function
                 function = functions_v2.Function(
                     build_config=functions_v2.BuildConfig(
