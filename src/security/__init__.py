@@ -54,7 +54,29 @@ from .security_event_registry import (
     get_security_event_registry
 )
 
+# Week 21: Domain-Specific Security Extensions
+from .sensors.quantum_security_sensor import (
+    QuantumSecuritySensor,
+    get_quantum_security_sensor
+)
+
+from .validators.der_grid_security_validator import (
+    DERGridSecurityValidator,
+    get_der_grid_security_validator
+)
+
+from .detectors.financial_fraud_detector import (
+    FinancialFraudDetector,
+    get_financial_fraud_detector
+)
+
+from .monitors.swarm_iot_security_monitor import (
+    SwarmIoTSecurityMonitor,
+    get_swarm_iot_security_monitor
+)
+
 __all__ = [
+    # Week 20: Core Primitives
     "ThermodynamicPUF",
     "PUFSignature",
     "get_thermodynamic_puf",
@@ -65,5 +87,14 @@ __all__ = [
     "InformationLeakageAnalyzer",
     "get_information_leakage_analyzer",
     "SecurityEventRegistry",
-    "get_security_event_registry"
+    "get_security_event_registry",
+    # Week 21: Domain Extensions
+    "QuantumSecuritySensor",
+    "get_quantum_security_sensor",
+    "DERGridSecurityValidator",
+    "get_der_grid_security_validator",
+    "FinancialFraudDetector",
+    "get_financial_fraud_detector",
+    "SwarmIoTSecurityMonitor",
+    "get_swarm_iot_security_monitor"
 ]
