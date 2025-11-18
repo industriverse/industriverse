@@ -14,10 +14,19 @@ from .capsule_lifecycle_coordinator import (
     get_capsule_lifecycle_coordinator
 )
 
+from .unified_capsule_registry import (
+    UnifiedCapsuleRegistry,
+    RegistrySearchField,
+    get_unified_capsule_registry
+)
+
 __all__ = [
     "CapsuleLifecycleCoordinator",
     "CapsuleLifecycleStage",
     "CapsuleSource",
     "CapsuleLifecycleContext",
-    "get_capsule_lifecycle_coordinator"
+    "get_capsule_lifecycle_coordinator",
+    "UnifiedCapsuleRegistry",
+    "RegistrySearchField",
+    "get_unified_capsule_registry"
 ]
