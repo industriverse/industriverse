@@ -566,7 +566,10 @@ class DataProcessingEngine:
                 try:
                     pd.to_datetime(sample_df[col])
                     datetime_cols.append(col)
-                except:
+                except (ValueError, TypeError, KeyError):
+                    # ValueError: invalid date format
+                    # TypeError: incompatible type for datetime conversion
+                    # KeyError: column doesn't exist
                     pass
             
             if datetime_cols:
@@ -580,12 +583,17 @@ class DataProcessingEngine:
             try:
                 with open(dataset_path, 'r') as f:
                     data = json.load(f)
-                
+
                 if isinstance(data, list) and len(data) > 0 and "image_path" in data[0]:
                     return "image"
                 else:
                     return "json"
-            except:
+            except (json.JSONDecodeError, FileNotFoundError, PermissionError, KeyError, TypeError):
+                # JSONDecodeError: invalid JSON format
+                # FileNotFoundError: file doesn't exist
+                # PermissionError: can't read file
+                # KeyError: unexpected data structure
+                # TypeError: data is not indexable
                 return "json"
         else:
             return "unknown"
@@ -647,7 +655,10 @@ class DataProcessingEngine:
             try:
                 df[col] = pd.to_datetime(df[col])
                 datetime_cols.append(col)
-            except:
+            except (ValueError, TypeError, KeyError):
+                # ValueError: invalid date format
+                # TypeError: incompatible type for datetime conversion
+                # KeyError: column doesn't exist
                 pass
         
         if not datetime_cols:
