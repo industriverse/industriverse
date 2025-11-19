@@ -67,6 +67,18 @@ from .i3 import (
     initialize_i3_platform,
 )
 
+from .credit_protocol import (
+    ProofOfInsightLedger,
+    UTIDMarketplace,
+    TokenEconomics,
+    RevenueDistributor,
+    get_proof_ledger,
+    get_utid_marketplace,
+    get_token_economics,
+    get_revenue_distributor,
+    initialize_credit_protocol,
+)
+
 __version__ = "2.0.0"
 
 __all__ = [
@@ -112,6 +124,17 @@ __all__ = [
     "get_msep_integration",
     "get_obmi_orchestrator",
     "initialize_i3_platform",
+
+    # Credit Protocol Economy
+    "ProofOfInsightLedger",
+    "UTIDMarketplace",
+    "TokenEconomics",
+    "RevenueDistributor",
+    "get_proof_ledger",
+    "get_utid_marketplace",
+    "get_token_economics",
+    "get_revenue_distributor",
+    "initialize_credit_protocol",
 ]
 
 
