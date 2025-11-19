@@ -55,6 +55,18 @@ from .partner_portal import (
     config_api_app,
 )
 
+from .i3 import (
+    RDREngine,
+    ShadowTwinBackend,
+    MSEPIntegration,
+    OBMIOrchestrator,
+    get_rdr_engine,
+    get_shadow_twin,
+    get_msep_integration,
+    get_obmi_orchestrator,
+    initialize_i3_platform,
+)
+
 __version__ = "2.0.0"
 
 __all__ = [
@@ -89,6 +101,17 @@ __all__ = [
     "get_partner_manager",
     "get_analytics_tracker",
     "config_api_app",
+
+    # I³ Intelligence Layer
+    "RDREngine",
+    "ShadowTwinBackend",
+    "MSEPIntegration",
+    "OBMIOrchestrator",
+    "get_rdr_engine",
+    "get_shadow_twin",
+    "get_msep_integration",
+    "get_obmi_orchestrator",
+    "initialize_i3_platform",
 ]
 
 
