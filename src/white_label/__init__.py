@@ -38,10 +38,27 @@ from .widgets import (
     ResearchExplorerWidget,
 )
 
+from .dac import (
+    DACManifest,
+    DACTier,
+    DACRegistry,
+    DACDeployer,
+    get_dac_registry,
+)
+
+from .partner_portal import (
+    Partner,
+    PartnerManager,
+    AnalyticsTracker,
+    get_partner_manager,
+    get_analytics_tracker,
+    config_api_app,
+)
+
 __version__ = "2.0.0"
 
 __all__ = [
-    # SDK
+    # Widget SDK
     "WidgetBase",
     "WidgetConfig",
     "WidgetTheme",
@@ -57,6 +74,21 @@ __all__ = [
     "PredictiveMaintenanceWidget",
     "ShadowTwin3DWidget",
     "ResearchExplorerWidget",
+
+    # DAC
+    "DACManifest",
+    "DACTier",
+    "DACRegistry",
+    "DACDeployer",
+    "get_dac_registry",
+
+    # Partner Portal
+    "Partner",
+    "PartnerManager",
+    "AnalyticsTracker",
+    "get_partner_manager",
+    "get_analytics_tracker",
+    "config_api_app",
 ]
 
 
