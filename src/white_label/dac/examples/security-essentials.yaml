@@ -1,0 +1,115 @@
+# DAC Manifest Example: Security Essentials Tier
+# Price Range: $5K-$15K/month
+# Target: Organizations needing core security monitoring
+
+name: acme-corp-security-essentials
+version: 1.0.0
+description: ACME Corp security monitoring deployment with AI Shield v2
+partner_id: acme-corp-001
+tier: security-essentials
+
+# Deployment targets
+target_environments:
+  - kubernetes
+  - docker
+  - aws
+
+# Resource requirements
+resources:
+  cpu_cores: 2.0
+  memory_gb: 4.0
+  storage_gb: 50.0
+  gpu_required: false
+  gpu_memory_gb: null
+
+# Network configuration
+network:
+  requires_internet: true
+  ingress_ports:
+    - 80
+    - 443
+  egress_allowed: true
+  api_endpoint: https://api.industriverse.ai
+
+# Security settings
+security:
+  requires_tls: true
+  api_key_required: true
+  client_cert_required: false
+  allowed_origins:
+    - https://acmecorp.com
+    - https://monitoring.acmecorp.com
+  rate_limit_per_minute: 1000
+
+# Widget configuration
+widgets:
+  - widget_type: ai-shield-dashboard
+    enabled: true
+    refresh_interval_ms: 5000
+    enable_animations: true
+    enable_websocket: true
+    custom_features:
+      show_threat_timeline: true
+      enable_export: false
+
+  - widget_type: compliance-score
+    enabled: true
+    refresh_interval_ms: 60000
+    enable_animations: true
+    enable_websocket: false
+    custom_features:
+      frameworks:
+        - NIST
+        - ISO27001
+        - SOC2
+
+  - widget_type: security-orb
+    enabled: true
+    refresh_interval_ms: 3000
+    enable_animations: true
+    enable_websocket: true
+    custom_features:
+      show_details_panel: true
+
+# Theme customization
+theme:
+  theme_base: chrome  # Corporate aesthetic
+  custom_colors:
+    primary: "#2C5F8D"  # ACME Corp blue
+    accent: "#E67E22"   # ACME Corp orange
+  logo_url: https://acmecorp.com/assets/logo.svg
+  brand_name: ACME Security Operations Center
+  custom_domain: soc.acmecorp.com
+
+# Feature flags
+features:
+  quantum_monitoring: false
+  grid_validation: false
+  financial_fraud: false
+  swarm_monitoring: false
+  i3_integration: false
+
+# Integration points
+integration_points:
+  siem:
+    enabled: true
+    endpoint: https://siem.acmecorp.com/api/v1/events
+    auth_type: api_key
+
+  slack:
+    enabled: true
+    webhook_url: https://hooks.slack.com/services/xxx
+    channel: "#security-alerts"
+
+  email:
+    enabled: true
+    smtp_server: smtp.acmecorp.com
+    from_address: security@acmecorp.com
+    alert_recipients:
+      - security-team@acmecorp.com
+      - ciso@acmecorp.com
+
+# Metadata
+created_at: "2024-01-15T10:30:00Z"
+updated_at: "2024-01-15T10:30:00Z"
+deployed_at: null

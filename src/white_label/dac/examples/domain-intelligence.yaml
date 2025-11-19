@@ -1,0 +1,172 @@
+# DAC Manifest Example: Domain Intelligence Tier
+# Price Range: $25K-$50K/month
+# Target: Organizations needing advanced analytics and predictive capabilities
+
+name: techglobal-domain-intelligence
+version: 1.2.0
+description: TechGlobal comprehensive security and operational intelligence platform
+partner_id: techglobal-002
+tier: domain-intelligence
+
+# Deployment targets
+target_environments:
+  - kubernetes
+  - aws
+  - azure
+
+# Resource requirements (enhanced for analytics)
+resources:
+  cpu_cores: 4.0
+  memory_gb: 8.0
+  storage_gb: 100.0
+  gpu_required: false
+  gpu_memory_gb: null
+
+# Network configuration
+network:
+  requires_internet: true
+  ingress_ports:
+    - 80
+    - 443
+    - 8443  # WebSocket streaming
+  egress_allowed: true
+  api_endpoint: https://api.industriverse.ai
+
+# Security settings (stricter for enterprise)
+security:
+  requires_tls: true
+  api_key_required: true
+  client_cert_required: true  # mTLS required
+  allowed_origins:
+    - https://techglobal.io
+    - https://ops.techglobal.io
+    - https://analytics.techglobal.io
+  rate_limit_per_minute: 5000
+
+# Widget configuration (full suite)
+widgets:
+  - widget_type: ai-shield-dashboard
+    enabled: true
+    refresh_interval_ms: 3000
+    enable_animations: true
+    enable_websocket: true
+    custom_features:
+      show_threat_timeline: true
+      enable_export: true
+      historical_data_days: 90
+
+  - widget_type: compliance-score
+    enabled: true
+    refresh_interval_ms: 30000
+    enable_animations: true
+    enable_websocket: true
+    custom_features:
+      frameworks:
+        - NIST
+        - ISO27001
+        - SOC2
+        - GDPR
+        - HIPAA
+
+  - widget_type: threat-heatmap
+    enabled: true
+    refresh_interval_ms: 5000
+    enable_animations: true
+    enable_websocket: true
+    custom_features:
+      topology_visualization: true
+      thermal_overlay: true
+      historical_playback: true
+
+  - widget_type: security-orb
+    enabled: true
+    refresh_interval_ms: 2000
+    enable_animations: true
+    enable_websocket: true
+    custom_features:
+      show_details_panel: true
+      ambient_mode: true
+
+  - widget_type: energy-flow-graph
+    enabled: true
+    refresh_interval_ms: 10000
+    enable_animations: true
+    enable_websocket: true
+    custom_features:
+      show_efficiency_trends: true
+      anomaly_detection: true
+      cost_estimation: true
+
+  - widget_type: predictive-maintenance
+    enabled: true
+    refresh_interval_ms: 60000
+    enable_animations: true
+    enable_websocket: false
+    custom_features:
+      component_tracking: true
+      failure_prediction: true
+      maintenance_scheduler: true
+      cost_optimization: true
+
+# Theme customization
+theme:
+  theme_base: cosmic  # Full thermodynamic aesthetic
+  custom_colors:
+    primary: "#1A5490"  # TechGlobal deep blue
+    accent: "#00D9FF"   # TechGlobal cyan
+  logo_url: https://cdn.techglobal.io/brand/logo-light.svg
+  brand_name: TechGlobal Intelligence Platform
+  custom_domain: intelligence.techglobal.io
+
+# Feature flags (domain-specific enabled)
+features:
+  quantum_monitoring: false
+  grid_validation: true  # Energy sector client
+  financial_fraud: false
+  swarm_monitoring: true  # IoT/Edge deployment
+  i3_integration: false
+  predictive_analytics: true
+  anomaly_detection: true
+  thermal_security: true
+
+# Integration points
+integration_points:
+  siem:
+    enabled: true
+    endpoint: https://siem.techglobal.io/api/v2/events
+    auth_type: oauth2
+    client_id: industriverse-dac
+
+  splunk:
+    enabled: true
+    hec_endpoint: https://splunk.techglobal.io:8088/services/collector
+    auth_type: hec_token
+
+  prometheus:
+    enabled: true
+    endpoint: https://prometheus.techglobal.io
+    scrape_interval: 30s
+
+  grafana:
+    enabled: true
+    endpoint: https://grafana.techglobal.io
+    dashboard_uid: industriverse-main
+
+  pagerduty:
+    enabled: true
+    integration_key: xxx-pagerduty-key-xxx
+    severity_mapping:
+      critical: P1
+      high: P2
+      medium: P3
+
+  servicenow:
+    enabled: true
+    instance: techglobal
+    endpoint: https://techglobal.service-now.com/api
+    auth_type: basic
+
+# Metadata
+created_at: "2024-01-10T08:00:00Z"
+updated_at: "2024-01-20T14:30:00Z"
+deployed_at: "2024-01-21T09:00:00Z"
