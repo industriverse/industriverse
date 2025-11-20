@@ -11,13 +11,63 @@
 
 This document represents the **complete integration blueprint** for Industriverse, combining:
 
-1. **Thermodynasty Foundation (Phases 0-5)** - 82+ Python files, production-ready
-2. **20 Pillars (6 Expansion Packs)** - Enterprise productization layer
-3. **9 Frontend Subdomains** - User-facing interfaces
-4. **Industriverse Diffusion Framework (IDF)** - Energy-based diffusion substrate
+1. **Historical Prototypes (Industriverse Phase 0-3)** - Early development artifacts (2024-2025)
+2. **Thermodynasty Foundation (Phases 0-5)** - 82+ Python files, production-ready (2025)
+3. **20 Pillars (6 Expansion Packs)** - Enterprise productization layer (planned)
+4. **9 Frontend Subdomains** - User-facing interfaces (planned)
+5. **Industriverse Diffusion Framework (IDF)** - Energy-based diffusion substrate (planned)
 
-**Current State:** All Thermodynasty phases (0-5) integrated into `/home/user/industriverse/`
+**Current State:**
+- ✅ All Thermodynasty phases (0-5) integrated into `/home/user/industriverse/`
+- ✅ Historical prototypes (Phase 0-3) preserved in `/home/user/industriverse/src/prototypes/`
+- ✅ Complete development lineage documented
+
 **Next Phase:** Layer 20 Pillars on top of foundation
+
+---
+
+## 🕰️ DEVELOPMENT LINEAGE
+
+Industriverse evolved through two major development phases:
+
+### Phase I: Prototyping (2024 Q4 - 2025 Q1)
+
+**Industriverse Prototypes (Phase 0-3)**:
+- **Phase 0**: Darwin Gödel Machine (DGM), Dynamic Autonomous Control (DAC), Shadow Twin v1
+- **Phase 1**: MicroAdapt v1, Time-to-Failure inference, Kafka bridge
+- **Phase 2**: Retraining pipeline, Bridge refinements
+- **Phase 3**: Documentation, Contracts
+
+**Location**: `src/prototypes/`
+**Files**: 25 Python files (~8,800 lines)
+**Purpose**: Concept validation, algorithm experimentation, architecture exploration
+**Status**: ✅ Preserved for historical reference
+
+### Phase II: Production (2025 Q2 - Q4)
+
+**Thermodynasty Production Platform (Phase 0-5)**:
+- **Phase 0**: Bootstrap & Data Layer
+- **Phase 1-3**: NVP Core (99.99% energy fidelity)
+- **Phase 4**: ACE Cognitive Architecture (BFT consensus)
+- **Phase 5**: EIL Production Platform (dual-branch decision fusion)
+
+**Location**: `src/core_ai_layer/`
+**Files**: 82 Python files (~38,400 lines)
+**Purpose**: Production-ready thermodynamic cybersecurity platform
+**Status**: ✅ Production-ready
+
+### Evolution Mapping
+
+```
+Prototype Phase → Production Phase
+
+Phase 0 DAC              → Phase 4 ACE (Aspiration-Calibration-Execution)
+Phase 0 Shadow Twin v1   → Phase 4 Shadow Ensemble (BFT)
+Phase 1 MicroAdapt v1    → Phase 5 MicroAdapt v2 (physics-aware)
+Phase 2 Retraining v1    → Phase 5 Feedback Trainer (online learning)
+```
+
+**Complete Documentation**: See `docs/DEVELOPMENT_LINEAGE.md` for detailed evolution analysis
 
 ---
 
