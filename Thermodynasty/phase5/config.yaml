@@ -1,0 +1,316 @@
+# Phase 5 EIL Platform Configuration
+
+# Application Settings
+app:
+  name: "industriverse-eil-platform"
+  version: "0.5.0-alpha"
+  environment: "development"  # development, staging, production
+  debug: true
+  log_level: "INFO"
+
+# API Gateway Configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: true  # Hot reload in development
+
+  # CORS settings
+  cors:
+    enabled: true
+    allow_origins:
+      - "http://localhost:3000"
+      - "http://localhost:8080"
+    allow_methods: ["GET", "POST", "PUT", "DELETE"]
+    allow_headers: ["*"]
+
+  # Rate limiting
+  rate_limit:
+    enabled: true
+    requests_per_minute: 100
+    burst: 20
+
+  # Request validation
+  max_request_size_mb: 100
+  timeout_seconds: 300
+
+# Diffusion Engine Configuration
+diffusion:
+  # Model settings
+  timesteps: 1000
+  noise_schedule: "boltzmann"  # linear, cosine, boltzmann
+  beta_start: 0.0001
+  beta_end: 0.02
+
+  # Energy constraints
+  energy_tolerance: 0.01
+  entropy_constraint: true
+  min_entropy_rate: 0.0
+
+  # Sampling
+  sampler: "ddpm"  # ddpm, ddim, pndm
+  num_inference_steps: 50
+  guidance_scale: 7.5
+
+  # Training
+  learning_rate: 0.0001
+  batch_size: 32
+  epochs: 100
+  gradient_accumulation_steps: 1
+  mixed_precision: true
+
+  # Hardware
+  device: "cuda"  # cuda, cpu, mps
+  num_workers: 4
+
+# Energy Intelligence Layer (EIL)
+eil:
+  # Regime detection
+  regime_detector:
+    window_size: 10
+    temporal_resolution: 0.1
+    hidden_dim: 128
+    confidence_threshold: 0.75
+
+  # Decision thresholds
+  consensus_threshold: 0.85
+  approval_threshold: 0.75
+
+  # Statistical branch
+  microadapt_units: 10
+
+  # Energy constraints
+  energy_fidelity_target: 0.999
+  entropy_coherence_target: 0.997
+
+# Proof Validation
+proof:
+  energy_tolerance: 0.01
+  entropy_threshold: 0.9
+  spectral_threshold: 0.85
+  consensus_required: 2  # out of 3 models
+
+# Market Engine
+market:
+  base_ceu_price_usd: 0.01
+  base_pft_price_usd: 1.0
+  ceu_pft_rate: 100.0
+
+  # AMM settings
+  pool_fee_percent: 0.3
+  slippage_tolerance: 0.01
+
+# Feedback Trainer
+feedback:
+  learning_rate: 0.01
+  adaptation_threshold: 0.7
+  calibration_window: 20
+  auto_retrain: true
+  retrain_interval_hours: 24
+
+# Streaming Layer
+streaming:
+  # Kafka configuration
+  kafka:
+    enabled: false  # Enable when Kafka is available
+    bootstrap_servers: "localhost:9092"
+    topics:
+      sense_in: "eil.sense.in"
+      act_out: "eil.act.out"
+      proof_verified: "eil.proof.verified"
+      energy_updates: "eil.energy.updates"
+
+    # Consumer settings
+    group_id: "eil-consumer-group"
+    auto_offset_reset: "latest"
+    max_poll_records: 500
+
+  # WebSocket
+  websocket:
+    enabled: true
+    port: 8001
+    max_connections: 1000
+
+# Monitoring
+monitoring:
+  # Prometheus
+  prometheus:
+    enabled: true
+    port: 9090
+    scrape_interval: "15s"
+
+  # Grafana
+  grafana:
+    enabled: false  # Enable in production
+    port: 3000
+
+  # OpenTelemetry
+  otel:
+    enabled: false
+    endpoint: "http://localhost:4317"
+
+  # Metrics
+  metrics:
+    - "eil_energy_fidelity"
+    - "eil_entropy_coherence"
+    - "eil_regime_confidence"
+    - "eil_proof_validation_rate"
+    - "diffusion_sampling_latency"
+    - "diffusion_energy_drift"
+    - "api_request_duration"
+    - "api_request_count"
+
+# Security
+security:
+  # Authentication
+  auth:
+    enabled: false  # Enable in production
+    jwt_secret: "CHANGE_ME_IN_PRODUCTION"
+    jwt_algorithm: "HS256"
+    access_token_expire_minutes: 30
+    refresh_token_expire_days: 7
+
+  # RBAC
+  rbac:
+    enabled: false
+    roles:
+      - name: "admin"
+        permissions: ["*"]
+      - name: "developer"
+        permissions: ["read", "write"]
+      - name: "viewer"
+        permissions: ["read"]
+
+  # mTLS
+  mtls:
+    enabled: false
+    cert_path: "/etc/certs/tls.crt"
+    key_path: "/etc/certs/tls.key"
+    ca_path: "/etc/certs/ca.crt"
+
+# Integration Hub
+integrations:
+  # S3 / Cloud Storage
+  s3:
+    enabled: false
+    endpoint: "s3.amazonaws.com"
+    bucket: "industriverse-eil"
+    region: "us-east-1"
+    access_key_id: ""  # Set via environment variable
+    secret_access_key: ""  # Set via environment variable
+
+  # InfluxDB
+  influxdb:
+    enabled: false
+    url: "http://localhost:8086"
+    token: ""  # Set via environment variable
+    org: "industriverse"
+    bucket: "eil-telemetry"
+
+  # Neo4j
+  neo4j:
+    enabled: false
+    uri: "bolt://localhost:7687"
+    user: "neo4j"
+    password: ""  # Set via environment variable
+    database: "energy-atlas"
+
+  # IoT Hub
+  iot:
+    enabled: false
+    protocol: "mqtt"  # mqtt, coap, http
+    broker: "localhost:1883"
+
+# Data Storage
+storage:
+  # Energy maps
+  energy_maps_dir: "data/energy_maps"
+
+  # Checkpoints
+  checkpoints_dir: "checkpoints"
+  checkpoint_interval: 1000  # steps
+  max_checkpoints: 5
+
+  # Cache
+  cache_dir: ".cache"
+  cache_size_gb: 10
+
+# Deployment
+deployment:
+  # Kubernetes
+  kubernetes:
+    namespace: "eil-platform"
+    replicas: 1
+
+    # Resource limits
+    resources:
+      requests:
+        cpu: "2"
+        memory: "8Gi"
+        nvidia.com/gpu: "0"
+      limits:
+        cpu: "4"
+        memory: "16Gi"
+        nvidia.com/gpu: "1"
+
+    # Auto-scaling
+    autoscaling:
+      enabled: false
+      min_replicas: 1
+      max_replicas: 10
+      target_cpu_percent: 80
+      target_memory_percent: 80
+
+  # Health checks
+  health:
+    liveness_probe:
+      path: "/health/live"
+      initial_delay_seconds: 30
+      period_seconds: 10
+    readiness_probe:
+      path: "/health/ready"
+      initial_delay_seconds: 10
+      period_seconds: 5
+
+# Research Enhancements (from phase5/config/research_integration_config.yaml)
+research:
+  # LeJÊPA
+  lejêpa:
+    enabled: false
+    checkpoint_path: ""
+
+  # Egocentric-10K
+  egocentric_10k:
+    enabled: false
+    cache_dir: ""
+    streaming: true
+
+  # PhysWorld
+  physworld:
+    enabled: false
+    grid_resolution: 64
+
+  # RealDeepResearch
+  realdeepresearch:
+    enabled: false
+    cache_dir: ""
+
+# Feature Flags
+features:
+  experimental:
+    multi_modal_fusion: false
+    online_research_updates: false
+    factory_transfer_learning: false
+
+  production:
+    checkpoint_saving: true
+    distributed_training: false
+    gradient_checkpointing: true
+
+# Logging
+logging:
+  level: "INFO"
+  format: "json"  # json, text
+  file: "logs/eil-platform.log"
+  max_size_mb: 100
+  max_files: 10

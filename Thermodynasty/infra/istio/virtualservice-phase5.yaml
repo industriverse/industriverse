@@ -1,0 +1,137 @@
+---
+# Istio VirtualService for ACE Server
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: thermodynasty-ace-vs
+  namespace: plan-solidify-phase5
+spec:
+  hosts:
+    - thermodynasty-ace.plan-solidify-phase5.svc.cluster.local
+    - ace.industriverse.ai  # External domain
+  gateways:
+    - istio-system/industriverse-gateway
+    - mesh  # Internal cluster traffic
+  http:
+    # Health check route (no auth required)
+    - match:
+        - uri:
+            exact: /v1/health
+      route:
+        - destination:
+            host: thermodynasty-ace.plan-solidify-phase5.svc.cluster.local
+            port:
+              number: 8000
+      timeout: 5s
+      retries:
+        attempts: 3
+        perTryTimeout: 2s
+    # Metrics endpoint (Prometheus only)
+    - match:
+        - uri:
+            exact: /v1/metrics
+        headers:
+          user-agent:
+            regex: ".*Prometheus.*"
+      route:
+        - destination:
+            host: thermodynasty-ace.plan-solidify-phase5.svc.cluster.local
+            port:
+              number: 8000
+      timeout: 5s
+    # Prediction API (requires auth)
+    - match:
+        - uri:
+            prefix: /v1/predict
+      route:
+        - destination:
+            host: thermodynasty-ace.plan-solidify-phase5.svc.cluster.local
+            port:
+              number: 8000
+          weight: 100
+      timeout: 30s
+      retries:
+        attempts: 2
+        perTryTimeout: 15s
+        retryOn: 5xx,reset,connect-failure
+      headers:
+        request:
+          add:
+            x-forwarded-proto: https
+    # HDF5 Validation (requires auth, longer timeout)
+    - match:
+        - uri:
+            prefix: /v1/validate_hdf5
+      route:
+        - destination:
+            host: thermodynasty-ace.plan-solidify-phase5.svc.cluster.local
+            port:
+              number: 8000
+      timeout: 300s  # 5 minutes for validation
+    # Default route
+    - route:
+        - destination:
+            host: thermodynasty-ace.plan-solidify-phase5.svc.cluster.local
+            port:
+              number: 8000
+      timeout: 30s
+---
+# Istio DestinationRule: mTLS and load balancing
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: thermodynasty-ace-dr
+  namespace: plan-solidify-phase5
+spec:
+  host: thermodynasty-ace.plan-solidify-phase5.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL  # mTLS for service-to-service
+    loadBalancer:
+      consistentHash:
+        httpHeaderName: "x-session-id"  # Session affinity for stateful requests
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 10
+    outlierDetection:
+      consecutiveErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+---
+# Istio AuthorizationPolicy: JWT validation
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: thermodynasty-ace-authz
+  namespace: plan-solidify-phase5
+spec:
+  selector:
+    matchLabels:
+      app: thermodynasty-ace
+  action: ALLOW
+  rules:
+    # Allow health checks (no auth)
+    - to:
+        - operation:
+            paths: ["/v1/health"]
+    # Allow metrics (Prometheus only)
+    - to:
+        - operation:
+            paths: ["/v1/metrics"]
+      when:
+        - key: request.headers[user-agent]
+          values: ["Prometheus*"]
+    # Require JWT for API endpoints
+    - to:
+        - operation:
+            paths: ["/v1/predict", "/v1/validate_hdf5", "/v1/models"]
+      when:
+        - key: request.auth.claims[iss]
+          values: ["https://auth.industriverse.ai"]
+        - key: request.auth.claims[aud]
+          values: ["thermodynasty-ace"]

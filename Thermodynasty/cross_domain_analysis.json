@@ -1,0 +1,72 @@
+{
+  "baseline_domain": "plasma_physics",
+  "tested_domains": [
+    "fluid_dynamics",
+    "astrophysics",
+    "active_matter",
+    "turbulent_radiative_layer"
+  ],
+  "domain_results": {
+    "fluid_dynamics": {
+      "total_predictions": 45,
+      "total_time": 43.16603660583496,
+      "mean_confidence": 0.9998924626244439,
+      "std_confidence": 0.00023123542104474764,
+      "mean_fidelity": 0.9999999670149682,
+      "std_fidelity": 2.306475514461583e-08,
+      "mean_entropy": 0.9745526803864373,
+      "std_entropy": 0.003588813256550587,
+      "aspiration_rate": 1.0,
+      "mean_execution_time": 0.9580390930175782,
+      "throughput": 1.0424862586044588
+    },
+    "astrophysics": {
+      "total_predictions": 45,
+      "total_time": 41.52297902107239,
+      "mean_confidence": 0.9998739242553711,
+      "std_confidence": 0.0001605178581510129,
+      "mean_fidelity": 0.9999999694398484,
+      "std_fidelity": 2.1522356671694748e-08,
+      "mean_entropy": 0.9973108914163378,
+      "std_entropy": 0.0006612357844912604,
+      "aspiration_rate": 1.0,
+      "mean_execution_time": 0.9217599391937256,
+      "throughput": 1.0837372717685565
+    },
+    "active_matter": {
+      "total_predictions": 45,
+      "total_time": 39.2674241065979,
+      "mean_confidence": 0.9999247458246019,
+      "std_confidence": 0.0001365186050163868,
+      "mean_fidelity": 0.9999999591983161,
+      "std_fidelity": 2.408602018332732e-08,
+      "mean_entropy": 0.9724199533462524,
+      "std_entropy": 0.0025300554464025024,
+      "aspiration_rate": 1.0,
+      "mean_execution_time": 0.8715129640367296,
+      "throughput": 1.1459880810577254
+    },
+    "turbulent_radiative_layer": {
+      "total_predictions": 45,
+      "total_time": 41.70579195022583,
+      "mean_confidence": 0.9999045915073819,
+      "std_confidence": 0.00015623309570526403,
+      "mean_fidelity": 0.9999999729110832,
+      "std_fidelity": 1.9232525818311405e-08,
+      "mean_entropy": 0.9975059363577101,
+      "std_entropy": 0.001357038082113112,
+      "aspiration_rate": 1.0,
+      "mean_execution_time": 0.9257749080657959,
+      "throughput": 1.0789868240292781
+    }
+  },
+  "aggregate_stats": {
+    "mean_confidence": 0.9998989310529496,
+    "std_confidence": 1.8477172891865937e-05,
+    "mean_fidelity": 0.999999967141054,
+    "std_fidelity": 5.041841828524374e-09,
+    "mean_entropy": 0.9854473653766844,
+    "std_entropy": 0.01198499071177497,
+    "aspiration_rate": 1.0
+  }
+}

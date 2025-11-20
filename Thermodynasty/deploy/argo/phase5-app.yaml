@@ -1,0 +1,68 @@
+---
+# ArgoCD Application for Thermodynasty ACE Phase 5
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: thermodynasty-ace-phase5
+  namespace: argocd
+  labels:
+    app: thermodynasty-ace
+    phase: "5"
+    team: industriverse
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: industriverse
+
+  # Source: GitHub repository
+  source:
+    repoURL: https://github.com/industriverse/industriverse
+    targetRevision: claude/review-industriverse-phase1-011CV2sSawNHXTjWxgW8DZnW
+    path: Thermodynasty/deploy/helm/phase5
+    helm:
+      valueFiles:
+        - values.yaml
+      # Override values for specific cluster
+      parameters:
+        - name: image.tag
+          value: "1.0.0-phase5"
+        - name: replicaCount
+          value: "3"
+        - name: autoscaling.enabled
+          value: "true"
+        - name: autoscaling.minReplicas
+          value: "2"
+        - name: autoscaling.maxReplicas
+          value: "10"
+
+  # Destination: plan-solidify-phase5 namespace in industriverse-aws cluster
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: plan-solidify-phase5
+
+  # Sync policy
+  syncPolicy:
+    automated:
+      prune: true  # Auto-delete resources not in git
+      selfHeal: true  # Auto-sync when drift detected
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # Health assessment
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas  # Ignore replica count (managed by HPA)
+
+  # Notifications
+  revisionHistoryLimit: 10

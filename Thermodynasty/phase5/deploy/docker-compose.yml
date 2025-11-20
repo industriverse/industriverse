@@ -1,0 +1,138 @@
+# Docker Compose for Industriverse EIL Platform
+# Development and testing environment
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # EIL API Gateway
+  # ============================================================================
+  eil-api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: development
+    container_name: eil-api
+    ports:
+      - "8000:8000"  # FastAPI
+      - "9090:9090"  # Prometheus metrics
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+      - DEVICE=cpu
+    volumes:
+      - ../:/app:delegated
+      - ../data:/app/data
+      - ../checkpoints:/app/checkpoints
+      - ../logs:/app/logs
+    networks:
+      - eil-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # ============================================================================
+  # Prometheus (Monitoring)
+  # ============================================================================
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: eil-prometheus
+    ports:
+      - "9091:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - eil-network
+    depends_on:
+      - eil-api
+    restart: unless-stopped
+
+  # ============================================================================
+  # Grafana (Dashboards)
+  # ============================================================================
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: eil-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../monitoring/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    networks:
+      - eil-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # ============================================================================
+  # Redis (Caching - Optional)
+  # ============================================================================
+  redis:
+    image: redis:7.2-alpine
+    container_name: eil-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - eil-network
+    restart: unless-stopped
+
+  # ============================================================================
+  # Kafka (Streaming - Optional)
+  # ============================================================================
+  # zookeeper:
+  #   image: confluentinc/cp-zookeeper:7.5.0
+  #   container_name: eil-zookeeper
+  #   environment:
+  #     ZOOKEEPER_CLIENT_PORT: 2181
+  #     ZOOKEEPER_TICK_TIME: 2000
+  #   networks:
+  #     - eil-network
+
+  # kafka:
+  #   image: confluentinc/cp-kafka:7.5.0
+  #   container_name: eil-kafka
+  #   depends_on:
+  #     - zookeeper
+  #   ports:
+  #     - "9092:9092"
+  #   environment:
+  #     KAFKA_BROKER_ID: 1
+  #     KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #   networks:
+  #     - eil-network
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  eil-network:
+    driver: bridge
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  prometheus-data:
+  grafana-data:
+  redis-data:

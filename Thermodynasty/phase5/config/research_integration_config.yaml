@@ -1,0 +1,225 @@
+# Research Integration Configuration for Phase 5 EIL
+# Configuration for LeJEPA, Egocentric-10K, PhysWorld, and RealDeepResearch
+
+---
+# === LeJEPA Configuration ===
+lejêpa:
+  enabled: false  # Enable after pretraining completes
+  backbone: "ViT-B/16"  # Options: "ViT-B/16", "ViT-L/14"
+  hidden_dim: 768  # 768 for ViT-B, 1024 for ViT-L
+  embedding_dim: 256
+  sigreg_lambda: 0.01  # SIGReg loss weight
+  learning_rate: 0.0001
+  warmup_epochs: 10
+  predictor_depth: 4
+  predictor_hidden_dim: 512
+
+  # Checkpoint path (after pretraining)
+  checkpoint_path: null  # "/path/to/lejêpa_checkpoint.pkl"
+
+  # Training settings
+  training:
+    batch_size: 32
+    epochs: 10
+    gradient_accumulation_steps: 1
+    mixed_precision: true
+
+# === Egocentric-10K Configuration ===
+egocentric_10k:
+  enabled: false  # Enable when dataset is downloaded
+  dataset_name: "builddotai/Egocentric-10K"
+  cache_dir: null  # Set to your 20TB drive path: "/mnt/20tb_drive/egocentric10k"
+  streaming: true  # Always use streaming for 16.4TB dataset
+
+  # Factory selection
+  num_factories: 85
+  target_factory_id: 0  # Specialize on specific factory (0-84)
+
+  # Video processing
+  fps: 30
+  resolution: [1920, 1080]  # 1080p HD
+  video_format: "H.265"
+
+  # Physics extraction
+  physics_extraction:
+    contact_density_threshold: 0.5
+    energy_map_grid_size: 64
+    temporal_smoothing: true
+    optical_flow_method: "farneback"
+
+# === PhysWorld Configuration ===
+physworld:
+  enabled: false  # Enable for video inputs
+
+  # Depth estimation
+  depth_estimation:
+    method: "monocular"  # Options: "monocular", "stereo", "lidar"
+    model: "gradient_based"  # Placeholder; use "MiDaS" or "ZoeDepth" in production
+
+  # 4D reconstruction
+  reconstruction:
+    grid_resolution: 64  # SDF grid size (higher = more accurate, slower)
+    gravity_alignment: true
+    collision_threshold: 0.01  # meters
+    temporal_smoothing: true
+
+  # Physics properties
+  physics:
+    estimate_mass: true
+    estimate_friction: true
+    estimate_contact_density: true
+
+# === RealDeepResearch Configuration ===
+realdeepresearch:
+  enabled: false  # Enable for continuous learning
+  cache_dir: "./arxiv_cache"
+
+  # ArXiv crawling
+  arxiv:
+    categories:
+      - "cs.LG"  # Machine Learning
+      - "cs.AI"  # Artificial Intelligence
+      - "cs.RO"  # Robotics
+      - "cs.CV"  # Computer Vision
+      - "physics.comp-ph"  # Computational Physics
+
+    update_schedule:
+      interval_seconds: 86400  # Daily
+      days_back: 7
+      max_papers_per_update: 50
+
+  # Perspective decomposition (I-M-O-W-R)
+  perspectives:
+    extract_introduction: true
+    extract_methods: true
+    extract_observations: true
+    extract_future_work: true
+    extract_related_work: true
+
+  # Embeddings
+  embeddings:
+    model: "hash_based"  # Options: "hash_based", "sentence-bert"
+    embedding_dim: 384
+
+  # Clustering
+  clustering:
+    method: "kmeans"
+    num_clusters: 5
+    update_on_new_papers: true
+
+# === Integration Settings ===
+integration:
+  # Priority levels (from research_integration_analysis.md)
+  current_priority: 1  # 1: Foundation, 2: Integration, 3: Enhancement, 4: Production
+
+  # Enhancement weights
+  enhancement_weights:
+    lejêpa_confidence: 0.3  # 30% weight
+    factory_physics: 0.4  # 40% weight
+    physworld_reconstruction: 0.3  # 30% weight
+
+  # Regime detection enhancement
+  regime_detection:
+    use_lejêpa_encoder: false
+    use_factory_patterns: false
+    use_physics_grounding: false
+
+  # Proof validation enhancement
+  proof_validation:
+    use_physics_grounding: false
+    physics_consistency_weight: 0.2
+
+# === Hardware Requirements ===
+hardware:
+  # Minimum requirements for Priority 1
+  min_gpu_memory_gb: 16  # For ViT-B/16
+  min_ram_gb: 32
+  min_storage_tb: 1
+
+  # Recommended for Priority 3 (full pretraining)
+  recommended_gpus: "8x A100 80GB"
+  recommended_ram_gb: 512
+  recommended_storage_tb: 25  # 20TB dataset + 5TB checkpoints
+
+  # Training time estimates
+  estimated_training_days:
+    priority_1_foundation: 1  # Small-scale validation
+    priority_2_integration: 3  # 10 factories
+    priority_3_full_pretrain: 14  # Full 85 factories
+
+# === Deployment Settings ===
+deployment:
+  # Kubernetes resources (when integrated with helm)
+  resources:
+    requests:
+      cpu: "4"
+      memory: "16Gi"
+      nvidia.com/gpu: "1"
+    limits:
+      cpu: "8"
+      memory: "32Gi"
+      nvidia.com/gpu: "1"
+
+  # Persistent volumes
+  volumes:
+    egocentric_data: "/mnt/egocentric10k"
+    lejêpa_checkpoints: "/mnt/lejêpa"
+    arxiv_cache: "/mnt/arxiv"
+
+# === Monitoring & Metrics ===
+monitoring:
+  # Metrics to track
+  metrics:
+    - "lejêpa_sigreg_loss"
+    - "lejêpa_prediction_loss"
+    - "lejêpa_isotropy_score"
+    - "factory_physics_contact_density"
+    - "physworld_reconstruction_accuracy"
+    - "research_papers_ingested"
+    - "regime_detection_confidence_boost"
+
+  # Logging
+  logging:
+    level: "INFO"
+    tensorboard: false
+    wandb: false
+
+# === Feature Flags ===
+features:
+  # Experimental features
+  experimental:
+    multi_modal_fusion: false  # Combine egocentric + energy maps
+    online_research_updates: false  # Real-time paper integration
+    factory_transfer_learning: false  # Transfer across factories
+
+  # Production features
+  production:
+    checkpoint_saving: true
+    distributed_training: false
+    gradient_checkpointing: true  # Reduce memory usage
+
+# === Success Criteria (from research_integration_analysis.md Part 8) ===
+success_criteria:
+  priority_1:
+    lejêpa_isotropy_score: 0.9  # Epps-Pulley < 0.1
+    factory_videos_processed: 100
+    arxiv_papers_ingested: 50
+    physworld_reconstructions: 20
+
+  priority_2:
+    regime_detection_accuracy: 0.85
+    lejêpa_pretraining_complete: true
+    factory_count: 10
+    research_clusters: 5
+
+  priority_3:
+    full_pretraining_complete: true
+    factory_count: 85
+    proof_validation_improvement: 0.1  # 10% boost
+    knowledge_graph_papers: 10000
+
+  priority_4:
+    production_deployment: true
+    real_time_inference: true
+    continuous_learning: true
+    factory_deployment_count: 10

@@ -1,0 +1,38 @@
+apiVersion: 1
+
+datasources:
+  # Prometheus datasource
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus-server:80
+    isDefault: true
+    editable: true
+    jsonData:
+      httpMethod: POST
+      timeInterval: '30s'
+
+  # InfluxDB datasource
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    editable: true
+    jsonData:
+      version: Flux
+      organization: eil-platform
+      defaultBucket: energy_metrics
+      tlsSkipVerify: true
+    secureJsonData:
+      token: ${INFLUXDB_TOKEN}
+
+  # Neo4j datasource (requires plugin)
+  - name: Neo4j
+    type: neo4j-datasource
+    access: proxy
+    url: bolt://neo4j:7687
+    editable: true
+    jsonData:
+      database: neo4j
+    secureJsonData:
+      password: ${NEO4J_PASSWORD}

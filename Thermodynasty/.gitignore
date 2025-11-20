@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Data files (large)
+data/energy_maps/**/*.npy
+data/telemetry/**/*
+
+# But keep directories and metadata
+!data/energy_maps/.gitkeep
+!data/telemetry/.gitkeep
+*.json
+# Except catalog and summary files
+!data/catalogs/catalog.json
+!data/energy_maps/generation_summary.json
+!results_*/inference_stats.json
+!cross_domain_analysis.json
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+logs/
+
+# Checkpoints
+phase4/checkpoints/
+phase5/checkpoints/
+*.ckpt
+*.pth
+
+# Results - keep stats but ignore large prediction files
+results_*/*.npz
+results_*/predictions_*.npz
+
+# Neo4j
+.neo4j/
+
+# OS
+.DS_Store
+Thumbs.db
