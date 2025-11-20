@@ -1,0 +1,286 @@
+{
+  "dashboard": {
+    "title": "EIL Platform - API Performance",
+    "tags": ["eil", "api", "performance"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Request Rate (RPS)",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{job=\"eil-api\"}[5m])) by (endpoint)",
+            "legendFormat": "{{endpoint}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Requests/sec", "format": "reqps"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "nullPointMode": "null",
+        "tooltip": {"shared": true, "sort": 2},
+        "legend": {"show": true, "alignAsTable": true, "rightSide": false}
+      },
+      {
+        "id": 2,
+        "title": "Total Requests",
+        "type": "stat",
+        "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "sum(http_requests_total{job=\"eil-api\"})",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value",
+          "orientation": "auto",
+          "textMode": "auto"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Error Rate (%)",
+        "type": "stat",
+        "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "100 * sum(rate(http_requests_total{job=\"eil-api\",status=~\"5..\"}[5m])) / sum(rate(http_requests_total{job=\"eil-api\"}[5m]))",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value",
+          "orientation": "auto",
+          "textMode": "auto"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 1, "color": "yellow"},
+                {"value": 5, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Response Time (P50, P95, P99)",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{job=\"eil-api\"}[5m])) by (le, endpoint))",
+            "legendFormat": "{{endpoint}} P50",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"eil-api\"}[5m])) by (le, endpoint))",
+            "legendFormat": "{{endpoint}} P95",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job=\"eil-api\"}[5m])) by (le, endpoint))",
+            "legendFormat": "{{endpoint}} P99",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {"label": "Response Time", "format": "s"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 0,
+        "linewidth": 2,
+        "nullPointMode": "null",
+        "tooltip": {"shared": true, "sort": 2},
+        "legend": {"show": true, "alignAsTable": true, "rightSide": false},
+        "alert": {
+          "name": "High Response Time",
+          "conditions": [
+            {
+              "evaluator": {"type": "gt", "params": [1]},
+              "query": {"params": ["B", "5m", "now"]},
+              "type": "query"
+            }
+          ],
+          "frequency": "60s",
+          "handler": 1,
+          "message": "P95 response time exceeded 1s",
+          "noDataState": "no_data",
+          "executionErrorState": "alerting"
+        }
+      },
+      {
+        "id": 5,
+        "title": "Status Code Distribution",
+        "type": "piechart",
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(increase(http_requests_total{job=\"eil-api\"}[1h])) by (status)",
+            "legendFormat": "{{status}}",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "legend": {"displayMode": "table", "placement": "right"},
+          "pieType": "donut"
+        }
+      },
+      {
+        "id": 6,
+        "title": "Endpoint Performance",
+        "type": "table",
+        "gridPos": {"x": 0, "y": 16, "w": 24, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{job=\"eil-api\"}[5m])) by (endpoint, method)",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"eil-api\"}[5m])) by (le, endpoint))",
+            "format": "table",
+            "instant": true,
+            "refId": "B"
+          },
+          {
+            "expr": "sum(rate(http_requests_total{job=\"eil-api\",status=~\"5..\"}[5m])) by (endpoint) / sum(rate(http_requests_total{job=\"eil-api\"}[5m])) by (endpoint) * 100",
+            "format": "table",
+            "instant": true,
+            "refId": "C"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "merge",
+            "options": {}
+          }
+        ],
+        "options": {
+          "showHeader": true,
+          "sortBy": [{"displayName": "RPS", "desc": true}]
+        },
+        "fieldConfig": {
+          "overrides": [
+            {"matcher": {"id": "byName", "options": "Value #A"}, "properties": [{"id": "displayName", "value": "RPS"}]},
+            {"matcher": {"id": "byName", "options": "Value #B"}, "properties": [{"id": "displayName", "value": "P95 Latency (s)"}, {"id": "unit", "value": "s"}]},
+            {"matcher": {"id": "byName", "options": "Value #C"}, "properties": [{"id": "displayName", "value": "Error Rate (%)"}, {"id": "unit", "value": "percent"}]}
+          ]
+        }
+      },
+      {
+        "id": 7,
+        "title": "Active Connections",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 24, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(active_connections{job=\"eil-api\"})",
+            "legendFormat": "Active Connections",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Connections", "format": "short"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2
+      },
+      {
+        "id": 8,
+        "title": "Request Size Distribution",
+        "type": "heatmap",
+        "gridPos": {"x": 12, "y": 24, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(increase(http_request_size_bytes_bucket{job=\"eil-api\"}[5m])) by (le)",
+            "format": "heatmap",
+            "refId": "A"
+          }
+        ],
+        "dataFormat": "tsbuckets",
+        "color": {
+          "mode": "spectrum",
+          "cardColor": "#b4ff00",
+          "colorScale": "sqrt",
+          "exponent": 0.5,
+          "colorScheme": "interpolateSpectral"
+        },
+        "yAxis": {
+          "format": "bytes"
+        }
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "datasource",
+          "type": "datasource",
+          "query": "prometheus",
+          "current": {
+            "text": "Prometheus",
+            "value": "Prometheus"
+          }
+        },
+        {
+          "name": "namespace",
+          "type": "query",
+          "datasource": "$datasource",
+          "query": "label_values(http_requests_total, namespace)",
+          "current": {
+            "text": "eil-platform",
+            "value": "eil-platform"
+          },
+          "refresh": 1
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Deployments",
+          "datasource": "$datasource",
+          "expr": "changes(kube_deployment_status_observed_generation{namespace=\"$namespace\"}[5m]) > 0",
+          "iconColor": "green",
+          "tagKeys": "deployment"
+        }
+      ]
+    }
+  }
+}

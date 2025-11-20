@@ -1,0 +1,437 @@
+{
+  "dashboard": {
+    "title": "EIL Platform - System Health",
+    "tags": ["eil", "system", "infrastructure", "kubernetes"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Pod Status",
+        "type": "stat",
+        "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "sum(kube_pod_status_phase{namespace=\"eil-platform\",phase=\"Running\"})",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "none",
+          "colorMode": "value",
+          "orientation": "auto",
+          "textMode": "value_and_name"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 3, "color": "green"}
+              ]
+            }
+          },
+          "overrides": []
+        }
+      },
+      {
+        "id": 2,
+        "title": "CPU Usage (%)",
+        "type": "gauge",
+        "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "100 * sum(rate(container_cpu_usage_seconds_total{namespace=\"eil-platform\",container=\"eil-api\"}[5m])) / sum(kube_pod_container_resource_limits{namespace=\"eil-platform\",container=\"eil-api\",resource=\"cpu\"})",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 70, "color": "yellow"},
+                {"value": 85, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Memory Usage (%)",
+        "type": "gauge",
+        "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "100 * sum(container_memory_working_set_bytes{namespace=\"eil-platform\",container=\"eil-api\"}) / sum(kube_pod_container_resource_limits{namespace=\"eil-platform\",container=\"eil-api\",resource=\"memory\"})",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 80, "color": "yellow"},
+                {"value": 90, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Replica Count",
+        "type": "stat",
+        "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "sum(kube_deployment_status_replicas_available{namespace=\"eil-platform\",deployment=\"eil-api\"})",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value",
+          "orientation": "auto",
+          "textMode": "value_and_name"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 2, "color": "yellow"},
+                {"value": 3, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "CPU Usage by Pod",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"eil-platform\",container=\"eil-api\"}[5m])) by (pod)",
+            "legendFormat": "{{pod}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "CPU Cores", "format": "short"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "stack": false,
+        "tooltip": {"shared": true, "sort": 2},
+        "legend": {"show": true, "alignAsTable": true, "rightSide": false}
+      },
+      {
+        "id": 6,
+        "title": "Memory Usage by Pod",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(container_memory_working_set_bytes{namespace=\"eil-platform\",container=\"eil-api\"}) by (pod)",
+            "legendFormat": "{{pod}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Memory", "format": "bytes"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "stack": false,
+        "tooltip": {"shared": true, "sort": 2},
+        "legend": {"show": true, "alignAsTable": true, "rightSide": false}
+      },
+      {
+        "id": 7,
+        "title": "Network I/O",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 12, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"eil-platform\"}[5m]))",
+            "legendFormat": "Receive",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(container_network_transmit_bytes_total{namespace=\"eil-platform\"}[5m]))",
+            "legendFormat": "Transmit",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"label": "Bytes/sec", "format": "Bps"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2
+      },
+      {
+        "id": 8,
+        "title": "Disk I/O",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 12, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(container_fs_reads_bytes_total{namespace=\"eil-platform\",container=\"eil-api\"}[5m]))",
+            "legendFormat": "Read",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(container_fs_writes_bytes_total{namespace=\"eil-platform\",container=\"eil-api\"}[5m]))",
+            "legendFormat": "Write",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"label": "Bytes/sec", "format": "Bps"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2
+      },
+      {
+        "id": 9,
+        "title": "Pod Restarts",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 20, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"eil-platform\"}[1h])) by (pod)",
+            "legendFormat": "{{pod}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Restarts", "format": "short"},
+          {"show": false}
+        ],
+        "lines": true,
+        "bars": true,
+        "fill": 1,
+        "alert": {
+          "name": "Pod Restarts",
+          "conditions": [
+            {
+              "evaluator": {"type": "gt", "params": [3]},
+              "query": {"params": ["A", "1h", "now"]},
+              "type": "query"
+            }
+          ],
+          "frequency": "60s",
+          "handler": 1,
+          "message": "Pod restart count exceeded threshold",
+          "noDataState": "ok",
+          "executionErrorState": "alerting"
+        }
+      },
+      {
+        "id": 10,
+        "title": "HPA Status",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 20, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "kube_horizontalpodautoscaler_status_current_replicas{namespace=\"eil-platform\",horizontalpodautoscaler=\"eil-api-hpa\"}",
+            "legendFormat": "Current Replicas",
+            "refId": "A"
+          },
+          {
+            "expr": "kube_horizontalpodautoscaler_status_desired_replicas{namespace=\"eil-platform\",horizontalpodautoscaler=\"eil-api-hpa\"}",
+            "legendFormat": "Desired Replicas",
+            "refId": "B"
+          },
+          {
+            "expr": "kube_horizontalpodautoscaler_spec_min_replicas{namespace=\"eil-platform\",horizontalpodautoscaler=\"eil-api-hpa\"}",
+            "legendFormat": "Min Replicas",
+            "refId": "C"
+          },
+          {
+            "expr": "kube_horizontalpodautoscaler_spec_max_replicas{namespace=\"eil-platform\",horizontalpodautoscaler=\"eil-api-hpa\"}",
+            "legendFormat": "Max Replicas",
+            "refId": "D"
+          }
+        ],
+        "yaxes": [
+          {"label": "Replicas", "format": "short"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 0,
+        "linewidth": 2
+      },
+      {
+        "id": 11,
+        "title": "Resource Usage Table",
+        "type": "table",
+        "gridPos": {"x": 0, "y": 26, "w": 24, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"eil-platform\",container=\"eil-api\"}[5m])) by (pod)",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          },
+          {
+            "expr": "sum(container_memory_working_set_bytes{namespace=\"eil-platform\",container=\"eil-api\"}) by (pod)",
+            "format": "table",
+            "instant": true,
+            "refId": "B"
+          },
+          {
+            "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"eil-platform\"}[5m])) by (pod)",
+            "format": "table",
+            "instant": true,
+            "refId": "C"
+          },
+          {
+            "expr": "sum(rate(container_network_transmit_bytes_total{namespace=\"eil-platform\"}[5m])) by (pod)",
+            "format": "table",
+            "instant": true,
+            "refId": "D"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "merge",
+            "options": {}
+          }
+        ],
+        "options": {
+          "showHeader": true,
+          "sortBy": [{"displayName": "CPU", "desc": true}]
+        },
+        "fieldConfig": {
+          "overrides": [
+            {"matcher": {"id": "byName", "options": "pod"}, "properties": [{"id": "displayName", "value": "Pod"}]},
+            {"matcher": {"id": "byName", "options": "Value #A"}, "properties": [{"id": "displayName", "value": "CPU (cores)"}, {"id": "unit", "value": "short"}, {"id": "decimals", "value": 3}]},
+            {"matcher": {"id": "byName", "options": "Value #B"}, "properties": [{"id": "displayName", "value": "Memory"}, {"id": "unit", "value": "bytes"}]},
+            {"matcher": {"id": "byName", "options": "Value #C"}, "properties": [{"id": "displayName", "value": "Net RX"}, {"id": "unit", "value": "Bps"}]},
+            {"matcher": {"id": "byName", "options": "Value #D"}, "properties": [{"id": "displayName", "value": "Net TX"}, {"id": "unit", "value": "Bps"}]}
+          ]
+        }
+      },
+      {
+        "id": 12,
+        "title": "Container Filesystem Usage",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 34, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(container_fs_usage_bytes{namespace=\"eil-platform\",container=\"eil-api\"}) by (pod)",
+            "legendFormat": "{{pod}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Usage", "format": "bytes"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2
+      },
+      {
+        "id": 13,
+        "title": "Goroutines / Threads",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 34, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(go_goroutines{job=\"eil-api\"}) by (instance)",
+            "legendFormat": "{{instance}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"label": "Count", "format": "short"},
+          {"show": false}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "datasource",
+          "type": "datasource",
+          "query": "prometheus",
+          "current": {
+            "text": "Prometheus",
+            "value": "Prometheus"
+          }
+        },
+        {
+          "name": "namespace",
+          "type": "constant",
+          "query": "eil-platform",
+          "current": {
+            "text": "eil-platform",
+            "value": "eil-platform"
+          }
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Pod Events",
+          "datasource": "$datasource",
+          "expr": "changes(kube_pod_status_phase{namespace=\"$namespace\"}[1m]) > 0",
+          "iconColor": "orange",
+          "tagKeys": "pod,phase"
+        },
+        {
+          "name": "Scaling Events",
+          "datasource": "$datasource",
+          "expr": "changes(kube_horizontalpodautoscaler_status_current_replicas{namespace=\"$namespace\"}[1m]) > 0",
+          "iconColor": "blue",
+          "tagKeys": "horizontalpodautoscaler"
+        }
+      ]
+    }
+  }
+}
