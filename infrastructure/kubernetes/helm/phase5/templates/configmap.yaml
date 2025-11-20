@@ -1,0 +1,246 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "thermodynasty-ace.fullname" . }}-config
+  labels:
+    {{- include "thermodynasty-ace.labels" . | nindent 4 }}
+data:
+  # EIL Configuration
+  eil-config.yaml: |
+    # Energy Intelligence Layer - Phase 5
+    energy_intelligence_layer:
+      enabled: {{ .Values.config.eil.enabled }}
+
+      # Parallel Ensemble Architecture
+      regime_detector:
+        checkpoint_path: {{ .Values.config.eil.regimeDetector.checkpointPath }}
+        thresholds:
+          entropy_rate_min: {{ .Values.config.eil.regimeDetector.entropyRateMin }}
+          entropy_rate_max: {{ .Values.config.eil.regimeDetector.entropyRateMax }}
+          temperature_stable_max: {{ .Values.config.eil.regimeDetector.temperatureStableMax }}
+          temperature_chaotic_min: {{ .Values.config.eil.regimeDetector.temperatureChaoticMin }}
+
+      microadapt:
+        max_model_units: {{ .Values.config.eil.microadapt.maxModelUnits }}
+        initial_model_units: {{ .Values.config.eil.microadapt.initialModelUnits }}
+        top_k: {{ .Values.config.eil.microadapt.topK }}
+        hierarchy_levels: {{ .Values.config.eil.microadapt.hierarchyLevels }}
+        window_sizes: [{{ .Values.config.eil.microadapt.windowSizes }}]
+        fitness_threshold: {{ .Values.config.eil.microadapt.fitnessThreshold }}
+        replacement_rate: {{ .Values.config.eil.microadapt.replacementRate }}
+
+      fusion:
+        statistical_weight: {{ .Values.config.eil.fusion.statisticalWeight }}
+        physics_weight: {{ .Values.config.eil.fusion.physicsWeight }}
+        consensus_threshold: {{ .Values.config.eil.fusion.consensusThreshold }}
+
+      regime_gating:
+        enabled: {{ .Values.config.eil.regimeGating.enabled }}
+        skip_on_unapproved: {{ .Values.config.eil.regimeGating.skipOnUnapproved }}
+        min_confidence: {{ .Values.config.eil.regimeGating.minConfidence }}
+
+    # Proof Validator - Tri-check validation
+    proof_validator:
+      enabled: {{ .Values.config.proofValidator.enabled }}
+      energy_tolerance: {{ .Values.config.proofValidator.energyTolerance }}
+      entropy_threshold: {{ .Values.config.proofValidator.entropyThreshold }}
+      spectral_threshold: {{ .Values.config.proofValidator.spectralThreshold }}
+
+      # Tri-check validation rules
+      validation_rules:
+        energy_conservation:
+          description: "Energy fidelity check"
+          formula: "|E_predicted - E_observed| / E_observed"
+          threshold: {{ .Values.config.proofValidator.energyTolerance }}
+
+        entropy_coherence:
+          description: "Entropy monotonicity check"
+          formula: "smooth entropy increase over time"
+          threshold: {{ .Values.config.proofValidator.entropyThreshold }}
+
+        spectral_similarity:
+          description: "Power spectrum correlation"
+          formula: "correlation(spectrum_pred, spectrum_obs)"
+          threshold: {{ .Values.config.proofValidator.spectralThreshold }}
+
+      # PFT minting rules
+      pft_minting:
+        base_amount: {{ .Values.config.marketEngine.basePftReward }}
+        quality_bonuses:
+          exceptional: 1.5  # >95% quality
+          high: 1.2         # >90% quality
+          good: 1.0         # >85% quality
+
+    # Market Engine - CEU/PFT Economics
+    market_engine:
+      enabled: {{ .Values.config.marketEngine.enabled }}
+
+      # AMM Bonding Curve (x * y = k)
+      amm:
+        initial_ceu_reserve: {{ .Values.config.marketEngine.initialCeuReserve }}
+        initial_pft_reserve: {{ .Values.config.marketEngine.initialPftReserve }}
+
+      # Pricing
+      pricing:
+        ceu_price_usd: {{ .Values.config.marketEngine.ceuPriceUsd }}
+        pft_price_usd: {{ .Values.config.marketEngine.pftPriceUsd }}
+        base_ceu_per_energy: {{ .Values.config.marketEngine.baseCeuPerEnergy }}
+
+      # Regime-based multipliers
+      regime_multipliers:
+        ceu_cost:
+          stable_confirmed: 0.8      # 20% discount
+          stable_unconfirmed: 1.0    # Standard rate
+          transitional: 1.1          # 10% premium
+          chaotic: 1.2               # 20% premium
+          unapproved: 1.5            # 50% premium (risk)
+
+        pft_reward:
+          stable_high_confidence: 2.0     # Double reward
+          stable_low_confidence: 1.5      # 50% bonus
+          transitional: 1.0               # Standard
+          chaotic: 0.8                    # 20% penalty
+          unapproved: 0.5                 # 50% penalty
+
+    # Feedback Trainer - Online Learning
+    feedback_trainer:
+      enabled: {{ .Values.config.feedbackTrainer.enabled }}
+      learning_rate: {{ .Values.config.feedbackTrainer.learningRate }}
+      adaptation_threshold: {{ .Values.config.feedbackTrainer.adaptationThreshold }}
+      calibration_window: {{ .Values.config.feedbackTrainer.calibrationWindow }}
+      enable_online_learning: {{ .Values.config.feedbackTrainer.enableOnlineLearning }}
+
+      # Learning strategies
+      strategies:
+        microadapt_adaptation:
+          enabled: true
+          fitness_boost: 0.1
+          fitness_penalty: 0.1
+
+        regime_detector_calibration:
+          enabled: true
+          threshold_adjustment_rate: 0.05
+
+        fusion_weight_optimization:
+          enabled: true
+          weight_adjustment_rate: 0.05
+          min_statistical_weight: 0.3
+          max_statistical_weight: 0.5
+
+  # Regime Classification Rules
+  regime-rules.yaml: |
+    # Regime Classification Matrix
+    regimes:
+      - name: "stable_confirmed"
+        conditions:
+          entropy_rate: "<0.01"
+          temperature: "<1.5"
+          energy_variance: "<0.1"
+        confidence_threshold: 0.90
+        approved: true
+
+      - name: "stable_unconfirmed"
+        conditions:
+          entropy_rate: "<0.01"
+          temperature: "<1.5"
+          energy_variance: "<0.2"
+        confidence_threshold: 0.75
+        approved: true
+
+      - name: "transitional_stable"
+        conditions:
+          entropy_rate: "0.01-0.05"
+          temperature: "1.5-2.5"
+        confidence_threshold: 0.70
+        approved: true
+
+      - name: "transitional_chaotic"
+        conditions:
+          entropy_rate: "0.05-0.1"
+          temperature: "2.5-3.5"
+        confidence_threshold: 0.60
+        approved: false
+
+      - name: "chaotic_unconfirmed"
+        conditions:
+          entropy_rate: ">0.1"
+          temperature: ">3.5"
+        confidence_threshold: 0.50
+        approved: false
+
+      - name: "chaotic_confirmed"
+        conditions:
+          entropy_rate: ">0.15"
+          temperature: ">5.0"
+        confidence_threshold: 0.70
+        approved: false
+
+  # Prometheus Metrics Configuration
+  prometheus-metrics.yaml: |
+    # Phase 5 EIL Metrics
+    metrics:
+      regime_detection:
+        - name: eil_regime_detections_total
+          type: counter
+          help: "Total regime detections by type"
+          labels: [regime, domain, cluster, approved]
+
+        - name: eil_regime_confidence
+          type: histogram
+          help: "Regime detection confidence scores"
+          labels: [regime, domain]
+          buckets: [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0]
+
+        - name: eil_regime_transitions_total
+          type: counter
+          help: "Regime transition events"
+          labels: [from_regime, to_regime, domain]
+
+      proof_validation:
+        - name: poe_validations_total
+          type: counter
+          help: "Total proof validations"
+          labels: [domain, passed, action]
+
+        - name: poe_tri_check_results
+          type: counter
+          help: "Tri-check validation results"
+          labels: [check_type, passed]
+
+        - name: poe_proof_quality
+          type: histogram
+          help: "Proof quality scores"
+          buckets: [0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0]
+
+      market_engine:
+        - name: market_ceu_cost
+          type: histogram
+          help: "CEU cost per inference"
+          labels: [regime, approved]
+          buckets: [1, 2, 5, 10, 20, 50, 100]
+
+        - name: market_pft_minted_total
+          type: counter
+          help: "Total PFT minted"
+          labels: [regime, quality_tier]
+
+        - name: market_amm_reserves
+          type: gauge
+          help: "AMM reserve levels"
+          labels: [token_type]
+
+      feedback_trainer:
+        - name: feedback_learning_events_total
+          type: counter
+          help: "Total learning events"
+          labels: [adaptation_type]
+
+        - name: feedback_regime_accuracy
+          type: gauge
+          help: "Regime prediction accuracy"
+          labels: [domain]
+
+        - name: feedback_fusion_weights
+          type: gauge
+          help: "Current fusion weights"
+          labels: [branch_type]

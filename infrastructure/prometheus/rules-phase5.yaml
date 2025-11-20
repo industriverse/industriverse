@@ -1,0 +1,191 @@
+---
+# Prometheus Recording and Alerting Rules for Thermodynasty ACE
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: thermodynasty-ace-rules
+  namespace: monitoring
+  labels:
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+    # Recording Rules
+    - name: thermodynasty.ace.recording
+      interval: 30s
+      rules:
+        # Inference latency percentiles
+        - record: ace:inference_latency_seconds:p50
+          expr: histogram_quantile(0.50, rate(ace_inference_duration_seconds_bucket[5m]))
+        - record: ace:inference_latency_seconds:p95
+          expr: histogram_quantile(0.95, rate(ace_inference_duration_seconds_bucket[5m]))
+        - record: ace:inference_latency_seconds:p99
+          expr: histogram_quantile(0.99, rate(ace_inference_duration_seconds_bucket[5m]))
+
+        # Throughput
+        - record: ace:inference_rate:5m
+          expr: rate(ace_inference_total[5m])
+
+        # Error rate
+        - record: ace:error_rate:5m
+          expr: rate(ace_errors_total[5m]) / rate(ace_inference_total[5m])
+
+        # Energy fidelity average
+        - record: ace:energy_fidelity:mean
+          expr: avg(ace_energy_fidelity)
+
+        # Consensus pass rate
+        - record: ace:consensus_pass_rate:5m
+          expr: rate(ace_consensus_passed_total[5m]) / rate(ace_inference_total[5m])
+
+    # SLO-based Alerting Rules
+    - name: thermodynasty.ace.slo
+      interval: 1m
+      rules:
+        # SLO: P95 latency < 500ms
+        - alert: ACELatencyHigh
+          expr: ace:inference_latency_seconds:p95 > 0.5
+          for: 5m
+          labels:
+            severity: warning
+            component: ace-server
+            slo: latency
+          annotations:
+            summary: "ACE inference latency high (p95 > 500ms)"
+            description: "ACE p95 latency is {{ $value | humanizeDuration }}, exceeding 500ms SLO for 5 minutes."
+            runbook: "https://docs.industriverse.ai/runbooks/ace-latency-high"
+            dashboard: "https://grafana.industriverse.ai/d/ace-phase5/thermodynasty-ace"
+
+        # SLO: Energy fidelity > 90%
+        - alert: ACEEnergyFidelityLow
+          expr: ace:energy_fidelity:mean < 0.90
+          for: 5m
+          labels:
+            severity: critical
+            component: ace-server
+            slo: physics
+          annotations:
+            summary: "ACE energy conservation violated (fidelity < 90%)"
+            description: "ACE energy fidelity is {{ $value | humanizePercentage }}, below 90% threshold. Physics accuracy compromised."
+            runbook: "https://docs.industriverse.ai/runbooks/ace-energy-fidelity-low"
+            dashboard: "https://grafana.industriverse.ai/d/ace-phase5/thermodynasty-ace"
+
+        # SLO: Entropy coherence > 90%
+        - alert: ACEEntropyCoherenceLow
+          expr: avg(ace_entropy_coherence) < 0.90
+          for: 10m
+          labels:
+            severity: warning
+            component: ace-server
+            slo: physics
+          annotations:
+            summary: "ACE entropy coherence low (< 90%)"
+            description: "ACE entropy coherence is {{ $value | humanizePercentage }}. Thermodynamic consistency degraded."
+
+        # SLO: Consensus pass rate > 95%
+        - alert: ACEConsensusFailureHigh
+          expr: ace:consensus_pass_rate:5m < 0.95
+          for: 10m
+          labels:
+            severity: warning
+            component: ace-server
+            slo: consensus
+          annotations:
+            summary: "ACE consensus failures high (< 95% pass rate)"
+            description: "ACE consensus pass rate is {{ $value | humanizePercentage }}. Shadow ensemble not reaching agreement."
+            runbook: "https://docs.industriverse.ai/runbooks/ace-consensus-failure"
+
+    # Operational Alerts
+    - name: thermodynasty.ace.operational
+      interval: 1m
+      rules:
+        # High error rate
+        - alert: ACEErrorRateHigh
+          expr: ace:error_rate:5m > 0.05
+          for: 5m
+          labels:
+            severity: critical
+            component: ace-server
+          annotations:
+            summary: "ACE error rate high (> 5%)"
+            description: "ACE error rate is {{ $value | humanizePercentage }} over the last 5 minutes."
+
+        # Pod restarts
+        - alert: ACEPodRestartsHigh
+          expr: rate(kube_pod_container_status_restarts_total{namespace="plan-solidify-phase5", pod=~"thermodynasty-ace.*"}[15m]) > 0
+          for: 5m
+          labels:
+            severity: warning
+            component: ace-server
+          annotations:
+            summary: "ACE pods restarting frequently"
+            description: "ACE pod {{ $labels.pod }} has restarted {{ $value }} times in the last 15 minutes."
+
+        # OOM kills
+        - alert: ACEPodOOMKilled
+          expr: kube_pod_container_status_last_terminated_reason{namespace="plan-solidify-phase5", pod=~"thermodynasty-ace.*", reason="OOMKilled"} == 1
+          labels:
+            severity: critical
+            component: ace-server
+          annotations:
+            summary: "ACE pod OOMKilled"
+            description: "ACE pod {{ $labels.pod }} was OOMKilled. Increase memory limits."
+
+        # GPU utilization
+        - alert: ACEGPUUtilizationLow
+          expr: avg(DCGM_FI_DEV_GPU_UTIL{namespace="plan-solidify-phase5"}) < 30
+          for: 30m
+          labels:
+            severity: info
+            component: ace-server
+          annotations:
+            summary: "ACE GPU utilization low"
+            description: "ACE GPU utilization is {{ $value }}% over 30 minutes. Check if inference is happening."
+
+        # Kafka consumer lag
+        - alert: ACEKafkaConsumerLagHigh
+          expr: kafka_consumergroup_lag{group="thermodynasty-ace-consumer"} > 1000
+          for: 10m
+          labels:
+            severity: warning
+            component: kafka-consumer
+          annotations:
+            summary: "ACE Kafka consumer lag high"
+            description: "ACE Kafka consumer lag is {{ $value }} messages. Processing falling behind."
+
+    # Capacity Alerts
+    - name: thermodynasty.ace.capacity
+      interval: 5m
+      rules:
+        # CPU throttling
+        - alert: ACECPUThrottlingHigh
+          expr: rate(container_cpu_cfs_throttled_seconds_total{namespace="plan-solidify-phase5", pod=~"thermodynasty-ace.*"}[5m]) > 0.25
+          for: 15m
+          labels:
+            severity: warning
+            component: ace-server
+          annotations:
+            summary: "ACE CPU throttling high"
+            description: "ACE pod {{ $labels.pod }} CPU throttled {{ $value | humanizePercentage }} of the time."
+
+        # Memory pressure
+        - alert: ACEMemoryPressureHigh
+          expr: container_memory_working_set_bytes{namespace="plan-solidify-phase5", pod=~"thermodynasty-ace.*"} / container_spec_memory_limit_bytes{namespace="plan-solidify-phase5", pod=~"thermodynasty-ace.*"} > 0.85
+          for: 10m
+          labels:
+            severity: warning
+            component: ace-server
+          annotations:
+            summary: "ACE memory usage high (> 85%)"
+            description: "ACE pod {{ $labels.pod }} using {{ $value | humanizePercentage }} of memory limit."
+
+        # HPA at max replicas
+        - alert: ACEHPAAtMaxReplicas
+          expr: kube_horizontalpodautoscaler_status_current_replicas{namespace="plan-solidify-phase5", horizontalpodautoscaler="thermodynasty-ace"} >= kube_horizontalpodautoscaler_spec_max_replicas{namespace="plan-solidify-phase5", horizontalpodautoscaler="thermodynasty-ace"}
+          for: 15m
+          labels:
+            severity: warning
+            component: ace-server
+          annotations:
+            summary: "ACE HPA at maximum replicas"
+            description: "ACE HPA has reached maximum replicas ({{ $value }}). Consider increasing max or adding capacity."

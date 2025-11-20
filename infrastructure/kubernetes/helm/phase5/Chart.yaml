@@ -1,0 +1,19 @@
+apiVersion: v2
+name: thermodynasty-ace
+description: Thermodynasty ACE Enterprise Integration Layer - Phase 5
+type: application
+version: 1.0.0-phase5
+appVersion: "1.0.0"
+keywords:
+  - thermodynasty
+  - ace
+  - thermodynamics
+  - ai
+  - energy-maps
+home: https://github.com/industriverse/industriverse
+sources:
+  - https://github.com/industriverse/industriverse
+maintainers:
+  - name: Industriverse
+    email: noreply@industriverse.ai
+dependencies: []

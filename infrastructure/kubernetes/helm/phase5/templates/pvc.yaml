@@ -1,0 +1,35 @@
+{{- if and .Values.persistence.models.enabled (not .Values.persistence.models.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "thermodynasty-ace.fullname" . }}-models
+  labels:
+    {{- include "thermodynasty-ace.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.models.accessMode }}
+  {{- if .Values.persistence.models.storageClass }}
+  storageClassName: {{ .Values.persistence.models.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.models.size }}
+{{- end }}
+---
+{{- if and .Values.persistence.pyramids.enabled (not .Values.persistence.pyramids.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "thermodynasty-ace.fullname" . }}-pyramids
+  labels:
+    {{- include "thermodynasty-ace.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.pyramids.accessMode }}
+  {{- if .Values.persistence.pyramids.storageClass }}
+  storageClassName: {{ .Values.persistence.pyramids.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.pyramids.size }}
+{{- end }}
