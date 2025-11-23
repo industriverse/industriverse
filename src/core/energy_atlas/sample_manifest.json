@@ -1,0 +1,47 @@
+{
+    "version": "1.0",
+    "nodes": [
+        {
+            "node_id": "gpu_h100_01",
+            "node_type": "gpu",
+            "electrical": {
+                "capacitance_gate": 1.5e-9,
+                "capacitance_wire": 2.0e-9,
+                "capacitance_fringe": 0.5e-9,
+                "voltage_min": 0.7,
+                "voltage_max": 1.2,
+                "leakage_current_base": 0.05,
+                "thermal_resistance": 0.15
+            },
+            "location": {
+                "rack": 1,
+                "u": 10
+            },
+            "metadata": {
+                "vendor": "NVIDIA",
+                "model": "H100"
+            }
+        },
+        {
+            "node_id": "tpu_v5_01",
+            "node_type": "tpu",
+            "electrical": {
+                "capacitance_gate": 1.2e-9,
+                "capacitance_wire": 1.8e-9,
+                "capacitance_fringe": 0.4e-9,
+                "voltage_min": 0.6,
+                "voltage_max": 1.1,
+                "leakage_current_base": 0.04,
+                "thermal_resistance": 0.18
+            },
+            "location": {
+                "rack": 2,
+                "u": 12
+            },
+            "metadata": {
+                "vendor": "Google",
+                "model": "TPUv5"
+            }
+        }
+    ]
+}

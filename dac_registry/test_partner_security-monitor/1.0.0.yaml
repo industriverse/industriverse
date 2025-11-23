@@ -1,0 +1,43 @@
+name: security-monitor
+version: 1.0.0
+description: Security Monitoring DAC
+partner_id: test_partner
+tier: security-essentials
+target_environments:
+- kubernetes
+resources:
+  cpu_cores: 1.0
+  memory_gb: 1.0
+  storage_gb: 50.0
+  gpu_required: false
+  gpu_memory_gb: null
+network:
+  requires_internet: true
+  ingress_ports:
+  - 8080
+  egress_allowed: true
+  api_endpoint: https://api.industriverse.ai
+security:
+  requires_tls: true
+  api_key_required: true
+  client_cert_required: false
+  allowed_origins: []
+  rate_limit_per_minute: 1000
+widgets:
+- widget_type: ai-shield-dashboard
+  enabled: true
+  refresh_interval_ms: 5000
+  enable_animations: true
+  enable_websocket: true
+  custom_features: {}
+theme:
+  theme_base: cosmic
+  custom_colors: null
+  logo_url: null
+  brand_name: null
+  custom_domain: null
+features: {}
+integration_points: {}
+created_at: null
+updated_at: null
+deployed_at: null

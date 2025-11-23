@@ -7,7 +7,7 @@ and manage their white-label deployments.
 
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
-from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi import APIRouter, HTTPException, Depends, Header
 from pydantic import BaseModel, Field
 import json
 from pathlib import Path
@@ -74,15 +74,14 @@ def get_partner_from_api_key(api_key: str = Header(..., alias="X-API-Key")) -> P
     return partner
 
 
-# Create FastAPI app
-app = FastAPI(
-    title="Industriverse Partner Configuration API",
-    description="White-label configuration and management API for partners",
-    version="2.0.0"
+# Create APIRouter
+router = APIRouter(
+    tags=["Partner Configuration"],
+    responses={404: {"description": "Not found"}},
 )
 
 
-@app.get("/")
+@router.get("/")
 async def root():
     """API root"""
     return {
@@ -92,7 +91,7 @@ async def root():
     }
 
 
-@app.get("/partner/info")
+@router.get("/partner/info")
 async def get_partner_info(partner: Partner = Depends(get_partner_from_api_key)):
     """Get partner account information"""
     return {
@@ -106,7 +105,7 @@ async def get_partner_info(partner: Partner = Depends(get_partner_from_api_key))
     }
 
 
-@app.get("/partner/dashboard")
+@router.get("/partner/dashboard")
 async def get_dashboard(partner: Partner = Depends(get_partner_from_api_key)) -> PartnerDashboardResponse:
     """Get partner dashboard summary"""
     analytics = get_analytics_tracker()
@@ -128,7 +127,7 @@ async def get_dashboard(partner: Partner = Depends(get_partner_from_api_key)) ->
     )
 
 
-@app.get("/partner/analytics")
+@router.get("/partner/analytics")
 async def get_analytics(
     days: int = 30,
     granularity: str = "day",
@@ -160,7 +159,7 @@ async def get_analytics(
     }
 
 
-@app.post("/theme/customize")
+@router.post("/theme/customize")
 async def customize_theme(
     request: ThemeCustomizationRequest,
     partner: Partner = Depends(get_partner_from_api_key)
@@ -214,7 +213,7 @@ async def customize_theme(
     }
 
 
-@app.get("/theme/current")
+@router.get("/theme/current")
 async def get_current_theme(partner: Partner = Depends(get_partner_from_api_key)):
     """Get current theme configuration"""
     if not partner.custom_branding:
@@ -229,7 +228,7 @@ async def get_current_theme(partner: Partner = Depends(get_partner_from_api_key)
     return partner.custom_branding
 
 
-@app.get("/widgets/available")
+@router.get("/widgets/available")
 async def list_available_widgets(partner: Partner = Depends(get_partner_from_api_key)):
     """List widgets available for partner's tier"""
     # All widgets
@@ -313,7 +312,7 @@ async def list_available_widgets(partner: Partner = Depends(get_partner_from_api
     }
 
 
-@app.post("/dac/configure")
+@router.post("/dac/configure")
 async def configure_dac(
     request: DACConfigurationRequest,
     partner: Partner = Depends(get_partner_from_api_key)
@@ -408,7 +407,7 @@ async def configure_dac(
     }
 
 
-@app.get("/dac/list")
+@router.get("/dac/list")
 async def list_dacs(partner: Partner = Depends(get_partner_from_api_key)):
     """List partner's DACs"""
     from ..dac import get_dac_registry
@@ -433,7 +432,7 @@ async def list_dacs(partner: Partner = Depends(get_partner_from_api_key)):
     }
 
 
-@app.get("/dac/{dac_id}/manifest")
+@router.get("/dac/{dac_id}/manifest")
 async def get_dac_manifest(
     dac_id: str,
     version: Optional[str] = None,
@@ -455,7 +454,7 @@ async def get_dac_manifest(
     return manifest.to_dict()
 
 
-@app.get("/billing/current")
+@router.get("/billing/current")
 async def get_current_billing(partner: Partner = Depends(get_partner_from_api_key)):
     """Get current billing information"""
     if not partner.billing:
@@ -475,7 +474,7 @@ async def get_current_billing(partner: Partner = Depends(get_partner_from_api_ke
     }
 
 
-@app.get("/billing/invoice/preview")
+@router.get("/billing/invoice/preview")
 async def preview_invoice(partner: Partner = Depends(get_partner_from_api_key)):
     """Preview next invoice"""
     from datetime import datetime, timedelta
@@ -501,12 +500,7 @@ async def preview_invoice(partner: Partner = Depends(get_partner_from_api_key)):
 
 # Error handlers
 
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request, exc):
-    return {
-        "error": exc.detail,
-        "status_code": exc.status_code
-    }
+# Error handlers - Handled by main app
 
 
 # Run with: uvicorn configuration_api:app --reload

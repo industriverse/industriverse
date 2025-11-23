@@ -34,7 +34,7 @@ from .analytics import (
     get_analytics_tracker,
 )
 
-from .configuration_api import app as config_api_app
+from .configuration_api import router as config_api_router
 
 __all__ = [
     # Partner Management
@@ -57,5 +57,5 @@ __all__ = [
     "get_analytics_tracker",
 
     # API
-    "config_api_app",
+    "config_api_router",
 ]

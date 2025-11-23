@@ -52,7 +52,7 @@ from .partner_portal import (
     AnalyticsTracker,
     get_partner_manager,
     get_analytics_tracker,
-    config_api_app,
+    config_api_router,
 )
 
 from .i3 import (
@@ -112,7 +112,7 @@ __all__ = [
     "AnalyticsTracker",
     "get_partner_manager",
     "get_analytics_tracker",
-    "config_api_app",
+    "config_api_router",
 
     # I³ Intelligence Layer
     "RDREngine",

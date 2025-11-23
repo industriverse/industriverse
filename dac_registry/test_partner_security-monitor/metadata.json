@@ -1,0 +1,21 @@
+{
+  "dac_id": "test_partner:security-monitor",
+  "name": "security-monitor",
+  "partner_id": "test_partner",
+  "tier": "security-essentials",
+  "description": "Security Monitoring DAC",
+  "latest_version": "1.0.0",
+  "created_at": "2025-11-22T05:22:31.264755",
+  "updated_at": "2025-11-22T05:22:31.265434",
+  "total_deployments": 0,
+  "active_deployments": 0,
+  "versions": [
+    {
+      "version": "1.0.0",
+      "checksum": "e525725aefec713712151c533f9f68a37f46f1b4b71c4abed0f33d1e3b4a4011",
+      "created_at": "2025-11-22T05:22:31.265432",
+      "deprecated": false,
+      "deprecation_reason": null
+    }
+  ]
+}

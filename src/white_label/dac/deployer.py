@@ -139,17 +139,22 @@ stringData:
   api_endpoint: "{self.manifest.network.api_endpoint}"
 
 ---
-# Deployment
-apiVersion: apps/v1
-kind: Deployment
+# ProofedDeployment (KaaS Operator Resource)
+apiVersion: infra.industriverse.ai/v1
+kind: ProofedDeployment
 metadata:
   name: {app_name}
   namespace: {namespace}
 spec:
-  replicas: {3 if self.manifest.tier == 'full-discovery' else 2 if self.manifest.tier == 'domain-intelligence' else 1}
-  selector:
-    matchLabels:
-      app: {app_name}
+  # KaaS Operator Policies
+  proofPolicy:
+    required: true
+    proofTypes: ["utid", "entropy"]
+  utidBinding:
+    type: {"'hardware-bound'" if self.manifest.tier == 'full-discovery' else "'soft'"}
+  prewarm: {str(self.manifest.tier == 'full-discovery').lower()}
+  
+  # Standard Pod Template
   template:
     metadata:
       labels:
