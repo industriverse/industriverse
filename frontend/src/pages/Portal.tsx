@@ -8,6 +8,7 @@ import { ProofWidget } from "@/components/ProofWidget";
 import { ShieldWidget } from "@/components/ShieldWidget";
 import { ProofDAG } from "@/components/ProofDAG";
 import { ShieldMetrics } from "@/components/ShieldMetrics";
+import { ProofLineage } from "@/components/ProofLineage";
 
 export default function Portal() {
     const { data: energyMap, isLoading } = useEnergyMap();
@@ -100,6 +101,9 @@ export default function Portal() {
                 </div>
                 <div className="mt-4">
                     <ShieldMetrics />
+                </div>
+                <div className="mt-4">
+                    <ProofLineage />
                 </div>
             </div>
 

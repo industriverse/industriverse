@@ -19,6 +19,8 @@ class ShieldState:
         self.state["last_event_ts"] = time.time()
         if metrics:
             self.state["metrics"] = metrics
+        if status == "quarantine":
+            self.state["metrics"]["quarantine"] = True
         return self.state
 
     def get(self):

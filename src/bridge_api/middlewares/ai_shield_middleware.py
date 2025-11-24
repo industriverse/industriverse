@@ -6,6 +6,7 @@ from ..event_bus import GlobalEventBus
 from src.core.energy_atlas.atlas_core import EnergyAtlas
 import logging
 from src.bridge_api.ai_shield.policy import should_quarantine, should_throttle
+from src.bridge_api.ai_shield.actions import quarantine_response, throttle_response
 
 class AIShieldMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
@@ -42,7 +43,7 @@ class AIShieldMiddleware(BaseHTTPMiddleware):
                 "energy": total_power,
             }
             await GlobalEventBus.publish(event)
-            return JSONResponse(status_code=429, content={"detail": "Thermodynamic Throttling: System Temperature Critical"})
+            return throttle_response("Thermodynamic Throttling", {"energy": total_power})
         
         # 2. Policy Safety Check (Mock)
         # Check for unsafe keywords in query params or headers
@@ -63,7 +64,8 @@ class AIShieldMiddleware(BaseHTTPMiddleware):
         if is_unsafe:
              return JSONResponse(status_code=400, content={"detail": "AI Shield: Request blocked by Policy Safety Layer"})
         if should_quarantine(event.get("threat_score")):
-            return JSONResponse(status_code=403, content={"detail": "AI Shield: Quarantine engaged"})
+            await GlobalEventBus.publish({"type": "quarantine", "reason": "threat_score", "score": event.get("threat_score")})
+            return quarantine_response("Threat score exceeded", {"score": event.get("threat_score")})
         
         response = await call_next(request)
         
