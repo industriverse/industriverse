@@ -39,7 +39,7 @@ class ProofMiddleware(BaseHTTPMiddleware):
             entropy = request.headers.get("X-Entropy")
             if energy is None:
                 from src.bridge_api.telemetry.thermo import thermo_metrics
-                metrics = thermo_metrics.current_metrics()
+                metrics = thermo_metrics.live_metrics()
                 energy = metrics.get("total_power_watts")
                 entropy = metrics.get("system_entropy")
             metadata = {}

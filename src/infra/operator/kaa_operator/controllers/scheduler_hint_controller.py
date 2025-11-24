@@ -18,6 +18,8 @@ def add_scheduler_hints(body, patch, **kwargs):
             score = float(proof_score)
             if score >= 0.8:
                 labels["priority"] = "high-proof"
+                patch.spec.template.spec = patch.spec.template.spec or {}
+                patch.spec.template.spec["priorityClassName"] = "proof-high-priority"
             elif score >= 0.5:
                 labels["priority"] = "medium-proof"
             else:

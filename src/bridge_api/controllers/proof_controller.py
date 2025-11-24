@@ -106,6 +106,8 @@ async def verify_proof(request: ProofVerifyRequest):
     await mesh_gossip.disseminate(items[0].__dict__ if hasattr(items[0], "__dict__") else {})
     if hasattr(repository, "update_status"):
         repository.update_status(proof_id, status="verified", anchors=anchors, extra={"proof_score": proof_score, "proof_hash": validation_hash})
+        # Optional lifecycle advance to validated
+        repository.lifecycle_transition(proof_id, "validated") if hasattr(repository, "lifecycle_transition") else None
     return {
         "status": "verified",
         "valid": True,
@@ -148,6 +150,7 @@ async def list_proofs(
     anchor_tx: Optional[str] = Query(None),
     evidence_contains: Optional[str] = Query(None),
     min_score: Optional[float] = Query(None),
+    parent_proof_id: Optional[str] = Query(None),
     limit: int = Query(50, le=200),
     offset: int = Query(0, ge=0),
 ):
@@ -161,7 +164,7 @@ async def list_proofs(
         anchor_chain=anchor_chain,
         anchor_tx=anchor_tx,
         evidence_contains=evidence_contains,
-        parent_proof_id=None,
+        parent_proof_id=parent_proof_id,
         limit=limit,
         offset=offset,
     )

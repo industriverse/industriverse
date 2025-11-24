@@ -170,8 +170,9 @@ class SQLiteProofRepository:
         """
         Simple lifecycle: queued -> processing -> verified -> validated
         """
-        valid = ["queued", "processing", "verified", "validated"]
-        if target_status not in valid:
+        from src.proof_core.proof_hub.lifecycle import LIFECYCLE_STATES
+
+        if target_status not in LIFECYCLE_STATES:
             return False
         return self.update_status(proof_id, status=target_status)
 

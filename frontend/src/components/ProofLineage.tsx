@@ -16,10 +16,12 @@ export function ProofLineage() {
   const [nodes, setNodes] = useState<ProofNode[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [edges, setEdges] = useState<ProofEdge[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProofs = async () => {
       try {
+        setLoading(true);
         const resp = await fetch("/v1/proofs?limit=20");
         if (!resp.ok) throw new Error("Failed to load proofs");
         const data = await resp.json();
@@ -36,6 +38,8 @@ export function ProofLineage() {
         }
       } catch (e: any) {
         setError(e.message);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProofs();
@@ -48,6 +52,7 @@ export function ProofLineage() {
         {error && <span className="text-xs text-red-400">{error}</span>}
       </div>
       <div className="text-xs space-y-2">
+        {loading && <div className="text-muted-foreground">Loading...</div>}
         {nodes.map((n) => (
           <div key={n.id} className="border border-border/50 rounded p-2">
             <div className="font-mono">{n.id}</div>

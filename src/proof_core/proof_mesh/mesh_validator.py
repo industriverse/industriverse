@@ -16,8 +16,11 @@ class ProofMeshValidator:
 
     def _compute_score(self, proof: Dict[str, Any]) -> float:
         base = 0.5
+        meta = proof.get("metadata", {})
         if proof.get("utid"):
             base += 0.2
-        if proof.get("anchors"):
+        if meta.get("anchors"):
             base += 0.2
+        if meta.get("proof_hash"):
+            base += 0.05
         return min(base, 1.0)

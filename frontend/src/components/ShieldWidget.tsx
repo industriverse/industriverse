@@ -45,6 +45,7 @@ export function ShieldWidget() {
             ))}
           </div>
         )}
+        {!shield && !error && <div className="text-muted-foreground">Loading shield state...</div>}
       </div>
     </div>
   );

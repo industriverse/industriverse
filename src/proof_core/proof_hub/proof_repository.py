@@ -55,6 +55,7 @@ class ProofRepository:
         anchor_chain: Optional[str] = None,
         anchor_tx: Optional[str] = None,
         evidence_contains: Optional[str] = None,
+        parent_proof_id: Optional[str] = None,
         limit: int = 50,
         offset: int = 0,
     ) -> List[StoredProof]:
@@ -69,6 +70,7 @@ class ProofRepository:
                 and (anchor_chain is None or any(a.get("chain") == anchor_chain for a in item.metadata.get("anchors", [])))
                 and (anchor_tx is None or any(a.get("tx") == anchor_tx for a in item.metadata.get("anchors", [])))
                 and (evidence_contains is None or (item.metadata.get("evidence") and evidence_contains in str(item.metadata.get("evidence"))))
+                and (parent_proof_id is None or item.metadata.get("parent_proof_id") == parent_proof_id)
                 and self._energy_in_range(item, min_energy, max_energy)
             ]
             return filtered[offset : offset + limit]

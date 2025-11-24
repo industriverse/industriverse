@@ -26,6 +26,7 @@ export function ProofWidget() {
         setProofs(data);
       } catch (e: any) {
         setError(e.message);
+        setProofs(fallbackProofs);
       }
     };
     fetchProofs();

@@ -2,6 +2,7 @@ import os
 from typing import Dict, Any
 
 from src.core.energy_atlas.atlas_core import EnergyAtlas
+from src.core.energy_atlas.hardware_loader import HardwareLoader
 
 
 class ThermoMetrics:
@@ -12,6 +13,7 @@ class ThermoMetrics:
     def __init__(self, manifest_path: str = "src/core/energy_atlas/sample_manifest.json"):
         self.manifest_path = os.environ.get("ENERGY_ATLAS_MANIFEST", manifest_path)
         self.atlas = EnergyAtlas(use_mock=True)
+        self.loader = HardwareLoader()
         try:
             self.atlas.load_manifest(self.manifest_path)
         except Exception:
@@ -47,6 +49,16 @@ class ThermoMetrics:
             return node
         except Exception:
             return {}
+
+    def live_metrics(self) -> Dict[str, Any]:
+        """
+        Simulate live telemetry by reloading manifest; in production, pull from real sensors.
+        """
+        try:
+            self.atlas.load_manifest(self.manifest_path)
+            return self.current_metrics()
+        except Exception:
+            return self.current_metrics()
 
 
 thermo_metrics = ThermoMetrics()
