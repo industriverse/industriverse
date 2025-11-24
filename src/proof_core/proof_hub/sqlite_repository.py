@@ -162,6 +162,15 @@ class SQLiteProofRepository:
             conn.commit()
         return True
 
+    def lifecycle_transition(self, proof_id: str, target_status: str) -> bool:
+        """
+        Simple lifecycle: queued -> processing -> verified -> validated
+        """
+        valid = ["queued", "processing", "verified", "validated"]
+        if target_status not in valid:
+            return False
+        return self.update_status(proof_id, status=target_status)
+
     def _energy_in_range(self, metadata: Dict[str, Any], min_energy: Optional[float], max_energy: Optional[float]) -> bool:
         if min_energy is None and max_energy is None:
             return True

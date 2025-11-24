@@ -6,11 +6,15 @@ import time
 
 from src.proof_core.integrity_layer.integrity_manager import IntegrityManager
 from src.proof_core.proof_mesh.mesh_validator import ProofMeshValidator
+from src.proof_core.proof_mesh.mesh_gossip import MeshGossip
+from src.proof_core.proof_economy.proofscore import compute_proof_score
+from src.proof_core.proof_hub.sqlite_repository import SQLiteProofRepository
 
 router = APIRouter(prefix="/v1/proofs", tags=["proofs"])
 manager = IntegrityManager()
 repository = manager.repository
 mesh_validator = ProofMeshValidator()
+mesh_gossip = MeshGossip(node_id="bridge_api_node")
 
 class ProofRequest(BaseModel):
     title: str
@@ -95,6 +99,8 @@ async def verify_proof(request: ProofVerifyRequest):
     proof_score = mesh_result.get("proof_score")
     validation_hash = mesh_result.get("proof_hash")
     anchors = mesh_result.get("anchors") or [{"chain": "local", "tx": validation_hash, "time": time.time()}]
+    # Disseminate to mesh (stub)
+    await mesh_gossip.disseminate(items[0].__dict__ if hasattr(items[0], "__dict__") else {})
     if hasattr(repository, "update_status"):
         repository.update_status(proof_id, status="verified", anchors=anchors, extra={"proof_score": proof_score, "proof_hash": validation_hash})
     return {
@@ -138,6 +144,7 @@ async def list_proofs(
     anchor_chain: Optional[str] = Query(None),
     anchor_tx: Optional[str] = Query(None),
     evidence_contains: Optional[str] = Query(None),
+    min_score: Optional[float] = Query(None),
     limit: int = Query(50, le=200),
     offset: int = Query(0, ge=0),
 ):

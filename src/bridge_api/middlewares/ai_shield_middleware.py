@@ -5,6 +5,7 @@ import time
 from ..event_bus import GlobalEventBus
 from src.core.energy_atlas.atlas_core import EnergyAtlas
 import logging
+from src.bridge_api.ai_shield.policy import should_quarantine, should_throttle
 
 class AIShieldMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
@@ -24,10 +25,12 @@ class AIShieldMiddleware(BaseHTTPMiddleware):
         # Mock check: if any node > 95C, block
         # In reality, we'd check thermal headroom
         is_overheated = False
-        # For demo, we assume safe unless "overheat" is in URL
+        # For demo, we assume safe unless "overheat" is in URL or throttle policy triggers
         if "overheat" in str(request.url):
             is_overheated = True
-            
+        total_power = sum([node.get("electrical", {}).get("total_capacitance", 0) for node in energy_map.get("nodes", {}).values()])
+        if should_throttle(total_power):
+            is_overheated = True
         if is_overheated:
             event = {
                 "type": "thermodynamic_throttle",
@@ -35,7 +38,8 @@ class AIShieldMiddleware(BaseHTTPMiddleware):
                 "method": request.method,
                 "url": str(request.url),
                 "status": "blocked",
-                "reason": "System Overheated"
+                "reason": "System Overheated or Energy Budget Exceeded",
+                "energy": total_power,
             }
             await GlobalEventBus.publish(event)
             return JSONResponse(status_code=429, content={"detail": "Thermodynamic Throttling: System Temperature Critical"})
@@ -58,6 +62,8 @@ class AIShieldMiddleware(BaseHTTPMiddleware):
 
         if is_unsafe:
              return JSONResponse(status_code=400, content={"detail": "AI Shield: Request blocked by Policy Safety Layer"})
+        if should_quarantine(event.get("threat_score")):
+            return JSONResponse(status_code=403, content={"detail": "AI Shield: Quarantine engaged"})
         
         response = await call_next(request)
         

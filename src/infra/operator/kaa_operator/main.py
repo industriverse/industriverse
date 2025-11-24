@@ -4,6 +4,7 @@ import asyncio
 import src.infra.operator.kaa_operator.controllers.deployment_controller
 import src.infra.operator.kaa_operator.controllers.proofscore_controller
 import src.infra.operator.kaa_operator.controllers.admission_controller
+import src.infra.operator.kaa_operator.controllers.job_mutation_example
 
 if __name__ == "__main__":
     # This entry point allows running the operator via `python -m src.infra.operator.kaa_operator.main`

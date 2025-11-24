@@ -40,5 +40,13 @@ class ThermoMetrics:
                 "node_count": 0,
             }
 
+    def summarize_node(self, node_id: str) -> Dict[str, Any]:
+        try:
+            energy_map = self.atlas.get_energy_map()
+            node = energy_map.get("nodes", {}).get(node_id, {})
+            return node
+        except Exception:
+            return {}
+
 
 thermo_metrics = ThermoMetrics()

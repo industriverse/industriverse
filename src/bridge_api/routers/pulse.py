@@ -4,6 +4,9 @@ import asyncio
 import json
 import random
 from datetime import datetime
+from typing import Callable
+from src.bridge_api.ai_shield.state import shield_state
+from src.bridge_api.telemetry.thermo import thermo_metrics
 
 router = APIRouter(tags=["pulse"])
 
@@ -42,14 +45,12 @@ async def pulse_websocket(websocket: WebSocket):
                 }
             }
             try:
-                from src.bridge_api.telemetry.thermo import thermo_metrics
                 metrics = thermo_metrics.current_metrics()
                 heartbeat["metrics"].update(metrics)
             except Exception:
                 pass
             await websocket.send_json(heartbeat)
             # Send current shield state snapshot
-            from src.bridge_api.ai_shield.state import shield_state
             await websocket.send_json({"type": "shield_state", **shield_state.get()})
             await asyncio.sleep(1.0)
             

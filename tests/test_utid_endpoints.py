@@ -12,7 +12,7 @@ def test_utid_generate_and_verify():
     utid = gen_resp.json()["utid"]
     parts = utid.split(":")
     assert parts[0:2] == ["UTID", "REAL"]
-    assert len(parts) == 6
+    assert len(parts) == 7  # includes attest signature
     assert parts[3].isdigit()
 
     verify_resp = client.post("/v1/utid/verify", json={"utid": utid})

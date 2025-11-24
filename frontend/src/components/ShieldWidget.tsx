@@ -4,6 +4,7 @@ type ShieldState = {
   status: string;
   last_event_ts: number;
   metrics?: Record<string, any>;
+  energy?: number;
 };
 
 export function ShieldWidget() {

@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from src.core_ai_layer.ace.playbook_manager import PlaybookManager
 from src.core_ai_layer.ace.memory_logger import ACEMemoryLogger
 from src.core_ai_layer.tumix.service import TUMIXService
+from src.proof_core.integrity_layer import record_reasoning_edge
 
 class UserLMService:
     """
@@ -19,7 +20,7 @@ class UserLMService:
         self.memory_logger = ACEMemoryLogger()
         self.tumix_service = TUMIXService()
 
-    async def generate_turn_stream(self, intent: str, history: list, persona: dict) -> AsyncGenerator[str, None]:
+    async def generate_turn_stream(self, intent: str, history: list, persona: dict, utid: str = "UTID:REAL:unknown") -> AsyncGenerator[str, None]:
         """
         Generates a User turn, streaming the output token by token.
         Uses ACE Playbooks to inform the response.
@@ -41,7 +42,8 @@ class UserLMService:
         if "create" in intent.lower() or "optimize" in intent.lower():
             consensus = await self.tumix_service.request_consensus(
                 intent_id="temp-id",
-                proposal=intent
+                proposal=intent,
+                context={"utid": utid}
             )
             if consensus.final_decision == "rejected":
                 tumix_note = f"[TUMIX WARNING: Proposal rejected due to {consensus.synthesis}]"
@@ -75,6 +77,15 @@ class UserLMService:
                 
             # 3. Log Output
             await self.memory_logger.log_event("user_turn_end", {"response_length": len(response_text)})
+            # Emit proof edge
+            await record_reasoning_edge(
+                utid=utid,
+                domain="userlm_turn",
+                node_id="userlm_service",
+                inputs={"intent": intent, "persona": persona},
+                outputs={"response_length": len(response_text), "tumix": tumix_note},
+                metadata={"status": "completed"},
+            )
                 
         except Exception as e:
             yield f" [ERROR: {str(e)}]"

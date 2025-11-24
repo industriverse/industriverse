@@ -17,6 +17,7 @@ class NanochatSwarm:
         """
         Aggregate threat scores from all agents.
         """
-        scores = [a.analyze(context) for a in self.agents]
-        avg_score = sum(scores) / len(scores)
+        utid = context.get("utid", "UTID:REAL:unknown")
+        scores = [a.analyze_with_proof(context, utid=utid) for a in self.agents]
+        avg_score = sum(scores) / len(scores) if scores else 0.0
         return avg_score

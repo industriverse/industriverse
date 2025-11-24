@@ -6,6 +6,7 @@ from hashlib import sha256
 from typing import Any, Dict, Optional
 import socket
 import json
+from src.proof_core.utid.hw_attestor import HardwareAttestor
 
 
 class UTIDGenerator:
@@ -20,6 +21,7 @@ class UTIDGenerator:
         self.secret = (secret or os.environ.get("UTID_SECRET") or "dev-utid-secret").encode()
         self.host_id = self._host_fingerprint()
         self.attest_token = os.environ.get("UTID_ATTEST_TOKEN", "")
+        self.attestor = HardwareAttestor()
 
     def generate(self, context: Optional[Dict[str, Any]] = None) -> str:
         """
@@ -32,7 +34,8 @@ class UTIDGenerator:
         ctx_digest = self._context_digest(context) if context else "none"
         payload = f"{nonce}:{issued_at}:{ctx_digest}:{self.host_id}:{self.attest_token}"
         signature = hmac.new(self.secret, payload.encode(), sha256).hexdigest()[:16]
-        return f"UTID:REAL:{nonce}:{issued_at}:{ctx_digest}:{signature}"
+        attest_sig = self.attestor.sign(payload)
+        return f"UTID:REAL:{nonce}:{issued_at}:{ctx_digest}:{signature}:{attest_sig}"
 
     def _context_digest(self, context: Dict[str, Any]) -> str:
         """

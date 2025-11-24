@@ -6,6 +6,8 @@ import { ArrowRight, Activity, Zap, Globe, Database, Shield } from 'lucide-react
 import { useEnergyMap } from "@/api/thermodynamic";
 import { ProofWidget } from "@/components/ProofWidget";
 import { ShieldWidget } from "@/components/ShieldWidget";
+import { ProofDAG } from "@/components/ProofDAG";
+import { ShieldMetrics } from "@/components/ShieldMetrics";
 
 export default function Portal() {
     const { data: energyMap, isLoading } = useEnergyMap();
@@ -92,6 +94,12 @@ export default function Portal() {
                 <ProofWidget />
                 <div className="mt-4">
                     <ShieldWidget />
+                </div>
+                <div className="mt-4">
+                    <ProofDAG />
+                </div>
+                <div className="mt-4">
+                    <ShieldMetrics />
                 </div>
             </div>
 
