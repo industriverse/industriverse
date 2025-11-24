@@ -56,81 +56,117 @@
   /* Semantic Mappings */
   --primary: var(--color-quantum-teal);
   --primary-foreground: var(--color-void-blue);
-  
+
   --secondary: var(--color-deep-space);
-  --secondary-foreground: var(--color-quantum-teal);
-  
-  --destructive: var(--color-plasma-pink);
-  --destructive-foreground: var(--color-supernova-white);
-  
-  --background: var(--color-void-blue);
-  --foreground: var(--color-supernova-white);
-  
-  --card: var(--color-glass-bg);
-  --card-foreground: var(--color-supernova-white);
-  
-  --popover: var(--color-deep-space);
-  --popover-foreground: var(--color-supernova-white);
-  
-  --muted: rgba(255, 255, 255, 0.05);
-  --muted-foreground: rgba(255, 255, 255, 0.5);
-  
-  --accent: rgba(0, 240, 255, 0.1);
-  --accent-foreground: var(--color-quantum-teal);
-  
-  --border: var(--color-glass-border);
-  --input: rgba(255, 255, 255, 0.1);
-  --ring: var(--color-quantum-teal);
-  
-  --radius: 0.5rem;
-}
 
-.dark {
-  /* Dark mode is the default/only mode for Thermodynamic Interface */
-  --background: var(--color-void-blue);
-  --foreground: var(--color-supernova-white);
-}
+  @layer base {
+    :root {
+      /* Dyson Sphere Theme - Dark Mode Default */
+      --background: 240 10% 3.9%;
+      /* #0a0a0a */
+      --foreground: 0 0% 98%;
 
-@layer utilities {
-  .glass-panel {
-    @apply bg-card/60 backdrop-blur-md border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)];
-  }
-  
-  .glass-panel-hover {
-    @apply hover:bg-card/80 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all duration-300;
-  }
-  
-  .text-glow {
-    text-shadow: 0 0 10px currentColor;
-  }
-  
-  .border-glow {
-    box-shadow: 0 0 10px var(--color-quantum-teal);
-  }
-}
+      --card: 240 10% 3.9%;
+      --card-foreground: 0 0% 98%;
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  button:not(:disabled),
-  [role="button"]:not([aria-disabled="true"]),
-  [type="button"]:not(:disabled),
-  [type="submit"]:not(:disabled),
-  [type="reset"]:not(:disabled),
-  a[href],
-  select:not(:disabled),
-  input[type="checkbox"]:not(:disabled),
-  input[type="radio"]:not(:disabled) {
-    @apply cursor-pointer;
-  }
-}
+      --popover: 240 10% 3.9%;
+      --popover-foreground: 0 0% 98%;
 
-@layer components {
-  /**
+      --primary: 346 87% 43%;
+      /* Plasma Red ish */
+      --primary-foreground: 0 0% 98%;
+
+      --secondary: 240 3.7% 15.9%;
+      --secondary-foreground: 0 0% 98%;
+
+      --muted: 240 3.7% 15.9%;
+      --muted-foreground: 240 5% 64.9%;
+
+      --accent: 45 100% 50%;
+      /* Amber/Gold */
+      --accent-foreground: 240 5.9% 10%;
+
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 0 0% 98%;
+
+      --border: 240 3.7% 15.9%;
+      --input: 240 3.7% 15.9%;
+      --ring: 346 87% 43%;
+
+      --radius: 0.5rem;
+
+      /* Custom Dyson Variables */
+      --dyson-plasma: #FF3333;
+      --dyson-amber: #FFB300;
+    }
+
+    .dark {
+      --background: 240 10% 3.9%;
+      --foreground: 0 0% 98%;
+      --card: 240 10% 3.9%;
+      --card-foreground: 0 0% 98%;
+      --popover: 240 10% 3.9%;
+      --popover-foreground: 0 0% 98%;
+      --primary: 0 0% 98%;
+      --primary-foreground: 240 5.9% 10%;
+      --secondary: 240 3.7% 15.9%;
+      --secondary-foreground: 0 0% 98%;
+      --muted: 240 3.7% 15.9%;
+      --muted-foreground: 240 5% 64.9%;
+      --accent: 240 3.7% 15.9%;
+      --accent-foreground: 0 0% 98%;
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 0 0% 98%;
+      --border: 240 3.7% 15.9%;
+      --input: 240 3.7% 15.9%;
+      --ring: 240 4.9% 83.9%;
+    }
+  }
+
+  @layer utilities {
+    .glass-panel {
+      @apply bg-card/60 backdrop-blur-md border border-white/10 shadow-[0_0_15px_rgba(0, 0, 0, 0.5)];
+    }
+
+    .glass-panel-hover {
+      @apply hover:bg-card/80 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(0, 240, 255, 0.2)] transition-all duration-300;
+    }
+
+    .text-glow {
+      text-shadow: 0 0 10px currentColor;
+    }
+
+    .border-glow {
+      box-shadow: 0 0 10px var(--color-quantum-teal);
+    }
+  }
+
+  @layer base {
+    * {
+      @apply border-border outline-ring/50;
+    }
+
+    body {
+      @apply bg-background text-foreground;
+      background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
+    }
+
+    button:not(:disabled),
+    [role="button"]:not([aria-disabled="true"]),
+    [type="button"]:not(:disabled),
+    [type="submit"]:not(:disabled),
+    [type="reset"]:not(:disabled),
+    a[href],
+    select:not(:disabled),
+    input[type="checkbox"]:not(:disabled),
+    input[type="radio"]:not(:disabled) {
+      @apply cursor-pointer;
+    }
+  }
+
+  @layer components {
+
+    /**
    * Custom container utility that centers content and adds responsive padding.
    *
    * This overrides Tailwind's default container behavior to:
@@ -143,31 +179,36 @@
    * For custom widths, use max-w-* utilities directly:
    * <div className="max-w-6xl mx-auto px-4">...</div>
    */
-  .container {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 1rem; /* 16px - mobile padding */
-    padding-right: 1rem;
-  }
-
-  .flex {
-    min-height: 0;
-    min-width: 0;
-  }
-
-  @media (min-width: 640px) {
     .container {
-      padding-left: 1.5rem; /* 24px - tablet padding */
-      padding-right: 1.5rem;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1rem;
+      /* 16px - mobile padding */
+      padding-right: 1rem;
     }
-  }
 
-  @media (min-width: 1024px) {
-    .container {
-      padding-left: 2rem; /* 32px - desktop padding */
-      padding-right: 2rem;
-      max-width: 1280px; /* Standard content width */
+    .flex {
+      min-height: 0;
+      min-width: 0;
+    }
+
+    @media (min-width: 640px) {
+      .container {
+        padding-left: 1.5rem;
+        /* 24px - tablet padding */
+        padding-right: 1.5rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .container {
+        padding-left: 2rem;
+        /* 32px - desktop padding */
+        padding-right: 2rem;
+        max-width: 1280px;
+        /* Standard content width */
+      }
     }
   }
 }
