@@ -80,6 +80,7 @@ class SQLiteProofRepository:
         anchor_chain: Optional[str] = None,
         anchor_tx: Optional[str] = None,
         evidence_contains: Optional[str] = None,
+        parent_proof_id: Optional[str] = None,
     ) -> List[StoredProof]:
         clauses = []
         params: List[Any] = []
@@ -116,6 +117,9 @@ class SQLiteProofRepository:
                         continue
                 if evidence_contains is not None:
                     if evidence_contains not in str(metadata.get("evidence", "")):
+                        continue
+                if parent_proof_id is not None:
+                    if metadata.get("parent_proof_id") != parent_proof_id:
                         continue
                 items.append(
                     StoredProof(

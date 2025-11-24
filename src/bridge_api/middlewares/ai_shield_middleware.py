@@ -5,8 +5,9 @@ import time
 from ..event_bus import GlobalEventBus
 from src.core.energy_atlas.atlas_core import EnergyAtlas
 import logging
-from src.bridge_api.ai_shield.policy import should_quarantine, should_throttle
+from src.bridge_api.ai_shield.policy import should_quarantine, should_throttle, entropy_alert
 from src.bridge_api.ai_shield.actions import quarantine_response, throttle_response
+from src.bridge_api.ai_shield.entropy_tracker import EntropyTracker
 
 class AIShieldMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
@@ -16,6 +17,7 @@ class AIShieldMiddleware(BaseHTTPMiddleware):
             self.energy_atlas.load_manifest("src/core/energy_atlas/sample_manifest.json")
         except Exception as e:
             logging.warning(f"Could not load sample manifest: {e}")
+        self.entropy_tracker = EntropyTracker()
 
     async def dispatch(self, request: Request, call_next):
         start_time = time.time()
@@ -30,7 +32,9 @@ class AIShieldMiddleware(BaseHTTPMiddleware):
         if "overheat" in str(request.url):
             is_overheated = True
         total_power = sum([node.get("electrical", {}).get("total_capacitance", 0) for node in energy_map.get("nodes", {}).values()])
-        if should_throttle(total_power):
+        entropy = sum([node.get("electrical", {}).get("thermal_resistance", 0) for node in energy_map.get("nodes", {}).values()])
+        self.entropy_tracker.record(entropy)
+        if should_throttle(total_power) or entropy_alert(entropy) or self.entropy_tracker.spike_detected(0.5):
             is_overheated = True
         if is_overheated:
             event = {
@@ -39,11 +43,12 @@ class AIShieldMiddleware(BaseHTTPMiddleware):
                 "method": request.method,
                 "url": str(request.url),
                 "status": "blocked",
-                "reason": "System Overheated or Energy Budget Exceeded",
+                "reason": "System Overheated or Energy/Entropy Budget Exceeded",
                 "energy": total_power,
+                "entropy": entropy,
             }
             await GlobalEventBus.publish(event)
-            return throttle_response("Thermodynamic Throttling", {"energy": total_power})
+            return throttle_response("Thermodynamic Throttling", {"energy": total_power, "entropy": entropy})
         
         # 2. Policy Safety Check (Mock)
         # Check for unsafe keywords in query params or headers

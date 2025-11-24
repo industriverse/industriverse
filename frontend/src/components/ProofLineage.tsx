@@ -12,18 +12,15 @@ type ProofNode = {
   status?: string;
 };
 
-const mockEdges: ProofEdge[] = [
-  { from: "proof-mock-1", to: "proof-mock-2", description: "Derived" },
-];
-
 export function ProofLineage() {
   const [nodes, setNodes] = useState<ProofNode[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [edges, setEdges] = useState<ProofEdge[]>([]);
 
   useEffect(() => {
     const fetchProofs = async () => {
       try {
-        const resp = await fetch("/v1/proofs?limit=10");
+        const resp = await fetch("/v1/proofs?limit=20");
         if (!resp.ok) throw new Error("Failed to load proofs");
         const data = await resp.json();
         const mapped = data.map((p: any) => ({
@@ -32,6 +29,11 @@ export function ProofLineage() {
           status: p.metadata?.status,
         }));
         setNodes(mapped);
+        const edgeResp = await fetch("/v1/proofs/lineage");
+        if (edgeResp.ok) {
+          const edgeData = await edgeResp.json();
+          setEdges(edgeData);
+        }
       } catch (e: any) {
         setError(e.message);
       }
@@ -52,7 +54,7 @@ export function ProofLineage() {
             <div className="text-muted-foreground">UTID: {n.utid}</div>
             <div>Status: {n.status || "unknown"}</div>
             <div className="mt-1">Edges:</div>
-            {(n.id && mockEdges.filter((e) => e.from === n.id || e.to === n.id)).map((e, idx) => (
+            {(n.id && edges.filter((e) => e.from === n.id || e.to === n.id)).map((e, idx) => (
               <div key={idx} className="text-muted-foreground">
                 {e.from} → {e.to} {e.description ? `(${e.description})` : ""}
               </div>

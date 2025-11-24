@@ -21,6 +21,8 @@ class ProofNormalizer:
         for key in ["proof_hash", "status", "anchors"]:
             if key in proof:
                 normalized["metadata"][key] = proof.get(key)
+        if proof.get("parent_proof_id"):
+            normalized["metadata"]["parent_proof_id"] = proof.get("parent_proof_id")
         # Promote common physics metadata if present
         if "energy_joules" in proof:
             normalized["metadata"]["energy_joules"] = proof.get("energy_joules")

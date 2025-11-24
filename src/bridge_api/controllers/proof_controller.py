@@ -25,6 +25,7 @@ class ProofRequest(BaseModel):
     anchors: Optional[List[Dict[str, Any]]] = None
     metadata: Optional[Dict[str, Any]] = None
     proof_hash: Optional[str] = None
+    parent_proof_id: Optional[str] = None
 
 class ProofResponse(BaseModel):
     proof_id: str
@@ -51,6 +52,7 @@ async def generate_proof(request: ProofRequest):
     utid = (request.anchor or {}).get("utid") if request.anchor else None
     proof_hash = request.proof_hash or uuid.uuid4().hex
     anchors = request.anchors or []
+    parent_proof_id = request.parent_proof_id or (request.anchor or {}).get("parent_proof_id")
     # Persist normalized proof skeleton
     repository.store(
         {
@@ -59,7 +61,8 @@ async def generate_proof(request: ProofRequest):
             "domain": (request.anchor or {}).get("domain", "general"),
             "inputs": {"artifacts": request.artifacts, "metadata": request.metadata},
             "outputs": {"proof_types": request.proof_types},
-            "metadata": {"requester": request.requester, "proof_hash": proof_hash, "status": "queued", "anchors": anchors, **(request.metadata or {})},
+            "metadata": {"requester": request.requester, "proof_hash": proof_hash, "status": "queued", "anchors": anchors, "parent_proof_id": parent_proof_id, **(request.metadata or {})},
+            "parent_proof_id": parent_proof_id,
         }
     )
     return {
@@ -158,6 +161,7 @@ async def list_proofs(
         anchor_chain=anchor_chain,
         anchor_tx=anchor_tx,
         evidence_contains=evidence_contains,
+        parent_proof_id=None,
         limit=limit,
         offset=offset,
     )
