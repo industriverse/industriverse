@@ -7,6 +7,8 @@ from src.bridge_api.middlewares.utid_middleware import UTIDMiddleware
 from src.bridge_api.middlewares.proof_middleware import ProofMiddleware
 from src.bridge_api.middlewares.ai_shield_middleware import AIShieldMiddleware
 from src.bridge_api.controllers import proof_controller
+from src.bridge_api.controllers import utid_controller
+from src.bridge_api.controllers import shield_controller
 
 app = FastAPI(
     title="Industriverse Bridge API",
@@ -30,16 +32,30 @@ app.add_middleware(
 
 # 3. Register Routers
 app.include_router(proof_controller.router)
+app.include_router(utid_controller.router)
+app.include_router(shield_controller.router)
 
 # 4. Register Thermodynamic Router (Grand Unification)
-from src.bridge_api.thermodynamic_router import create_bridge_api
-bridge_api = create_bridge_api()
-app.include_router(bridge_api.router)
+# Some optional dependencies (e.g., flax) may not be present in minimal test envs.
+try:
+    from src.bridge_api.thermodynamic_router import create_bridge_api
+    bridge_api = create_bridge_api()
+    app.include_router(bridge_api.router)
+except ImportError as e:
+    # Degrade gracefully when optional thermodynamic deps are absent
+    import logging
+
+    logging.warning(f"Thermodynamic router not loaded: {e}")
 
 # 5. Register White-Label Partner Router
-from src.white_label.partner_portal.configuration_api import router as partner_router
-from src.white_label.partner_portal.configuration_api import router as partner_router
-app.include_router(partner_router, prefix="/v1/white-label", tags=["White Label"])
+try:
+    from src.white_label.partner_portal.configuration_api import router as partner_router
+
+    app.include_router(partner_router, prefix="/v1/white-label", tags=["White Label"])
+except ImportError as e:
+    import logging
+
+    logging.warning(f"White-label partner routes not loaded: {e}")
 
 # 6. Register "The Pulse" Router (Grand Unification)
 from src.bridge_api.routers import pulse

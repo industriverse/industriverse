@@ -3,6 +3,8 @@ import logging
 from src.overseer.nanochat.swarm import NanochatSwarm
 from src.core_ai_layer.swi_reasoning.engine import SwiReasoningEngine
 from src.overseer.ace.memory_cortex import MemoryCortex
+from src.bridge_api.ai_shield.policy import should_quarantine
+from src.proof_core.integrity_layer import record_reasoning_edge
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("SafetyLoop")
@@ -51,6 +53,25 @@ class MultiAgentSafetyLoop:
                 playbook = self.memory.get_playbook("general_threat")
                 logger.info(f"📚 Executing Playbook: {playbook}")
                 self.memory.add_episode({"context": context, "analysis": analysis, "response": playbook})
+                # Quarantine decision
+                if should_quarantine(threat_level):
+                    logger.error("🛑 Quarantine triggered due to high threat level")
+                # Emit proof of decision
+                try:
+                    import asyncio
+                    loop = asyncio.get_event_loop()
+                    loop.create_task(
+                        record_reasoning_edge(
+                            utid="UTID:REAL:safety_loop",
+                            domain="safety_loop",
+                            node_id="multi_agent_safety",
+                            inputs={"context": context, "threat_level": threat_level},
+                            outputs={"analysis": analysis, "playbook": playbook},
+                            metadata={"status": "quarantine" if should_quarantine(threat_level) else "alert"},
+                        )
+                    )
+                except Exception:
+                    pass
 
 if __name__ == "__main__":
     loop = MultiAgentSafetyLoop()

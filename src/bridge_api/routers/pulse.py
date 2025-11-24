@@ -41,7 +41,16 @@ async def pulse_websocket(websocket: WebSocket):
                     "system_entropy": 0.4 + random.random() * 0.1
                 }
             }
+            try:
+                from src.bridge_api.telemetry.thermo import thermo_metrics
+                metrics = thermo_metrics.current_metrics()
+                heartbeat["metrics"].update(metrics)
+            except Exception:
+                pass
             await websocket.send_json(heartbeat)
+            # Send current shield state snapshot
+            from src.bridge_api.ai_shield.state import shield_state
+            await websocket.send_json({"type": "shield_state", **shield_state.get()})
             await asyncio.sleep(1.0)
             
     except WebSocketDisconnect:

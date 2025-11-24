@@ -4,6 +4,8 @@ import { GlassPanel } from '@/components/ui/GlassPanel';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Activity, Zap, Globe, Database, Shield } from 'lucide-react';
 import { useEnergyMap } from "@/api/thermodynamic";
+import { ProofWidget } from "@/components/ProofWidget";
+import { ShieldWidget } from "@/components/ShieldWidget";
 
 export default function Portal() {
     const { data: energyMap, isLoading } = useEnergyMap();
@@ -82,6 +84,14 @@ export default function Portal() {
                             </div>
                         </GlassPanel>
                     </Link>
+                </div>
+            </div>
+
+            {/* Proofs & UTID */}
+            <div className="absolute right-4 top-4 w-80 z-20">
+                <ProofWidget />
+                <div className="mt-4">
+                    <ShieldWidget />
                 </div>
             </div>
 

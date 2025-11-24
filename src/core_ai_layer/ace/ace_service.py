@@ -5,6 +5,7 @@ from .schema import ACERequest, ACEResponse, ReflectionResult
 from .reflection_engine import ReflectionEngine
 from .playbook_manager import PlaybookManager
 from .memory_logger import MemoryLogger
+from src.proof_core.integrity_layer import record_reasoning_edge
 
 # Thermodynamic Integration
 from src.core.energy_atlas.atlas_core import EnergyAtlas
@@ -43,13 +44,23 @@ class ACEService:
         # 3. Memory Logging
         self.memory_logger.log_interaction(request, reflection)
         
-        # 4. Thermodynamic Telemetry
+        # 4. Thermodynamic Telemetry + Proof/UTID lineage
         # Estimate energy cost based on complexity
         # E = base + complexity * factor
         complexity = len(request.context) / 1000.0 # normalized
         energy_cost = 0.001 + complexity * 0.005 # Joules (mocked)
         
         self._report_thermodynamic_cost("ace_reflection", energy_cost)
+
+        utid = getattr(request, "utid", "UTID:REAL:unknown")
+        await record_reasoning_edge(
+            utid=utid,
+            domain="ace_reflection",
+            node_id="ace_service",
+            inputs={"context": request.context},
+            outputs={"reflection": reflection.dict(), "playbook": getattr(playbook, "playbook_id", None)},
+            metadata={"energy_joules": energy_cost, "status": "completed"},
+        )
         
         return ACEResponse(
             request_id=request.request_id,

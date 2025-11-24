@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 import logging
 from src.core.energy_atlas.atlas_core import EnergyAtlas
+import asyncio
+from src.proof_core.integrity_layer import record_reasoning_edge
 
 @dataclass
 class EvolutionStep:
@@ -72,6 +74,22 @@ class DGMEngine:
         energy_cost = 0.05 # Joules per hypothesis
         logging.info(f"THERMODYNAMIC_TELEMETRY: Action=dgm_hypothesis_gen Energy={energy_cost}J")
         # self.energy_atlas.update_node_state("tpu_v5_01", energy_cost)
+
+        utid = context.get("utid", "UTID:REAL:unknown")
+        try:
+            loop = asyncio.get_event_loop()
+            loop.create_task(
+                record_reasoning_edge(
+                    utid=utid,
+                    domain="dgm_hypothesis",
+                    node_id=f"dgm_gen_{self.generation}",
+                    inputs={"context": context},
+                    outputs={"prompt": prompt},
+                    metadata={"energy_joules": energy_cost, "status": "generated"},
+                )
+            )
+        except Exception:
+            pass
             
         return prompt
 

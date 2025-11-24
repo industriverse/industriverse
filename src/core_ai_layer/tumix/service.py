@@ -3,6 +3,7 @@ from typing import Dict, Any, Optional
 from .schema import ConsensusRequest, ConsensusResult
 from .agent_swarm import AgentSwarm
 from .consensus_engine import ConsensusEngine
+from src.proof_core.integrity_layer import record_reasoning_edge
 
 class TUMIXService:
     """
@@ -27,6 +28,16 @@ class TUMIXService:
             request_id=request_id,
             votes=votes,
             required_majority=0.6
+        )
+
+        utid = context.get("utid") if context else "UTID:REAL:unknown"
+        await record_reasoning_edge(
+            utid=utid or "UTID:REAL:unknown",
+            domain="tumix_consensus",
+            node_id="tumix_service",
+            inputs={"proposal": proposal, "votes": votes},
+            outputs={"consensus": result.dict() if hasattr(result, "dict") else str(result)},
+            metadata={"status": "completed"},
         )
         
         return result

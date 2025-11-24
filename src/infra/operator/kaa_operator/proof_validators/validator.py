@@ -1,17 +1,10 @@
-def validate_proof_bundle(bundle_id: str) -> bool:
+def validate_proof_bundle(bundle: dict) -> bool:
     """
     Validates a cryptographic proof bundle.
-    
-    Args:
-        bundle_id: The ID of the proof bundle to verify.
-        
-    Returns:
-        True if valid, False otherwise.
+    Requires utid and proof_hash fields present and non-empty.
     """
-    # Mock validation logic
-    # In production, this would:
-    # 1. Fetch bundle from Proof Registry
-    # 2. Verify HSM signature
-    # 3. Verify anchor on blockchain
-    print(f"[Validator] Verifying proof bundle {bundle_id}...")
-    return True
+    if not bundle:
+        return False
+    utid = bundle.get("utid")
+    proof_hash = bundle.get("proof_hash")
+    return bool(utid and proof_hash)

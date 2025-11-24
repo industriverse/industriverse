@@ -10,10 +10,12 @@ def create_fn(spec, name, namespace, logger, **kwargs):
     # 1. Validate Proof Policy
     proof_policy = spec.get('proofPolicy', {})
     if proof_policy.get('required', True):
-        # In a real scenario, we would fetch the proof bundle from the registry
-        # using a reference in the spec. For now, we simulate validation.
-        if not validate_proof_bundle("mock_bundle_id"):
-             raise kopf.PermanentError("Proof validation failed")
+        bundle = {
+            "utid": proof_policy.get('utid'),
+            "proof_hash": proof_policy.get('proofHash')
+        }
+        if not validate_proof_bundle(bundle):
+             raise kopf.PermanentError("Proof validation failed: UTID or proof_hash missing")
         logger.info("✅ Proof bundle validated")
 
     # 2. Handle Pre-warming
@@ -48,12 +50,21 @@ def create_fn(spec, name, namespace, logger, **kwargs):
         }
     }
     
-    # Ensure labels match
+    # Ensure labels and annotations match
     if 'metadata' not in deployment_body['spec']['template']:
         deployment_body['spec']['template']['metadata'] = {}
     if 'labels' not in deployment_body['spec']['template']['metadata']:
         deployment_body['spec']['template']['metadata']['labels'] = {}
+    if 'annotations' not in deployment_body['spec']['template']['metadata']:
+        deployment_body['spec']['template']['metadata']['annotations'] = {}
     deployment_body['spec']['template']['metadata']['labels']['app'] = name
+    # Propagate UTID and proof hash annotations for proof-assisted scheduling
+    if proof_policy.get('utid'):
+        deployment_body['spec']['template']['metadata']['annotations']['utid'] = proof_policy.get('utid')
+    if proof_policy.get('proofHash'):
+        deployment_body['spec']['template']['metadata']['annotations']['proofHash'] = proof_policy.get('proofHash')
+    if proof_policy.get('proofScore'):
+        deployment_body['spec']['template']['metadata']['annotations']['proofScore'] = str(proof_policy.get('proofScore'))
 
     api = kubernetes.client.AppsV1Api()
     try:

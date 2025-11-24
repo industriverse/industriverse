@@ -1,28 +1,31 @@
-from fastapi import Request, HTTPException
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
+from src.bridge_api.security.real_utid_service import RealUTIDService
+
+
 class UTIDMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app):
+        super().__init__(app)
+        self.utid_service = RealUTIDService()
+
     async def dispatch(self, request: Request, call_next):
-        # Skip UTID check for health, root, and docs
+        # Skip UTID check for public endpoints
         if request.url.path in ["/", "/health", "/docs", "/openapi.json"]:
+            return await call_next(request)
+        if request.url.path.startswith("/v1/utid"):
             return await call_next(request)
 
         utid = request.headers.get("X-UTID")
-        
-        # Mock Validation Logic
-        if not utid:
-            # For development, we might allow requests without UTID if a flag is set, 
-            # but for "Secure by Design" we enforce it.
-            # Allowing a bypass for now to not break simple tests unless specifically testing security.
-            # In production, this would be strict.
-            pass 
-            # return JSONResponse(status_code=403, content={"detail": "Missing X-UTID header"})
-        
-        if utid and utid.startswith("INVALID"):
-             return JSONResponse(status_code=403, content={"detail": "Invalid UTID"})
 
-        # In a real implementation, we would verify the UTID signature here.
-        
+        if not utid:
+            return JSONResponse(status_code=403, content={"detail": "Missing X-UTID header"})
+
+        if not self.utid_service.verify(utid):
+            return JSONResponse(status_code=403, content={"detail": "Invalid UTID"})
+
+        request.state.utid = utid
         response = await call_next(request)
+        response.headers["X-Industriverse-UTID"] = utid
         return response
