@@ -10,6 +10,7 @@ from src.bridge_api.controllers import proof_controller
 from src.bridge_api.controllers import utid_controller
 from src.bridge_api.controllers import shield_controller
 from src.bridge_api.controllers import proof_lineage_controller
+from src.bridge_api.controllers import proof_graph_controller
 
 app = FastAPI(
     title="Industriverse Bridge API",
@@ -36,6 +37,7 @@ app.include_router(proof_controller.router)
 app.include_router(utid_controller.router)
 app.include_router(shield_controller.router)
 app.include_router(proof_lineage_controller.router)
+app.include_router(proof_graph_controller.router)
 
 # 4. Register Thermodynamic Router (Grand Unification)
 # Some optional dependencies (e.g., flax) may not be present in minimal test envs.

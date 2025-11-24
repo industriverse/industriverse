@@ -4,6 +4,7 @@ type ProofEdge = {
   from: string;
   to: string;
   description?: string;
+  proof_score?: number;
 };
 
 type ProofNode = {
@@ -31,10 +32,10 @@ export function ProofLineage() {
           status: p.metadata?.status,
         }));
         setNodes(mapped);
-        const edgeResp = await fetch("/v1/proofs/lineage");
-        if (edgeResp.ok) {
-          const edgeData = await edgeResp.json();
-          setEdges(edgeData);
+        const graphResp = await fetch("/v1/proofs/graph");
+        if (graphResp.ok) {
+          const graphData = await graphResp.json();
+          setEdges(graphData.edges || []);
         }
       } catch (e: any) {
         setError(e.message);

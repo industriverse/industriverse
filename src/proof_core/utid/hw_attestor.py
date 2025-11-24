@@ -6,11 +6,18 @@ from typing import Optional
 
 class HardwareAttestor:
     """
-    Lightweight attestor stub. In production, this would integrate with TPM/PUF.
+    Lightweight attestor. Uses HMAC over a keyfile or env secret.
+    In production, integrate with TPM/PUF secure key storage.
     """
 
-    def __init__(self, secret: Optional[str] = None):
-        self.secret = (secret or os.environ.get("UTID_ATTEST_SECRET") or "dev-attest-secret").encode()
+    def __init__(self, secret: Optional[str] = None, key_path: Optional[str] = None):
+        key_path = key_path or os.environ.get("UTID_ATTEST_KEY_PATH")
+        if key_path and os.path.exists(key_path):
+            with open(key_path, "rb") as f:
+                key = f.read().strip()
+        else:
+            key = (secret or os.environ.get("UTID_ATTEST_SECRET") or "dev-attest-secret").encode()
+        self.secret = key
 
     def sign(self, payload: str) -> str:
         return hmac.new(self.secret, payload.encode(), sha256).hexdigest()[:16]
