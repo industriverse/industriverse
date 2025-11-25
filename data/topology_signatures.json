@@ -1,0 +1,667 @@
+[
+  {
+    "capsule_id": "capsule:rawmat:v1",
+    "name": "Raw Material Sourcing",
+    "category": "Category A - High-energy, dynamic systems",
+    "physics_topology": "Granular flow + geomechanics (avalanche, percolation)",
+    "domain_equations": [
+      "Granular stress models",
+      "Coulomb failure",
+      "Darcy flow"
+    ],
+    "energy_prior": {
+      "file": "MHD_64_energy_map",
+      "shape": "(64, 64)"
+    },
+    "prin_config": {
+      "alpha": 0.6,
+      "beta": 0.25,
+      "gamma": 0.15,
+      "approve_threshold": 0.78,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.334366",
+    "version": "1.0",
+    "signature": "sig:34a68d9aa3328434"
+  },
+  {
+    "capsule_id": "capsule:rareearth:v1",
+    "name": "Rare-earth Refining & Metallurgy",
+    "category": "Category A - High-energy, dynamic systems",
+    "physics_topology": "High-temperature phase transformations, diffusion",
+    "domain_equations": [
+      "Arrhenius diffusion",
+      "Phase diagram equilibrium",
+      "Heat equation"
+    ],
+    "energy_prior": {
+      "file": "MHD_64_energy_map",
+      "shape": "(64, 64)"
+    },
+    "prin_config": {
+      "alpha": 0.6,
+      "beta": 0.25,
+      "gamma": 0.15,
+      "approve_threshold": 0.8,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.334708",
+    "version": "1.0",
+    "signature": "sig:aa60f89ae9350962"
+  },
+  {
+    "capsule_id": "capsule:powder:v1",
+    "name": "Powder Processing & Additive Feedstock",
+    "category": "Category A - High-energy, dynamic systems",
+    "physics_topology": "Particle packing, flowability, powder bed sintering thermal fields",
+    "domain_equations": [
+      "Contact mechanics",
+      "Sintering heat diffusion",
+      "Porosity models"
+    ],
+    "energy_prior": {
+      "file": "MHD_64_energy_map",
+      "shape": "(64, 64)"
+    },
+    "prin_config": {
+      "alpha": 0.55,
+      "beta": 0.3,
+      "gamma": 0.15,
+      "approve_threshold": 0.75,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.334749",
+    "version": "1.0",
+    "signature": "sig:ea6a82a77a9652db"
+  },
+  {
+    "capsule_id": "capsule:casting:v1",
+    "name": "Casting & Foundry Operations",
+    "category": "Category A - High-energy, dynamic systems",
+    "physics_topology": "Fluid metal flow, solidification fronts, shrinkage",
+    "domain_equations": [
+      "Navier-Stokes (melt)",
+      "Stefan condition",
+      "Heat conduction"
+    ],
+    "energy_prior": {
+      "file": "turbulent_radiative_layer_2D_energy_map",
+      "shape": "(128, 384)"
+    },
+    "prin_config": {
+      "alpha": 0.58,
+      "beta": 0.3,
+      "gamma": 0.12,
+      "approve_threshold": 0.77,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.342051",
+    "version": "1.0",
+    "signature": "sig:c812ee9d2a9d69be"
+  },
+  {
+    "capsule_id": "capsule:forming:v1",
+    "name": "Forming (Rolling, Extrusion)",
+    "category": "Category A - High-energy, dynamic systems",
+    "physics_topology": "Plastic flow, strain hardening, thermal-mechanical coupling",
+    "domain_equations": [
+      "Plasticity models (Von Mises)",
+      "Work hardening relations",
+      "Heat generation"
+    ],
+    "energy_prior": {
+      "file": "shear_flow_energy_map",
+      "shape": "(256, 512)"
+    },
+    "prin_config": {
+      "alpha": 0.6,
+      "beta": 0.28,
+      "gamma": 0.12,
+      "approve_threshold": 0.78,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.351032",
+    "version": "1.0",
+    "signature": "sig:7819e4cae5dd10e3"
+  },
+  {
+    "capsule_id": "capsule:machining:v1",
+    "name": "Machining & Precision Fabrication",
+    "category": "Category A - High-energy, dynamic systems",
+    "physics_topology": "Material removal, tool-chip interface, vibration dynamics",
+    "domain_equations": [
+      "Cutting force models",
+      "Chatter stability diagrams",
+      "Thermal tool wear"
+    ],
+    "energy_prior": {
+      "file": "shear_flow_energy_map",
+      "shape": "(256, 512)"
+    },
+    "prin_config": {
+      "alpha": 0.5,
+      "beta": 0.35,
+      "gamma": 0.15,
+      "approve_threshold": 0.74,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.351116",
+    "version": "1.0",
+    "signature": "sig:383ce68540c97e92"
+  },
+  {
+    "capsule_id": "capsule:welding:v1",
+    "name": "Joining & Welding",
+    "category": "Category A - High-energy, dynamic systems",
+    "physics_topology": "Arc/plasma heating, melt-pool dynamics, micro-structure evolution",
+    "domain_equations": [
+      "Heat transfer in welding",
+      "Marangoni flow",
+      "Phase solidification"
+    ],
+    "energy_prior": {
+      "file": "turbulent_radiative_layer_2D_energy_map",
+      "shape": "(128, 384)"
+    },
+    "prin_config": {
+      "alpha": 0.62,
+      "beta": 0.28,
+      "gamma": 0.1,
+      "approve_threshold": 0.8,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.351148",
+    "version": "1.0",
+    "signature": "sig:39ce7c093ba71a47"
+  },
+  {
+    "capsule_id": "capsule:coatings:v1",
+    "name": "Surface Treatment & Coatings",
+    "category": "Category B - Flow, heat, pressure",
+    "physics_topology": "Chemical kinetics, diffusion layers, adhesion mechanics",
+    "domain_equations": [
+      "Reaction-diffusion",
+      "Adhesion energy",
+      "Stress due to coating"
+    ],
+    "energy_prior": {
+      "file": "turbulent_radiative_layer_2D_energy_map",
+      "shape": "(128, 384)"
+    },
+    "prin_config": {
+      "alpha": 0.56,
+      "beta": 0.3,
+      "gamma": 0.14,
+      "approve_threshold": 0.76,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.351175",
+    "version": "1.0",
+    "signature": "sig:26b543771fe4c74b"
+  },
+  {
+    "capsule_id": "capsule:composites:v1",
+    "name": "Polymers, Composites & Molding",
+    "category": "Category B - Flow, heat, pressure",
+    "physics_topology": "Viscoelastic flow, cure kinetics, shrinkage/warpage",
+    "domain_equations": [
+      "Viscoelastic constitutive equations",
+      "Cure kinetics",
+      "Heat conduction"
+    ],
+    "energy_prior": {
+      "file": "rayleigh_benard_energy_map",
+      "shape": "(512, 128)"
+    },
+    "prin_config": {
+      "alpha": 0.58,
+      "beta": 0.3,
+      "gamma": 0.12,
+      "approve_threshold": 0.77,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.352794",
+    "version": "1.0",
+    "signature": "sig:f9ba63662053f0ee"
+  },
+  {
+    "capsule_id": "capsule:pcb:v1",
+    "name": "Electronics & PCB Assembly",
+    "category": "Category B - Flow, heat, pressure",
+    "physics_topology": "Thermal reflow, solder wetting, EMI coupling",
+    "domain_equations": [
+      "Heat conduction",
+      "Reflow phase transforms",
+      "Circuit parasitics"
+    ],
+    "energy_prior": {
+      "file": "rayleigh_benard_energy_map",
+      "shape": "(512, 128)"
+    },
+    "prin_config": {
+      "alpha": 0.5,
+      "beta": 0.4,
+      "gamma": 0.1,
+      "approve_threshold": 0.74,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.352832",
+    "version": "1.0",
+    "signature": "sig:18634f2ff1102e33"
+  },
+  {
+    "capsule_id": "capsule:sensor:v1",
+    "name": "Sensor & Embedded Systems Integration",
+    "category": "Category B - Flow, heat, pressure",
+    "physics_topology": "Signal propagation, sensor cross-sensitivity, thermal drift",
+    "domain_equations": [
+      "Transfer functions",
+      "Noise models (SNR)",
+      "Calibration curves"
+    ],
+    "energy_prior": {
+      "file": "rayleigh_benard_energy_map",
+      "shape": "(512, 128)"
+    },
+    "prin_config": {
+      "alpha": 0.5,
+      "beta": 0.35,
+      "gamma": 0.15,
+      "approve_threshold": 0.74,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.352865",
+    "version": "1.0",
+    "signature": "sig:2624f3d9350b8595"
+  },
+  {
+    "capsule_id": "capsule:magnet:v1",
+    "name": "Permanent Magnets & Magnetic Assemblies",
+    "category": "Category B - Flow, heat, pressure",
+    "physics_topology": "Magnetostatics, hysteresis, thermal demagnetization",
+    "domain_equations": [
+      "Maxwell magnetostatic equations",
+      "Hysteresis loops",
+      "Curie temperature"
+    ],
+    "energy_prior": {
+      "file": "MHD_64_energy_map",
+      "shape": "(64, 64)"
+    },
+    "prin_config": {
+      "alpha": 0.65,
+      "beta": 0.25,
+      "gamma": 0.1,
+      "approve_threshold": 0.82,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.352888",
+    "version": "1.0",
+    "signature": "sig:4d6ce1c08130b31e"
+  },
+  {
+    "capsule_id": "capsule:chem:v1",
+    "name": "Chemical Synthesis & Pharma Process Lines",
+    "category": "Category B - Flow, heat, pressure",
+    "physics_topology": "Reactive flows, multi-phase reactors, heat removal",
+    "domain_equations": [
+      "Reaction kinetics",
+      "Mass balance",
+      "Energy balance"
+    ],
+    "energy_prior": {
+      "file": "turbulent_radiative_layer_2D_energy_map",
+      "shape": "(128, 384)"
+    },
+    "prin_config": {
+      "alpha": 0.63,
+      "beta": 0.27,
+      "gamma": 0.1,
+      "approve_threshold": 0.8,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.352909",
+    "version": "1.0",
+    "signature": "sig:f78156b4410a6fbc"
+  },
+  {
+    "capsule_id": "capsule:battery:v1",
+    "name": "Battery Chemistry & Cell Production",
+    "category": "Category B - Flow, heat, pressure",
+    "physics_topology": "Ion transport, phase changes (SEI formation), thermal runaway risk",
+    "domain_equations": [
+      "Nernst-Planck",
+      "Butler-Volmer kinetics",
+      "Heat generation models"
+    ],
+    "energy_prior": {
+      "file": "MHD_64_energy_map",
+      "shape": "(64, 64)"
+    },
+    "prin_config": {
+      "alpha": 0.66,
+      "beta": 0.24,
+      "gamma": 0.1,
+      "approve_threshold": 0.82,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.352928",
+    "version": "1.0",
+    "signature": "sig:8d2fb8ba264af4d6"
+  },
+  {
+    "capsule_id": "capsule:microgrid:v1",
+    "name": "Energy Generation & Microgrids (On-site)",
+    "category": "Category B - Flow, heat, pressure",
+    "physics_topology": "Load balancing, transient response, inverter dynamics",
+    "domain_equations": [
+      "Power flow",
+      "Transient stability",
+      "Control loops"
+    ],
+    "energy_prior": {
+      "file": "MHD_64_energy_map",
+      "shape": "(64, 64)"
+    },
+    "prin_config": {
+      "alpha": 0.55,
+      "beta": 0.35,
+      "gamma": 0.1,
+      "approve_threshold": 0.78,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.352944",
+    "version": "1.0",
+    "signature": "sig:2177960be927cd8d"
+  },
+  {
+    "capsule_id": "capsule:ot:v1",
+    "name": "Process Control & OT/PLC Integration",
+    "category": "Category C - Swarm, logistics, active matter",
+    "physics_topology": "Closed-loop control, actuator delays, sensor noise",
+    "domain_equations": [
+      "PID/advanced MPC equations",
+      "Lag dynamics"
+    ],
+    "energy_prior": {
+      "file": "active_matter_energy_map",
+      "shape": "(256, 256)"
+    },
+    "prin_config": {
+      "alpha": 0.52,
+      "beta": 0.38,
+      "gamma": 0.1,
+      "approve_threshold": 0.75,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.389469",
+    "version": "1.0",
+    "signature": "sig:eeaf886269c8ed10"
+  },
+  {
+    "capsule_id": "capsule:robotics:v1",
+    "name": "Robotics & Material Handling (AGV/AMR)",
+    "category": "Category C - Swarm, logistics, active matter",
+    "physics_topology": "Multi-body dynamics, collision avoidance, load transfer",
+    "domain_equations": [
+      "Rigid-body dynamics",
+      "Contact models",
+      "Path planning cost functions"
+    ],
+    "energy_prior": {
+      "file": "active_matter_energy_map",
+      "shape": "(256, 256)"
+    },
+    "prin_config": {
+      "alpha": 0.48,
+      "beta": 0.42,
+      "gamma": 0.1,
+      "approve_threshold": 0.73,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.389623",
+    "version": "1.0",
+    "signature": "sig:e6e4deecdb0c0bc1"
+  },
+  {
+    "capsule_id": "capsule:ndt:v1",
+    "name": "Quality Control & NDT",
+    "category": "Category C - Swarm, logistics, active matter",
+    "physics_topology": "Wave propagation scattering, imaging inverse problems",
+    "domain_equations": [
+      "Helmholtz",
+      "Scattering kernels",
+      "Inverse transform models"
+    ],
+    "energy_prior": {
+      "file": "active_matter_energy_map",
+      "shape": "(256, 256)"
+    },
+    "prin_config": {
+      "alpha": 0.6,
+      "beta": 0.3,
+      "gamma": 0.1,
+      "approve_threshold": 0.8,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.389810",
+    "version": "1.0",
+    "signature": "sig:99a502a4c9a9a714"
+  },
+  {
+    "capsule_id": "capsule:testlab:v1",
+    "name": "Testing & Certification Labs",
+    "category": "Category C - Swarm, logistics, active matter",
+    "physics_topology": "Controlled experiments with thermodynamic boundary conditions",
+    "domain_equations": [
+      "Measurement uncertainty models",
+      "Calibration curve fits"
+    ],
+    "energy_prior": {
+      "file": "active_matter_energy_map",
+      "shape": "(256, 256)"
+    },
+    "prin_config": {
+      "alpha": 0.55,
+      "beta": 0.35,
+      "gamma": 0.1,
+      "approve_threshold": 0.78,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.389894",
+    "version": "1.0",
+    "signature": "sig:0d62bddc12ac023b"
+  },
+  {
+    "capsule_id": "capsule:assembly:v1",
+    "name": "Packaging & Final Assembly",
+    "category": "Category C - Swarm, logistics, active matter",
+    "physics_topology": "Kinematic assembly tolerances, thermal expansion, sealing tests",
+    "domain_equations": [
+      "Tolerance stack-ups",
+      "Boltzmann heat expansion model"
+    ],
+    "energy_prior": {
+      "file": "active_matter_energy_map",
+      "shape": "(256, 256)"
+    },
+    "prin_config": {
+      "alpha": 0.5,
+      "beta": 0.4,
+      "gamma": 0.1,
+      "approve_threshold": 0.75,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.389964",
+    "version": "1.0",
+    "signature": "sig:15074bad86ba6b90"
+  },
+  {
+    "capsule_id": "capsule:logistics:v1",
+    "name": "Logistics & Inbound/Outbound Routing",
+    "category": "Category C - Swarm, logistics, active matter",
+    "physics_topology": "Flow-of-goods, vehicle routing with stochastic demand",
+    "domain_equations": [
+      "VRP formulations",
+      "Queueing network models"
+    ],
+    "energy_prior": {
+      "file": "active_matter_energy_map",
+      "shape": "(256, 256)"
+    },
+    "prin_config": {
+      "alpha": 0.4,
+      "beta": 0.45,
+      "gamma": 0.15,
+      "approve_threshold": 0.7,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.390004",
+    "version": "1.0",
+    "signature": "sig:29f67544d8db4ce9"
+  },
+  {
+    "capsule_id": "capsule:warehousing:v1",
+    "name": "Warehousing & Inventory Optimization",
+    "category": "Category C - Swarm, logistics, active matter",
+    "physics_topology": "Stochastic demand, shelf-space optimization (flow vs density tradeoffs)",
+    "domain_equations": [
+      "Inventory control (EOQ, (Q,R))",
+      "Stochastic control"
+    ],
+    "energy_prior": {
+      "file": "active_matter_energy_map",
+      "shape": "(256, 256)"
+    },
+    "prin_config": {
+      "alpha": 0.4,
+      "beta": 0.45,
+      "gamma": 0.15,
+      "approve_threshold": 0.7,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.390040",
+    "version": "1.0",
+    "signature": "sig:acedfa35c4a94c7f"
+  },
+  {
+    "capsule_id": "capsule:electronics:v1",
+    "name": "Electronics Assembly (Reflow + Pick-Place)",
+    "category": "Category D - High-complexity multi-physics",
+    "physics_topology": "Reflow soldering, pick and place dynamics",
+    "domain_equations": [
+      "Heat transfer",
+      "Kinematics"
+    ],
+    "energy_prior": {
+      "file": "supernova_explosion_64_energy_map",
+      "shape": "(64, 64)"
+    },
+    "prin_config": {
+      "alpha": 0.5,
+      "beta": 0.4,
+      "gamma": 0.1,
+      "approve_threshold": 0.74,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.405698",
+    "version": "1.0",
+    "signature": "sig:10ee6b3d07d040ce"
+  },
+  {
+    "capsule_id": "capsule:pcbmfg:v1",
+    "name": "PCB Manufacturing (EM + Thermal)",
+    "category": "Category D - High-complexity multi-physics",
+    "physics_topology": "EM + thermal coupling",
+    "domain_equations": [
+      "Maxwell equations",
+      "Heat diffusion"
+    ],
+    "energy_prior": {
+      "file": "supernova_explosion_64_energy_map",
+      "shape": "(64, 64)"
+    },
+    "prin_config": {
+      "alpha": 0.55,
+      "beta": 0.35,
+      "gamma": 0.1,
+      "approve_threshold": 0.76,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.405786",
+    "version": "1.0",
+    "signature": "sig:b5890f8b0c2fd773"
+  },
+  {
+    "capsule_id": "capsule:sensorint:v1",
+    "name": "Sensor Integration (Signal Entropy)",
+    "category": "Category D - High-complexity multi-physics",
+    "physics_topology": "Signal entropy, sensor fusion",
+    "domain_equations": [
+      "Information theory",
+      "Kalman filtering"
+    ],
+    "energy_prior": {
+      "file": "supernova_explosion_64_energy_map",
+      "shape": "(64, 64)"
+    },
+    "prin_config": {
+      "alpha": 0.5,
+      "beta": 0.4,
+      "gamma": 0.1,
+      "approve_threshold": 0.75,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.405844",
+    "version": "1.0",
+    "signature": "sig:f132d3dcc1246469"
+  },
+  {
+    "capsule_id": "capsule:surface:v1",
+    "name": "Surface Finishing (Fluid + Pressure)",
+    "category": "Category D - High-complexity multi-physics",
+    "physics_topology": "Fluid dynamics, pressure distribution",
+    "domain_equations": [
+      "Bernoulli equation",
+      "Surface tension"
+    ],
+    "energy_prior": {
+      "file": "supernova_explosion_64_energy_map",
+      "shape": "(64, 64)"
+    },
+    "prin_config": {
+      "alpha": 0.55,
+      "beta": 0.35,
+      "gamma": 0.1,
+      "approve_threshold": 0.76,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.405875",
+    "version": "1.0",
+    "signature": "sig:058fda23bd8aad79"
+  },
+  {
+    "capsule_id": "capsule:lifecycle:v1",
+    "name": "End-to-End Lifecycle Analytics",
+    "category": "Category D - High-complexity multi-physics",
+    "physics_topology": "Entropy accumulation, failure probability",
+    "domain_equations": [
+      "Weibull distribution",
+      "Entropy production"
+    ],
+    "energy_prior": {
+      "file": "supernova_explosion_64_energy_map",
+      "shape": "(64, 64)"
+    },
+    "prin_config": {
+      "alpha": 0.45,
+      "beta": 0.4,
+      "gamma": 0.15,
+      "approve_threshold": 0.72,
+      "review_threshold": 0.6
+    },
+    "generated_at": "2025-11-24T18:29:52.405897",
+    "version": "1.0",
+    "signature": "sig:f413c51a9287032a"
+  }
+]

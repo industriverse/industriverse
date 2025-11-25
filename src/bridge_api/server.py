@@ -12,6 +12,7 @@ from src.bridge_api.controllers import shield_controller
 from src.bridge_api.controllers import proof_lineage_controller
 from src.bridge_api.controllers import proof_graph_controller
 
+
 app = FastAPI(
     title="Industriverse Bridge API",
     description="Unified gateway for all Industriverse services (Trifecta, Expansion Packs, AI Shield)",
@@ -38,6 +39,10 @@ app.include_router(utid_controller.router)
 app.include_router(shield_controller.router)
 app.include_router(proof_lineage_controller.router)
 app.include_router(proof_graph_controller.router)
+
+# Register Capsule Router
+from src.bridge_api.routers import capsule_router
+app.include_router(capsule_router.router)
 
 # 4. Register Thermodynamic Router (Grand Unification)
 # Some optional dependencies (e.g., flax) may not be present in minimal test envs.

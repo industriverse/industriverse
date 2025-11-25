@@ -1,5 +1,7 @@
 import logging
 from typing import Dict, List, Optional, Any
+import numpy as np
+import os
 from datetime import datetime
 from .hardware_schema import HardwareNode
 from .hardware_loader import HardwareLoader
@@ -55,6 +57,7 @@ class EnergyAtlas:
     def __init__(self, neo4j_uri: str = "bolt://localhost:7687", neo4j_auth: tuple = ("neo4j", "password"), use_mock: bool = True):
         self.loader = HardwareLoader()
         self.nodes: Dict[str, HardwareNode] = {}
+        self.energy_maps: Dict[str, Any] = {} # Registry for loaded physics maps
         
         if use_mock:
             self.driver = MockNeo4jDriver(neo4j_uri, neo4j_auth)

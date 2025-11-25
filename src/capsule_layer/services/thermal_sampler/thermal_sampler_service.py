@@ -18,10 +18,40 @@ Use cases:
 """
 
 import asyncio
-import jax
-import jax.numpy as jnp
-from jax import random, jit, vmap, grad
 import numpy as np
+from typing import Dict, List, Tuple, Optional, Any, Callable
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+import json
+import hashlib
+
+# Try to import JAX, fall back to mock if fails
+try:
+    import jax
+    import jax.numpy as jnp
+    from jax import random, jit, vmap, grad
+    JAX_AVAILABLE = True
+except Exception as e:
+    print(f"WARNING: JAX not available ({e}). Using mock mode.")
+    JAX_AVAILABLE = False
+    jnp = np
+    def jit(f): return f
+    class MockRandom:
+        def PRNGKey(self, seed): return seed
+        def split(self, key): return key, key
+        def uniform(self, key, shape=None, minval=0.0, maxval=1.0): 
+            if shape is None: return np.random.uniform(minval, maxval)
+            return np.random.uniform(minval, maxval, size=shape)
+        def normal(self, key, shape=None):
+            return np.random.normal(size=shape)
+    random = MockRandom()
+    # Mock jax.lax
+    class MockLax:
+        def cond(self, pred, true_fun, false_fun, *args):
+            if pred: return true_fun(*args)
+            else: return false_fun(*args)
+    jax = type('MockJax', (), {'lax': MockLax()})
 from typing import Dict, List, Tuple, Optional, Any, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -132,7 +162,8 @@ class ThermalSamplerService:
         problem_type: ProblemType,
         dimensions: int,
         constraints: List[Constraint],
-        bounds: Optional[List[Tuple[float, float]]] = None
+        bounds: Optional[List[Tuple[float, float]]] = None,
+        prior_map: Optional[str] = None
     ) -> str:
         """
         Create an energy landscape for optimization.
@@ -156,7 +187,8 @@ class ThermalSamplerService:
             bounds=bounds,
             metadata={
                 "created_at": datetime.now().isoformat(),
-                "num_constraints": len(constraints)
+                "num_constraints": len(constraints),
+                "prior_map": prior_map
             }
         )
         
@@ -175,27 +207,46 @@ class ThermalSamplerService:
     # ========================================================================
     
     @staticmethod
-    @jit
-    def _quadratic_penalty(x: jnp.ndarray, target: float, weight: float) -> float:
+    def _quadratic_penalty(x: np.ndarray, target: float, weight: float) -> float:
         """Quadratic penalty for constraint violation"""
+        if JAX_AVAILABLE:
+            return ThermalSamplerService._quadratic_penalty_jax(x, target, weight)
+        return weight * np.sum((x - target) ** 2)
+
+    @staticmethod
+    @jit
+    def _quadratic_penalty_jax(x: jnp.ndarray, target: float, weight: float) -> float:
         return weight * jnp.sum((x - target) ** 2)
     
     @staticmethod
-    @jit
-    def _inequality_penalty(x: jnp.ndarray, threshold: float, weight: float) -> float:
+    def _inequality_penalty(x: np.ndarray, threshold: float, weight: float) -> float:
         """Penalty for inequality constraint violation"""
+        if JAX_AVAILABLE:
+            return ThermalSamplerService._inequality_penalty_jax(x, threshold, weight)
+        violation = np.maximum(0.0, x - threshold)
+        return weight * np.sum(violation ** 2)
+
+    @staticmethod
+    @jit
+    def _inequality_penalty_jax(x: jnp.ndarray, threshold: float, weight: float) -> float:
         violation = jnp.maximum(0.0, x - threshold)
         return weight * jnp.sum(violation ** 2)
     
     @staticmethod
-    @jit
-    def _distance_penalty(x: jnp.ndarray, points: jnp.ndarray, min_dist: float, weight: float) -> float:
+    def _distance_penalty(x: np.ndarray, points: np.ndarray, min_dist: float, weight: float) -> float:
         """Penalty for minimum distance violations"""
-        # Compute pairwise distances
+        if JAX_AVAILABLE:
+            return ThermalSamplerService._distance_penalty_jax(x, points, min_dist, weight)
+        diff = x[:, None, :] - points[None, :, :]
+        distances = np.sqrt(np.sum(diff ** 2, axis=-1))
+        violations = np.maximum(0.0, min_dist - distances)
+        return weight * np.sum(violations ** 2)
+
+    @staticmethod
+    @jit
+    def _distance_penalty_jax(x: jnp.ndarray, points: jnp.ndarray, min_dist: float, weight: float) -> float:
         diff = x[:, None, :] - points[None, :, :]
         distances = jnp.sqrt(jnp.sum(diff ** 2, axis=-1))
-        
-        # Penalty for distances below minimum
         violations = jnp.maximum(0.0, min_dist - distances)
         return weight * jnp.sum(violations ** 2)
     
@@ -238,14 +289,33 @@ class ThermalSamplerService:
     # ========================================================================
     
     @staticmethod
-    @jit
     def _metropolis_accept(
+        current_energy: float,
+        proposed_energy: float,
+        temperature: float,
+        rng_key: Any
+    ) -> Tuple[bool, Any]:
+        """Metropolis acceptance criterion"""
+        if JAX_AVAILABLE:
+            return ThermalSamplerService._metropolis_accept_jax(current_energy, proposed_energy, temperature, rng_key)
+            
+        delta_e = proposed_energy - current_energy
+        if delta_e < 0:
+            return True, rng_key
+        
+        rng_key, subkey = random.split(rng_key)
+        acceptance_prob = np.exp(-delta_e / temperature)
+        accept = random.uniform(subkey) < acceptance_prob
+        return accept, rng_key
+
+    @staticmethod
+    @jit
+    def _metropolis_accept_jax(
         current_energy: float,
         proposed_energy: float,
         temperature: float,
         rng_key: jax.random.PRNGKey
     ) -> Tuple[bool, jax.random.PRNGKey]:
-        """Metropolis acceptance criterion"""
         delta_e = proposed_energy - current_energy
         
         # Use jax.lax.cond for JIT compatibility

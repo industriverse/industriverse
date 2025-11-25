@@ -18,18 +18,29 @@ export function TheGauntlet() {
     });
 
     useEffect(() => {
-        // Mock data fetch - in real app this hits /v1/utid/verify
         const fetchWallet = async () => {
-            // Simulate network delay
-            await new Promise(r => setTimeout(r, 1000));
-            setWallet({
-                utid: "UTID:H100:8X:7F3A",
-                credits: 4500, // Joules
-                reputation: 98.5,
-                trust_level: 'gold'
-            });
+            try {
+                // In a real app, we'd get the user's UTID from auth context.
+                // For this demo, we'll use a hardcoded "current user" UTID or fetch one.
+                const demoUtid = "UTID:USER:DEMO_001";
+                const res = await fetch(`/v1/utid/wallet/${demoUtid}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setWallet({
+                        utid: data.utid,
+                        credits: data.credits,
+                        reputation: data.reputation,
+                        trust_level: data.trust_level as any
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to fetch wallet", e);
+            }
         };
         fetchWallet();
+        // Poll for updates
+        const interval = setInterval(fetchWallet, 5000);
+        return () => clearInterval(interval);
     }, []);
 
     return (

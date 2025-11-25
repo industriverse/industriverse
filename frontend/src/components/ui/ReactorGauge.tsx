@@ -18,19 +18,26 @@ export function ReactorGauge() {
     });
 
     useEffect(() => {
-        // Mock pulse
-        const interval = setInterval(() => {
-            setState(prev => {
-                const noise = (Math.random() - 0.5) * 5;
-                const newEntropy = Math.max(0, Math.min(100, prev.entropy + noise));
-                return {
-                    ...prev,
-                    entropy: newEntropy,
-                    is_overheating: newEntropy > 80,
-                    stability: newEntropy > 80 ? "CRITICAL" : newEntropy > 60 ? "UNSTABLE" : "STABLE"
-                };
-            });
-        }, 1000);
+        const fetchState = async () => {
+            try {
+                const res = await fetch("/v1/shield/state");
+                if (res.ok) {
+                    const data = await res.json();
+                    const metrics = data.metrics || {};
+                    setState({
+                        entropy: metrics.system_entropy || 0,
+                        stability: data.status === "stable" ? "STABLE" : "UNSTABLE",
+                        threat_level: metrics.threat_level || 0,
+                        is_overheating: (metrics.system_entropy || 0) > 80
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to fetch reactor state", e);
+            }
+        };
+
+        fetchState();
+        const interval = setInterval(fetchState, 2000);
         return () => clearInterval(interval);
     }, []);
 

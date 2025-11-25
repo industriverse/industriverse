@@ -19,12 +19,6 @@ Use cases:
 """
 
 import asyncio
-import jax
-import jax.numpy as jnp
-from jax import random, jit, vmap, grad, lax
-import flax.linen as nn
-from flax.training import train_state
-import optax
 import numpy as np
 from typing import Dict, List, Tuple, Optional, Any, Callable
 from dataclasses import dataclass, field
@@ -32,6 +26,32 @@ from datetime import datetime
 from enum import Enum
 import json
 import hashlib
+
+# Try to import JAX/Flax, fall back to mock if fails
+try:
+    import jax
+    import jax.numpy as jnp
+    from jax import random, jit, vmap, grad, lax
+    import flax.linen as nn
+    from flax.training import train_state
+    import optax
+    JAX_AVAILABLE = True
+except Exception as e:
+    print(f"WARNING: JAX/Flax not available ({e}). Using mock mode.")
+    JAX_AVAILABLE = False
+    # Mock JAX/Flax objects
+    class MockModule:
+        pass
+    nn = MockModule()
+    nn.Module = object
+    jnp = np
+    def jit(f): return f
+    
+    class MockRandom:
+        def PRNGKey(self, seed): return seed
+        def split(self, key): return key, key
+        def uniform(self, key, shape): return np.random.uniform(size=shape)
+    random = MockRandom()
 
 # ============================================================================
 # TYPES & ENUMS
@@ -89,70 +109,78 @@ class SimulationResult:
 # NEURAL WORLD MODEL (Transformer-based)
 # ============================================================================
 
-class WorldModelTransformer(nn.Module):
-    """
-    Transformer-based world model for physics prediction.
-    
-    Predicts next state given current state and action.
-    """
-    features: int = 256
-    num_heads: int = 8
-    num_layers: int = 6
-    
-    @nn.compact
-    def __call__(self, state: jnp.ndarray, action: Optional[jnp.ndarray] = None, training: bool = False):
-        # Flatten spatial dimensions
-        batch_size = state.shape[0]
-        spatial_dims = state.shape[1:-1]
-        channels = state.shape[-1]
+# ============================================================================
+# NEURAL WORLD MODEL (Transformer-based)
+# ============================================================================
+
+if JAX_AVAILABLE:
+    class WorldModelTransformer(nn.Module):
+        """
+        Transformer-based world model for physics prediction.
         
-        # Reshape to sequence
-        x = state.reshape(batch_size, -1, channels)
+        Predicts next state given current state and action.
+        """
+        features: int = 256
+        num_heads: int = 8
+        num_layers: int = 6
         
-        # Add action if provided
-        if action is not None:
-            action_expanded = jnp.tile(action[:, None, :], (1, x.shape[1], 1))
-            x = jnp.concatenate([x, action_expanded], axis=-1)
-        
-        # Positional encoding
-        seq_len = x.shape[1]
-        pos_encoding = self._positional_encoding(seq_len, self.features)
-        
-        # Project to model dimension
-        x = nn.Dense(self.features)(x)
-        x = x + pos_encoding
-        
-        # Transformer layers
-        for _ in range(self.num_layers):
-            # Multi-head attention
-            attn_output = nn.MultiHeadDotProductAttention(
-                num_heads=self.num_heads,
-                qkv_features=self.features
-            )(x, x)
-            x = nn.LayerNorm()(x + attn_output)
+        @nn.compact
+        def __call__(self, state: jnp.ndarray, action: Optional[jnp.ndarray] = None, training: bool = False):
+            # Flatten spatial dimensions
+            batch_size = state.shape[0]
+            spatial_dims = state.shape[1:-1]
+            channels = state.shape[-1]
             
-            # Feed-forward
-            ff_output = nn.Dense(self.features * 4)(x)
-            ff_output = nn.gelu(ff_output)
-            ff_output = nn.Dense(self.features)(ff_output)
-            x = nn.LayerNorm()(x + ff_output)
+            # Reshape to sequence
+            x = state.reshape(batch_size, -1, channels)
+            
+            # Add action if provided
+            if action is not None:
+                action_expanded = jnp.tile(action[:, None, :], (1, x.shape[1], 1))
+                x = jnp.concatenate([x, action_expanded], axis=-1)
+            
+            # Positional encoding
+            seq_len = x.shape[1]
+            pos_encoding = self._positional_encoding(seq_len, self.features)
+            
+            # Project to model dimension
+            x = nn.Dense(self.features)(x)
+            x = x + pos_encoding
+            
+            # Transformer layers
+            for _ in range(self.num_layers):
+                # Multi-head attention
+                attn_output = nn.MultiHeadDotProductAttention(
+                    num_heads=self.num_heads,
+                    qkv_features=self.features
+                )(x, x)
+                x = nn.LayerNorm()(x + attn_output)
+                
+                # Feed-forward
+                ff_output = nn.Dense(self.features * 4)(x)
+                ff_output = nn.gelu(ff_output)
+                ff_output = nn.Dense(self.features)(ff_output)
+                x = nn.LayerNorm()(x + ff_output)
+            
+            # Project back to spatial dimensions
+            x = nn.Dense(channels)(x)
+            x = x.reshape(batch_size, *spatial_dims, channels)
+            
+            return x
         
-        # Project back to spatial dimensions
-        x = nn.Dense(channels)(x)
-        x = x.reshape(batch_size, *spatial_dims, channels)
-        
-        return x
-    
-    def _positional_encoding(self, seq_len: int, d_model: int) -> jnp.ndarray:
-        """Generate positional encoding"""
-        position = jnp.arange(seq_len)[:, None]
-        div_term = jnp.exp(jnp.arange(0, d_model, 2) * -(jnp.log(10000.0) / d_model))
-        
-        pe = jnp.zeros((seq_len, d_model))
-        pe = pe.at[:, 0::2].set(jnp.sin(position * div_term))
-        pe = pe.at[:, 1::2].set(jnp.cos(position * div_term))
-        
-        return pe[None, :, :]
+        def _positional_encoding(self, seq_len: int, d_model: int) -> jnp.ndarray:
+            """Generate positional encoding"""
+            position = jnp.arange(seq_len)[:, None]
+            div_term = jnp.exp(jnp.arange(0, d_model, 2) * -(jnp.log(10000.0) / d_model))
+            
+            pe = jnp.zeros((seq_len, d_model))
+            pe = pe.at[:, 0::2].set(jnp.sin(position * div_term))
+            pe = pe.at[:, 1::2].set(jnp.cos(position * div_term))
+            
+            return pe[None, :, :]
+else:
+    class WorldModelTransformer:
+        pass
 
 # ============================================================================
 # PHYSICS SIMULATORS
@@ -162,22 +190,44 @@ class PhysicsSimulator:
     """Base class for physics simulators"""
     
     @staticmethod
-    @jit
-    def laplacian_2d(field: jnp.ndarray) -> jnp.ndarray:
+    def laplacian_2d(field: np.ndarray) -> np.ndarray:
         """Compute 2D Laplacian using finite differences"""
-        laplacian = (
+        if JAX_AVAILABLE:
+            return PhysicsSimulator._laplacian_2d_jax(field)
+        
+        # Numpy implementation
+        return (
+            np.roll(field, 1, axis=0) +
+            np.roll(field, -1, axis=0) +
+            np.roll(field, 1, axis=1) +
+            np.roll(field, -1, axis=1) -
+            4 * field
+        )
+
+    @staticmethod
+    @jit
+    def _laplacian_2d_jax(field: jnp.ndarray) -> jnp.ndarray:
+        return (
             jnp.roll(field, 1, axis=0) +
             jnp.roll(field, -1, axis=0) +
             jnp.roll(field, 1, axis=1) +
             jnp.roll(field, -1, axis=1) -
             4 * field
         )
-        return laplacian
     
     @staticmethod
-    @jit
-    def gradient_2d(field: jnp.ndarray) -> Tuple[jnp.ndarray, jnp.ndarray]:
+    def gradient_2d(field: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Compute 2D gradient using central differences"""
+        if JAX_AVAILABLE:
+            return PhysicsSimulator._gradient_2d_jax(field)
+            
+        grad_x = (np.roll(field, -1, axis=1) - np.roll(field, 1, axis=1)) / 2.0
+        grad_y = (np.roll(field, -1, axis=0) - np.roll(field, 1, axis=0)) / 2.0
+        return grad_x, grad_y
+
+    @staticmethod
+    @jit
+    def _gradient_2d_jax(field: jnp.ndarray) -> Tuple[jnp.ndarray, jnp.ndarray]:
         grad_x = (jnp.roll(field, -1, axis=1) - jnp.roll(field, 1, axis=1)) / 2.0
         grad_y = (jnp.roll(field, -1, axis=0) - jnp.roll(field, 1, axis=0)) / 2.0
         return grad_x, grad_y
@@ -186,78 +236,102 @@ class ResistDiffusionSimulator(PhysicsSimulator):
     """Photoresist diffusion simulator"""
     
     @staticmethod
-    @jit
     def step(
-        concentration: jnp.ndarray,
-        temperature: jnp.ndarray,
+        concentration: np.ndarray,
+        temperature: np.ndarray,
         dt: float,
         diffusion_coeff: float = 0.1,
         reaction_rate: float = 0.01
-    ) -> jnp.ndarray:
+    ) -> np.ndarray:
         """
         Simulate one time step of resist diffusion.
-        
-        Uses reaction-diffusion equation:
-        ∂C/∂t = D∇²C - kC
         """
-        # Diffusion term
+        if JAX_AVAILABLE:
+            return ResistDiffusionSimulator._step_jax(concentration, temperature, dt, diffusion_coeff, reaction_rate)
+
+        # Numpy implementation
         laplacian = PhysicsSimulator.laplacian_2d(concentration)
         diffusion = diffusion_coeff * laplacian
-        
-        # Temperature-dependent reaction
         reaction = -reaction_rate * concentration * (1.0 + 0.1 * temperature)
-        
-        # Update concentration
         new_concentration = concentration + dt * (diffusion + reaction)
-        
-        # Clamp to physical range
+        new_concentration = np.clip(new_concentration, 0.0, 1.0)
+        return new_concentration
+
+    @staticmethod
+    @jit
+    def _step_jax(concentration, temperature, dt, diffusion_coeff, reaction_rate):
+        laplacian = PhysicsSimulator._laplacian_2d_jax(concentration)
+        diffusion = diffusion_coeff * laplacian
+        reaction = -reaction_rate * concentration * (1.0 + 0.1 * temperature)
+        new_concentration = concentration + dt * (diffusion + reaction)
         new_concentration = jnp.clip(new_concentration, 0.0, 1.0)
-        
         return new_concentration
 
 class PlasmaSimulator(PhysicsSimulator):
     """Plasma dynamics simulator"""
     
     @staticmethod
-    @jit
     def step(
-        density: jnp.ndarray,
-        velocity_x: jnp.ndarray,
-        velocity_y: jnp.ndarray,
-        temperature: jnp.ndarray,
+        density: np.ndarray,
+        velocity_x: np.ndarray,
+        velocity_y: np.ndarray,
+        temperature: np.ndarray,
         dt: float,
         viscosity: float = 0.01
-    ) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray, jnp.ndarray]:
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Simulate one time step of plasma dynamics.
-        
-        Uses simplified MHD equations.
         """
-        # Advection
+        if JAX_AVAILABLE:
+            return PlasmaSimulator._step_jax(density, velocity_x, velocity_y, temperature, dt, viscosity)
+
+        # Numpy implementation
         grad_density_x, grad_density_y = PhysicsSimulator.gradient_2d(density)
         advection_density = -(velocity_x * grad_density_x + velocity_y * grad_density_y)
         
-        # Viscous diffusion
         laplacian_vx = PhysicsSimulator.laplacian_2d(velocity_x)
         laplacian_vy = PhysicsSimulator.laplacian_2d(velocity_y)
         diffusion_vx = viscosity * laplacian_vx
         diffusion_vy = viscosity * laplacian_vy
         
-        # Pressure gradient (simplified)
         grad_temp_x, grad_temp_y = PhysicsSimulator.gradient_2d(temperature)
         pressure_force_x = -0.1 * grad_temp_x
         pressure_force_y = -0.1 * grad_temp_y
         
-        # Update fields
         new_density = density + dt * advection_density
         new_velocity_x = velocity_x + dt * (diffusion_vx + pressure_force_x)
         new_velocity_y = velocity_y + dt * (diffusion_vy + pressure_force_y)
         
-        # Temperature evolution (simplified)
         laplacian_temp = PhysicsSimulator.laplacian_2d(temperature)
         new_temperature = temperature + dt * 0.05 * laplacian_temp
         
-        # Clamp to physical ranges
+        new_density = np.clip(new_density, 0.0, 10.0)
+        new_temperature = np.clip(new_temperature, 0.0, 10.0)
+        
+        return new_density, new_velocity_x, new_velocity_y, new_temperature
+
+    @staticmethod
+    @jit
+    def _step_jax(density, velocity_x, velocity_y, temperature, dt, viscosity):
+        grad_density_x, grad_density_y = PhysicsSimulator._gradient_2d_jax(density)
+        advection_density = -(velocity_x * grad_density_x + velocity_y * grad_density_y)
+        
+        laplacian_vx = PhysicsSimulator._laplacian_2d_jax(velocity_x)
+        laplacian_vy = PhysicsSimulator._laplacian_2d_jax(velocity_y)
+        diffusion_vx = viscosity * laplacian_vx
+        diffusion_vy = viscosity * laplacian_vy
+        
+        grad_temp_x, grad_temp_y = PhysicsSimulator._gradient_2d_jax(temperature)
+        pressure_force_x = -0.1 * grad_temp_x
+        pressure_force_y = -0.1 * grad_temp_y
+        
+        new_density = density + dt * advection_density
+        new_velocity_x = velocity_x + dt * (diffusion_vx + pressure_force_x)
+        new_velocity_y = velocity_y + dt * (diffusion_vy + pressure_force_y)
+        
+        laplacian_temp = PhysicsSimulator._laplacian_2d_jax(temperature)
+        new_temperature = temperature + dt * 0.05 * laplacian_temp
+        
         new_density = jnp.clip(new_density, 0.0, 10.0)
         new_temperature = jnp.clip(new_temperature, 0.0, 10.0)
         

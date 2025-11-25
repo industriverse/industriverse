@@ -81,6 +81,10 @@ from src.core.energy_atlas.atlas_core import EnergyAtlas
 from src.core.nvp.nvp_predictor import NVPPredictor
 from src.core.nvp.schema import TelemetryVector, PredictionResult
 
+# Proof Economy Integration
+from src.proof_core.integrity_layer.integrity_manager import IntegrityManager
+import uuid
+
 # ============================================================================
 # REQUEST/RESPONSE MODELS
 # ============================================================================
@@ -88,6 +92,7 @@ from src.core.nvp.schema import TelemetryVector, PredictionResult
 class ThermalSamplingRequest(BaseModel):
     """Request for thermal sampling"""
     problem_type: str = Field(..., description="Type of optimization problem")
+    dataset_id: Optional[str] = Field(None, description="Physics dataset to use as prior")
     variables: Dict[str, Any] = Field(..., description="Problem variables")
     constraints: List[Dict[str, Any]] = Field(default_factory=list, description="Constraints")
     num_samples: int = Field(1000, description="Number of samples")
@@ -190,12 +195,24 @@ class BridgeAPI:
         # Initialize Energy Atlas & NVP
         self.energy_atlas = EnergyAtlas(use_mock=True)
         try:
+
             self.energy_atlas.load_manifest("src/core/energy_atlas/sample_manifest.json")
+            # Auto-load regenerated maps
+            map_dir = "/tmp/energy_maps_test"
+            if os.path.exists(map_dir):
+                for f in os.listdir(map_dir):
+                    if f.endswith("_energy_map.npz"):
+                        name = f.replace("_energy_map.npz", "")
+                        self.energy_atlas.ingest_energy_map(name, os.path.join(map_dir, f))
         except Exception as e:
-            print(f"Warning: Could not load sample manifest: {e}")
+            print(f"Warning: Could not load sample manifest or maps: {e}")
             
         self.nvp_predictor = NVPPredictor(context_window=20)
         
+        # Initialize Proof Repository
+        self.integrity_manager = IntegrityManager()
+        self.proof_repository = self.integrity_manager.repository
+
         # Register routes
         self._register_routes()
     
@@ -229,11 +246,17 @@ class BridgeAPI:
                     constraints.append(constraint)
                 
                 # Create landscape
+                # If dataset_id is provided, use it as the energy landscape
+                prior_map = None
+                if request.dataset_id and request.dataset_id in self.energy_atlas.energy_maps:
+                    prior_map = self.energy_atlas.energy_maps[request.dataset_id]["data"]
+
                 landscape_id = self.thermal_sampler.create_landscape(
                     problem_type=ProblemType(request.problem_type),
                     dimensions=len(request.variables),
                     constraints=constraints,
-                    bounds=[request.variables[k] for k in sorted(request.variables.keys())]
+                    bounds=[request.variables[k] for k in sorted(request.variables.keys())],
+                    prior_map=prior_map # Pass the physics map
                 )
                 
                 # Run thermal sampling
@@ -250,13 +273,31 @@ class BridgeAPI:
                         best_energy = r.energy
                         best_idx = i
                 
+                # Generate Proof of Compute
+                proof_id = f"proof_{uuid.uuid4().hex[:8]}"
+                if hasattr(self, "proof_repository"):
+                    self.proof_repository.store({
+                        "proof_id": proof_id,
+                        "utid": "UTID:SYSTEM:THERMAL_SAMPLER",
+                        "domain": "thermal_optimization",
+                        "inputs": {"problem_type": request.problem_type, "variables": request.variables},
+                        "outputs": {"best_energy": float(best_energy)},
+                        "metadata": {
+                            "status": "verified",
+                            "proof_score": 1.0, # High confidence for internal compute
+                            "energy_joules": float(best_energy) if best_energy != float('inf') else 0.0,
+                            "timestamp": datetime.now().isoformat()
+                        },
+                        "parent_proof_id": None
+                    })
+
                 return ThermalSamplingResponse(
                     sampling_id=landscape_id,
                     solutions=[{f"x{i}": float(v) for i, v in enumerate(r.state)} for r in results],
                     energies=[float(r.energy) for r in results],
                     best_solution={f"x{i}": float(v) for i, v in enumerate(results[best_idx].state)} if results else {},
                     best_energy=float(best_energy),
-                    proof_hash=results[best_idx].proof_hash if results else "",
+                    proof_hash=proof_id, # Use proof_id as hash for now
                     timestamp=results[best_idx].timestamp.isoformat() if results else datetime.now().isoformat()
                 )
             except Exception as e:
@@ -303,6 +344,24 @@ class BridgeAPI:
                 # Run simulation
                 result = await self.world_model.simulate(config, initial_state)
                 
+                # Generate Proof of Simulation
+                proof_id = f"proof_{uuid.uuid4().hex[:8]}"
+                if hasattr(self, "proof_repository"):
+                    self.proof_repository.store({
+                        "proof_id": proof_id,
+                        "utid": "UTID:SYSTEM:WORLD_MODEL",
+                        "domain": request.domain,
+                        "inputs": {"grid_size": request.grid_size, "time_steps": request.time_steps},
+                        "outputs": {"final_energy": result.energy_trajectory[-1] if result.energy_trajectory else 0},
+                        "metadata": {
+                            "status": "verified",
+                            "proof_score": 0.95,
+                            "energy_joules": result.energy_trajectory[-1] if result.energy_trajectory else 0.0,
+                            "timestamp": result.timestamp.isoformat()
+                        },
+                        "parent_proof_id": None
+                    })
+
                 return WorldModelSimulationResponse(
                     simulation_id=result.simulation_id,
                     domain=result.initial_state.domain.value,

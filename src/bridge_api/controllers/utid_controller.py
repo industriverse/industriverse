@@ -32,6 +32,12 @@ class UTIDRecordResponse(BaseModel):
     context_digest: str
     context: Optional[Dict[str, Any]] = None
 
+class WalletResponse(BaseModel):
+    utid: str
+    credits: float
+    reputation: float
+    trust_level: str
+
 
 @router.post("/generate", response_model=UTIDGenerateResponse)
 async def generate_utid(req: UTIDGenerateRequest):
@@ -60,3 +66,20 @@ async def list_utids(limit: int = 50, offset: int = 0, context_digest: Optional[
         }
         for item in items
     ]
+
+@router.get("/wallet/{utid}", response_model=WalletResponse)
+async def get_wallet(utid: str):
+    # Mock Wallet Logic (Persistent in a real implementation)
+    # Deterministic credits based on UTID hash for demo consistency
+    seed = sum(ord(c) for c in utid)
+    credits = (seed * 123) % 10000
+    reputation = (seed % 100)
+    
+    trust_level = "gold" if reputation > 90 else "silver" if reputation > 50 else "bronze"
+    
+    return {
+        "utid": utid,
+        "credits": float(credits),
+        "reputation": float(reputation),
+        "trust_level": trust_level
+    }
