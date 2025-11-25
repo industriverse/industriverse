@@ -653,7 +653,10 @@ class StorageManagementSystem:
                 try:
                     pd.to_datetime(sample_df[col])
                     datetime_cols.append(col)
-                except:
+                except (ValueError, TypeError, KeyError):
+                    # ValueError: invalid date format
+                    # TypeError: incompatible type for datetime conversion
+                    # KeyError: column doesn't exist
                     pass
             
             if datetime_cols:
@@ -672,7 +675,12 @@ class StorageManagementSystem:
                     return "image"
                 else:
                     return "json"
-            except:
+            except (json.JSONDecodeError, FileNotFoundError, PermissionError, KeyError, TypeError):
+                # JSONDecodeError: invalid JSON format
+                # FileNotFoundError: file doesn't exist
+                # PermissionError: can't read file
+                # KeyError: unexpected data structure
+                # TypeError: data is not indexable
                 return "json"
         else:
             return "unknown"
@@ -728,7 +736,11 @@ class StorageManagementSystem:
                     return str(int(result[0]) + 1)
                 else:
                     return "1"
-            except:
+            except (sqlite3.Error, TypeError, ValueError, IndexError):
+                # sqlite3.Error: database error
+                # TypeError: result[0] is None
+                # ValueError: can't cast to int
+                # IndexError: result is empty
                 # Fallback to timestamp
                 return datetime.now().strftime("%Y%m%d%H%M%S")
         elif version_naming == "semantic":
@@ -755,7 +767,10 @@ class StorageManagementSystem:
                 
                 # Default to 0.1.0
                 return "0.1.0"
-            except:
+            except (sqlite3.Error, IndexError, TypeError):
+                # sqlite3.Error: database error
+                # IndexError: result is empty
+                # TypeError: invalid type conversion
                 # Fallback to 0.1.0
                 return "0.1.0"
         else:
@@ -1540,7 +1555,9 @@ class StorageManagementSystem:
                         try:
                             # Try to parse JSON
                             metadata[key] = json.loads(value)
-                        except:
+                        except (json.JSONDecodeError, TypeError):
+                            # JSONDecodeError: invalid JSON
+                            # TypeError: value is not a string
                             metadata[key] = value
                     
                     dataset_info["metadata"] = metadata

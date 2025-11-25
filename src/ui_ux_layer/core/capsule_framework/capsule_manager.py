@@ -42,8 +42,14 @@ class CapsuleManager:
     CONFIDENCE_LOW = "low"
     CONFIDENCE_UNKNOWN = "unknown"
     
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
-        """Initialize the Capsule Manager with optional configuration."""
+    def __init__(self, config: Optional[Dict[str, Any]] = None, ar_vr_adapter=None):
+        """
+        Initialize the Capsule Manager with optional configuration.
+
+        Args:
+            config: Configuration dictionary
+            ar_vr_adapter: Optional AR/VR Integration Adapter for AR rendering (Week 18-19 Day 7)
+        """
         self.config = config or {}
         self.capsules = {}
         self.morphology_engine = None
@@ -54,8 +60,11 @@ class CapsuleManager:
         self.state_machine = None
         self.event_bus = None
         self.event_subscribers = {}
-        
+        self.ar_vr_adapter = ar_vr_adapter  # Week 18-19 Day 7: AR/VR integration
+
         logger.info("Capsule Manager initialized with config: %s", self.config)
+        if self.ar_vr_adapter:
+            logger.info("AR/VR Integration Adapter connected to Capsule Manager")
     
     def initialize(self):
         """Initialize the Capsule Manager and all its components."""
@@ -727,3 +736,258 @@ class CapsuleManager:
         except Exception as e:
             logger.error("Error deserializing capsule manager state: %s", e)
             return False
+
+    # ========================================================================
+    # AR/VR Integration (Week 18-19 Day 7)
+    # ========================================================================
+
+    async def render_capsule_in_ar(
+        self,
+        capsule_id: str,
+        environment_id: str,
+        spatial_anchor: Dict[str, Any],
+        ar_config: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Render capsule in AR/VR environment.
+
+        Flow:
+        1. Get capsule from local registry
+        2. Adapt capsule morphology for AR (using morphology_engine)
+        3. Request AR spawn through ar_vr_adapter
+        4. Track AR instance locally
+        5. Update capsule state to include AR rendering
+
+        Args:
+            capsule_id: Capsule ID
+            environment_id: AR/VR environment ID
+            spatial_anchor: Spatial anchor data {position: {x, y, z}, rotation: {x, y, z, w}}
+            ar_config: Optional AR configuration override
+
+        Returns:
+            AR spawn result
+
+        Week 18-19 Day 7: AR/VR rendering integration
+        """
+        if not self.ar_vr_adapter:
+            logger.error("AR/VR adapter not configured - cannot render in AR")
+            return {
+                "status": "error",
+                "error": "ar_vr_adapter_not_configured"
+            }
+
+        if capsule_id not in self.capsules:
+            logger.error(f"Capsule not found: {capsule_id}")
+            return {
+                "status": "error",
+                "error": f"capsule_not_found: {capsule_id}"
+            }
+
+        try:
+            logger.info(f"Rendering capsule {capsule_id} in AR environment {environment_id}")
+
+            capsule = self.capsules[capsule_id]
+            ar_config = ar_config or {}
+
+            # Step 1: Adapt capsule morphology for AR
+            ar_spawn_config = self._adapt_capsule_morphology_for_ar(
+                capsule=capsule,
+                ar_config=ar_config
+            )
+
+            # Step 2: Request AR spawn through adapter
+            spawn_result = await self.ar_vr_adapter.orchestrate_ar_capsule_spawn(
+                capsule_id=capsule_id,
+                environment_id=environment_id,
+                spatial_anchor=spatial_anchor,
+                spawn_config=ar_spawn_config
+            )
+
+            if spawn_result.get("status") == "success":
+                # Step 3: Track AR instance in capsule metadata
+                if "ar_instances" not in capsule:
+                    capsule["ar_instances"] = {}
+
+                capsule["ar_instances"][environment_id] = {
+                    "ar_instance_id": spawn_result.get("ar_instance_id"),
+                    "anchor_id": spawn_result.get("anchor_id"),
+                    "spawned_at": spawn_result.get("ar_instance_data", {}).get("spawned_at"),
+                    "spawn_config": ar_spawn_config
+                }
+
+                # Step 4: Emit event
+                if self.event_bus:
+                    self.event_bus.emit("capsule_rendered_in_ar", {
+                        "capsule_id": capsule_id,
+                        "environment_id": environment_id,
+                        "ar_instance_id": spawn_result.get("ar_instance_id")
+                    })
+
+                logger.info(f"Capsule {capsule_id} successfully rendered in AR: {spawn_result.get('ar_instance_id')}")
+
+            return spawn_result
+
+        except Exception as e:
+            logger.error(f"Failed to render capsule in AR: {e}")
+            return {
+                "status": "error",
+                "error": str(e)
+            }
+
+    async def despawn_capsule_from_ar(
+        self,
+        capsule_id: str,
+        environment_id: str
+    ) -> Dict[str, Any]:
+        """
+        Despawn capsule from AR/VR environment.
+
+        Args:
+            capsule_id: Capsule ID
+            environment_id: AR/VR environment ID
+
+        Returns:
+            Despawn result
+        """
+        if not self.ar_vr_adapter:
+            return {
+                "status": "error",
+                "error": "ar_vr_adapter_not_configured"
+            }
+
+        if capsule_id not in self.capsules:
+            return {
+                "status": "error",
+                "error": f"capsule_not_found: {capsule_id}"
+            }
+
+        try:
+            capsule = self.capsules[capsule_id]
+
+            # Check if capsule has AR instance in this environment
+            if "ar_instances" not in capsule or environment_id not in capsule["ar_instances"]:
+                return {
+                    "status": "error",
+                    "error": "capsule_not_in_ar_environment"
+                }
+
+            # Despawn from AR
+            despawn_result = await self.ar_vr_adapter.despawn_ar_capsule(
+                capsule_id=capsule_id,
+                environment_id=environment_id
+            )
+
+            if despawn_result.get("status") == "success":
+                # Remove AR instance tracking
+                del capsule["ar_instances"][environment_id]
+
+                # Emit event
+                if self.event_bus:
+                    self.event_bus.emit("capsule_despawned_from_ar", {
+                        "capsule_id": capsule_id,
+                        "environment_id": environment_id
+                    })
+
+                logger.info(f"Capsule {capsule_id} despawned from AR environment {environment_id}")
+
+            return despawn_result
+
+        except Exception as e:
+            logger.error(f"Failed to despawn capsule from AR: {e}")
+            return {
+                "status": "error",
+                "error": str(e)
+            }
+
+    def get_ar_instances(self, capsule_id: str) -> Dict[str, Any]:
+        """
+        Get all AR instances for a capsule.
+
+        Args:
+            capsule_id: Capsule ID
+
+        Returns:
+            Dictionary of AR instances by environment_id
+        """
+        if capsule_id not in self.capsules:
+            return {}
+
+        return self.capsules[capsule_id].get("ar_instances", {})
+
+    def _adapt_capsule_morphology_for_ar(
+        self,
+        capsule: Dict[str, Any],
+        ar_config: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Adapt capsule morphology for AR rendering.
+
+        Uses morphology_engine to determine visual configuration.
+
+        Args:
+            capsule: Capsule data
+            ar_config: AR configuration override
+
+        Returns:
+            AR spawn configuration
+        """
+        # Extract capsule visual properties
+        capsule_config = capsule.get("config", {})
+        capsule_type = capsule_config.get("type", self.TYPE_AGENT)
+        capsule_state = capsule.get("state", self.STATE_IDLE)
+
+        # Use morphology engine if available
+        if self.morphology_engine:
+            try:
+                # Get morphology visualization data
+                morphology_data = self.morphology_engine.get_morphology(capsule["id"])
+
+                # Extract visual properties from morphology
+                visual_config = {
+                    "model": ar_config.get("model") or morphology_data.get("shape", "default_capsule"),
+                    "scale": ar_config.get("scale") or morphology_data.get("scale", {"x": 1.0, "y": 1.0, "z": 1.0}),
+                    "color": ar_config.get("color") or morphology_data.get("color", self._get_type_color(capsule_type)),
+                    "opacity": ar_config.get("opacity") or morphology_data.get("opacity", 1.0)
+                }
+            except (AttributeError, KeyError):
+                # Fallback if morphology_engine doesn't have expected methods
+                visual_config = self._get_default_ar_visual_config(capsule_type, ar_config)
+        else:
+            # No morphology engine - use defaults
+            visual_config = self._get_default_ar_visual_config(capsule_type, ar_config)
+
+        # Add state-based visual effects
+        if capsule_state == self.STATE_ACTIVE:
+            visual_config["effects"] = ["pulsing"]
+        elif capsule_state == self.STATE_ERROR:
+            visual_config["effects"] = ["shaking", "red_flash"]
+        elif capsule_state == self.STATE_PROCESSING:
+            visual_config["effects"] = ["rotating"]
+
+        return visual_config
+
+    def _get_default_ar_visual_config(
+        self,
+        capsule_type: str,
+        ar_config: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Get default AR visual configuration based on capsule type."""
+        return {
+            "model": ar_config.get("model", "default_capsule"),
+            "scale": ar_config.get("scale", {"x": 1.0, "y": 1.0, "z": 1.0}),
+            "color": ar_config.get("color", self._get_type_color(capsule_type)),
+            "opacity": ar_config.get("opacity", 1.0)
+        }
+
+    def _get_type_color(self, capsule_type: str) -> str:
+        """Get default color based on capsule type."""
+        type_colors = {
+            self.TYPE_WORKFLOW: "#4A90E2",  # Blue
+            self.TYPE_AGENT: "#50C878",     # Green
+            self.TYPE_TASK: "#F5A623",      # Orange
+            self.TYPE_DECISION: "#9013FE",  # Purple
+            self.TYPE_MONITOR: "#00D4FF",   # Cyan
+            self.TYPE_ALERT: "#FF6B6B",     # Red
+            self.TYPE_CONTROL: "#FFD700"    # Gold
+        }
+        return type_colors.get(capsule_type, "#4A90E2")

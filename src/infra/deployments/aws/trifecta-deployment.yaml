@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trifecta-core
+  namespace: industriverse
+  labels:
+    app: trifecta
+    component: core
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: trifecta
+  template:
+    metadata:
+      labels:
+        app: trifecta
+      annotations:
+        sidecar.istio.io/inject: "true"
+        ai-shield.industriverse.ai/enabled: "true"
+    spec:
+      containers:
+      # 1. UserLM (Human Simulator)
+      - name: userlm
+        image: registry.industriverse.ai/userlm:8b-v2
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+            memory: "16Gi"
+        env:
+        - name: MODEL_PATH
+          value: "/models/UserLM-8b"
+        - name: BRIDGE_API_URL
+          value: "http://bridge-api:8000"
+
+      # 2. RND1 (Optimizer)
+      - name: rnd1
+        image: registry.industriverse.ai/rnd1:base-0910
+        resources:
+          limits:
+            nvidia.com/gpu: 2
+            memory: "32Gi"
+        env:
+        - name: OPTIMIZATION_TARGET
+          value: "latency"
+
+      # 3. ACE (Context Engineer)
+      - name: ace
+        image: registry.industriverse.ai/ace:v4
+        resources:
+          requests:
+            cpu: "2"
+            memory: "4Gi"
+        volumeMounts:
+        - name: memory-cortex
+          mountPath: /data/memory
+      
+      volumes:
+      - name: memory-cortex
+        persistentVolumeClaim:
+          claimName: ace-pvc

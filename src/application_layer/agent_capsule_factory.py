@@ -15,26 +15,41 @@ from typing import Dict, Any, List, Optional, Union
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Week 18-19 Day 2: Import CapsuleSource for coordinator integration
+try:
+    from ..overseer_system.capsule_lifecycle import CapsuleSource
+except ImportError:
+    # Fallback if overseer system not available
+    class CapsuleSource:
+        APPLICATION_LAYER = "application_layer"
+
 class AgentCapsuleFactory:
     """
     Agent Capsule Factory for the Industriverse platform.
     """
     
-    def __init__(self, agent_core):
+    def __init__(self, agent_core, lifecycle_coordinator=None):
         """
         Initialize the Agent Capsule Factory.
-        
+
         Args:
             agent_core: Reference to the agent core
+            lifecycle_coordinator: Optional CapsuleLifecycleCoordinator for unified lifecycle management
         """
         self.agent_core = agent_core
         self.capsule_templates = {}
         self.capsule_instances = {}
         self.capsule_registry = {}
-        
+        self.lifecycle_coordinator = lifecycle_coordinator  # NEW: Week 18-19 Day 2
+
         # Register with agent core
         self.agent_core.register_component("agent_capsule_factory", self)
-        
+
+        # Register with lifecycle coordinator if available (Week 18-19 integration)
+        if self.lifecycle_coordinator:
+            self.lifecycle_coordinator.register_app_factory(self)
+            logger.info("Agent Capsule Factory registered with Capsule Lifecycle Coordinator")
+
         logger.info("Agent Capsule Factory initialized")
     
     def register_capsule_template(self, template_config: Dict[str, Any]) -> Dict[str, Any]:
@@ -130,7 +145,65 @@ class AgentCapsuleFactory:
             "instance_id": instance_id,
             "instance": instance
         }
-    
+
+    async def create_capsule_instance_with_coordinator(
+        self,
+        template_id: str,
+        instance_config: Dict[str, Any],
+        deployment_context: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Create capsule instance using the full lifecycle coordinator.
+
+        This method provides complete capsule lifecycle management including:
+        - Governance validation
+        - Infrastructure provisioning
+        - Unified registry registration
+        - Evolution tracking
+
+        Args:
+            template_id: Template ID
+            instance_config: Instance configuration
+            deployment_context: Deployment context for infrastructure layer
+
+        Returns:
+            Full lifecycle creation result
+
+        Week 18-19 Day 2: New method for coordinator-based creation
+        """
+        if not self.lifecycle_coordinator:
+            # Fallback to direct creation if no coordinator
+            logger.warning("No lifecycle coordinator available - falling back to direct creation")
+            return self.create_capsule_instance(template_id, instance_config)
+
+        try:
+            logger.info(f"Creating capsule instance with full lifecycle: template={template_id}")
+
+            # Use lifecycle coordinator for full lifecycle management
+            result = await self.lifecycle_coordinator.create_capsule_full_lifecycle(
+                template_id=template_id,
+                instance_config=instance_config,
+                deployment_context=deployment_context or {},
+                source=CapsuleSource.APPLICATION_LAYER
+            )
+
+            if result.get("status") == "success":
+                # Store local copy for backward compatibility
+                app_instance = result.get("application_instance", {})
+                if app_instance and "instance_id" in app_instance:
+                    self.capsule_instances[app_instance["instance_id"]] = app_instance.get("instance", {})
+
+                logger.info(f"Capsule created with full lifecycle: {result.get('capsule_id')}")
+
+            return result
+
+        except Exception as e:
+            logger.error(f"Coordinator-based creation failed: {e}")
+            return {
+                "status": "error",
+                "error": str(e)
+            }
+
     def _register_capsule_instance(self, instance_id: str, instance: Dict[str, Any]):
         """
         Register a capsule instance in the registry.

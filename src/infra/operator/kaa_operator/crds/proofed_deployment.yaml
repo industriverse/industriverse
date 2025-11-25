@@ -1,0 +1,54 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: proofeddeployments.infra.industriverse.ai
+spec:
+  group: infra.industriverse.ai
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              template:
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+                description: Standard Pod template
+              proofPolicy:
+                type: object
+                properties:
+                  required:
+                    type: boolean
+                  proofTypes:
+                    type: array
+                    items:
+                      type: string
+              utidBinding:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum: ["hardware-bound", "soft"]
+              prewarm:
+                type: boolean
+              autoscale:
+                type: object
+                properties:
+                  minReplicas:
+                    type: integer
+                  maxReplicas:
+                    type: integer
+                  proofCostTarget:
+                    type: number
+  scope: Namespaced
+  names:
+    plural: proofeddeployments
+    singular: proofeddeployment
+    kind: ProofedDeployment
+    shortNames:
+    - pd

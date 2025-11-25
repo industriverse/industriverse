@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ai-shield-sidecar-template
+spec:
+  containers:
+  - name: ai-shield-proxy
+    image: registry.industriverse.ai/ai-shield:v2-proxy
+    args:
+    - "--mode=sidecar"
+    - "--upstream=127.0.0.1:8080"
+    - "--policy-server=http://bridge-api:8000/v1/policy"
+    ports:
+    - containerPort: 9000
+      name: shield-proxy
+    env:
+    - name: ENFORCE_UTID
+      value: "true"
+    - name: BLOCK_UNVERIFIED_PROOFS
+      value: "true"
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true

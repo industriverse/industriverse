@@ -1,0 +1,191 @@
+[
+  {
+    "capsule": "Raw Material Sourcing",
+    "category": "Category A - High-energy, dynamic systems",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:rawmat:20251124184747:88a0c5dd",
+    "prin": 0.8475
+  },
+  {
+    "capsule": "Rare-earth Refining & Metallurgy",
+    "category": "Category A - High-energy, dynamic systems",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:rareearth:20251124184747:f9da6956",
+    "prin": 0.8475
+  },
+  {
+    "capsule": "Powder Processing & Additive Feedstock",
+    "category": "Category A - High-energy, dynamic systems",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:powder:20251124184747:ece23b9f",
+    "prin": 0.85
+  },
+  {
+    "capsule": "Casting & Foundry Operations",
+    "category": "Category A - High-energy, dynamic systems",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:casting:20251124184747:797ae1c7",
+    "prin": 0.853
+  },
+  {
+    "capsule": "Forming (Rolling, Extrusion)",
+    "category": "Category A - High-energy, dynamic systems",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:forming:20251124184747:215a19e2",
+    "prin": 0.852
+  },
+  {
+    "capsule": "Machining & Precision Fabrication",
+    "category": "Category A - High-energy, dynamic systems",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:machining:20251124184747:406b2fc7",
+    "prin": 0.8525
+  },
+  {
+    "capsule": "Joining & Welding",
+    "category": "Category A - High-energy, dynamic systems",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:welding:20251124184747:1ae555a7",
+    "prin": 0.854
+  },
+  {
+    "capsule": "Surface Treatment & Coatings",
+    "category": "Category B - Flow, heat, pressure",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:coatings:20251124184747:6ab290fd",
+    "prin": 0.851
+  },
+  {
+    "capsule": "Polymers, Composites & Molding",
+    "category": "Category B - Flow, heat, pressure",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:composites:20251124184747:08cd3ede",
+    "prin": 0.853
+  },
+  {
+    "capsule": "Electronics & PCB Assembly",
+    "category": "Category B - Flow, heat, pressure",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:pcb:20251124184747:4a964a31",
+    "prin": 0.86
+  },
+  {
+    "capsule": "Sensor & Embedded Systems Integration",
+    "category": "Category B - Flow, heat, pressure",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:sensor:20251124184747:f761828d",
+    "prin": 0.8525
+  },
+  {
+    "capsule": "Permanent Magnets & Magnetic Assemblies",
+    "category": "Category B - Flow, heat, pressure",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:magnet:20251124184747:b2507785",
+    "prin": 0.8525
+  },
+  {
+    "capsule": "Chemical Synthesis & Pharma Process Lines",
+    "category": "Category B - Flow, heat, pressure",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:chem:20251124184747:be029713",
+    "prin": 0.8535
+  },
+  {
+    "capsule": "Battery Chemistry & Cell Production",
+    "category": "Category B - Flow, heat, pressure",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:battery:20251124184747:6cd8afad",
+    "prin": 0.852
+  },
+  {
+    "capsule": "Energy Generation & Microgrids (On-site)",
+    "category": "Category B - Flow, heat, pressure",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:microgrid:20251124184747:c55e0a72",
+    "prin": 0.8575
+  },
+  {
+    "capsule": "Process Control & OT/PLC Integration",
+    "category": "Category C - Swarm, logistics, active matter",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:ot:20251124184747:0680f6a5",
+    "prin": 0.859
+  },
+  {
+    "capsule": "Robotics & Material Handling (AGV/AMR)",
+    "category": "Category C - Swarm, logistics, active matter",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:robotics:20251124184747:7fadeff0",
+    "prin": 0.861
+  },
+  {
+    "capsule": "Quality Control & NDT",
+    "category": "Category C - Swarm, logistics, active matter",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:ndt:20251124184747:77b24249",
+    "prin": 0.855
+  },
+  {
+    "capsule": "Testing & Certification Labs",
+    "category": "Category C - Swarm, logistics, active matter",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:testlab:20251124184747:7613a58a",
+    "prin": 0.8575
+  },
+  {
+    "capsule": "Packaging & Final Assembly",
+    "category": "Category C - Swarm, logistics, active matter",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:assembly:20251124184747:b121fd3f",
+    "prin": 0.86
+  },
+  {
+    "capsule": "Logistics & Inbound/Outbound Routing",
+    "category": "Category C - Swarm, logistics, active matter",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:logistics:20251124184747:43362906",
+    "prin": 0.8575
+  },
+  {
+    "capsule": "Warehousing & Inventory Optimization",
+    "category": "Category C - Swarm, logistics, active matter",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:warehousing:20251124184747:ad0be7cd",
+    "prin": 0.8575
+  },
+  {
+    "capsule": "Electronics Assembly (Reflow + Pick-Place)",
+    "category": "Category D - High-complexity multi-physics",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:electronics:20251124184747:f488eaa9",
+    "prin": 0.86
+  },
+  {
+    "capsule": "PCB Manufacturing (EM + Thermal)",
+    "category": "Category D - High-complexity multi-physics",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:pcbmfg:20251124184747:8e03db38",
+    "prin": 0.8575
+  },
+  {
+    "capsule": "Sensor Integration (Signal Entropy)",
+    "category": "Category D - High-complexity multi-physics",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:sensorint:20251124184747:70d8c0f9",
+    "prin": 0.86
+  },
+  {
+    "capsule": "Surface Finishing (Fluid + Pressure)",
+    "category": "Category D - High-complexity multi-physics",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:surface:20251124184747:197a83a0",
+    "prin": 0.8575
+  },
+  {
+    "capsule": "End-to-End Lifecycle Analytics",
+    "category": "Category D - High-complexity multi-physics",
+    "status": "SUCCESS",
+    "utid": "UTID:REAL:beb20b:lifecycle:20251124184747:ef4be8dc",
+    "prin": 0.855
+  }
+]

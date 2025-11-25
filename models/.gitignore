@@ -1,0 +1,10 @@
+# Ignore large model files
+UserLM-8b/
+RND1-Base-0910/
+BitNet/
+*.bin
+*.pth
+*.pt
+*.gguf
+*.safetensors
+!download_models.sh

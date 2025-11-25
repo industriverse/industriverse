@@ -1,0 +1,274 @@
+{
+  "$schema": "https://industriverse.ai/schemas/design-tokens-v1.json",
+  "version": "1.0.0",
+  "themes": {
+    "cosmic": {
+      "name": "Industriverse Cosmic",
+      "description": "Core thermodynamic aesthetic - deep space meets factory floor",
+      "colors": {
+        "primary": {
+          "value": "#0A4B5C",
+          "description": "Deep Teal - thermodynamic depth"
+        },
+        "accent": {
+          "value": "#FF6B35",
+          "description": "Energy Orange - active processes"
+        },
+        "entropy": {
+          "value": "#9B59B6",
+          "description": "Entropy Purple - disorder visualization"
+        },
+        "proof": {
+          "value": "#2ECC71",
+          "description": "Verification Green - validated states"
+        },
+        "alert": {
+          "value": "#E74C3C",
+          "description": "Critical Red - threat detection"
+        },
+        "background": {
+          "value": "#0D1117",
+          "description": "Deep space background"
+        },
+        "surface": {
+          "value": "#161B22",
+          "description": "Elevated surfaces"
+        },
+        "text": {
+          "primary": "#E6EDF3",
+          "secondary": "#8B949E",
+          "disabled": "#6E7681"
+        }
+      },
+      "gradients": {
+        "cosmic": {
+          "value": "linear-gradient(135deg, #0A4B5C 0%, #1A1A2E 100%)",
+          "description": "Primary cosmic gradient"
+        },
+        "plasma": {
+          "value": "radial-gradient(circle, #FF6B35 0%, #9B59B6 100%)",
+          "description": "Energy plasma effect"
+        },
+        "shield": {
+          "value": "linear-gradient(90deg, #2ECC71 0%, #3498DB 100%)",
+          "description": "Security shield gradient"
+        },
+        "threat": {
+          "value": "linear-gradient(45deg, #E74C3C 0%, #C0392B 100%)",
+          "description": "Threat alert gradient"
+        }
+      },
+      "typography": {
+        "fontFamily": {
+          "primary": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          "monospace": "'JetBrains Mono', 'Fira Code', monospace"
+        },
+        "fontSize": {
+          "xs": "0.75rem",
+          "sm": "0.875rem",
+          "base": "1rem",
+          "lg": "1.125rem",
+          "xl": "1.25rem",
+          "2xl": "1.5rem",
+          "3xl": "1.875rem",
+          "4xl": "2.25rem"
+        },
+        "fontWeight": {
+          "normal": "400",
+          "medium": "500",
+          "semibold": "600",
+          "bold": "700"
+        },
+        "lineHeight": {
+          "tight": "1.25",
+          "normal": "1.5",
+          "relaxed": "1.75"
+        }
+      },
+      "spacing": {
+        "xs": "0.25rem",
+        "sm": "0.5rem",
+        "md": "1rem",
+        "lg": "1.5rem",
+        "xl": "2rem",
+        "2xl": "3rem",
+        "3xl": "4rem"
+      },
+      "motion": {
+        "duration": {
+          "fast": "150ms",
+          "normal": "300ms",
+          "slow": "500ms",
+          "pulse": "2400ms"
+        },
+        "easing": {
+          "linear": "linear",
+          "ease": "ease",
+          "easeIn": "cubic-bezier(0.4, 0, 1, 1)",
+          "easeOut": "cubic-bezier(0, 0, 0.2, 1)",
+          "easeInOut": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "bounce": "cubic-bezier(0.68, -0.55, 0.265, 1.55)"
+        },
+        "animations": {
+          "pulse_energy": {
+            "duration": "2.4s",
+            "easing": "ease-in-out",
+            "iterations": "infinite",
+            "description": "Energy flow pulse"
+          },
+          "entropy_flow": {
+            "duration": "4.8s",
+            "easing": "linear",
+            "iterations": "infinite",
+            "description": "Entropy visualization"
+          },
+          "proof_verification": {
+            "duration": "600ms",
+            "easing": "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+            "iterations": "1",
+            "description": "Proof validation feedback"
+          },
+          "threat_alert": {
+            "duration": "800ms",
+            "easing": "ease-in-out",
+            "iterations": "infinite",
+            "description": "Threat alert pulse"
+          }
+        }
+      },
+      "shadows": {
+        "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.3)",
+        "md": "0 4px 6px -1px rgba(0, 0, 0, 0.3)",
+        "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.3)",
+        "xl": "0 20px 25px -5px rgba(0, 0, 0, 0.3)",
+        "glow": "0 0 20px rgba(255, 107, 53, 0.5)"
+      },
+      "borders": {
+        "radius": {
+          "sm": "0.25rem",
+          "md": "0.375rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "width": {
+          "thin": "1px",
+          "medium": "2px",
+          "thick": "4px"
+        }
+      }
+    },
+    "chrome": {
+      "name": "Industrial Chrome",
+      "description": "Muted, professional aesthetic for corporate environments",
+      "extends": "cosmic",
+      "colors": {
+        "primary": {
+          "value": "#4A5568"
+        },
+        "accent": {
+          "value": "#3182CE"
+        },
+        "background": {
+          "value": "#F7FAFC"
+        },
+        "surface": {
+          "value": "#FFFFFF"
+        },
+        "text": {
+          "primary": "#1A202C",
+          "secondary": "#718096",
+          "disabled": "#A0AEC0"
+        }
+      },
+      "motion": {
+        "animations": {
+          "pulse_energy": {
+            "duration": "3s",
+            "description": "Subtle energy pulse"
+          }
+        }
+      }
+    },
+    "light": {
+      "name": "Light Portal",
+      "description": "Clean, accessible light theme",
+      "extends": "cosmic",
+      "colors": {
+        "primary": {
+          "value": "#2D3748"
+        },
+        "accent": {
+          "value": "#4299E1"
+        },
+        "background": {
+          "value": "#FFFFFF"
+        },
+        "surface": {
+          "value": "#F7FAFC"
+        },
+        "text": {
+          "primary": "#1A202C",
+          "secondary": "#4A5568",
+          "disabled": "#A0AEC0"
+        }
+      }
+    }
+  },
+  "components": {
+    "widget": {
+      "padding": "{spacing.md}",
+      "borderRadius": "{borders.radius.lg}",
+      "shadow": "{shadows.md}"
+    },
+    "button": {
+      "primary": {
+        "background": "{colors.primary}",
+        "color": "{colors.text.primary}",
+        "borderRadius": "{borders.radius.md}",
+        "padding": "{spacing.sm} {spacing.lg}",
+        "hoverBackground": "{colors.accent}"
+      },
+      "secondary": {
+        "background": "transparent",
+        "color": "{colors.accent}",
+        "border": "{borders.width.thin} solid {colors.accent}",
+        "borderRadius": "{borders.radius.md}",
+        "padding": "{spacing.sm} {spacing.lg}"
+      }
+    },
+    "card": {
+      "background": "{colors.surface}",
+      "borderRadius": "{borders.radius.lg}",
+      "padding": "{spacing.lg}",
+      "shadow": "{shadows.md}"
+    },
+    "input": {
+      "background": "{colors.surface}",
+      "borderColor": "{colors.text.disabled}",
+      "borderRadius": "{borders.radius.md}",
+      "padding": "{spacing.sm} {spacing.md}",
+      "focusBorderColor": "{colors.accent}"
+    }
+  },
+  "partner_customization": {
+    "allowed_overrides": [
+      "colors.primary",
+      "colors.accent",
+      "colors.background",
+      "colors.surface",
+      "typography.fontFamily.primary",
+      "motion.animations.*.duration"
+    ],
+    "preserve_required": [
+      "motion.animations.*.description",
+      "shadows.glow",
+      "gradients.plasma"
+    ],
+    "branding": {
+      "logo_placement": ["top-left", "top-center", "top-right"],
+      "logo_max_height": "48px",
+      "custom_icons_allowed": true
+    }
+  }
+}

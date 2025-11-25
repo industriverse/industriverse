@@ -952,7 +952,10 @@ class ModbusAdapter(ProtocolComponent):
                 if not result.isError():
                     for key, value in result.information.items():
                         identification[key] = value.decode('utf-8', errors='replace')
-            except:
+            except (AttributeError, UnicodeDecodeError, KeyError):
+                # AttributeError: result.information doesn't exist
+                # UnicodeDecodeError: can't decode bytes
+                # KeyError: missing expected keys
                 identification = {}
                 
             # Close connection

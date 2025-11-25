@@ -1,0 +1,126 @@
+# =============================================================================
+# Industriverse Database Configuration
+# Week 17: Unified Database Setup
+# =============================================================================
+
+# PostgreSQL Configuration
+postgresql:
+  # Connection settings
+  host: ${DATABASE_HOST:-localhost}
+  port: ${DATABASE_PORT:-5432}
+  database: ${DATABASE_NAME:-industriverse}
+  user: ${DATABASE_USER:-industriverse}
+  password: ${DATABASE_PASSWORD:-changeme}
+
+  # Connection pool settings
+  pool:
+    min_connections: 5
+    max_connections: 20
+    connection_timeout: 30
+    idle_timeout: 600
+    max_lifetime: 1800
+
+  # Performance tuning
+  statement_timeout: 30000  # 30 seconds
+  command_timeout: 60000    # 60 seconds
+  query_timeout: 30000      # 30 seconds
+
+  # SSL settings (production)
+  ssl_mode: ${DATABASE_SSL_MODE:-prefer}  # disable, prefer, require, verify-ca, verify-full
+  ssl_cert: ${DATABASE_SSL_CERT:-}
+  ssl_key: ${DATABASE_SSL_KEY:-}
+  ssl_root_cert: ${DATABASE_SSL_ROOT_CERT:-}
+
+# Redis Configuration
+redis:
+  # Connection settings
+  host: ${REDIS_HOST:-localhost}
+  port: ${REDIS_PORT:-6379}
+  password: ${REDIS_PASSWORD:-}
+  database: ${REDIS_DB:-0}
+
+  # Connection pool
+  pool:
+    max_connections: 50
+    timeout: 5000
+
+  # Cache settings
+  cache:
+    default_ttl: 3600  # 1 hour
+    behavioral_vectors_ttl: 1800  # 30 minutes
+    capsules_ttl: 300  # 5 minutes
+    sensor_readings_ttl: 60  # 1 minute
+
+# Migration Settings
+migrations:
+  directory: ./database/migrations
+  table_name: schema_migrations
+  auto_migrate: ${AUTO_MIGRATE:-false}
+
+# Backup Settings
+backup:
+  enabled: ${BACKUP_ENABLED:-true}
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 30
+  destination: ${BACKUP_DESTINATION:-./backups}
+  compress: true
+
+# Monitoring
+monitoring:
+  slow_query_threshold_ms: 1000
+  log_queries: ${LOG_QUERIES:-false}
+  log_slow_queries: true
+  metrics_enabled: true
+  metrics_port: 9090
+
+# Schema Configuration
+schemas:
+  behavioral:
+    enabled: true
+    description: "Behavioral tracking and user analytics"
+  capsules:
+    enabled: true
+    description: "Capsule management and sensor data"
+  overseer:
+    enabled: true
+    description: "System governance and health"
+  security:
+    enabled: true
+    description: "User authentication and audit logs"
+  analytics:
+    enabled: true
+    description: "Aggregated analytics and reporting"
+
+# Development/Testing
+development:
+  seed_data: ${SEED_DATA:-false}
+  drop_existing: ${DROP_EXISTING:-false}
+  verbose_logging: true
+
+# Production
+production:
+  read_replicas:
+    - host: ${READ_REPLICA_1_HOST:-}
+      port: ${READ_REPLICA_1_PORT:-5432}
+    - host: ${READ_REPLICA_2_HOST:-}
+      port: ${READ_REPLICA_2_PORT:-5432}
+
+  connection_retry:
+    max_attempts: 5
+    backoff_multiplier: 2
+    initial_delay_ms: 1000
+
+# Data Retention Policies
+retention:
+  interaction_events:
+    days: 90
+    archive_after_days: 30
+  sensor_readings:
+    days: 365
+    archive_after_days: 90
+  audit_logs:
+    days: 730  # 2 years
+    archive_after_days: 365
+  capsule_events:
+    days: 180
+    archive_after_days: 60
