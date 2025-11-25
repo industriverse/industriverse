@@ -1,0 +1,40 @@
+{
+  "capsule_id": "forming_rolling_v1",
+  "version": "1.0.0",
+  "area_code": 5,
+  "name": "Smart Forming Capsule",
+  "description": "Optimizes rolling and extrusion parameters to maximize throughput and yield.",
+  "connectors": [
+    {
+      "type": "plc",
+      "name": "roller_speed"
+    },
+    {
+      "type": "sensor",
+      "name": "load_cell"
+    }
+  ],
+  "models": [
+    {
+      "id": "stress_strain_sim",
+      "type": "simulation"
+    },
+    {
+      "id": "rnd1_process_opt",
+      "type": "optimization"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Efficiency",
+      "claim": "yield_improvement"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "stress_strain_sim",
+      "title": "Smart Forming Capsule Dashboard"
+    }
+  ]
+}

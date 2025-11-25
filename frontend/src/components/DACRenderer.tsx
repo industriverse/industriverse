@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import PlasmaVisualizer from './visualizers/PlasmaVisualizer';
 import NetworkGraph from './visualizers/NetworkGraph';
+import { Heatmap3D } from './visualizers/IndustrialWidgets/Heatmap3D';
+import { GeoMap } from './visualizers/IndustrialWidgets/GeoMap';
+import { MoleculeViewer } from './visualizers/IndustrialWidgets/MoleculeViewer';
+import { StreamlitContainer } from './StreamlitContainer';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ComponentSchema {
     type: string;
@@ -16,6 +21,16 @@ interface DACSchema {
 interface DACRendererProps {
     schema: DACSchema;
 }
+
+const componentMap: Record<string, React.ComponentType<any>> = {
+    'plasma_visualizer': PlasmaVisualizer,
+    'network_graph': NetworkGraph,
+    'Heatmap3D': Heatmap3D,
+    'GeoMap': GeoMap,
+    'MoleculeViewer': MoleculeViewer,
+    'StreamlitView': StreamlitContainer,
+    // Add more mappings here
+};
 
 const DACRenderer: React.FC<DACRendererProps> = ({ schema }) => {
     if (!schema || !schema.components) return <div className="text-red-500">Invalid DAC Schema</div>;

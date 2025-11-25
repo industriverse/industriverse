@@ -1,0 +1,40 @@
+{
+  "capsule_id": "rare_earth_refining_v1",
+  "version": "1.0.0",
+  "area_code": 2,
+  "name": "Metallurgical Intelligence Capsule",
+  "description": "Optimizes refining processes and minimizes reagent usage via chemical kinetics models.",
+  "connectors": [
+    {
+      "type": "lims",
+      "name": "lab_analysis"
+    },
+    {
+      "type": "sensor",
+      "name": "reactor_temp"
+    }
+  ],
+  "models": [
+    {
+      "id": "kinetics_solver",
+      "type": "simulation"
+    },
+    {
+      "id": "m2n2_alloy_opt",
+      "type": "evolutionary"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Compliance",
+      "claim": "purity_level"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "kinetics_solver",
+      "title": "Metallurgical Intelligence Capsule Dashboard"
+    }
+  ]
+}

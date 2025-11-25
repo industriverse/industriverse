@@ -1,0 +1,40 @@
+{
+  "capsule_id": "joining_welding_v1",
+  "version": "1.0.0",
+  "area_code": 7,
+  "name": "Weld Quality Capsule",
+  "description": "Ensures zero-defect welds through real-time arc monitoring and physics modeling.",
+  "connectors": [
+    {
+      "type": "sensor",
+      "name": "arc_voltage"
+    },
+    {
+      "type": "robot",
+      "name": "arm_telemetry"
+    }
+  ],
+  "models": [
+    {
+      "id": "plasma_physics_sim",
+      "type": "simulation"
+    },
+    {
+      "id": "weld_defect_detect",
+      "type": "inference"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Safety",
+      "claim": "weld_integrity"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "plasma_physics_sim",
+      "title": "Weld Quality Capsule Dashboard"
+    }
+  ]
+}

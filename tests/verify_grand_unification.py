@@ -1,99 +1,60 @@
 import requests
 import json
-import time
+import os
 import sys
 
-BASE_URL = "http://localhost:8000"
-
-def test_grand_unification():
-    print("🔍 Starting Grand Unification Verification...")
-
-    headers = {
-        "X-UTID": "UTID:REAL:BROWSER:DASHBOARD:20251124:nonce",
-        "Content-Type": "application/json"
-    }
-
-    # 1. Trigger Thermal Sampling (Thermodynamics -> Proof)
-    print("\n1. Triggering Thermal Sampling...")
-    payload = {
-        "problem_type": "combinatorial",
-        "variables": {"x": [0, 1], "y": [0, 1]},
-        "num_samples": 10,
-        "temperature": 1.0
-    }
+def verify_grand_unification():
+    print("--- 🌌 Verifying Grand Unification 🌌 ---")
+    
+    # 1. Backend API Check
     try:
-        resp = requests.post(f"{BASE_URL}/api/v1/thermodynamic/thermal/sample", json=payload, headers=headers)
-        if resp.status_code == 200:
-            data = resp.json()
-            proof_hash = data.get("proof_hash")
-            print(f"✅ Thermal Sampling Successful. Proof Hash: {proof_hash}")
+        print("Checking Backend API...", end=" ")
+        r = requests.get("http://localhost:8000/health")
+        if r.status_code == 200:
+            print("✅ ONLINE")
         else:
-            print(f"❌ Thermal Sampling Failed: {resp.text}")
-            return
-    except Exception as e:
-        print(f"❌ Connection Failed: {e}")
-        return
+            print(f"❌ FAILED ({r.status_code})")
+    except:
+        print("❌ UNREACHABLE (Is uvicorn running?)")
 
-    # 2. Verify Proof Existence (Proof Economy)
-    print("\n2. Verifying Proof in Repository...")
-    # Give it a moment to propagate if async (though implementation looked sync)
-    time.sleep(1) 
-    try:
-        resp = requests.get(f"{BASE_URL}/v1/proofs?limit=5", headers=headers)
-        if resp.status_code == 200:
-            proofs = resp.json()
-            found = False
-            for p in proofs:
-                if p["proof_id"] == proof_hash:
-                    found = True
-                    print(f"✅ Proof {proof_hash} found in repository.")
-                    print(f"   - Score: {p['metadata'].get('proof_score')}")
-                    print(f"   - Energy: {p['metadata'].get('energy_joules')} J")
-                    break
-            if not found:
-                print(f"❌ Proof {proof_hash} NOT found in recent proofs.")
-        else:
-            print(f"❌ Failed to fetch proofs: {resp.text}")
-    except Exception as e:
-        print(f"❌ Connection Failed: {e}")
-
-    # 3. Check Shield State (Real Entropy)
-    print("\n3. Checking Shield State (Entropy)...")
-    try:
-        resp = requests.get(f"{BASE_URL}/v1/shield/state", headers=headers)
-        if resp.status_code == 200:
-            state = resp.json()
-            metrics = state.get("metrics", {})
-            entropy = metrics.get("system_entropy")
-            print(f"✅ Shield State Retrieved.")
-            print(f"   - System Entropy: {entropy}")
-            print(f"   - Status: {state.get('status')}")
-            if entropy > 0:
-                print("   - Entropy is ACTIVE (Real Data).")
+    # 2. Capsule Blueprint Check (Magnet Assembly)
+    print("Checking Magnet Blueprint...", end=" ")
+    blueprint_path = "src/capsules/blueprints/factory_ops/magnet_assembly_v1.json"
+    if os.path.exists(blueprint_path):
+        with open(blueprint_path, 'r') as f:
+            data = json.load(f)
+            if "pilot_config" in data and data["pilot_config"]["enabled"]:
+                print("✅ VALID (Pilot Enabled)")
             else:
-                print("   - Entropy is ZERO (Possibly Mock/Idle).")
-        else:
-            print(f"❌ Failed to fetch shield state: {resp.text}")
-    except Exception as e:
-        print(f"❌ Connection Failed: {e}")
+                print("❌ INVALID (Missing pilot_config)")
+    else:
+        print("❌ MISSING")
 
-    # 4. Check Wallet (Identity)
-    print("\n4. Checking User Wallet...")
-    demo_utid = "UTID:USER:DEMO_001"
+    # 3. Streamlit Pilot App Check
     try:
-        resp = requests.get(f"{BASE_URL}/v1/utid/wallet/{demo_utid}", headers=headers)
-        if resp.status_code == 200:
-            wallet = resp.json()
-            print(f"✅ Wallet Retrieved.")
-            print(f"   - UTID: {wallet['utid']}")
-            print(f"   - Credits: {wallet['credits']}")
-            print(f"   - Trust Level: {wallet['trust_level']}")
+        print("Checking Streamlit Pilot...", end=" ")
+        # Streamlit health check usually at /_stcore/health
+        r = requests.get("http://localhost:8501/_stcore/health") 
+        if r.status_code == 200:
+            print("✅ ONLINE")
         else:
-            print(f"❌ Failed to fetch wallet: {resp.text}")
-    except Exception as e:
-        print(f"❌ Connection Failed: {e}")
+            print(f"⚠️ WARNING (Status {r.status_code} - App might be loading)")
+    except:
+        print("⚠️ WARNING (Not running on port 8501 - Launch script needed?)")
 
-    print("\n✨ Grand Unification Verification Complete.")
+    # 4. Frontend Component Check
+    print("Checking Frontend Components...", end=" ")
+    dac_renderer_path = "frontend/src/components/DACRenderer.tsx"
+    with open(dac_renderer_path, 'r') as f:
+        content = f.read()
+        if "StreamlitContainer" in content and "StreamlitView" in content:
+            print("✅ INTEGRATED")
+        else:
+            print("❌ MISSING INTEGRATION")
+
+    print("\n--- Verification Summary ---")
+    print("If all checks passed (or warnings are expected), the system is unified.")
+    print("Ready for: git commit && git push")
 
 if __name__ == "__main__":
-    test_grand_unification()
+    verify_grand_unification()

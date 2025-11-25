@@ -56,6 +56,8 @@ const Dashboard: React.FC = () => {
     const [selectedDacId, setSelectedDacId] = useState<string | null>(null);
     const [dacSchema, setDacSchema] = useState<any>(null);
     const [isLoadingDac, setIsLoadingDac] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // Added general loading state
+    const [viewMode, setViewMode] = useState<'grid' | 'grouped'>('grouped');
 
     const handleIgnite = async (id: string) => {
         console.log(`Igniting ${id}...`);
@@ -105,82 +107,75 @@ const Dashboard: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-blue-500/30">
+        <div className="min-h-screen bg-black text-white font-sans selection:bg-cyan-500/30">
             {/* Header */}
-            <header className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-md sticky top-0 z-10">
-                <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center font-bold text-white">
-                            I
+            <header className="border-b border-slate-800 bg-slate-950/50 backdrop-blur-md sticky top-0 z-10">
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                            <span className="font-bold text-lg">I</span>
                         </div>
-                        <h1 className="text-xl font-bold tracking-tight text-gray-100">
-                            INDUSTRI<span className="text-blue-500">VERSE</span>
+                        <h1 className="text-xl font-bold tracking-tight">
+                            INDUSTRI<span className="text-cyan-400">VERSE</span>
                         </h1>
                     </div>
 
-                    <div className="flex-1 max-w-2xl mx-8">
-                        <CapsuleOmniBar onIgnite={handleIgnite} />
-                    </div>
-
-                    <div className="flex items-center space-x-4">
-                        <CreditTicker balance={pulse.credits} flowRate={pulse.creditFlow} />
-                        <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-xs font-mono">
-                            OP
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-900 rounded-full border border-slate-800">
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                            <span className="text-xs font-mono text-slate-400">SYSTEM ONLINE</span>
                         </div>
+                        <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700" />
                     </div>
                 </div>
             </header>
 
-            {/* Main Content */}
-            <main className="max-w-7xl mx-auto px-4 py-8">
-                {/* Stats Row */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div className="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
-                        <div className="text-sm text-gray-500 mb-1">Global Entropy</div>
-                        <div className="text-2xl font-mono text-white">{pulse.globalEntropy.toFixed(4)}</div>
-                    </div>
-                    <div className="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
-                        <div className="text-sm text-gray-500 mb-1">Active Capsules</div>
-                        <div className="text-2xl font-mono text-blue-400">{pulse.activeCapsules}</div>
-                    </div>
-                    <div className="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
-                        <div className="text-sm text-gray-500 mb-1">System Status</div>
-                        <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                            <span className="text-green-400 font-medium">NOMINAL</span>
-                        </div>
-                    </div>
-                    <div className="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
-                        <div className="text-sm text-gray-500 mb-1">Grid Frequency</div>
-                        <div className="text-2xl font-mono text-purple-400">60.00 Hz</div>
-                    </div>
+            <main className="container mx-auto px-4 py-8">
+                <div className="flex justify-between items-center mb-8">
+                    <h2 className="text-2xl font-light tracking-wide text-slate-400">
+                        Sovereign Capsules <span className="text-cyan-500">({capsules.length})</span>
+                    </h2>
                 </div>
 
-                {/* Capsules Grid */}
-                <h2 className="text-lg font-semibold text-gray-300 mb-4 flex items-center">
-                    <span className="mr-2">⚡</span> Sovereign Capsules
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {capsules.map(capsule => (
-                        <CapsuleCard
-                            key={capsule.capsule_id}
-                            capsule={capsule}
-                            onIgnite={handleIgnite}
-                            onLaunch={handleLaunch}
-                        />
-                    ))}
+                {/* OmniBar */}
+                <div className="mb-8">
+                    <CapsuleOmniBar onIgnite={handleIgnite} />
                 </div>
+
+                {/* Credit Ticker */}
+                <div className="mb-8">
+                    <CreditTicker />
+                </div>
+
+                {isLoading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {[...Array(8)].map((_, i) => (
+                            <div key={i} className="h-64 bg-slate-900/50 rounded-xl animate-pulse border border-slate-800" />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {capsules.map((capsule) => (
+                            <CapsuleCard
+                                key={capsule.capsule_id}
+                                capsule={capsule}
+                                onIgnite={handleIgnite}
+                                onLaunch={handleLaunch}
+                            />
+                        ))}
+                    </div>
+                )}
             </main>
 
             {/* DAC Modal */}
             {selectedDacId && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="w-full max-w-4xl bg-gray-950 rounded-2xl shadow-2xl border border-gray-800 overflow-hidden flex flex-col max-h-[90vh]">
+                    <div className="w-full max-w-6xl bg-gray-950 rounded-2xl shadow-2xl border border-gray-800 overflow-hidden flex flex-col h-[90vh]">
                         {/* Modal Header */}
                         <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-900">
                             <div className="flex items-center space-x-2">
-                                <span className="text-blue-500">◈</span>
-                                <h2 className="font-bold text-lg">DAC: {selectedDacId}</h2>
+                                <span className="text-cyan-500">◈</span>
+                                <h2 className="font-bold text-lg text-white">DAC: {selectedDacId}</h2>
                             </div>
                             <button onClick={closeDac} className="text-gray-400 hover:text-white transition-colors">
                                 ✕
@@ -188,14 +183,16 @@ const Dashboard: React.FC = () => {
                         </div>
 
                         {/* Modal Content */}
-                        <div className="flex-1 overflow-y-auto p-6">
+                        <div className="flex-1 overflow-y-auto p-6 bg-black">
                             {isLoadingDac ? (
                                 <div className="flex flex-col items-center justify-center h-64 space-y-4">
-                                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                                    <div className="text-blue-400 font-mono animate-pulse">Materializing DAC...</div>
+                                    <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="text-cyan-400 font-mono animate-pulse">Materializing DAC...</div>
                                 </div>
-                            ) : (
+                            ) : dacSchema ? (
                                 <DACRenderer schema={dacSchema} />
+                            ) : (
+                                <div className="text-red-500">Failed to load DAC schema</div>
                             )}
                         </div>
                     </div>

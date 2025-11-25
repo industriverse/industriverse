@@ -1,0 +1,40 @@
+{
+  "capsule_id": "packaging_assembly_v1",
+  "version": "1.0.0",
+  "area_code": 20,
+  "name": "Smart Assembly Capsule",
+  "description": "Optimizes final assembly layout and packaging density.",
+  "connectors": [
+    {
+      "type": "camera",
+      "name": "line_feed"
+    },
+    {
+      "type": "sensor",
+      "name": "weight_check"
+    }
+  ],
+  "models": [
+    {
+      "id": "layout_opt",
+      "type": "optimization"
+    },
+    {
+      "id": "pack_density_sim",
+      "type": "simulation"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Efficiency",
+      "claim": "space_utilization"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "layout_opt",
+      "title": "Smart Assembly Capsule Dashboard"
+    }
+  ]
+}

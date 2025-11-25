@@ -1,0 +1,40 @@
+{
+  "capsule_id": "energy_microgrids_v1",
+  "version": "1.0.0",
+  "area_code": 15,
+  "name": "Microgrid Capsule",
+  "description": "Balances distributed energy resources and optimizes microgrid stability.",
+  "connectors": [
+    {
+      "type": "smart_meter",
+      "name": "grid_tie"
+    },
+    {
+      "type": "inverter",
+      "name": "solar_output"
+    }
+  ],
+  "models": [
+    {
+      "id": "load_flow_sim",
+      "type": "simulation"
+    },
+    {
+      "id": "dispatch_opt",
+      "type": "optimization"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Sustainability",
+      "claim": "renewable_fraction"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "load_flow_sim",
+      "title": "Microgrid Capsule Dashboard"
+    }
+  ]
+}

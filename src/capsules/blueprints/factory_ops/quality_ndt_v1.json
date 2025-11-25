@@ -1,0 +1,40 @@
+{
+  "capsule_id": "quality_ndt_v1",
+  "version": "1.0.0",
+  "area_code": 18,
+  "name": "Intelligent Inspection Capsule",
+  "description": "Automated defect detection using multi-modal NDT data.",
+  "connectors": [
+    {
+      "type": "stream",
+      "name": "ultrasound"
+    },
+    {
+      "type": "image",
+      "name": "thermal"
+    }
+  ],
+  "models": [
+    {
+      "id": "asal_detector",
+      "type": "inference"
+    },
+    {
+      "id": "shadow_twin_defect",
+      "type": "simulation"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "ASAL_PCCA",
+      "claim": "defect_free"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "asal_detector",
+      "title": "Intelligent Inspection Capsule Dashboard"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "capsule_id": "machining_fabrication_v1",
+  "version": "1.0.0",
+  "area_code": 6,
+  "name": "Precision Fabrication Capsule",
+  "description": "Auto-generates toolpaths and detects tool wear using vibration analysis.",
+  "connectors": [
+    {
+      "type": "sensor",
+      "name": "vibration_accel"
+    },
+    {
+      "type": "cnc",
+      "name": "gcode_stream"
+    }
+  ],
+  "models": [
+    {
+      "id": "tool_wear_pred",
+      "type": "inference"
+    },
+    {
+      "id": "cam_optimizer",
+      "type": "optimization"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Quality",
+      "claim": "tolerance_adherence"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "tool_wear_pred",
+      "title": "Precision Fabrication Capsule Dashboard"
+    }
+  ]
+}

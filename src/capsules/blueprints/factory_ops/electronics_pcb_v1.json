@@ -1,0 +1,40 @@
+{
+  "capsule_id": "electronics_pcb_v1",
+  "version": "1.0.0",
+  "area_code": 10,
+  "name": "PCB Flow Capsule",
+  "description": "Optimizes reflow profiles and detects placement defects in electronics assembly.",
+  "connectors": [
+    {
+      "type": "aoi",
+      "name": "inspection_results"
+    },
+    {
+      "type": "oven",
+      "name": "reflow_profile"
+    }
+  ],
+  "models": [
+    {
+      "id": "thermal_reflow_sim",
+      "type": "simulation"
+    },
+    {
+      "id": "solder_joint_pred",
+      "type": "inference"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Reliability",
+      "claim": "ipc_compliance"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "thermal_reflow_sim",
+      "title": "PCB Flow Capsule Dashboard"
+    }
+  ]
+}

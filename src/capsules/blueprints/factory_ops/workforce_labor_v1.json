@@ -1,0 +1,40 @@
+{
+  "capsule_id": "workforce_labor_v1",
+  "version": "1.0.0",
+  "area_code": 25,
+  "name": "Workforce Orchestration Capsule",
+  "description": "Optimizes shift scheduling and ensures worker safety.",
+  "connectors": [
+    {
+      "type": "hris",
+      "name": "schedule"
+    },
+    {
+      "type": "wearable",
+      "name": "safety_monitor"
+    }
+  ],
+  "models": [
+    {
+      "id": "schedule_opt",
+      "type": "optimization"
+    },
+    {
+      "id": "fatigue_pred",
+      "type": "inference"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Safety",
+      "claim": "incident_free"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "schedule_opt",
+      "title": "Workforce Orchestration Capsule Dashboard"
+    }
+  ]
+}

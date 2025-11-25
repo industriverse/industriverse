@@ -1,0 +1,40 @@
+{
+  "capsule_id": "aftermarket_service_v1",
+  "version": "1.0.0",
+  "area_code": 27,
+  "name": "Service Twin Capsule",
+  "description": "Predicts maintenance needs and verifies service execution.",
+  "connectors": [
+    {
+      "type": "crm",
+      "name": "service_logs"
+    },
+    {
+      "type": "iot",
+      "name": "device_health"
+    }
+  ],
+  "models": [
+    {
+      "id": "predictive_maint",
+      "type": "inference"
+    },
+    {
+      "id": "service_verifier",
+      "type": "inference"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Reliability",
+      "claim": "uptime_guarantee"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "predictive_maint",
+      "title": "Service Twin Capsule Dashboard"
+    }
+  ]
+}

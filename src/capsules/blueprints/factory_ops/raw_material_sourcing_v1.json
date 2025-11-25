@@ -1,0 +1,40 @@
+{
+  "capsule_id": "raw_material_sourcing_v1",
+  "version": "1.0.0",
+  "area_code": 1,
+  "name": "Raw Material Sourcing Capsule",
+  "description": "Optimizes mining and ore operations with EDCoC sensors and RND1 extraction planning.",
+  "connectors": [
+    {
+      "type": "sensor",
+      "name": "drill_telemetry"
+    },
+    {
+      "type": "api",
+      "name": "seismic_data"
+    }
+  ],
+  "models": [
+    {
+      "id": "rnd1_extraction",
+      "type": "optimization"
+    },
+    {
+      "id": "shadow_twin_mine",
+      "type": "simulation"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Sustainability",
+      "claim": "ore_recovery_rate"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "rnd1_extraction",
+      "title": "Raw Material Sourcing Capsule Dashboard"
+    }
+  ]
+}

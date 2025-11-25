@@ -1,0 +1,40 @@
+{
+  "capsule_id": "surface_treatment_v1",
+  "version": "1.0.0",
+  "area_code": 8,
+  "name": "Surface Engineering Capsule",
+  "description": "Optimizes coating thickness and adhesion via thin-film growth models.",
+  "connectors": [
+    {
+      "type": "sensor",
+      "name": "thickness_gauge"
+    },
+    {
+      "type": "env",
+      "name": "bath_chemistry"
+    }
+  ],
+  "models": [
+    {
+      "id": "film_growth_sim",
+      "type": "simulation"
+    },
+    {
+      "id": "adhesion_predictor",
+      "type": "inference"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Durability",
+      "claim": "corrosion_resistance"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "film_growth_sim",
+      "title": "Surface Engineering Capsule Dashboard"
+    }
+  ]
+}

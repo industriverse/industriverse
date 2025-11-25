@@ -1,0 +1,40 @@
+{
+  "capsule_id": "process_control_v1",
+  "version": "1.0.0",
+  "area_code": 16,
+  "name": "Control Bridge Capsule",
+  "description": "Bridges legacy OT/PLC systems with modern AI control and security.",
+  "connectors": [
+    {
+      "type": "opc-ua",
+      "name": "plc_tags"
+    },
+    {
+      "type": "network",
+      "name": "packet_capture"
+    }
+  ],
+  "models": [
+    {
+      "id": "anomaly_detector",
+      "type": "inference"
+    },
+    {
+      "id": "control_loop_tuner",
+      "type": "optimization"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Security",
+      "claim": "intrusion_free"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "anomaly_detector",
+      "title": "Control Bridge Capsule Dashboard"
+    }
+  ]
+}

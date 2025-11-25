@@ -33,7 +33,61 @@ app.add_middleware(
 )
 
 # 3. Register Routers
-app.include_router(capsule_router.router, prefix="/api/v1")
+# --- MCP Integration (Lightweight Adapter) ---
+class MCPAdapter:
+    def __init__(self, app: FastAPI):
+        self.app = app
+        self.tools = []
+
+    def tool(self):
+        def decorator(func):
+            self.tools.append({
+                "name": func.__name__,
+                "description": func.__doc__,
+                "parameters": func.__annotations__
+            })
+            return func
+        return decorator
+
+    def expose_tools(self):
+        @self.app.get("/mcp/tools")
+        async def list_tools():
+            return {"tools": self.tools}
+
+mcp = MCPAdapter(app)
+
+# --- A2A Integration ---
+from src.capsule_layer.services.a2a_agent_integration import registry, host_agent, WorkflowRequest
+
+@app.get("/agents")
+async def list_agents():
+    """List all registered agents."""
+    return registry.list_agents()
+
+@app.get("/agents/{agent_id}")
+async def get_agent(agent_id: str):
+    """Get details of a specific agent."""
+    agent = registry.get_agent(agent_id)
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    return agent
+
+@app.post("/orchestrate")
+async def orchestrate_workflow(request: WorkflowRequest):
+    """Orchestrate a workflow using A2A agents."""
+    return await host_agent.orchestrate_workflow(request)
+
+# Expose thermodynamic endpoints as MCP tools
+@mcp.tool()
+async def get_thermodynamic_state(capsule_id: str):
+    """Get the thermodynamic state of a capsule."""
+    # Mock implementation
+    return {"entropy": 0.5, "energy": 100}
+
+mcp.expose_tools()
+
+# --- Existing Routes ---
+app.include_router(capsule_router.router, prefix="/capsules", tags=["Capsules"])
 app.include_router(orchestrator_router.router, prefix="/api/v1")
 app.include_router(utid_controller.router)
 app.include_router(shield_controller.router)

@@ -1,0 +1,72 @@
+{
+  "capsule_id": "magnet_assembly_v1",
+  "version": "1.0.0",
+  "area_code": 12,
+  "name": "Permanent Magnet Assembly Capsule",
+  "description": "Optimizes magnet performance and reduces rare-earth dependence.",
+  "connectors": [
+    {
+      "type": "csv",
+      "name": "magnetization_curves"
+    },
+    {
+      "type": "mqtt",
+      "name": "heat_treatment"
+    }
+  ],
+  "models": [
+    {
+      "id": "shadow_twin_magnetic",
+      "type": "simulation"
+    },
+    {
+      "id": "m2n2_microstructure",
+      "type": "evolutionary"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "ASAL_SPA",
+      "claim": "performance_uplift"
+    }
+  ],
+  "ui_schema": {
+    "layout": "grid",
+    "components": [
+      {
+        "type": "Header",
+        "props": {
+          "title": "Area 12: Magnet Assembly (Sovereign Node)",
+          "subtitle": "High-Performance Sintering & GBD Optimization"
+        }
+      },
+      {
+        "type": "StreamlitView",
+        "props": {
+          "url": "http://localhost:8501",
+          "title": "S-REAN Pilot: Live Control",
+          "height": "800px"
+        }
+      },
+      {
+        "type": "Heatmap3D",
+        "props": {
+          "title": "Furnace Thermal Gradient (Real-time)",
+          "data_source": "mqtt://furnace-01/thermal_map"
+        }
+      }
+    ]
+  },
+  "pilot_config": {
+    "enabled": true,
+    "url": "http://localhost:8501",
+    "mode": "embedded"
+  },
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "shadow_twin_magnetic",
+      "title": "Permanent Magnet Assembly Capsule Dashboard"
+    }
+  ]
+}

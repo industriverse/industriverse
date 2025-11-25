@@ -1,0 +1,40 @@
+{
+  "capsule_id": "testing_labs_v1",
+  "version": "1.0.0",
+  "area_code": 19,
+  "name": "Verification Capsule",
+  "description": "Automates test execution and generates proof-backed certification reports.",
+  "connectors": [
+    {
+      "type": "daq",
+      "name": "test_bench"
+    },
+    {
+      "type": "lims",
+      "name": "sample_meta"
+    }
+  ],
+  "models": [
+    {
+      "id": "validity_checker",
+      "type": "inference"
+    },
+    {
+      "id": "report_gen",
+      "type": "inference"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Compliance",
+      "claim": "spec_adherence"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "validity_checker",
+      "title": "Verification Capsule Dashboard"
+    }
+  ]
+}

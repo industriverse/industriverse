@@ -1,0 +1,40 @@
+{
+  "capsule_id": "robotics_material_handling_v1",
+  "version": "1.0.0",
+  "area_code": 17,
+  "name": "Swarm Robotics Capsule",
+  "description": "Coordinates AGV/AMR fleets for optimal routing and collision avoidance.",
+  "connectors": [
+    {
+      "type": "fleet",
+      "name": "agv_positions"
+    },
+    {
+      "type": "wms",
+      "name": "task_list"
+    }
+  ],
+  "models": [
+    {
+      "id": "swarm_planner",
+      "type": "optimization"
+    },
+    {
+      "id": "collision_pred",
+      "type": "simulation"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Efficiency",
+      "claim": "throughput_rate"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "swarm_planner",
+      "title": "Swarm Robotics Capsule Dashboard"
+    }
+  ]
+}

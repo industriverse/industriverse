@@ -1,0 +1,60 @@
+{
+    "capsule_id": "logistics_v1",
+    "version": "1.0.0",
+    "area_code": 21,
+    "name": "Adaptive Logistics Capsule",
+    "description": "Optimizes supply chain routing and inventory flow to minimize carbon footprint and avoid stockouts.",
+    "connectors": [
+        {
+            "type": "api",
+            "name": "tms_feed",
+            "endpoint": "https://api.tms-provider.com/v1/shipments"
+        },
+        {
+            "type": "gps",
+            "name": "fleet_telematics",
+            "protocol": "mqtt",
+            "topic": "fleet/+/location"
+        }
+    ],
+    "models": [
+        {
+            "id": "rnd1_router",
+            "type": "optimization",
+            "engine": "vrp_solver",
+            "description": "Solves dynamic Vehicle Routing Problem with time windows and carbon constraints."
+        },
+        {
+            "id": "shadow_twin_inventory",
+            "type": "simulation",
+            "engine": "discrete_event_sim",
+            "description": "Simulates warehouse inflow/outflow to predict stockout risks."
+        }
+    ],
+    "proofs": [
+        {
+            "type": "Sustainability",
+            "claim": "carbon_neutral_shipping",
+            "metric": "co2_per_km",
+            "target": "< 150g"
+        },
+        {
+            "type": "Service_Level",
+            "claim": "on_time_delivery",
+            "metric": "otp_rate",
+            "threshold": "> 98%"
+        }
+    ],
+    "ui_widgets": [
+        {
+            "type": "map_view",
+            "data_source": "rnd1_router",
+            "title": "Live Fleet Routing"
+        },
+        {
+            "type": "gauge",
+            "data_source": "shadow_twin_inventory",
+            "title": "Stockout Risk Probability"
+        }
+    ]
+}
