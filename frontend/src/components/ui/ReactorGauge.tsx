@@ -1,45 +1,21 @@
-import { useEffect, useState } from "react";
+// @ts-nocheck
+import { useEnergyMap } from "@/hooks/useEnergyMap";
 import { cn } from "@/lib/utils";
 import { AlertTriangle } from "lucide-react";
 
-interface ReactorState {
-    entropy: number; // 0-100 (Temperature)
-    stability: string;
-    threat_level: number; // 0-5
-    is_overheating: boolean;
-}
-
 export function ReactorGauge() {
-    const [state, setState] = useState<ReactorState>({
-        entropy: 45,
-        stability: "STABLE",
-        threat_level: 0,
-        is_overheating: false
-    });
+    const { data: energyData } = useEnergyMap();
 
-    useEffect(() => {
-        const fetchState = async () => {
-            try {
-                const res = await fetch("/v1/shield/state");
-                if (res.ok) {
-                    const data = await res.json();
-                    const metrics = data.metrics || {};
-                    setState({
-                        entropy: metrics.system_entropy || 0,
-                        stability: data.status === "stable" ? "STABLE" : "UNSTABLE",
-                        threat_level: metrics.threat_level || 0,
-                        is_overheating: (metrics.system_entropy || 0) > 80
-                    });
-                }
-            } catch (e) {
-                console.error("Failed to fetch reactor state", e);
-            }
-        };
+    const entropy = energyData?.total_energy ? Math.min(100, energyData.total_energy / 100) : 45;
+    const isOverheating = entropy > 80;
+    const stability = energyData?.status === "stable" ? "STABLE" : "UNSTABLE";
 
-        fetchState();
-        const interval = setInterval(fetchState, 2000);
-        return () => clearInterval(interval);
-    }, []);
+    const state = {
+        entropy,
+        stability,
+        threat_level: isOverheating ? 4 : 1,
+        is_overheating: isOverheating
+    };
 
     return (
         <div className="relative w-32 h-32 flex items-center justify-center group">

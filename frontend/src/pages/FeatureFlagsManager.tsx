@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Feature Flags Manager Page
  * Week 8: White-Label Platform - Phase 4

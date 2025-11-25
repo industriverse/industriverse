@@ -153,6 +153,11 @@ class ThermalSamplerService:
         self.total_samples = 0
         self.total_energy_computed = 0.0
         
+        # Log Runtime Mode
+        mode = "ACCELERATOR (JAX)" if JAX_AVAILABLE else "EMULATION (NumPy)"
+        print(f"ThermalSampler initialized in {mode} mode.")
+
+        
     # ========================================================================
     # ENERGY LANDSCAPE CREATION
     # ========================================================================

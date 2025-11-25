@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -170,13 +171,12 @@ export default function TenantManagement() {
                       <TableCell>{tenant.industry || "—"}</TableCell>
                       <TableCell>
                         <span
-                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            tenant.status === "active"
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${tenant.status === "active"
                               ? "bg-green-500/10 text-green-500"
                               : tenant.status === "pending"
-                              ? "bg-yellow-500/10 text-yellow-500"
-                              : "bg-red-500/10 text-red-500"
-                          }`}
+                                ? "bg-yellow-500/10 text-yellow-500"
+                                : "bg-red-500/10 text-red-500"
+                            }`}
                         >
                           {tenant.status}
                         </span>

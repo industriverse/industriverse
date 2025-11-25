@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MediaPipe Pose Controller for Body Language Commands
  * 

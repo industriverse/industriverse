@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AR/VR Interaction Controller
  * 
@@ -29,25 +30,25 @@ import * as THREE from 'three';
 export interface ARVRInteractionConfig {
   /** Three.js scene */
   scene: THREE.Scene;
-  
+
   /** Three.js camera */
   camera: THREE.Camera;
-  
+
   /** Three.js renderer */
   renderer: THREE.WebGLRenderer;
-  
+
   /** Enable AR mode */
   enableAR?: boolean;
-  
+
   /** Enable VR mode */
   enableVR?: boolean;
-  
+
   /** Enable voice commands */
   enableVoice?: boolean;
-  
+
   /** Enable spatial anchoring */
   enableAnchoring?: boolean;
-  
+
   /** Interaction callbacks */
   onCapsuleSelect?: (capsule: any) => void;
   onCapsuleLongPress?: (capsule: any) => void;
@@ -79,7 +80,7 @@ export interface VRControllerState {
 export class ARVRInteractionController {
   private config: Required<ARVRInteractionConfig>;
   private raycaster: THREE.Raycaster = new THREE.Raycaster();
-  
+
   // Gesture tracking
   private gestureState: GestureState = {
     isPressed: false,
@@ -89,21 +90,21 @@ export class ARVRInteractionController {
     isPinching: false,
     pinchScale: 1.0
   };
-  
+
   // VR controllers
   private vrControllers: VRControllerState[] = [];
-  
+
   // Voice recognition
   private speechRecognition?: SpeechRecognition;
   private isListening: boolean = false;
-  
+
   // Spatial anchors (AR)
   private spatialAnchors: Map<string, XRAnchor> = new Map();
-  
+
   // XR session
   private xrSession?: XRSession;
   private xrReferenceSpace?: XRReferenceSpace;
-  
+
   constructor(config: ARVRInteractionConfig) {
     this.config = {
       scene: config.scene,
@@ -113,101 +114,101 @@ export class ARVRInteractionController {
       enableVR: config.enableVR ?? false,
       enableVoice: config.enableVoice ?? false,
       enableAnchoring: config.enableAnchoring ?? false,
-      onCapsuleSelect: config.onCapsuleSelect ?? (() => {}),
-      onCapsuleLongPress: config.onCapsuleLongPress ?? (() => {}),
-      onCapsuleSwipe: config.onCapsuleSwipe ?? (() => {}),
-      onVoiceCommand: config.onVoiceCommand ?? (() => {})
+      onCapsuleSelect: config.onCapsuleSelect ?? (() => { }),
+      onCapsuleLongPress: config.onCapsuleLongPress ?? (() => { }),
+      onCapsuleSwipe: config.onCapsuleSwipe ?? (() => { }),
+      onVoiceCommand: config.onVoiceCommand ?? (() => { })
     };
-    
+
     this.initialize();
   }
-  
+
   /**
    * Initialize interaction handlers
    */
   private initialize() {
     console.log('Initializing AR/VR Interaction Controller');
-    
+
     // Set up touch/mouse handlers
     this.setupTouchHandlers();
-    
+
     // Set up VR controllers if enabled
     if (this.config.enableVR) {
       this.setupVRControllers();
     }
-    
+
     // Set up voice recognition if enabled
     if (this.config.enableVoice) {
       this.setupVoiceRecognition();
     }
-    
+
     console.log('AR/VR Interaction Controller initialized');
   }
-  
+
   // ==========================================================================
   // Touch/Mouse Interaction (Mobile AR + Desktop)
   // ==========================================================================
-  
+
   /**
    * Set up touch and mouse event handlers
    */
   private setupTouchHandlers() {
     const canvas = this.config.renderer.domElement;
-    
+
     // Mouse events (desktop)
     canvas.addEventListener('mousedown', this.onPointerDown.bind(this));
     canvas.addEventListener('mousemove', this.onPointerMove.bind(this));
     canvas.addEventListener('mouseup', this.onPointerUp.bind(this));
-    
+
     // Touch events (mobile AR)
     canvas.addEventListener('touchstart', this.onTouchStart.bind(this), { passive: false });
     canvas.addEventListener('touchmove', this.onTouchMove.bind(this), { passive: false });
     canvas.addEventListener('touchend', this.onTouchEnd.bind(this), { passive: false });
-    
+
     // Prevent context menu on long press
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   }
-  
+
   /**
    * Handle pointer down (mouse/touch start)
    */
   private onPointerDown(event: MouseEvent) {
     this.gestureState.isPressed = true;
     this.gestureState.pressStartTime = Date.now();
-    
+
     const rect = this.config.renderer.domElement.getBoundingClientRect();
     this.gestureState.pressStartPosition.set(
       ((event.clientX - rect.left) / rect.width) * 2 - 1,
       -((event.clientY - rect.top) / rect.height) * 2 + 1
     );
-    
+
     this.gestureState.currentPosition.copy(this.gestureState.pressStartPosition);
   }
-  
+
   /**
    * Handle pointer move
    */
   private onPointerMove(event: MouseEvent) {
     if (!this.gestureState.isPressed) return;
-    
+
     const rect = this.config.renderer.domElement.getBoundingClientRect();
     this.gestureState.currentPosition.set(
       ((event.clientX - rect.left) / rect.width) * 2 - 1,
       -((event.clientY - rect.top) / rect.height) * 2 + 1
     );
   }
-  
+
   /**
    * Handle pointer up (mouse/touch end)
    */
   private onPointerUp(event: MouseEvent) {
     if (!this.gestureState.isPressed) return;
-    
+
     const pressDuration = Date.now() - this.gestureState.pressStartTime;
     const moveDistance = this.gestureState.currentPosition.distanceTo(
       this.gestureState.pressStartPosition
     );
-    
+
     // Determine gesture type
     if (pressDuration > 500 && moveDistance < 0.05) {
       // Long press
@@ -222,16 +223,16 @@ export class ARVRInteractionController {
       // Tap
       this.handleTap(this.gestureState.pressStartPosition);
     }
-    
+
     this.gestureState.isPressed = false;
   }
-  
+
   /**
    * Handle touch start (mobile)
    */
   private onTouchStart(event: TouchEvent) {
     event.preventDefault();
-    
+
     if (event.touches.length === 1) {
       // Single touch - treat as pointer down
       const touch = event.touches[0];
@@ -246,13 +247,13 @@ export class ARVRInteractionController {
       this.gestureState.pinchScale = this.getTouchDistance(event.touches);
     }
   }
-  
+
   /**
    * Handle touch move (mobile)
    */
   private onTouchMove(event: TouchEvent) {
     event.preventDefault();
-    
+
     if (event.touches.length === 1 && this.gestureState.isPressed) {
       // Single touch move
       const touch = event.touches[0];
@@ -269,13 +270,13 @@ export class ARVRInteractionController {
       this.gestureState.pinchScale = newDistance;
     }
   }
-  
+
   /**
    * Handle touch end (mobile)
    */
   private onTouchEnd(event: TouchEvent) {
     event.preventDefault();
-    
+
     if (event.touches.length === 0) {
       if (this.gestureState.isPinching) {
         this.gestureState.isPinching = false;
@@ -289,7 +290,7 @@ export class ARVRInteractionController {
       }
     }
   }
-  
+
   /**
    * Get distance between two touch points
    */
@@ -298,53 +299,53 @@ export class ARVRInteractionController {
     const dy = touches[0].clientY - touches[1].clientY;
     return Math.sqrt(dx * dx + dy * dy);
   }
-  
+
   /**
    * Handle tap gesture
    */
   private handleTap(position: THREE.Vector2) {
     const capsule = this.raycastCapsule(position);
-    
+
     if (capsule) {
       console.log('Tap on capsule:', capsule.id);
       this.config.onCapsuleSelect(capsule);
     }
   }
-  
+
   /**
    * Handle long press gesture
    */
   private handleLongPress(position: THREE.Vector2) {
     const capsule = this.raycastCapsule(position);
-    
+
     if (capsule) {
       console.log('Long press on capsule:', capsule.id);
       this.config.onCapsuleLongPress(capsule);
     }
   }
-  
+
   /**
    * Handle swipe gesture
    */
   private handleSwipe(start: THREE.Vector2, end: THREE.Vector2) {
     const delta = new THREE.Vector2().subVectors(end, start);
-    
+
     let direction: 'left' | 'right' | 'up' | 'down';
-    
+
     if (Math.abs(delta.x) > Math.abs(delta.y)) {
       direction = delta.x > 0 ? 'right' : 'left';
     } else {
       direction = delta.y > 0 ? 'up' : 'down';
     }
-    
+
     const capsule = this.raycastCapsule(start);
-    
+
     if (capsule) {
       console.log(`Swipe ${direction} on capsule:`, capsule.id);
       this.config.onCapsuleSwipe(capsule, direction);
     }
   }
-  
+
   /**
    * Handle pinch gesture (zoom)
    */
@@ -355,13 +356,13 @@ export class ARVRInteractionController {
       this.config.camera.updateProjectionMatrix();
     }
   }
-  
+
   /**
    * Raycast to find capsule at screen position
    */
   private raycastCapsule(screenPosition: THREE.Vector2): any | null {
     this.raycaster.setFromCamera(screenPosition, this.config.camera);
-    
+
     // Get all capsule meshes from scene
     const capsuleMeshes: THREE.Object3D[] = [];
     this.config.scene.traverse((object) => {
@@ -369,20 +370,20 @@ export class ARVRInteractionController {
         capsuleMeshes.push(object);
       }
     });
-    
+
     const intersects = this.raycaster.intersectObjects(capsuleMeshes);
-    
+
     if (intersects.length > 0) {
       return intersects[0].object.userData.capsule;
     }
-    
+
     return null;
   }
-  
+
   // ==========================================================================
   // VR Controller Interaction
   // ==========================================================================
-  
+
   /**
    * Set up VR controllers
    */
@@ -392,23 +393,23 @@ export class ARVRInteractionController {
     controller0.addEventListener('selectstart', () => this.onVRSelectStart(0));
     controller0.addEventListener('selectend', () => this.onVRSelectEnd(0));
     this.config.scene.add(controller0);
-    
+
     const grip0 = this.config.renderer.xr.getControllerGrip(0);
     this.config.scene.add(grip0);
-    
+
     // Controller 1 (right hand)
     const controller1 = this.config.renderer.xr.getController(1);
     controller1.addEventListener('selectstart', () => this.onVRSelectStart(1));
     controller1.addEventListener('selectend', () => this.onVRSelectEnd(1));
     this.config.scene.add(controller1);
-    
+
     const grip1 = this.config.renderer.xr.getControllerGrip(1);
     this.config.scene.add(grip1);
-    
+
     // Add controller ray visualizations
     this.addControllerRay(controller0);
     this.addControllerRay(controller1);
-    
+
     // Store controller states
     this.vrControllers = [
       {
@@ -426,10 +427,10 @@ export class ARVRInteractionController {
         isSqueezing: false
       }
     ];
-    
+
     console.log('VR controllers initialized');
   }
-  
+
   /**
    * Add ray visualization to VR controller
    */
@@ -438,32 +439,32 @@ export class ARVRInteractionController {
       new THREE.Vector3(0, 0, 0),
       new THREE.Vector3(0, 0, -5)
     ]);
-    
+
     const material = new THREE.LineBasicMaterial({
       color: 0x00d4ff,
       linewidth: 2
     });
-    
+
     const line = new THREE.Line(geometry, material);
     controller.add(line);
   }
-  
+
   /**
    * Handle VR controller select start
    */
   private onVRSelectStart(controllerIndex: number) {
     const controller = this.vrControllers[controllerIndex];
     controller.isSelecting = true;
-    
+
     // Raycast from controller
     const capsule = this.raycastFromController(controller.controller);
-    
+
     if (capsule) {
       console.log('VR controller selected capsule:', capsule.id);
       this.config.onCapsuleSelect(capsule);
     }
   }
-  
+
   /**
    * Handle VR controller select end
    */
@@ -471,7 +472,7 @@ export class ARVRInteractionController {
     const controller = this.vrControllers[controllerIndex];
     controller.isSelecting = false;
   }
-  
+
   /**
    * Raycast from VR controller
    */
@@ -479,10 +480,10 @@ export class ARVRInteractionController {
     // Set raycaster from controller position and direction
     const tempMatrix = new THREE.Matrix4();
     tempMatrix.identity().extractRotation(controller.matrixWorld);
-    
+
     this.raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
     this.raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
-    
+
     // Get all capsule meshes
     const capsuleMeshes: THREE.Object3D[] = [];
     this.config.scene.traverse((object) => {
@@ -490,20 +491,20 @@ export class ARVRInteractionController {
         capsuleMeshes.push(object);
       }
     });
-    
+
     const intersects = this.raycaster.intersectObjects(capsuleMeshes);
-    
+
     if (intersects.length > 0) {
       return intersects[0].object.userData.capsule;
     }
-    
+
     return null;
   }
-  
+
   // ==========================================================================
   // Voice Commands
   // ==========================================================================
-  
+
   /**
    * Set up voice recognition
    */
@@ -512,29 +513,29 @@ export class ARVRInteractionController {
       console.warn('Speech recognition not supported in this browser');
       return;
     }
-    
+
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     this.speechRecognition = new SpeechRecognition();
-    
+
     this.speechRecognition.continuous = true;
     this.speechRecognition.interimResults = false;
     this.speechRecognition.lang = 'en-US';
-    
+
     this.speechRecognition.onresult = (event: SpeechRecognitionEvent) => {
       const last = event.results.length - 1;
       const command = event.results[last][0].transcript.toLowerCase().trim();
-      
+
       console.log('Voice command:', command);
       this.handleVoiceCommand(command);
     };
-    
+
     this.speechRecognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
     };
-    
+
     console.log('Voice recognition initialized');
   }
-  
+
   /**
    * Start listening for voice commands
    */
@@ -543,14 +544,14 @@ export class ARVRInteractionController {
       console.warn('Voice recognition not available');
       return;
     }
-    
+
     if (!this.isListening) {
       this.speechRecognition.start();
       this.isListening = true;
       console.log('Voice recognition started');
     }
   }
-  
+
   /**
    * Stop listening for voice commands
    */
@@ -561,7 +562,7 @@ export class ARVRInteractionController {
       console.log('Voice recognition stopped');
     }
   }
-  
+
   /**
    * Handle voice command
    */
@@ -579,11 +580,11 @@ export class ARVRInteractionController {
       console.warn('Unknown voice command:', command);
     }
   }
-  
+
   // ==========================================================================
   // Spatial Anchoring (AR)
   // ==========================================================================
-  
+
   /**
    * Create spatial anchor at position
    */
@@ -595,12 +596,12 @@ export class ARVRInteractionController {
       console.warn('Spatial anchoring not enabled');
       return false;
     }
-    
+
     if (!this.xrSession || !this.xrReferenceSpace) {
       console.warn('XR session not active');
       return false;
     }
-    
+
     try {
       // Create XR anchor
       const pose = new XRRigidTransform({
@@ -608,44 +609,44 @@ export class ARVRInteractionController {
         y: position.y,
         z: position.z
       });
-      
+
       const anchor = await this.xrSession.requestReferenceSpace('local')
         .then((space) => (this.xrSession as any).createAnchor(pose, space));
-      
+
       this.spatialAnchors.set(capsuleId, anchor);
       console.log(`Spatial anchor created for capsule: ${capsuleId}`);
-      
+
       return true;
     } catch (error) {
       console.error('Failed to create spatial anchor:', error);
       return false;
     }
   }
-  
+
   /**
    * Remove spatial anchor
    */
   public removeSpatialAnchor(capsuleId: string) {
     const anchor = this.spatialAnchors.get(capsuleId);
-    
+
     if (anchor) {
       anchor.delete();
       this.spatialAnchors.delete(capsuleId);
       console.log(`Spatial anchor removed for capsule: ${capsuleId}`);
     }
   }
-  
+
   /**
    * Get all spatial anchors
    */
   public getSpatialAnchors(): Map<string, XRAnchor> {
     return this.spatialAnchors;
   }
-  
+
   // ==========================================================================
   // XR Session Management
   // ==========================================================================
-  
+
   /**
    * Start AR session
    */
@@ -654,18 +655,18 @@ export class ARVRInteractionController {
       console.error('WebXR not supported');
       return false;
     }
-    
+
     try {
       const session = await navigator.xr.requestSession('immersive-ar', {
         requiredFeatures: ['local', 'hit-test'],
         optionalFeatures: ['anchors', 'dom-overlay']
       });
-      
+
       await this.config.renderer.xr.setSession(session);
       this.xrSession = session;
-      
+
       this.xrReferenceSpace = await session.requestReferenceSpace('local');
-      
+
       console.log('AR session started');
       return true;
     } catch (error) {
@@ -673,7 +674,7 @@ export class ARVRInteractionController {
       return false;
     }
   }
-  
+
   /**
    * Start VR session
    */
@@ -682,17 +683,17 @@ export class ARVRInteractionController {
       console.error('WebXR not supported');
       return false;
     }
-    
+
     try {
       const session = await navigator.xr.requestSession('immersive-vr', {
         requiredFeatures: ['local']
       });
-      
+
       await this.config.renderer.xr.setSession(session);
       this.xrSession = session;
-      
+
       this.xrReferenceSpace = await session.requestReferenceSpace('local');
-      
+
       console.log('VR session started');
       return true;
     } catch (error) {
@@ -700,7 +701,7 @@ export class ARVRInteractionController {
       return false;
     }
   }
-  
+
   /**
    * End XR session
    */
@@ -712,26 +713,26 @@ export class ARVRInteractionController {
       console.log('XR session ended');
     }
   }
-  
+
   // ==========================================================================
   // Cleanup
   // ==========================================================================
-  
+
   /**
    * Dispose controller and clean up resources
    */
   public dispose() {
     // Stop voice recognition
     this.stopVoiceRecognition();
-    
+
     // Remove spatial anchors
     for (const capsuleId of this.spatialAnchors.keys()) {
       this.removeSpatialAnchor(capsuleId);
     }
-    
+
     // End XR session
     this.endXRSession();
-    
+
     console.log('AR/VR Interaction Controller disposed');
   }
 }

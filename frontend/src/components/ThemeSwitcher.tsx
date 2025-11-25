@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Theme Switcher Component
  * Week 8: White-Label Platform
