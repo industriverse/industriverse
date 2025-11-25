@@ -1,36 +1,60 @@
 """
-WebSocket server skeleton for Shadow Twin telemetry.
-
-Production:
-- Use an ASGI server (e.g., FastAPI/Starlette) and broadcast events to clients.
-- Add auth and rate limiting.
+WebSocket server for Shadow Twin streaming.
+Broadcasts telemetry events to connected clients.
 """
-
-from __future__ import annotations
 
 import asyncio
 import json
 import logging
-from typing import Any, Dict, Set
+from typing import Set
+from fastapi import WebSocket, WebSocketDisconnect
 
 logger = logging.getLogger(__name__)
 
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: Set[WebSocket] = set()
 
-class WSServer:
-    def __init__(self) -> None:
-        self.clients: Set[Any] = set()
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.add(websocket)
+        logger.info(f"Client connected. Total: {len(self.active_connections)}")
 
-    async def register(self, ws) -> None:
-        self.clients.add(ws)
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+        logger.info(f"Client disconnected. Total: {len(self.active_connections)}")
 
-    async def unregister(self, ws) -> None:
-        self.clients.discard(ws)
-
-    async def broadcast(self, topic: str, payload: Dict[str, Any]) -> None:
-        msg = json.dumps({"topic": topic, "payload": payload})
-        for ws in list(self.clients):
+    async def broadcast(self, message: dict):
+        if not self.active_connections:
+            return
+            
+        # Serialize once
+        text = json.dumps(message)
+        
+        # Broadcast to all
+        to_remove = set()
+        for connection in self.active_connections:
             try:
-                await ws.send_str(msg)
-            except Exception:  # noqa: BLE001
-                logger.debug("Dropping client")
-                await self.unregister(ws)
+                await connection.send_text(text)
+            except Exception as e:
+                logger.error(f"Failed to send to client: {e}")
+                to_remove.add(connection)
+        
+        for conn in to_remove:
+            self.disconnect(conn)
+
+manager = ConnectionManager()
+
+async def handle_websocket(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            # Keep connection alive and handle incoming messages (e.g. subscriptions)
+            # For now, just echo or ignore
+            data = await websocket.receive_text()
+            # Optional: handle heartbeat or subscription requests
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+    except Exception as e:
+        logger.error(f"WebSocket error: {e}")
+        manager.disconnect(websocket)

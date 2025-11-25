@@ -1,0 +1,9 @@
+{
+    "proof_type": "network_resilience",
+    "work_metric": "load_balance_efficiency",
+    "hash_algo": "sha256",
+    "constraints": [
+        "thermal_limits",
+        "stability_margin"
+    ]
+}

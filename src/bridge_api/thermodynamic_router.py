@@ -77,12 +77,14 @@ from src.capsule_layer.services.remix_lab_service import (
     RemixCommit,
     RemixEventType
 )
+from src.white_label.credit_protocol.utid_marketplace import get_utid_marketplace
 from src.core.energy_atlas.atlas_core import EnergyAtlas
 from src.core.nvp.nvp_predictor import NVPPredictor
 from src.core.nvp.schema import TelemetryVector, PredictionResult
 
 # Proof Economy Integration
 from src.proof_core.integrity_layer.integrity_manager import IntegrityManager
+from src.white_label.governance.behavioral_tracker import get_behavioral_tracker
 import uuid
 
 # ============================================================================
@@ -212,6 +214,9 @@ class BridgeAPI:
         # Initialize Proof Repository
         self.integrity_manager = IntegrityManager()
         self.proof_repository = self.integrity_manager.repository
+        
+        # Initialize Governance Tracker
+        self.behavioral_tracker = get_behavioral_tracker()
 
         # Register routes
         self._register_routes()
@@ -797,6 +802,13 @@ class BridgeAPI:
                 raise HTTPException(status_code=404, detail=f"UTID {utid} not found")
             return record.dict()
         
+        @self.router.get("/marketplace/user/{user_id}/access")
+        async def get_user_access(user_id: str):
+            """Get user's access grants (widgets, insights)"""
+            marketplace = get_utid_marketplace()
+            access_grants = marketplace.get_user_insights(user_id)
+            return {"access_grants": [a.__dict__ for a in access_grants]}
+
         @self.router.get("/remixlab/user/{user_id}/snapshots")
         async def list_user_snapshots(user_id: str):
             """List user's snapshots"""

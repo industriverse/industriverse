@@ -1,0 +1,11 @@
+{
+    "max_entropy": 0.05,
+    "stability_threshold": 0.99,
+    "compute_budget_flops": 1e15,
+    "thermal_budget_joules": 5000.0,
+    "safety_invariants": [
+        "plasma_current < 15MA",
+        "divertor_heat_flux < 10MW/m2"
+    ],
+    "max_horizon_steps": 100
+}

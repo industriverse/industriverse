@@ -1,0 +1,16 @@
+{
+  "proof_type": "thermodynamic_work",
+  "work_metric": "entropy_reduction",
+  "hash_algo": "sha256",
+  "constraints": [
+    "energy_conservation",
+    "carbon_footprint_limit",
+    "water_usage_limit"
+  ],
+  "required_fields": [
+    "carbon_footprint",
+    "water_usage",
+    "fabric_origin",
+    "design_hash"
+  ]
+}

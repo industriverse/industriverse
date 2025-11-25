@@ -1,19 +1,14 @@
 import React from 'react';
+import { Capsule } from '../types/capsule';
+import UTIDLineage from './UTIDLineage';
 
 interface CapsuleCardProps {
-    capsule: {
-        capsule_id: string;
-        name: string;
-        category: string;
-        status: 'active' | 'idle' | 'error';
-        prin_score: number;
-        energy_usage: number;
-        utid?: string;
-    };
+    capsule: Capsule;
     onIgnite: (id: string) => void;
+    onLaunch?: (id: string) => void;
 }
 
-const CapsuleCard: React.FC<CapsuleCardProps> = ({ capsule, onIgnite }) => {
+const CapsuleCard: React.FC<CapsuleCardProps> = ({ capsule, onIgnite, onLaunch }) => {
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'active': return 'bg-green-500';
@@ -38,6 +33,22 @@ const CapsuleCard: React.FC<CapsuleCardProps> = ({ capsule, onIgnite }) => {
                     <span className="text-blue-400 font-mono">{capsule.category}</span>
                 </div>
 
+                {capsule.utid && (
+                    <div className="mt-4 flex justify-between items-center">
+                        <div className="text-xs text-gray-500 font-mono">
+                            <UTIDLineage utid={capsule.utid} />
+                        </div>
+                        {onLaunch && (
+                            <button
+                                onClick={() => onLaunch(capsule.capsule_id)}
+                                className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded font-medium transition-colors"
+                            >
+                                LAUNCH DAC
+                            </button>
+                        )}
+                    </div>
+                )}
+
                 <div className="flex justify-between text-sm">
                     <span className="text-gray-400">PRIN Score</span>
                     <span className={`font-mono ${capsule.prin_score >= 0.75 ? 'text-green-400' : 'text-yellow-400'}`}>
@@ -51,8 +62,8 @@ const CapsuleCard: React.FC<CapsuleCardProps> = ({ capsule, onIgnite }) => {
                 </div>
 
                 {capsule.utid && (
-                    <div className="mt-2 p-2 bg-gray-900 rounded text-xs font-mono text-gray-500 break-all">
-                        {capsule.utid}
+                    <div className="mt-4 pt-4 border-t border-gray-700">
+                        <UTIDLineage utid={capsule.utid} />
                     </div>
                 )}
             </div>

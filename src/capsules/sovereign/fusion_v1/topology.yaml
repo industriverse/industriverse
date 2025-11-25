@@ -1,0 +1,18 @@
+# Directive 01: Physics Topology
+# Magnetohydrodynamic (MHD) constraints for fusion plasma
+domain: fusion_plasma
+manifold_type: toroidal
+state_variables:
+  - electron_temperature (Te)
+  - ion_temperature (Ti)
+  - plasma_density (ne)
+  - magnetic_field_strength (B)
+boundary_conditions:
+  wall_temperature: 300K
+  vacuum_pressure: 1e-8 Torr
+constraints:
+  beta_limit: "beta < 0.05" # Troyon limit
+  q_safety_factor: "q > 2.0" # Kink instability limit
+equations:
+  - "grad(p) = J x B" # Force balance
+  - "div(B) = 0"

@@ -1,0 +1,6 @@
+# Directive 04: PRIN Class
+physics_class: "Magnetohydrodynamics"
+regularity_score: 0.95 # High physics fidelity required
+intelligence_level: "L4_Autonomous_Optimization"
+narrative_role: "The Star Builder"
+domain: "Nuclear Fusion"

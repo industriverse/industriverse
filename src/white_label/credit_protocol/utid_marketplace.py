@@ -25,6 +25,13 @@ from datetime import datetime, timedelta
 from enum import Enum
 import secrets
 from decimal import Decimal
+import json
+import os
+import logging
+import asyncio
+from src.bridge_api.event_bus import GlobalEventBus
+
+logger = logging.getLogger(__name__)
 
 
 class ListingType(Enum):
@@ -242,6 +249,157 @@ class UTIDMarketplace:
 
         # Revenue tracking
         self.total_volume: Decimal = Decimal(0)
+        
+        # Persistence
+        self.persistence_path = "data/marketplace_storage.json"
+        self._load_from_disk()
+        
+        # Event Subscription
+        GlobalEventBus.subscribe(self._on_event)
+
+    async def _on_event(self, event: Dict[str, Any]):
+        """Handle global events"""
+        if event.get("type") == "proof_generated":
+            await self._handle_proof_generated(event)
+
+    async def _handle_proof_generated(self, event: Dict[str, Any]):
+        """Auto-list high quality proofs"""
+        try:
+            proof = event.get("proof", {})
+            metadata = proof.get("metadata", {})
+            score = metadata.get("proof_score", 0.0)
+            
+            # Auto-list if score is high enough (> 0.9)
+            if score > 0.9:
+                utid = proof.get("utid")
+                # Check if already listed
+                if utid in self.listings_by_utid:
+                    return
+
+                logger.info(f"Auto-listing high quality proof: {utid} (Score: {score})")
+                
+                self.create_sale_listing(
+                    utid=utid,
+                    insight_id=proof.get("proof_id"),
+                    seller_id="system_auto_lister",
+                    seller_name="Industriverse System",
+                    price=Decimal(100 * score), # Dynamic pricing
+                    title=f"High Quality Insight: {proof.get('domain', 'General')}",
+                    description=f"Auto-listed high fidelity proof. Score: {score:.4f}",
+                    tags=["auto-listed", "premium", proof.get("domain", "general")],
+                    proof_score=score
+                )
+        except Exception as e:
+            logger.error(f"Error handling proof event: {e}")
+
+    def _save_to_disk(self):
+        """Save state to disk"""
+        try:
+            os.makedirs(os.path.dirname(self.persistence_path), exist_ok=True)
+            
+            data = {
+                "listings": [l.to_dict() for l in self.listings.values()],
+                "transactions": [t.to_dict() for t in self.transactions],
+                "access_grants": {k: {
+                    "access_id": v.access_id,
+                    "utid": v.utid,
+                    "insight_id": v.insight_id,
+                    "user_id": v.user_id,
+                    "access_type": v.access_type,
+                    "is_active": v.is_active,
+                    "access_count": v.access_count
+                } for k, v in self.access_grants.items()}
+            }
+            
+            with open(self.persistence_path, 'w') as f:
+                json.dump(data, f, indent=2)
+                
+        except Exception as e:
+            logger.error(f"Failed to save marketplace state: {e}")
+
+    def _load_from_disk(self):
+        """Load state from disk"""
+        if not os.path.exists(self.persistence_path):
+            return
+            
+        try:
+            with open(self.persistence_path, 'r') as f:
+                data = json.load(f)
+                
+            # Restore Listings
+            for l_data in data.get("listings", []):
+                listing = MarketplaceListing(
+                    listing_id=l_data['listing_id'],
+                    utid=l_data['utid'],
+                    insight_id=l_data['insight_id'],
+                    listing_type=ListingType(l_data['listing_type']),
+                    status=ListingStatus(l_data['status']),
+                    seller_id=l_data['seller_id'],
+                    seller_name=l_data['seller_name'],
+                    price=Decimal(str(l_data['price'])),
+                    currency=l_data['currency'],
+                    license_type=LicenseType(l_data['license_type']) if l_data.get('license_type') else None,
+                    license_duration_days=l_data.get('license_duration_days'),
+                    max_users=l_data.get('max_users'),
+                    minimum_bid=Decimal(str(l_data['minimum_bid'])) if l_data.get('minimum_bid') else None,
+                    current_bid=Decimal(str(l_data['current_bid'])) if l_data.get('current_bid') else None,
+                    highest_bidder=l_data.get('highest_bidder'),
+                    auction_end_time=datetime.fromisoformat(l_data['auction_end_time']) if l_data.get('auction_end_time') else None,
+                    royalty_per_citation=Decimal(str(l_data['royalty_per_citation'])) if l_data.get('royalty_per_citation') else None,
+                    title=l_data['title'],
+                    description=l_data['description'],
+                    tags=l_data['tags'],
+                    proof_score=l_data['proof_score'],
+                    citation_count=l_data['citation_count'],
+                    created_at=datetime.fromisoformat(l_data['created_at']),
+                    updated_at=datetime.fromisoformat(l_data['updated_at']),
+                    expires_at=datetime.fromisoformat(l_data['expires_at']) if l_data.get('expires_at') else None,
+                    total_sales=l_data['total_sales'],
+                    total_revenue=Decimal(str(l_data['total_revenue']))
+                )
+                self._add_listing(listing)
+                
+            # Restore Transactions
+            for t_data in data.get("transactions", []):
+                transaction = Transaction(
+                    transaction_id=t_data['transaction_id'],
+                    listing_id=t_data['listing_id'],
+                    utid=t_data['utid'],
+                    buyer_id=t_data['buyer_id'],
+                    seller_id=t_data['seller_id'],
+                    transaction_type=t_data['transaction_type'],
+                    amount=Decimal(str(t_data['amount'])),
+                    currency=t_data['currency'],
+                    status=t_data['status'],
+                    license_type=LicenseType(t_data['license_type']) if t_data.get('license_type') else None,
+                    license_expires=datetime.fromisoformat(t_data['license_expires']) if t_data.get('license_expires') else None,
+                    metadata=t_data.get('metadata', {}),
+                    timestamp=datetime.fromisoformat(t_data['timestamp'])
+                )
+                self.transactions.append(transaction)
+                if transaction.buyer_id not in self.transactions_by_user:
+                    self.transactions_by_user[transaction.buyer_id] = []
+                self.transactions_by_user[transaction.buyer_id].append(transaction)
+                self.total_volume += transaction.amount
+
+            # Restore Access Grants
+            for k, v in data.get("access_grants", {}).items():
+                access = InsightAccess(
+                    access_id=v['access_id'],
+                    utid=v['utid'],
+                    insight_id=v['insight_id'],
+                    user_id=v['user_id'],
+                    access_type=v['access_type'],
+                    is_active=v['is_active'],
+                    access_count=v['access_count']
+                )
+                self.access_grants[k] = access
+                if access.user_id not in self.access_by_user:
+                    self.access_by_user[access.user_id] = []
+                self.access_by_user[access.user_id].append(access.access_id)
+                
+        except Exception as e:
+            logger.error(f"Failed to load marketplace state: {e}")
 
     def create_sale_listing(
         self,
@@ -280,6 +438,7 @@ class UTIDMarketplace:
         )
 
         self._add_listing(listing)
+        self._save_to_disk()
         return listing
 
     def create_license_listing(
@@ -327,6 +486,7 @@ class UTIDMarketplace:
         )
 
         self._add_listing(listing)
+        self._save_to_disk()
         return listing
 
     def create_auction_listing(
@@ -365,6 +525,7 @@ class UTIDMarketplace:
         )
 
         self._add_listing(listing)
+        self._save_to_disk()
         return listing
 
     def create_citation_royalty_listing(
@@ -399,6 +560,7 @@ class UTIDMarketplace:
         )
 
         self._add_listing(listing)
+        self._save_to_disk()
         return listing
 
     def _add_listing(self, listing: MarketplaceListing):
@@ -477,6 +639,8 @@ class UTIDMarketplace:
 
         # Update volume
         self.total_volume += listing.price
+        
+        self._save_to_disk()
 
         return True, "Purchase successful", transaction
 
@@ -544,6 +708,8 @@ class UTIDMarketplace:
 
         # Update volume
         self.total_volume += listing.price
+        
+        self._save_to_disk()
 
         return True, "License acquired", transaction
 
@@ -582,6 +748,8 @@ class UTIDMarketplace:
         listing.current_bid = bid_amount
         listing.highest_bidder = bidder_id
         listing.updated_at = datetime.now()
+        
+        self._save_to_disk()
 
         return True, "Bid placed successfully"
 
@@ -629,6 +797,8 @@ class UTIDMarketplace:
         # Record transaction
         self.transactions.append(transaction)
         self.total_volume += listing.current_bid
+        
+        self._save_to_disk()
 
         return True, "Auction finalized", transaction
 

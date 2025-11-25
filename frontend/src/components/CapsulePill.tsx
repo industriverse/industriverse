@@ -68,6 +68,18 @@ const statusConfig: Record<CapsuleStatus, {
     color: 'text-slate-400',
     bgColor: 'bg-slate-800/50',
     borderColor: 'border-slate-600/40'
+  },
+  idle: {
+    icon: Clock,
+    color: 'text-slate-400',
+    bgColor: 'bg-slate-800/50',
+    borderColor: 'border-slate-600/40'
+  },
+  error: {
+    icon: AlertTriangle,
+    color: 'text-red-500',
+    bgColor: 'bg-red-900/20',
+    borderColor: 'border-red-500/40'
   }
 };
 
@@ -100,6 +112,21 @@ const actionConfig: Record<CapsuleAction, {
     label: 'Acknowledge',
     icon: CheckCircle,
     variant: 'secondary'
+  },
+  ignite: {
+    label: 'Ignite',
+    icon: Zap,
+    variant: 'default'
+  },
+  shutdown: {
+    label: 'Shutdown',
+    icon: X,
+    variant: 'destructive'
+  },
+  restart: {
+    label: 'Restart',
+    icon: Clock,
+    variant: 'secondary'
   }
 };
 
@@ -110,25 +137,25 @@ export default function CapsulePill({
   onStateChange
 }: CapsulePillProps) {
   const [viewState, setViewState] = useState<CapsuleViewState>(initialState);
-  
+
   const config = statusConfig[capsule.status];
   const StatusIcon = config.icon;
-  
+
   const handleStateChange = (newState: CapsuleViewState) => {
     setViewState(newState);
     onStateChange?.(newState);
   };
-  
+
   const handleAction = (action: CapsuleAction) => {
     onAction?.(action, capsule.id);
   };
-  
+
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return 'just now';
     if (diffMins < 60) return `${diffMins}m ago`;
     const diffHours = Math.floor(diffMins / 60);
@@ -136,7 +163,7 @@ export default function CapsulePill({
     const diffDays = Math.floor(diffHours / 24);
     return `${diffDays}d ago`;
   };
-  
+
   // Pill State (Collapsed)
   if (viewState === 'pill') {
     return (
@@ -169,7 +196,7 @@ export default function CapsulePill({
       </Card>
     );
   }
-  
+
   // Expanded State (Medium Detail)
   if (viewState === 'expanded') {
     return (
@@ -212,7 +239,7 @@ export default function CapsulePill({
               </Button>
             </div>
           </div>
-          
+
           {/* Metadata */}
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
@@ -226,7 +253,7 @@ export default function CapsulePill({
               {capsule.source}
             </Badge>
           </div>
-          
+
           {/* Actions */}
           <div className="flex flex-wrap gap-2 pt-2">
             {capsule.actions.map((action) => {
@@ -250,7 +277,7 @@ export default function CapsulePill({
       </Card>
     );
   }
-  
+
   // Full State (Complete Detail)
   return (
     <Card
@@ -291,7 +318,7 @@ export default function CapsulePill({
             <Minimize2 className="h-5 w-5" />
           </Button>
         </div>
-        
+
         {/* Metadata Grid */}
         <div className="grid grid-cols-2 gap-4 p-4 bg-background/50 rounded-lg border border-border">
           <div>
@@ -329,7 +356,7 @@ export default function CapsulePill({
             </div>
           )}
         </div>
-        
+
         {/* Additional Metadata */}
         {Object.keys(capsule.metadata).length > 0 && (
           <div className="p-4 bg-background/50 rounded-lg border border-border">
@@ -344,7 +371,7 @@ export default function CapsulePill({
             </div>
           </div>
         )}
-        
+
         {/* Actions */}
         <div className="flex flex-wrap gap-2 pt-2">
           {capsule.actions.map((action) => {

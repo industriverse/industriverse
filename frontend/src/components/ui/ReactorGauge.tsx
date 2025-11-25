@@ -1,14 +1,16 @@
 // @ts-nocheck
-import { useEnergyMap } from "@/hooks/useEnergyMap";
+import { useSystemPulse } from "@/hooks/useSystemPulse";
 import { cn } from "@/lib/utils";
 import { AlertTriangle } from "lucide-react";
 
 export function ReactorGauge() {
-    const { data: energyData } = useEnergyMap();
+    const { metrics, isConnected } = useSystemPulse();
 
-    const entropy = energyData?.total_energy ? Math.min(100, energyData.total_energy / 100) : 45;
+    // Map system_entropy (0.0-1.0) to percentage (0-100)
+    // Default to 45 if not connected
+    const entropy = isConnected ? Math.min(100, metrics.system_entropy * 100) : 45;
     const isOverheating = entropy > 80;
-    const stability = energyData?.status === "stable" ? "STABLE" : "UNSTABLE";
+    const stability = entropy < 60 ? "STABLE" : (entropy < 85 ? "UNSTABLE" : "CRITICAL");
 
     const state = {
         entropy,

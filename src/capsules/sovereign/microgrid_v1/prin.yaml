@@ -1,0 +1,5 @@
+domain: Microgrid Pulse Stability
+intelligence_level: L3_Predictive_Immunity
+narrative_role: The Pulse Keeper
+physics_class: NetworkDynamics
+regularity_score: 0.9

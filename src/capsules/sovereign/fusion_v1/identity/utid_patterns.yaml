@@ -1,0 +1,6 @@
+# Directive 08: UTID Patterns
+required_credentials:
+  - "doe_clearance_l2"
+  - "fusion_operator_cert"
+reputation_min: 0.8
+lineage_signature: "fusion_v1_genesis_sig"

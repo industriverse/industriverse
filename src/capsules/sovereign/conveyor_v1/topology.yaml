@@ -1,0 +1,14 @@
+boundary_conditions:
+  type: dirichlet
+  value: 0
+constraints:
+  stability: energy < 0
+domain: Conveyor Coordination
+equations:
+- Kuramoto Model
+manifold_type: generic_manifold
+state_variables:
+- x
+- y
+- z
+- energy
