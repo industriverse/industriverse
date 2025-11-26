@@ -1,0 +1,7 @@
+
+name: fusion_ebdm
+domain: fusion
+prin_target: 0.75
+safety:
+  runtime_energy_budget_j: 10000
+utid_pattern: HOST-{sha256(model)}-{ts}
