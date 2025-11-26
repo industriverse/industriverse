@@ -14,3 +14,9 @@ We have deployed the **Sovereign Rare Earth Acceleration Network (S-REAN)**, a m
 
 ### Validated Reality
 Our "Grand Unification Testing Loop" validates this entire stack in real-time. We have successfully demonstrated a live feedback loop where a change in a physical furnace parameter instantly triggers a simulation update, recalculates the "Sovereignty Score," and publishes a verified claim to the dashboard. This is now fully realized and deployed across a secure, segmented domain architecture, providing a scalable foundation for the re-industrialization of the West.
+
+## The "Industrial Web" Strategy (Capsule URIs)
+We are proposing a fundamental shift from the Document Web (`https://`) to the Industrial Web (`capsule://`). A Capsule URI is not a location on a server; it is a **cryptographic address** for a sovereign industrial process. When a user navigates to `capsule://magnet_assembly_v1`, they are not downloading a webpage; they are establishing a direct, verified, peer-to-peer connection with the manufacturing node itself. 
+
+**Traction & Adoption Strategy**:
+We leverage **Regulatory Moats** to drive adoption. As governments mandate "Digital Product Passports" (e.g., EU Battery Regulation) and supply chain transparency, the `capsule://` protocol becomes the standard for **Executable Compliance**. It serves as a digital "Permit to Operate"—ensuring that every interaction with the machine is authorized, logged, and compliant by design. We are not just building a platform; we are establishing the **DNS for the Physical Economy**, where permits and protocols are one and the same.

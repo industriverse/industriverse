@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industriverse Capsule Pin Demo</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .capsule-pin {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            backdrop-filter: blur(10px);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #22c55e;
+            box-shadow: 0 0 10px #22c55e;
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        .metric-value {
+            font-family: 'Roboto Mono', monospace;
+            color: #38bdf8;
+        }
+        .footer {
+            margin-top: 15px;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-align: center;
+            border-top: 1px solid #334155;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="capsule-pin">
+        <div class="header">
+            <div class="title">Refining Node 01</div>
+            <div class="status-dot" id="status-dot"></div>
+        </div>
+        <div class="metric">
+            <span>Temperature</span>
+            <span class="metric-value" id="temp">1500 K</span>
+        </div>
+        <div class="metric">
+            <span>Pressure</span>
+            <span class="metric-value" id="pressure">100 Bar</span>
+        </div>
+        <div class="metric">
+            <span>Efficiency</span>
+            <span class="metric-value" id="efficiency">98.5%</span>
+        </div>
+        <div class="footer">
+            UTID: capsule_refiner_v1_8a7b
+        </div>
+    </div>
+
+    <script>
+        // Simulate live data updates
+        setInterval(() => {
+            const temp = 1500 + (Math.random() * 20 - 10);
+            const pressure = 100 + (Math.random() * 5 - 2.5);
+            const efficiency = 98.5 + (Math.random() * 1 - 0.5);
+            
+            document.getElementById('temp').innerText = temp.toFixed(1) + ' K';
+            document.getElementById('pressure').innerText = pressure.toFixed(1) + ' Bar';
+            document.getElementById('efficiency').innerText = efficiency.toFixed(1) + '%';
+            
+            // Random status flicker
+            const dot = document.getElementById('status-dot');
+            if (Math.random() > 0.95) {
+                dot.style.backgroundColor = '#eab308'; // Warning
+                dot.style.boxShadow = '0 0 10px #eab308';
+            } else {
+                dot.style.backgroundColor = '#22c55e'; // Nominal
+                dot.style.boxShadow = '0 0 10px #22c55e';
+            }
+            
+        }, 1000);
+    </script>
+
+</body>
+</html>
