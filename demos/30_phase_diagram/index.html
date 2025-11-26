@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Demo 30: Interactive Phase Diagram</title>
+    <style>
+        body {
+            background: #111;
+            color: #fff;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .diagram {
+            width: 400px;
+            height: 400px;
+            border: 2px solid #555;
+            position: relative;
+            background: linear-gradient(45deg, #2a0a0a 0%, #0a2a0a 100%);
+        }
+
+        .cursor {
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px #fff;
+            transition: all 0.1s;
+        }
+
+        .label {
+            position: absolute;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .safe-zone {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 50%;
+            border-bottom: 1px dashed #0f0;
+            border-left: 1px dashed #0f0;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .danger-zone {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50%;
+            height: 50%;
+            border-top: 1px dashed #f00;
+            border-right: 1px dashed #f00;
+            background: rgba(255, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Phase Diagram: Entropy vs. Energy</h1>
+        <div class="diagram" id="diagram">
+            <div class="safe-zone"></div>
+            <div class="danger-zone"></div>
+            <div class="label" style="bottom: 10px; right: 10px;">High Energy / Low Entropy (Optimal)</div>
+            <div class="label" style="top: 10px; left: 10px;">Low Energy / High Entropy (Decay)</div>
+            <div class="cursor" id="cursor" style="left: 50%; top: 50%;"></div>
+        </div>
+        <p>Status: <span id="status">TRANSITIONING</span></p>
+    </div>
+    <script>
+        const cursor = document.getElementById('cursor');
+        const status = document.getElementById('status');
+        let x = 50;
+        let y = 50;
+
+        // Random walk
+        setInterval(() => {
+            x += (Math.random() - 0.5) * 5;
+            y += (Math.random() - 0.5) * 5;
+            if (x < 0) x = 0; if (x > 100) x = 100;
+            if (y < 0) y = 0; if (y > 100) y = 100;
+
+            cursor.style.left = x + '%';
+            cursor.style.top = y + '%';
+
+            if (x > 50 && y < 50) {
+                status.innerText = "OPTIMAL";
+                status.style.color = "#0f0";
+            } else if (x < 50 && y > 50) {
+                status.innerText = "CRITICAL";
+                status.style.color = "#f00";
+            } else {
+                status.innerText = "TRANSITIONING";
+                status.style.color = "#ff0";
+            }
+        }, 100);
+    </script>
+</body>
+
+</html>

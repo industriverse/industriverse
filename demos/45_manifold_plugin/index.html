@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Demo 45: Manifold Explorer Plugin</title>
+    <style>
+        body {
+            background: #fff;
+            color: #333;
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        .plugin-container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .viewport {
+            background: #eee;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="plugin-container">
+        <div class="header">
+            <h3>Manifold Explorer (React Component)</h3>
+            <span>v1.0.2</span>
+        </div>
+        <div class="controls">
+            <button onclick="rotate('left')">Rotate L</button>
+            <button onclick="rotate('right')">Rotate R</button>
+            <button onclick="zoom('in')">Zoom In</button>
+        </div>
+        <div class="viewport" id="viewport">
+            [3D Manifold Render Area]
+        </div>
+        <p>Selected Cluster: <b id="cluster">None</b></p>
+    </div>
+
+    <script>
+        const viewport = document.getElementById('viewport');
+        const clusterLabel = document.getElementById('cluster');
+
+        function rotate(dir) {
+            viewport.innerText = `Rotating ${dir}...`;
+            setTimeout(() => viewport.innerText = "[3D Manifold Render Area]", 500);
+        }
+
+        function zoom(dir) {
+            viewport.innerText = `Zooming ${dir}...`;
+            clusterLabel.innerText = "Cluster_Alpha";
+            setTimeout(() => viewport.innerText = "[3D Manifold Render Area]", 500);
+        }
+    </script>
+</body>
+
+</html>
