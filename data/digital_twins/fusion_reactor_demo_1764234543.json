@@ -1,0 +1,555 @@
+{
+  "id": "fusion_reactor_demo_1764234543",
+  "type": "fusion_reactor",
+  "config": {
+    "location": "Sector 7"
+  },
+  "created_at": "2025-11-27T02:09:03.546628",
+  "current_state": {
+    "plasma_temp": 150.0,
+    "magnetic_field": 12.5,
+    "stability": 0.99
+  },
+  "shadow_projections": [
+    {
+      "timestamp": "2025-11-27T02:10:03.546914",
+      "metrics": {
+        "plasma_temp": 149.9547797261969,
+        "magnetic_field": 12.5,
+        "stability": 0.9804779726196904
+      },
+      "status": "NOMINAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:11:03.546914",
+      "metrics": {
+        "plasma_temp": 149.98140157030005,
+        "magnetic_field": 12.5,
+        "stability": 0.9731401570300059
+      },
+      "status": "NOMINAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:12:03.546914",
+      "metrics": {
+        "plasma_temp": 149.98962319211333,
+        "magnetic_field": 12.5,
+        "stability": 0.9589623192113331
+      },
+      "status": "NOMINAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:13:03.546914",
+      "metrics": {
+        "plasma_temp": 149.86220415204122,
+        "magnetic_field": 12.5,
+        "stability": 0.9262204152041208
+      },
+      "status": "NOMINAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:14:03.546914",
+      "metrics": {
+        "plasma_temp": 149.79304343609354,
+        "magnetic_field": 12.5,
+        "stability": 0.8943043436093545
+      },
+      "status": "NOMINAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:15:03.546914",
+      "metrics": {
+        "plasma_temp": 149.73295389153844,
+        "magnetic_field": 12.5,
+        "stability": 0.8582953891538438
+      },
+      "status": "NOMINAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:16:03.546914",
+      "metrics": {
+        "plasma_temp": 149.74699945410205,
+        "magnetic_field": 12.5,
+        "stability": 0.824699945410204
+      },
+      "status": "NOMINAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:17:03.546914",
+      "metrics": {
+        "plasma_temp": 149.62751177049927,
+        "magnetic_field": 12.5,
+        "stability": 0.7727511770499247
+      },
+      "status": "WARNING"
+    },
+    {
+      "timestamp": "2025-11-27T02:18:03.546914",
+      "metrics": {
+        "plasma_temp": 149.67012313615209,
+        "magnetic_field": 12.5,
+        "stability": 0.7320123136152061
+      },
+      "status": "WARNING"
+    },
+    {
+      "timestamp": "2025-11-27T02:19:03.546914",
+      "metrics": {
+        "plasma_temp": 149.50367427251257,
+        "magnetic_field": 12.5,
+        "stability": 0.6653674272512533
+      },
+      "status": "WARNING"
+    },
+    {
+      "timestamp": "2025-11-27T02:20:03.546914",
+      "metrics": {
+        "plasma_temp": 149.52152513526903,
+        "magnetic_field": 12.5,
+        "stability": 0.6121525135268997
+      },
+      "status": "WARNING"
+    },
+    {
+      "timestamp": "2025-11-27T02:21:03.546914",
+      "metrics": {
+        "plasma_temp": 149.41877691535288,
+        "magnetic_field": 12.5,
+        "stability": 0.5418776915352854
+      },
+      "status": "WARNING"
+    },
+    {
+      "timestamp": "2025-11-27T02:22:03.546914",
+      "metrics": {
+        "plasma_temp": 149.38165506146632,
+        "magnetic_field": 12.5,
+        "stability": 0.47316550614662956
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:23:03.546914",
+      "metrics": {
+        "plasma_temp": 149.40615609186327,
+        "magnetic_field": 12.5,
+        "stability": 0.4056156091863257
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:24:03.546914",
+      "metrics": {
+        "plasma_temp": 149.40425290668225,
+        "magnetic_field": 12.5,
+        "stability": 0.33042529066822224
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:25:03.546914",
+      "metrics": {
+        "plasma_temp": 149.44227412827965,
+        "magnetic_field": 12.5,
+        "stability": 0.25422741282796124
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:26:03.546914",
+      "metrics": {
+        "plasma_temp": 149.40715059300814,
+        "magnetic_field": 12.5,
+        "stability": 0.1657150593008114
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:27:03.546914",
+      "metrics": {
+        "plasma_temp": 149.3501151681899,
+        "magnetic_field": 12.5,
+        "stability": 0.07001151681898707
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:28:03.546914",
+      "metrics": {
+        "plasma_temp": 149.39635347854792,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:29:03.546914",
+      "metrics": {
+        "plasma_temp": 149.28860843563825,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:30:03.546914",
+      "metrics": {
+        "plasma_temp": 149.30897362118355,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:31:03.546914",
+      "metrics": {
+        "plasma_temp": 149.29906988290432,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:32:03.546914",
+      "metrics": {
+        "plasma_temp": 149.33304143088932,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:33:03.546914",
+      "metrics": {
+        "plasma_temp": 149.47298706708006,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:34:03.546914",
+      "metrics": {
+        "plasma_temp": 149.71547451434327,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:35:03.546914",
+      "metrics": {
+        "plasma_temp": 149.61812011448671,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:36:03.546914",
+      "metrics": {
+        "plasma_temp": 149.52389608013746,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:37:03.546914",
+      "metrics": {
+        "plasma_temp": 149.53375478229322,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:38:03.546914",
+      "metrics": {
+        "plasma_temp": 149.4225887013355,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:39:03.546914",
+      "metrics": {
+        "plasma_temp": 149.24651708300308,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:40:03.546914",
+      "metrics": {
+        "plasma_temp": 149.1570143469664,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:41:03.546914",
+      "metrics": {
+        "plasma_temp": 149.06629567897699,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:42:03.546914",
+      "metrics": {
+        "plasma_temp": 149.03344263021353,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:43:03.546914",
+      "metrics": {
+        "plasma_temp": 149.07648107219478,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:44:03.546914",
+      "metrics": {
+        "plasma_temp": 149.01442079826728,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:45:03.546914",
+      "metrics": {
+        "plasma_temp": 148.86787877881332,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:46:03.546914",
+      "metrics": {
+        "plasma_temp": 148.97257562903286,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:47:03.546914",
+      "metrics": {
+        "plasma_temp": 148.93646165763772,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:48:03.546914",
+      "metrics": {
+        "plasma_temp": 148.98894740467045,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:49:03.546914",
+      "metrics": {
+        "plasma_temp": 148.90665393453727,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:50:03.546914",
+      "metrics": {
+        "plasma_temp": 148.88635687497273,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:51:03.546914",
+      "metrics": {
+        "plasma_temp": 148.96443780044518,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:52:03.546914",
+      "metrics": {
+        "plasma_temp": 148.96640259190426,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:53:03.546914",
+      "metrics": {
+        "plasma_temp": 148.9015186820572,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:54:03.546914",
+      "metrics": {
+        "plasma_temp": 148.8703807068419,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:55:03.546914",
+      "metrics": {
+        "plasma_temp": 148.8708170141688,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:56:03.546914",
+      "metrics": {
+        "plasma_temp": 148.76452573308643,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:57:03.546914",
+      "metrics": {
+        "plasma_temp": 148.9062661410067,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:58:03.546914",
+      "metrics": {
+        "plasma_temp": 148.7917580700304,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T02:59:03.546914",
+      "metrics": {
+        "plasma_temp": 148.8697273000958,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T03:00:03.546914",
+      "metrics": {
+        "plasma_temp": 148.99957322870648,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T03:01:03.546914",
+      "metrics": {
+        "plasma_temp": 149.14276847885876,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T03:02:03.546914",
+      "metrics": {
+        "plasma_temp": 149.20154721874763,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T03:03:03.546914",
+      "metrics": {
+        "plasma_temp": 149.15239396735453,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T03:04:03.546914",
+      "metrics": {
+        "plasma_temp": 149.09418379695006,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T03:05:03.546914",
+      "metrics": {
+        "plasma_temp": 148.93220617653566,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T03:06:03.546914",
+      "metrics": {
+        "plasma_temp": 149.00464878057124,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T03:07:03.546914",
+      "metrics": {
+        "plasma_temp": 149.0628488503143,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T03:08:03.546914",
+      "metrics": {
+        "plasma_temp": 149.15547067479832,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    },
+    {
+      "timestamp": "2025-11-27T03:09:03.546914",
+      "metrics": {
+        "plasma_temp": 149.19654519808694,
+        "magnetic_field": 12.5,
+        "stability": 0.0
+      },
+      "status": "CRITICAL"
+    }
+  ]
+}
