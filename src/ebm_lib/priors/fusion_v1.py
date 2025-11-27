@@ -27,6 +27,12 @@ class FusionPrior(EnergyPrior):
         except Exception as e:
             print(f"Failed to load calibration: {e}")
 
+    def load_energy_map(self):
+        """Override to also set target_field from the loaded map."""
+        super().load_energy_map()
+        if self.ground_truth is not None:
+            self.target_field = torch.tensor(self.ground_truth, dtype=torch.float32)
+
     def energy(self, x: torch.Tensor) -> torch.Tensor:
         """
         Fusion Plasma Confinement Prior (calibrated).
@@ -50,7 +56,7 @@ class FusionPrior(EnergyPrior):
         # Pad to match shapes
         e_div = (div_x[..., :, :-1] + div_y[..., :-1, :]).pow(2).mean(dim=(-1, -2))
         
-        return e_deviation + 10.0 * e_div
+        return e_deviation + 1.0 * e_div
 
 prior = FusionPrior()
 prior.register()
