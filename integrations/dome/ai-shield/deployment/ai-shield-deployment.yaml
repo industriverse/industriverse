@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-shield-core
+  namespace: ai-shield-security
+  labels:
+    app: ai-shield-core
+    version: v1.0.0-alpha
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ai-shield-core
+  template:
+    metadata:
+      labels:
+        app: ai-shield-core
+    spec:
+      containers:
+      - name: ai-shield
+        image: empeiriahaus/ai-shield-core:v1.0.0-alpha
+        ports:
+        - containerPort: 5005
+        env:
+        - name: MATERIALS_OS_ENDPOINT
+          value: "http://materials-os-final-service.industriverse-production:5004"
+        - name: SHADOW_TWINS_ENDPOINT
+          value: "http://shadow-twins-enhanced-v3:9000"
+        - name: OBMI_ENDPOINT
+          value: "http://localhost:8000"
+        - name: FLASK_ENV
+          value: "production"
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /api/ai-shield/health
+            port: 5005
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/ai-shield/health
+            port: 5005
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-shield-service
+  namespace: ai-shield-security
+spec:
+  selector:
+    app: ai-shield-core
+  ports:
+  - port: 5005
+    targetPort: 5005
+    name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-shield-external
+  namespace: ai-shield-security
+spec:
+  selector:
+    app: ai-shield-core
+  ports:
+  - port: 80
+    targetPort: 5005
+    name: http
+  type: LoadBalancer

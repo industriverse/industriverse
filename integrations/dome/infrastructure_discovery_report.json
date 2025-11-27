@@ -1,0 +1,22 @@
+{
+  "aws_clusters": [
+    "industriverse-aws",
+    "industriverse-data",
+    "molecular-industrial-cluster"
+  ],
+  "azure_clusters": [
+    "industriverse-azure-v2"
+  ],
+  "gcp_clusters": [
+    "industriverse-gcp",
+    "industriverse-cluster"
+  ],
+  "services_found": {},
+  "mcp_services": [],
+  "a2a_services": [],
+  "edge_services": [],
+  "ambient_services": [],
+  "aws_account": "423267931076",
+  "azure_subscription": "4609f81e-e69d-4e22-a483-3cdec02caf11",
+  "gcp_project": "industriverse"
+}

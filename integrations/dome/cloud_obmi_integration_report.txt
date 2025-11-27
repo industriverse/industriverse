@@ -1,0 +1,15 @@
+=== CLOUD OBMI INTEGRATION DISCOVERY REPORT ===
+Generated: Sun Sep 21 00:03:19 MDT 2025
+Scanned: AWS, Azure, GCP
+
+=== AWS RESOURCES ===
+CLUSTERS	industriverse-aws
+CLUSTERS	industriverse-data
+CLUSTERS	molecular-industrial-cluster
+
+=== GCP RESOURCES ===
+industriverse-gcp
+industriverse-cluster
+
+=== AZURE RESOURCES ===
+industriverse-azure-v2

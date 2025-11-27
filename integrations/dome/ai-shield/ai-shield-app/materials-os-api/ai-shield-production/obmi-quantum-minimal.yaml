@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resource-reservation
+  namespace: obmi-quantum-enhancement
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resource-reservation
+  template:
+    metadata:
+      labels:
+        app: resource-reservation
+    spec:
+      nodeSelector:
+        workload-type: general
+      containers:
+      - name: placeholder
+        image: busybox
+        command: ["sleep", "infinity"]
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 300m
+            memory: 512Mi

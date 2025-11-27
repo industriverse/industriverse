@@ -1,0 +1,34 @@
+📊 DOME SOURCE CODE VERIFICATION REPORT
+=
+Generated: Thu Sep 18 05:16:11 MDT 2025
+
+📁 DIRECTORY STRUCTURE:
+src
+src/ambient
+src/csi_processing
+src/cuda_kernels
+src/cuda_kernels/__pycache__
+src/deployment
+src/edge
+src/hardware_abstraction
+src/hardware_abstraction/__pycache__
+src/industrial
+src/industrial/__pycache__
+src/integration
+src/obmi_operators
+src/obmi_operators/__pycache__
+src/proof_economy
+src/protocols
+src/protocols/__pycache__
+src/testing
+src/white_label
+src/white_label/__pycache__
+src/widgets
+src/widgets/__pycache__
+src/wifi_sensing
+
+📄 PYTHON FILES:
+      34
+
+🧪 TEST FILES:
+       6

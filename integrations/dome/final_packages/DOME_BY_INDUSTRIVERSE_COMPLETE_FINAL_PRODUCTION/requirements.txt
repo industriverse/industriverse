@@ -1,0 +1,15 @@
+numpy>=1.21.0
+scipy>=1.7.0
+matplotlib>=3.4.0
+librosa>=0.8.0
+soundfile>=0.10.0
+pywavelets>=1.1.0
+esptool>=3.0.0
+pyserial>=3.5.0
+cryptography>=3.4.0
+websockets>=9.0.0
+jinja2>=3.0.0
+pyyaml>=5.4.0
+grpcio-tools>=1.40.0
+scikit-learn>=1.0.0
+requests>=2.25.0

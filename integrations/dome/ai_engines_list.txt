@@ -1,0 +1,21 @@
+ai-ripple-deploy-anywhere         ai-ripple-deploy-anywhere-77cbf6f4f8-sc8b9                1/1     Running             0                13m
+ai-ripple                         ai-ripple-5c8d56495b-h6gwr                                1/1     Running             0                13m
+ai-ripple                         ai-ripple-5c8d56495b-hnj4x                                1/1     Running             0                83m
+dac-foundry-aws                   dac-runtime-engine-aws-769c85768-r499x                    1/1     Running             0                50m
+hilbert-space-engine              hilbert-space-mathematics-engine-65f7d74fdc-v6jls         1/1     Running             0                50m
+hilbert-space-engine              hilbert-space-mathematics-engine-65f7d74fdc-x8jss         1/1     Running             0                13m
+industrial-optimization           industrial-optimization-fusion-76f7649f85-mmlh4           1/1     Running             0                83m
+industriverse-platform            industriverse-platform-8f5b979b4-bg8bv                    0/1     ContainerCreating   0                50m
+industriverse-platform            industriverse-platform-8f5b979b4-lzrfc                    0/1     ContainerCreating   0                50m
+industriverse-platform            industriverse-platform-8f5b979b4-vkx2t                    0/1     ContainerCreating   0                13m
+industriverse-showcase            industriverse-showcase-76f694f975-8pggj                   0/1     ContainerCreating   0                50m
+industriverse-showcase            industriverse-showcase-76f694f975-gvmr6                   0/1     ContainerCreating   0                13m
+industriverse-showcase            industriverse-showcase-76f694f975-x9zb2                   0/1     ContainerCreating   0                50m
+m2n2-fusion                       m2n2-evolution-engine-bfcd59675-b5bvf                     1/1     Running             0                83m
+predictive-maintenance-advanced   advanced-predictive-maintenance-engine-676767c955-cc7gf   1/1     Running             0                50m
+predictive-maintenance            predictive-maintenance-engine-797875dff4-l7db8            1/1     Running             0                83m
+predictive-maintenance            predictive-maintenance-engine-797875dff4-mbfjg            1/1     Running             1 (80m ago)      83m
+process-optimization              real-time-process-optimization-engine-5987787d69-gffwx    1/1     Running             0                50m
+quality-control                   quality-control-engine-79968d75bb-8shtc                   1/1     Running             0                83m
+safety-monitoring                 safety-monitoring-engine-6bc96c49b6-6vjt5                 1/1     Running             1 (10m ago)      13m
+safety-monitoring                 safety-monitoring-engine-6bc96c49b6-sdhkq                 1/1     Running             1 (81m ago)      83m

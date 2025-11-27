@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dome-industriverse-platform-minimal
+  namespace: industriverse-unified
+  labels:
+    app: dome-industriverse-minimal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dome-industriverse-minimal
+  template:
+    metadata:
+      labels:
+        app: dome-industriverse-minimal
+    spec:
+      containers:
+      - name: dome-platform
+        image: alpine:latest
+        command: ["sh", "-c", "echo 'Dome by Industriverse - Minimal' && sleep 3600"]
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DOME_MODE
+          value: "production-minimal"
+        resources:
+          requests:
+            memory: "64Mi"   # Ultra minimal
+            cpu: "50m"       # Ultra minimal
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dome-industriverse-service-minimal
+  namespace: industriverse-unified
+spec:
+  selector:
+    app: dome-industriverse-minimal
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer
