@@ -1,6 +1,7 @@
 import os, yaml, json, time
 import numpy as np
 from ebm_lib.registry import get as load_prior
+import ebm_lib.priors # Force registration
 from ebm_runtime.samplers.langevin import langevin_sample
 import importlib
 

@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "capsule_id": "fusion_v1",
-  "title": "Fusion Control (v1)",
-  "description": "Physics-driven control for fusion",
-  "utid_pattern": "urn:utid:fusion:{node}:{nonce}",
-  "energy_prior": "fusion_v1",
-  "tnn": "tnn.fusion_tnn.FusionTNN",
+  "capsule_id": "pipeline_v1",
+  "title": "Pipeline Control (v1)",
+  "description": "Physics-driven control for pipeline",
+  "utid_pattern": "urn:utid:pipeline:{node}:{nonce}",
+  "energy_prior": "pipeline_v1",
+  "tnn": "tnn.pipeline_tnn.PipelineTNN",
   "widgets": [
     {
       "id": "reactor_gauge",
@@ -15,18 +15,18 @@
     },
     
     {
-      "id": "target_beta",
+      "id": "param_1",
       "type": "Slider",
-      "label": "Target β",
-      "bind": "controls.target_beta",
-      "props": {'min': 0, 'max': 2, 'step': 0.01}
+      "label": "Parameter 1",
+      "bind": "controls.p1",
+      "props": {'min': 0, 'max': 100, 'step': 1}
     },
     
     {
-      "id": "ignite",
+      "id": "run",
       "type": "Button",
-      "label": "Ignite",
-      "bind": "actions.ignite",
+      "label": "Run Simulation",
+      "bind": "actions.run",
       "props": {}
     }
     ,

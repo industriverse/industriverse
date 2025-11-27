@@ -1,0 +1,18 @@
+description: Sovereign capsule for assembly.
+energy_prior: assembly_v1
+id: assembly_v1
+prin:
+  approval_threshold: 0.75
+  score_weights:
+    coherence: 0.2
+    novelty: 0.2
+    physics: 0.6
+safety:
+  energy_budget_j: 1000000.0
+  entropy_threshold: 10.0
+  runtime_budget_ms: 10000
+title: Assembly Capsule v1
+tnn_class: tnn.assembly_tnn.AssemblyTNN
+utid_pattern: urn:utid:assembly:{node}:{nonce}
+visual:
+  dac_schema: frontend/dac_schemas/assembly_v1.json

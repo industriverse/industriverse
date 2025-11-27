@@ -1,0 +1,18 @@
+description: Sovereign capsule for conveyor.
+energy_prior: conveyor_v1
+id: conveyor_v1
+prin:
+  approval_threshold: 0.75
+  score_weights:
+    coherence: 0.2
+    novelty: 0.2
+    physics: 0.6
+safety:
+  energy_budget_j: 1000000.0
+  entropy_threshold: 10.0
+  runtime_budget_ms: 10000
+title: Conveyor Capsule v1
+tnn_class: tnn.conveyor_tnn.ConveyorTNN
+utid_pattern: urn:utid:conveyor:{node}:{nonce}
+visual:
+  dac_schema: frontend/dac_schemas/conveyor_v1.json

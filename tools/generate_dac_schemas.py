@@ -15,22 +15,47 @@ env = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
 # We need to make sure the template file exists before running this.
 # template = env.get_template("dac_schema_template.jinja2")
 
-CAPSULE_SPECS = [
-    {
-        "capsule_id":"fusion_v1",
-        "title":"Fusion Control (v1)",
-        "description":"MHD-driven fusion coil control",
-        "utid_pattern":"urn:utid:fusion:{node}:{nonce}",
-        "energy_prior":"fusion_v1",
-        "tnn_class":"tnn.fusion_tnn.FusionHamiltonianTNN",
-        "controls":[
+# Dynamic generation for all domains
+DOMAINS = [
+    "fusion", "grid", "wafer", "apparel", "battery",
+    "motor", "magnet", "cnc", "chassis", "microgrid",
+    "casting", "heat", "chem", "polymer", "metal",
+    "pipeline", "qctherm", "failure",
+    "robotics", "matflow", "workforce", "schedule",
+    "amrsafety", "conveyor", "assembly",
+    "electronics", "pcbmfg", "sensorint",
+    "surface", "lifecycle",
+]
+
+def get_capsule_spec(domain):
+    capsule_id = f"{domain}_v1"
+    
+    # Default controls
+    controls = [
+        {"id": "param_1", "type": "Slider", "label": "Parameter 1", "bind": "controls.p1", "props": {"min": 0, "max": 100, "step": 1}},
+        {"id": "run", "type": "Button", "label": "Run Simulation", "bind": "actions.run", "props": {}}
+    ]
+    
+    # Custom overrides for specific domains
+    if domain == "fusion":
+        controls = [
             {"id":"target_beta","type":"Slider","label":"Target β","bind":"controls.target_beta","props":{"min":0,"max":2,"step":0.01}},
             {"id":"ignite","type":"Button","label":"Ignite","bind":"actions.ignite","props":{}}
-        ],
-        "visualizer":{"type":"PlasmaVisualizer","config":{"mode":"toroid","show_field_lines":True}},
-        "gesture_map":{"ignite":"THUMBS_UP"}
+        ]
+    
+    return {
+        "capsule_id": capsule_id,
+        "title": f"{domain.capitalize()} Control (v1)",
+        "description": f"Physics-driven control for {domain}",
+        "utid_pattern": f"urn:utid:{domain}:{{node}}:{{nonce}}",
+        "energy_prior": f"{domain}_v1",
+        "tnn_class": f"tnn.{domain}_tnn.{domain.capitalize()}TNN",
+        "controls": controls,
+        "visualizer": {"type": "ReactorGauge", "config": {}}, # Default visualizer
+        "gesture_map": {"run": "THUMBS_UP"}
     }
-]
+
+CAPSULE_SPECS = [get_capsule_spec(d) for d in DOMAINS]
 
 def generate():
     try:

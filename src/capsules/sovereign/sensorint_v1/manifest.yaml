@@ -1,0 +1,18 @@
+description: Sovereign capsule for sensorint.
+energy_prior: sensorint_v1
+id: sensorint_v1
+prin:
+  approval_threshold: 0.75
+  score_weights:
+    coherence: 0.2
+    novelty: 0.2
+    physics: 0.6
+safety:
+  energy_budget_j: 1000000.0
+  entropy_threshold: 10.0
+  runtime_budget_ms: 10000
+title: Sensorint Capsule v1
+tnn_class: tnn.sensorint_tnn.SensorintTNN
+utid_pattern: urn:utid:sensorint:{node}:{nonce}
+visual:
+  dac_schema: frontend/dac_schemas/sensorint_v1.json

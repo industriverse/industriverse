@@ -1,0 +1,18 @@
+description: Sovereign capsule for wafer.
+energy_prior: wafer_v1
+id: wafer_v1
+prin:
+  approval_threshold: 0.75
+  score_weights:
+    coherence: 0.2
+    novelty: 0.2
+    physics: 0.6
+safety:
+  energy_budget_j: 1000000.0
+  entropy_threshold: 10.0
+  runtime_budget_ms: 10000
+title: Wafer Capsule v1
+tnn_class: tnn.wafer_tnn.WaferTNN
+utid_pattern: urn:utid:wafer:{node}:{nonce}
+visual:
+  dac_schema: frontend/dac_schemas/wafer_v1.json

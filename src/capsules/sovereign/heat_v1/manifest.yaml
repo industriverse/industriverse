@@ -1,0 +1,18 @@
+description: Sovereign capsule for heat.
+energy_prior: heat_v1
+id: heat_v1
+prin:
+  approval_threshold: 0.75
+  score_weights:
+    coherence: 0.2
+    novelty: 0.2
+    physics: 0.6
+safety:
+  energy_budget_j: 1000000.0
+  entropy_threshold: 10.0
+  runtime_budget_ms: 10000
+title: Heat Capsule v1
+tnn_class: tnn.heat_tnn.HeatTNN
+utid_pattern: urn:utid:heat:{node}:{nonce}
+visual:
+  dac_schema: frontend/dac_schemas/heat_v1.json

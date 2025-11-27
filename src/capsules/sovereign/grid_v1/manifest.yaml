@@ -1,0 +1,18 @@
+description: Sovereign capsule for grid.
+energy_prior: grid_v1
+id: grid_v1
+prin:
+  approval_threshold: 0.75
+  score_weights:
+    coherence: 0.2
+    novelty: 0.2
+    physics: 0.6
+safety:
+  energy_budget_j: 1000000.0
+  entropy_threshold: 10.0
+  runtime_budget_ms: 10000
+title: Grid Capsule v1
+tnn_class: tnn.grid_tnn.GridTNN
+utid_pattern: urn:utid:grid:{node}:{nonce}
+visual:
+  dac_schema: frontend/dac_schemas/grid_v1.json
