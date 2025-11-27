@@ -1,0 +1,15 @@
+{
+  "chain_id": "grid-comp-1764226557",
+  "magnet": {
+    "temp": 360.0,
+    "risk": 0.7259386189568428
+  },
+  "motor": {
+    "adjusted_current": 40.0,
+    "torque": 479070.3656921304
+  },
+  "grid": {
+    "freq": 40.05647830530567
+  },
+  "timestamp": 1764226557.81776
+}
