@@ -9,33 +9,64 @@ import { TheGauntlet } from "@/components/ui/TheGauntlet";
 import { ReactorGauge } from "@/components/ui/ReactorGauge";
 import { DysonLayout } from "@/layouts/DysonLayout";
 import { TheConstellation } from "@/components/3d/TheConstellation";
+import { useOptimizeConfiguration } from "@/api/thermodynamic";
+import { toast } from "sonner";
+
+const StrikeButton = ({ domain }: { domain: string }) => {
+    const { mutate: optimize, isPending } = useOptimizeConfiguration();
+
+    const handleStrike = () => {
+        optimize({ map_name: `${domain}_map`, steps: 100 }, {
+            onSuccess: (data) => {
+                toast.success(`Strike Successful: ${domain.toUpperCase()}`, {
+                    description: `Energy Delta: ${data.energy_delta.toFixed(4)} J | Final: ${data.final_energy.toFixed(4)} J`
+                });
+            },
+            onError: () => {
+                toast.error(`Strike Failed: ${domain.toUpperCase()}`);
+            }
+        });
+    };
+
+    return (
+        <button
+            onClick={handleStrike}
+            disabled={isPending}
+            className={`w-full text-left text-xs px-3 py-2 rounded border transition-all flex justify-between items-center ${isPending
+                ? "border-dyson-plasma text-dyson-plasma bg-dyson-plasma/10 animate-pulse"
+                : "border-dyson-glass/20 text-dyson-glass hover:border-dyson-gold/50 hover:text-dyson-gold"
+                }`}
+        >
+            <span className="uppercase tracking-widest">{domain}</span>
+            {isPending && <Activity className="w-3 h-3 animate-spin" />}
+        </button>
+    );
+};
+
+import { VoiceCommand } from "@/components/multimodal/VoiceCommand";
+import { useEffect } from "react";
+import { TrifectaConsole } from "@/components/trifecta/TrifectaConsole";
 
 export default function Portal() {
     const { data: energyMap } = useEnergyMap();
-    const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
-    const datasets = ["turbulent_radiative_layer_2D", "active_matter", "supernova_explosion"];
-
-    const handleDatasetChange = async (dataset: string) => {
-        setSelectedDataset(dataset);
-        // Trigger backend to use this dataset (mock call for now, or real if endpoint exists)
-        try {
-            await fetch("/api/v1/thermodynamic/thermal/sample", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    problem_type: "sampling",
-                    dataset_id: dataset,
-                    variables: { "x": [0, 1], "y": [0, 1] },
-                    num_samples: 100
-                })
-            });
-        } catch (e) {
-            console.error("Failed to trigger sampling", e);
-        }
-    };
     const nodeCount = energyMap?.node_count || 0;
+
+    // Listen for voice events
+    useEffect(() => {
+        const handleVoiceStrike = (e: any) => {
+            const domain = e.detail;
+            console.log("Voice Triggered Strike:", domain);
+            toast("Voice Trigger Received", { description: `Initiating strike for ${domain}...` });
+        };
+
+        window.addEventListener('value-strike', handleVoiceStrike);
+        return () => window.removeEventListener('value-strike', handleVoiceStrike);
+    }, []);
+
     return (
         <DysonLayout>
+            <VoiceCommand />
+            <TrifectaConsole />
             <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 pointer-events-none">
                 <div className="pointer-events-auto">
                     <EnergyField />
@@ -96,21 +127,14 @@ export default function Portal() {
                     <TheGauntlet />
                     <ReactorGauge />
 
-                    {/* Dataset Selector */}
+                    {/* Value Strike Panel */}
                     <div className="bg-dyson-void/80 backdrop-blur-md border border-dyson-glass/30 p-4 rounded-lg pointer-events-auto">
-                        <h3 className="text-dyson-gold text-sm font-mono mb-2 uppercase tracking-wider">Physics Prior</h3>
+                        <h3 className="text-dyson-gold text-sm font-mono mb-2 uppercase tracking-wider flex items-center gap-2">
+                            <Activity className="w-4 h-4" /> Value Strike
+                        </h3>
                         <div className="space-y-2">
-                            {datasets.map(ds => (
-                                <button
-                                    key={ds}
-                                    onClick={() => handleDatasetChange(ds)}
-                                    className={`w-full text-left text-xs px-3 py-2 rounded border transition-all ${selectedDataset === ds
-                                            ? "border-dyson-plasma text-dyson-plasma bg-dyson-plasma/10"
-                                            : "border-dyson-glass/20 text-dyson-glass hover:border-dyson-gold/50 hover:text-dyson-gold"
-                                        }`}
-                                >
-                                    {ds.replace(/_/g, " ")}
-                                </button>
+                            {["fusion", "grid", "wafer"].map(domain => (
+                                <StrikeButton key={domain} domain={domain} />
                             ))}
                         </div>
                     </div>

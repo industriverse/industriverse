@@ -41,6 +41,20 @@ export interface PredictionResult {
     failure_probability: number;
 }
 
+export interface OptimizationRequest {
+    map_name: string;
+    steps: number;
+    initial_state?: number[];
+}
+
+export interface OptimizationResponse {
+    final_energy: number;
+    energy_delta: number;
+    entropy: number;
+    converged: boolean;
+    final_state_sample: number[];
+}
+
 // Fetch Energy Map
 export const fetchEnergyMap = async (): Promise<EnergyMap> => {
     try {
@@ -107,6 +121,20 @@ export const usePredictVector = () => {
             });
             if (!response.ok) throw new Error("Prediction failed");
             return (await response.json()) as PredictionResult;
+        },
+    });
+};
+
+export const useOptimizeConfiguration = () => {
+    return useMutation({
+        mutationFn: async (req: OptimizationRequest) => {
+            const response = await fetch(`/api/v1/idf/diffuse/optimize`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(req),
+            });
+            if (!response.ok) throw new Error("Optimization failed");
+            return (await response.json()) as OptimizationResponse;
         },
     });
 };

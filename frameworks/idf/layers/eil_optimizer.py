@@ -23,8 +23,8 @@ class EILOptimizer:
         Run diffusion to optimize the configuration.
         """
         if initial_config is None:
-            # Start from random noise
-            initial_config = np.random.rand(*self.field.shape)
+            # Start from random point in 2D space (normalized 0-1)
+            initial_config = np.random.rand(2)
             
         # Run diffusion
         trajectory = self.dynamics.sample_trajectory(initial_config, steps=steps)
