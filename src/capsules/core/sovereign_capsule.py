@@ -93,9 +93,42 @@ class SovereignCapsule(ABC):
         pass
 
     def thermo_loop(self, steps: int = 10):
-        """Step 4: Thermodynamic Search."""
-        # Default implementation or abstract?
-        pass
+        """Step 4: Thermodynamic Search (Directive 03)."""
+        logger.info(f"Running thermo loop for {self.capsule_id}...")
+        
+        # Determine mode from manifest or params
+        mode = self.manifest.prin.mode if hasattr(self.manifest.prin, 'mode') else "sampling"
+        
+        if mode == "sampling":
+            from ebm_runtime.service import sample
+            # Create initial state (placeholder)
+            initial_state = {"state_vector": [0.0] * 8} # Should be loaded or random
+            
+            result = sample(
+                prior_name=self.manifest.energy_prior,
+                initial_state=initial_state,
+                sampler={"type": "langevin", "steps": steps}
+            )
+            return result
+            
+        elif mode == "simulation":
+            # Load TNN class dynamically
+            import importlib
+            module_name, class_name = self.manifest.tnn_class.rsplit(".", 1)
+            module = importlib.import_module(module_name)
+            TNNClass = getattr(module, class_name)
+            tnn = TNNClass()
+            
+            # Placeholder state
+            state = {"B": None, "v": None, "rho": 1.0} # Needs proper init
+            control = {}
+            
+            result = tnn.simulate(state, control, dt=0.01, steps=steps)
+            return result
+            
+        else:
+            logger.warning(f"Unknown mode {mode} for {self.capsule_id}")
+            return {}
 
     def run_policy(self, observation: Dict[str, Any]) -> Dict[str, Any]:
         """Step 6: Agent Policy Execution (Directive 05)."""

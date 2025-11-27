@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "capsule_id": "fusion_v1",
+  "title": "Fusion Control (v1)",
+  "description": "MHD-driven fusion coil control",
+  "utid_pattern": "urn:utid:fusion:{node}:{nonce}",
+  "energy_prior": "fusion_v1",
+  "tnn": "tnn.fusion_tnn.FusionHamiltonianTNN",
+  "widgets": [
+    {
+      "id": "reactor_gauge",
+      "type": "ReactorGauge",
+      "bind": {"energy": "telemetry.energy", "entropy": "telemetry.entropy"},
+      "layout": {"x":0,"y":0,"w":6,"h":4}
+    },
+    
+    {
+      "id": "target_beta",
+      "type": "Slider",
+      "label": "Target β",
+      "bind": "controls.target_beta",
+      "props": {'min': 0, 'max': 2, 'step': 0.01}
+    },
+    
+    {
+      "id": "ignite",
+      "type": "Button",
+      "label": "Ignite",
+      "bind": "actions.ignite",
+      "props": {}
+    }
+    ,
+    {
+      "id":"visualizer",
+      "type":"PlasmaVisualizer",
+      "config": {'mode': 'toroid', 'show_field_lines': True},
+      "layout": {"x":6,"y":0,"w":6,"h":8}
+    },
+    {
+      "id":"proof_widget",
+      "type":"ProofWidget",
+      "bind":{"proof_id":"last_proof.id","proof_score":"last_proof.score"}
+    }
+  ],
+  "gesture_map": {'ignite': 'THUMBS_UP'}
+}
