@@ -1,18 +1,6 @@
-description: Sovereign capsule for casting.
-energy_prior: casting_v1
-id: casting_v1
-prin:
-  approval_threshold: 0.75
-  score_weights:
-    coherence: 0.2
-    novelty: 0.2
-    physics: 0.6
-safety:
-  energy_budget_j: 1000000.0
-  entropy_threshold: 10.0
-  runtime_budget_ms: 10000
-title: Casting Capsule v1
-tnn_class: tnn.casting_tnn.CastingTNN
-utid_pattern: urn:utid:casting:{node}:{nonce}
-visual:
-  dac_schema: frontend/dac_schemas/casting_v1.json
+dac_id: casting_v1
+version: 1.0.0
+energy_prior: src.ebm_lib.priors.casting_v1
+tnn_solver: src.tnn.casting_tnn
+inputs: [state_vector]
+outputs: [optimized_state]

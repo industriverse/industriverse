@@ -1,18 +1,6 @@
-id: fusion_v1
-title: Fusion Capsule v1
-description: MHD-driven control capsule for toroidal confinement.
-utid_pattern: "urn:utid:fusion:{node}:{nonce}"
-energy_prior: fusion_v1
-tnn_class: tnn.fusion_tnn.FusionHamiltonianTNN
-safety:
-  energy_budget_j: 1000000.0
-  runtime_budget_ms: 10000
-  entropy_threshold: 10.0
-prin:
-  approval_threshold: 0.75
-  score_weights:
-    physics: 0.6
-    coherence: 0.2
-    novelty: 0.2
-visual:
-  dac_schema: frontend/dac_schemas/fusion_v1.json
+dac_id: fusion_v1
+version: 1.0.0
+energy_prior: src.ebm_lib.priors.fusion_v1
+tnn_solver: src.tnn.fusion_tnn
+inputs: [state_vector]
+outputs: [optimized_state]

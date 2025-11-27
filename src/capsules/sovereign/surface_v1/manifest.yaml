@@ -1,18 +1,6 @@
-description: Sovereign capsule for surface.
-energy_prior: surface_v1
-id: surface_v1
-prin:
-  approval_threshold: 0.75
-  score_weights:
-    coherence: 0.2
-    novelty: 0.2
-    physics: 0.6
-safety:
-  energy_budget_j: 1000000.0
-  entropy_threshold: 10.0
-  runtime_budget_ms: 10000
-title: Surface Capsule v1
-tnn_class: tnn.surface_tnn.SurfaceTNN
-utid_pattern: urn:utid:surface:{node}:{nonce}
-visual:
-  dac_schema: frontend/dac_schemas/surface_v1.json
+dac_id: surface_v1
+version: 1.0.0
+energy_prior: src.ebm_lib.priors.surface_v1
+tnn_solver: src.tnn.surface_tnn
+inputs: [state_vector]
+outputs: [optimized_state]

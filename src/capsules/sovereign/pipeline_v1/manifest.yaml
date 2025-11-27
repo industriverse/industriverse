@@ -1,18 +1,6 @@
-description: Sovereign capsule for pipeline.
-energy_prior: pipeline_v1
-id: pipeline_v1
-prin:
-  approval_threshold: 0.75
-  score_weights:
-    coherence: 0.2
-    novelty: 0.2
-    physics: 0.6
-safety:
-  energy_budget_j: 1000000.0
-  entropy_threshold: 10.0
-  runtime_budget_ms: 10000
-title: Pipeline Capsule v1
-tnn_class: tnn.pipeline_tnn.PipelineTNN
-utid_pattern: urn:utid:pipeline:{node}:{nonce}
-visual:
-  dac_schema: frontend/dac_schemas/pipeline_v1.json
+dac_id: pipeline_v1
+version: 1.0.0
+energy_prior: src.ebm_lib.priors.pipeline_v1
+tnn_solver: src.tnn.pipeline_tnn
+inputs: [state_vector]
+outputs: [optimized_state]

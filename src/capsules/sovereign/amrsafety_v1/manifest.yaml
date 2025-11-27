@@ -1,18 +1,6 @@
-description: Sovereign capsule for amrsafety.
-energy_prior: amrsafety_v1
-id: amrsafety_v1
-prin:
-  approval_threshold: 0.75
-  score_weights:
-    coherence: 0.2
-    novelty: 0.2
-    physics: 0.6
-safety:
-  energy_budget_j: 1000000.0
-  entropy_threshold: 10.0
-  runtime_budget_ms: 10000
-title: Amrsafety Capsule v1
-tnn_class: tnn.amrsafety_tnn.AmrsafetyTNN
-utid_pattern: urn:utid:amrsafety:{node}:{nonce}
-visual:
-  dac_schema: frontend/dac_schemas/amrsafety_v1.json
+dac_id: amrsafety_v1
+version: 1.0.0
+energy_prior: src.ebm_lib.priors.amrsafety_v1
+tnn_solver: src.tnn.amrsafety_tnn
+inputs: [state_vector]
+outputs: [optimized_state]

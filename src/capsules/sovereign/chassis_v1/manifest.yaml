@@ -1,18 +1,6 @@
-description: Sovereign capsule for chassis.
-energy_prior: chassis_v1
-id: chassis_v1
-prin:
-  approval_threshold: 0.75
-  score_weights:
-    coherence: 0.2
-    novelty: 0.2
-    physics: 0.6
-safety:
-  energy_budget_j: 1000000.0
-  entropy_threshold: 10.0
-  runtime_budget_ms: 10000
-title: Chassis Capsule v1
-tnn_class: tnn.chassis_tnn.ChassisTNN
-utid_pattern: urn:utid:chassis:{node}:{nonce}
-visual:
-  dac_schema: frontend/dac_schemas/chassis_v1.json
+dac_id: chassis_v1
+version: 1.0.0
+energy_prior: src.ebm_lib.priors.chassis_v1
+tnn_solver: src.tnn.chassis_tnn
+inputs: [state_vector]
+outputs: [optimized_state]

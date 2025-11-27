@@ -1,18 +1,6 @@
-description: Sovereign capsule for lifecycle.
-energy_prior: lifecycle_v1
-id: lifecycle_v1
-prin:
-  approval_threshold: 0.75
-  score_weights:
-    coherence: 0.2
-    novelty: 0.2
-    physics: 0.6
-safety:
-  energy_budget_j: 1000000.0
-  entropy_threshold: 10.0
-  runtime_budget_ms: 10000
-title: Lifecycle Capsule v1
-tnn_class: tnn.lifecycle_tnn.LifecycleTNN
-utid_pattern: urn:utid:lifecycle:{node}:{nonce}
-visual:
-  dac_schema: frontend/dac_schemas/lifecycle_v1.json
+dac_id: lifecycle_v1
+version: 1.0.0
+energy_prior: src.ebm_lib.priors.lifecycle_v1
+tnn_solver: src.tnn.lifecycle_tnn
+inputs: [state_vector]
+outputs: [optimized_state]

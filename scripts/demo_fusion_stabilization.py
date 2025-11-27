@@ -1,49 +1,30 @@
-import time
-import numpy as np
-import json
-import os
-from ebm_lib.registry import get as load_prior
-import ebm_lib.priors
-from ebm_runtime.samplers.langevin import langevin_sample
+import torch
+from src.ebm_lib.priors.fusion_v1 import prior as fusion_prior
+from src.thermo_sdk.thermo_sdk.ebm_runtime import langevin_step
 
-def run_cinematic_demo():
-    print("🎬 STARTING CINEMATIC DEMO: FUSION COIL STABILIZATION")
-    print("=====================================================")
+def run_demo():
+    print("=== Fusion Stabilization Demo ===")
     
-    # 1. Initialize Fusion Prior
-    prior = load_prior("fusion_v1")
-    print(f"✅ Loaded Energy Prior: {prior.name} (v{prior.version})")
-    print(f"   Equations: {prior.metadata['equations']}")
+    # 1. Initial State (High Energy / Unstable)
+    # [beta, leakage, temperature]
+    x0 = torch.tensor([[0.05, 0.05, 1.2e7]], dtype=torch.float32)
+    e0 = fusion_prior.energy(x0).item()
+    print(f"Initial State: {x0.numpy()}")
+    print(f"Initial Energy: {e0:.4f} (Unstable)")
     
-    # 2. Simulate unstable plasma state
-    print("\n⚠️  INJECTING INSTABILITY...")
-    state = {"state_vector": np.random.randn(8) * 5.0} # High energy state
-    initial_energy = prior.energy(state)
-    print(f"   Initial System Energy: {initial_energy:.4f} J (CRITICAL)")
+    # 2. Optimization (Langevin Sampling)
+    print("\nRunning Thermodynamic Optimization...")
+    x_opt = langevin_step(x0, fusion_prior.energy, steps=100, step_size=1e-3)
+    e_opt = fusion_prior.energy(x_opt).item()
     
-    # 3. Run EBDM Stabilization Loop
-    print("\n🔄 ENGAGING EBDM STABILIZER (Langevin Dynamics)...")
-    cfg = {"steps": 50, "lr": 0.1, "noise": 0.01}
+    # 3. Final State (Low Energy / Stable)
+    print(f"Final State:   {x_opt.detach().numpy()}")
+    print(f"Final Energy:  {e_opt:.4f} (Stable)")
     
-    # Simulate real-time stream
-    res = langevin_sample(prior, state, cfg)
-    
-    for i, step in enumerate(res["samples"]):
-        # Cinematic log output
-        bar = "█" * int(20 * (1.0 - i/50))
-        print(f"   Step {i:02d} | Energy: {step['energy']:.4f} | Stability: {bar}")
-        time.sleep(0.05) # Fake real-time delay
-        
-    print("\n✅ STABILIZATION COMPLETE")
-    print(f"   Final Energy: {res['energy_trace'][-1]:.4f} J (OPTIMAL)")
-    
-    # 4. Generate Proof
-    proof_hash = f"0x{os.urandom(16).hex()}"
-    print(f"\n🔐 MINTING SOVEREIGN PROOF...")
-    print(f"   Proof Hash: {proof_hash}")
-    print(f"   UTID: urn:utid:fusion:reactor-1:{int(time.time())}")
-    
-    print("\n🎬 DEMO END")
+    if e_opt < e0:
+        print("\nSUCCESS: Energy reduced (Entropy minimized).")
+    else:
+        print("\nFAILURE: Energy did not decrease.")
 
 if __name__ == "__main__":
-    run_cinematic_demo()
+    run_demo()
