@@ -1,0 +1,6 @@
+{
+  "id": "17",
+  "name": "Microfluidic Chip Cooling",
+  "domain": "compute",
+  "task": "Design a two-phase microfluidic cooling channel network for 1000W AI accelerators."
+}

@@ -1,0 +1,6 @@
+{
+  "id": "10",
+  "name": "Swarm Consensus Algorithm",
+  "domain": "defense",
+  "task": "Develop a decentralized consensus algorithm for drone swarms operating in comms-denied environments."
+}

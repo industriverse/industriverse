@@ -1,0 +1,6 @@
+{
+  "id": "02",
+  "name": "HTS Magnet Optimization",
+  "domain": "fusion",
+  "task": "Optimize the winding geometry of REBCO high-temperature superconducting magnets for 20T fields."
+}

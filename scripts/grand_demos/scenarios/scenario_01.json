@@ -1,0 +1,6 @@
+{
+  "id": "01",
+  "name": "Fusion Plasma Instability",
+  "domain": "fusion",
+  "task": "Design a feedback control system to suppress neoclassical tearing modes in tokamak plasma."
+}

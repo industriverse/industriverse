@@ -1,0 +1,6 @@
+{
+  "id": "18",
+  "name": "Quantum Error Correction Code",
+  "domain": "compute",
+  "task": "Develop a surface code variant optimized for biased noise in superconducting qubits."
+}

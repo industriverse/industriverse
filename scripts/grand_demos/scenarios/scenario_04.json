@@ -1,0 +1,6 @@
+{
+  "id": "04",
+  "name": "CRISPR Off-Target Reduction",
+  "domain": "bio",
+  "task": "Design a high-fidelity Cas9 variant with minimized off-target editing in human cells."
+}

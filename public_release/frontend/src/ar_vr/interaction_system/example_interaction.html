@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AR/VR Interaction System - Example</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #ffffff;
+      overflow: hidden;
+    }
+    
+    #viewer-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      touch-action: none; /* Prevent default touch behaviors */
+    }
+    
+    #controls-panel {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      min-width: 200px;
+      backdrop-filter: blur(10px);
+    }
+    
+    #controls-panel h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #00d4ff;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+    }
+    
+    .control-button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .control-button:hover {
+      background: #2a2a2a;
+      border-color: #00d4ff;
+    }
+    
+    .control-button:active {
+      background: #00d4ff;
+      color: #000;
+    }
+    
+    .control-button.active {
+      background: #00d4ff;
+      color: #000;
+      border-color: #00d4ff;
+    }
+    
+    #gesture-log {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+      max-height: 200px;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+    }
+    
+    #gesture-log h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #00d4ff;
+    }
+    
+    .gesture-entry {
+      font-size: 12px;
+      padding: 5px 0;
+      border-bottom: 1px solid #222;
+      color: #888;
+    }
+    
+    .gesture-entry:last-child {
+      border-bottom: none;
+    }
+    
+    .gesture-entry .type {
+      color: #00d4ff;
+      font-weight: bold;
+    }
+    
+    .gesture-entry .timestamp {
+      float: right;
+      color: #555;
+    }
+    
+    #haptic-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(0, 212, 255, 0.3);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    #haptic-indicator.active {
+      opacity: 1;
+      animation: pulse 0.5s ease-out;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: translate(-50%, -50%) scale(0.5);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1.5);
+      }
+    }
+    
+    #voice-status {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+      backdrop-filter: blur(10px);
+    }
+    
+    #voice-status.listening {
+      border-color: #00d4ff;
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+    }
+    
+    .voice-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #888;
+      display: inline-block;
+      margin-right: 8px;
+    }
+    
+    .voice-indicator.active {
+      background: #00d4ff;
+      animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+  <div id="viewer-container">
+    <!-- Controls panel -->
+    <div id="controls-panel">
+      <h2>Controls</h2>
+      <button class="control-button" id="btn-ar">Start AR</button>
+      <button class="control-button" id="btn-vr">Start VR</button>
+      <button class="control-button" id="btn-voice">Toggle Voice</button>
+      <button class="control-button" id="btn-haptics">Toggle Haptics</button>
+    </div>
+    
+    <!-- Voice status -->
+    <div id="voice-status">
+      <span class="voice-indicator" id="voice-indicator"></span>
+      <span id="voice-text">Voice: Off</span>
+    </div>
+    
+    <!-- Haptic feedback indicator -->
+    <div id="haptic-indicator"></div>
+    
+    <!-- Gesture log -->
+    <div id="gesture-log">
+      <h3>Gesture Log</h3>
+      <div id="gesture-entries"></div>
+    </div>
+  </div>
+  
+  <script type="module">
+    import * as THREE from 'three';
+    import ARVRInteractionController from './ARVRInteractionController.js';
+    import GestureRecognizer from './GestureRecognizer.js';
+    
+    // ========================================================================
+    // Setup Three.js Scene
+    // ========================================================================
+    
+    const container = document.getElementById('viewer-container');
+    
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a0a);
+    
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.set(0, 1.6, 3);
+    
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.xr.enabled = true;
+    container.appendChild(renderer.domElement);
+    
+    // Add lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 5, 5);
+    scene.add(directionalLight);
+    
+    // Add demo capsules
+    addDemoCapsules();
+    
+    // ========================================================================
+    // Initialize Interaction Controllers
+    // ========================================================================
+    
+    const interactionController = new ARVRInteractionController({
+      scene,
+      camera,
+      renderer,
+      enableAR: true,
+      enableVR: true,
+      enableVoice: true,
+      enableAnchoring: true,
+      onCapsuleSelect: (capsule) => {
+        console.log('Capsule selected:', capsule);
+        logGesture('capsule-select', `Selected: ${capsule.userData.title}`);
+        showHapticFeedback();
+      },
+      onCapsuleLongPress: (capsule) => {
+        console.log('Capsule long press:', capsule);
+        logGesture('capsule-long-press', `Long press: ${capsule.userData.title}`);
+        showHapticFeedback();
+      },
+      onCapsuleSwipe: (capsule, direction) => {
+        console.log('Capsule swipe:', capsule, direction);
+        logGesture('capsule-swipe', `Swipe ${direction}: ${capsule.userData.title}`);
+        showHapticFeedback();
+      },
+      onVoiceCommand: (command, capsule) => {
+        console.log('Voice command:', command, capsule);
+        logGesture('voice-command', `Command: ${command}`);
+      }
+    });
+    
+    const gestureRecognizer = new GestureRecognizer({
+      element: renderer.domElement,
+      enableHaptics: true,
+      onGesture: (event) => {
+        console.log('Gesture:', event);
+        logGesture(event.type, `Position: (${event.position.x.toFixed(2)}, ${event.position.y.toFixed(2)})`);
+        
+        if (event.type.includes('tap') || event.type === 'long-press') {
+          showHapticFeedback();
+        }
+      }
+    });
+    
+    // ========================================================================
+    // Control Buttons
+    // ========================================================================
+    
+    document.getElementById('btn-ar').addEventListener('click', async () => {
+      const success = await interactionController.startARSession();
+      if (success) {
+        document.getElementById('btn-ar').classList.add('active');
+        logGesture('system', 'AR session started');
+      } else {
+        logGesture('system', 'AR not supported or permission denied');
+      }
+    });
+    
+    document.getElementById('btn-vr').addEventListener('click', async () => {
+      const success = await interactionController.startVRSession();
+      if (success) {
+        document.getElementById('btn-vr').classList.add('active');
+        logGesture('system', 'VR session started');
+      } else {
+        logGesture('system', 'VR not supported or permission denied');
+      }
+    });
+    
+    let voiceEnabled = false;
+    document.getElementById('btn-voice').addEventListener('click', () => {
+      voiceEnabled = !voiceEnabled;
+      
+      if (voiceEnabled) {
+        interactionController.startVoiceRecognition();
+        document.getElementById('btn-voice').classList.add('active');
+        document.getElementById('voice-status').classList.add('listening');
+        document.getElementById('voice-indicator').classList.add('active');
+        document.getElementById('voice-text').textContent = 'Voice: Listening';
+        logGesture('system', 'Voice recognition started');
+      } else {
+        interactionController.stopVoiceRecognition();
+        document.getElementById('btn-voice').classList.remove('active');
+        document.getElementById('voice-status').classList.remove('listening');
+        document.getElementById('voice-indicator').classList.remove('active');
+        document.getElementById('voice-text').textContent = 'Voice: Off';
+        logGesture('system', 'Voice recognition stopped');
+      }
+    });
+    
+    let hapticsEnabled = true;
+    document.getElementById('btn-haptics').addEventListener('click', () => {
+      hapticsEnabled = !hapticsEnabled;
+      
+      if (hapticsEnabled) {
+        document.getElementById('btn-haptics').classList.add('active');
+        logGesture('system', 'Haptics enabled');
+      } else {
+        document.getElementById('btn-haptics').classList.remove('active');
+        logGesture('system', 'Haptics disabled');
+      }
+    });
+    
+    // ========================================================================
+    // Helper Functions
+    // ========================================================================
+    
+    function addDemoCapsules() {
+      const capsuleData = [
+        { title: 'Critical Alert', color: 0xff3333, position: new THREE.Vector3(-1, 1.5, 0) },
+        { title: 'Warning', color: 0xffaa33, position: new THREE.Vector3(0, 1.5, 0) },
+        { title: 'Active', color: 0x33ff33, position: new THREE.Vector3(1, 1.5, 0) }
+      ];
+      
+      capsuleData.forEach((data) => {
+        const geometry = new THREE.SphereGeometry(0.1, 32, 32);
+        const material = new THREE.MeshStandardMaterial({
+          color: data.color,
+          emissive: data.color,
+          emissiveIntensity: 0.3
+        });
+        
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.copy(data.position);
+        mesh.userData.type = 'capsule_overlay';
+        mesh.userData.title = data.title;
+        
+        scene.add(mesh);
+      });
+    }
+    
+    function logGesture(type, details) {
+      const entry = document.createElement('div');
+      entry.className = 'gesture-entry';
+      
+      const timestamp = new Date().toLocaleTimeString();
+      entry.innerHTML = `
+        <span class="type">${type}</span>: ${details}
+        <span class="timestamp">${timestamp}</span>
+      `;
+      
+      const entries = document.getElementById('gesture-entries');
+      entries.insertBefore(entry, entries.firstChild);
+      
+      // Keep only last 20 entries
+      while (entries.children.length > 20) {
+        entries.removeChild(entries.lastChild);
+      }
+    }
+    
+    function showHapticFeedback() {
+      if (!hapticsEnabled) return;
+      
+      const indicator = document.getElementById('haptic-indicator');
+      indicator.classList.add('active');
+      
+      setTimeout(() => {
+        indicator.classList.remove('active');
+      }, 500);
+    }
+    
+    // ========================================================================
+    // Render Loop
+    // ========================================================================
+    
+    function animate() {
+      renderer.setAnimationLoop(() => {
+        renderer.render(scene, camera);
+      });
+    }
+    
+    animate();
+    
+    // ========================================================================
+    // Window Resize
+    // ========================================================================
+    
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    
+    // ========================================================================
+    // Cleanup
+    // ========================================================================
+    
+    window.addEventListener('beforeunload', () => {
+      interactionController.dispose();
+      gestureRecognizer.dispose();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "id": "08",
+  "name": "Negentropy Credit Valuation",
+  "domain": "economy",
+  "task": "Create a valuation model for Negentropy Credits pegged to kilowatt-hours of avoided waste heat."
+}

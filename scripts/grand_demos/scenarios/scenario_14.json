@@ -1,0 +1,6 @@
+{
+  "id": "14",
+  "name": "Zero-G 3D Printing Correction",
+  "domain": "manufacturing",
+  "task": "Develop a G-code compensation algorithm for FDM printing in microgravity."
+}

@@ -1,0 +1,6 @@
+{
+  "id": "12",
+  "name": "Grid Frequency Stabilization",
+  "domain": "energy",
+  "task": "Design a distributed inertia synthesis controller for inverter-dominated power grids."
+}
