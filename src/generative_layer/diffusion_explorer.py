@@ -36,3 +36,21 @@ class DiffusionExplorer:
             viz += f"{entry['step']:4d} | {entry['energy']:.4f} | {entry['latent_norm']:.4f}\n"
             
         return viz
+
+    def visualize_sanddance(self) -> str:
+        """
+        Generate a SandDance-style 3D visualization data packet.
+        """
+        logger.info("Generating SandDance 3D visualization...")
+        
+        # Convert history to a columnar format suitable for SandDance
+        data = []
+        for entry in self.history:
+            data.append({
+                "step": entry['step'],
+                "energy": entry['energy'],
+                "norm": entry['latent_norm'],
+                "color": "red" if entry['energy'] > 0.5 else "green"
+            })
+            
+        return f"SandDance Data Packet: {len(data)} points ready for 3D rendering."

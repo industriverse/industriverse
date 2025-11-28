@@ -55,6 +55,40 @@ async def run_demo():
     logger.info("--- Iteration 5: Egocentric Perception ---")
     # Mock check for egocentric patterns
     logger.info("SAM 3 loaded with Egocentric-10K patterns.")
+
+    # --- Batch 4 Integration ---
+    from src.compute_layer.asm_kernels import ASMKernel
+    from src.compute_layer.fpga_compiler import FPGACompiler
+    from src.economic_engine.xrpl_bridge import XRPLBridge
+    from src.generative_layer.petri_dish_nca import PetriDishNCA
+
+    logger.info("--- Batch 4: Hardware & ALife ---")
+    
+    # ASM
+    asm = ASMKernel()
+    asm.matrix_multiply_optimized([], [])
+    
+    # FPGA
+    fpga = FPGACompiler()
+    bitstream = fpga.compile_capsule_to_bitstream("module blinky(input clk); ... endmodule")
+    logger.info(f"FPGA Bitstream Generated: {bitstream}")
+    
+    # XRPL
+    xrpl = XRPLBridge()
+    xrpl.mint_capsule_nft("capsule://industriverse/demo/v1", {})
+    
+    # SandDance
+    logger.info(explorer.visualize_sanddance())
+    
+    # NCA
+    nca = PetriDishNCA()
+    nca.step()
+    logger.info(f"Petri Dish State: {nca.get_state_summary()}")
+    
+    # Sat Security
+    sat_prior = orchestrator.shield.priors['sat_security_v1']
+    leakage_energy = sat_prior.calculate_energy({"rf_leakage": 0.5})
+    logger.info(f"Satellite Leakage Energy: {leakage_energy}")
     
     logger.info("Grand Unified Demo Complete. System is fully operational.")
 

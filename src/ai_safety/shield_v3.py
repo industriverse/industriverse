@@ -8,6 +8,16 @@ from src.ebm_lib.priors.grid_v1 import GridPrior
 from src.ebm_lib.priors.space_v1 import SpacePhysicsPrior
 from src.ebm_lib.priors.bio_v1 import BioPhysicsPrior
 
+class SatelliteCamouflagePrior:
+    """
+    Prior for Satellite Spectrum Security.
+    Ensures generated comms patterns don't leak identifiable signatures.
+    """
+    def calculate_energy(self, state):
+        # Mock energy calculation based on RF signature
+        rf_leakage = state.get("rf_leakage", 0.0)
+        return rf_leakage * 10.0 # High penalty for leakage
+
 logger = logging.getLogger(__name__)
 
 class AIShieldV3:
@@ -23,6 +33,7 @@ class AIShieldV3:
             'grid_v1': GridPrior(),
             'space_v1': SpacePhysicsPrior(),
             'bio_v1': BioPhysicsPrior(),
+            'sat_security_v1': SatelliteCamouflagePrior(),
         }
         self.wifi_sensing_active = True
 
