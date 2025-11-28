@@ -1,92 +1,81 @@
-"""
-RDR ingestion skeleton.
+import time
+from typing import List, Dict, Any
 
-Pipeline (Phase 3):
-- enqueue ingest requests
-- fetch + store metadata
-- run perspective extraction
-- embed + cluster
-- emit hypotheses and twin updates
-"""
-
-from __future__ import annotations
-
-import logging
-from typing import Iterable, Optional
-
-from .schemas import IngestRequest, PerspectiveRecord, TrendRecord
-
-logger = logging.getLogger(__name__)
-
-
-class IngestQueue:
-    def __init__(self) -> None:
-        self._queue: list[IngestRequest] = []
-
-    def enqueue(self, req: IngestRequest) -> None:
-        self._queue.append(req)
-        logger.debug("Enqueued ingest request: %s", req)
-
-    def dequeue_batch(self, size: int = 10) -> list[IngestRequest]:
-        batch = self._queue[:size]
-        self._queue = self._queue[size:]
-        return batch
-
-
-class PerspectiveExtractor:
-    def __init__(self, llm=None) -> None:
-        self.llm = llm
-
-    def extract(self, text: str) -> dict[str, str]:
+class PhysicsDataPreparation:
+    def __init__(self, llm_filter_model=None):
+        self.venues = [
+            'arXiv:astro-ph', 'arXiv:physics.plasm-ph', 'arXiv:physics.flu-dyn',
+            'Physical Review Letters', 'Nature Physics', 'Astrophysical Journal',
+            'Physics of Fluids', 'Plasma Physics and Controlled Fusion'
+        ]
+        self.llm_filter = llm_filter_model
+    
+    def collect_papers(self, start_year: int = 2020) -> List[Dict[str, Any]]:
+        """Collect physics papers from top venues"""
+        papers = []
+        for venue in self.venues:
+            papers.extend(self._crawl_venue(venue, start_year))
+        return papers
+    
+    def filter_papers(self, papers: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Filter papers using LLM-based domain matching"""
+        physics_definition = """
+        Research involving computational physics simulations, experimental 
+        datasets from high-energy physics, astrophysics, fluid dynamics, 
+        plasma physics, and materials science. These datasets enable discovery 
+        of physical laws, mechanisms, and predictive models.
+        
+        Key Indicators:
+        - MHD simulations
+        - Astrophysical phenomena (supernovae, neutron stars)
+        - Turbulent flow dynamics
+        - Plasma physics
+        - Computational fluid dynamics
         """
-        Placeholder: plug in LLM prompt that returns perspectives.
+        
+        filtered = []
+        for paper in papers:
+            if self._matches_domain(paper, physics_definition):
+                filtered.append(paper)
+        
+        return filtered
+
+    def _crawl_venue(self, venue: str, start_year: int) -> List[Dict[str, Any]]:
         """
-        if not self.llm:
-            return {}
-        return self.llm.generate_perspectives(text)
-
-
-class EmbeddingIndexer:
-    def __init__(self, vector_client=None, graph_client=None) -> None:
-        self.vector = vector_client
-        self.graph = graph_client
-
-    def index(self, paper_id: str, embedding: list[float], metadata: dict) -> Optional[str]:
+        Mock crawler for physics venues.
+        In production, this would use arXiv API or web scraping.
         """
-        Placeholder: store embedding and return embedding id.
+        print(f"Crawling {venue} from {start_year}...")
+        # Mock data return
+        return [
+            {
+                "id": f"{venue}_001",
+                "title": f"Novel MHD Simulation in {venue}",
+                "abstract": "We present a new method for simulating plasma instabilities...",
+                "year": 2024,
+                "venue": venue
+            },
+            {
+                "id": f"{venue}_002",
+                "title": f"Turbulence Modeling in {venue}",
+                "abstract": "A study of Reynolds numbers in fluid dynamics...",
+                "year": 2023,
+                "venue": venue
+            }
+        ]
+
+    def _matches_domain(self, paper: Dict[str, Any], definition: str) -> bool:
         """
-        if not self.vector:
-            return None
-        return self.vector.store(paper_id, embedding, metadata)
-
-    def upsert_graph_node(self, node_id: str, metadata: dict) -> None:
-        if self.graph:
-            self.graph.upsert(node_id, metadata)
-
-
-def process_batch(
-    queue: IngestQueue,
-    extractor: PerspectiveExtractor,
-    indexer: EmbeddingIndexer,
-    fetch_text_fn,
-    emit_hypothesis_fn,
-    emit_twin_event_fn,
-    batch_size: int = 10,
-) -> None:
-    """
-    Pull a batch, process, and emit downstream events.
-    """
-    for req in queue.dequeue_batch(batch_size):
-        text = fetch_text_fn(req.uri)
-        perspectives = extractor.extract(text)
-        embedding_id = indexer.index(req.uri, [], {"tags": req.tags})
-        record = PerspectiveRecord(
-            paper_id=req.uri,
-            perspectives=perspectives,
-            embedding_id=embedding_id,
-            cluster_id=None,
-            novelty_score=None,
-            created_at=None,  # fill with real timestamp in impl
-        )
-        emit_hypothesis_fn(record)
-        emit_twin_event_fn("rdr.node", {"id": req.uri, "label": req.uri, "embedding_id": embedding_id})
+        Check if paper matches the physics domain definition.
+        Uses LLM if available, otherwise keyword matching.
+        """
+        if self.llm_filter:
+            # Mock LLM call
+            # prompt = f"Does this paper match the definition?\nPaper: {paper}\nDefinition: {definition}"
+            # return self.llm_filter.generate(prompt) == "Yes"
+            return True
+        
+        # Fallback: Keyword matching
+        keywords = ["MHD", "plasma", "turbulence", "fluid", "simulation", "physics"]
+        text = (paper['title'] + " " + paper['abstract']).lower()
+        return any(k.lower() in text for k in keywords)
