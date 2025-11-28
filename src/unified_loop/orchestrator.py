@@ -8,6 +8,7 @@ from src.ai_safety.shield_v3 import AIShieldV3
 from src.tnn.predictor import TNNPredictor
 from src.generative_layer.ebdm import EBDMGenerator
 from src.unified_loop.client_config import ClientConfiguration
+from src.core.dac_factory import DACFactory
 
 # --- Economic Components (Thermodynasty) ---
 from src.economic_engine.thermodynamic_staking import ExergyStakingContract, EntropyOracle, RewardEngine
@@ -38,6 +39,9 @@ class UnifiedLoopOrchestrator:
         
         # 4. Configuration
         self.client_config = None
+        
+        # 5. Factory
+        self.dac_factory = DACFactory()
 
     async def run_campaign(self, client_id: str, datasets: List[str], config: Dict[str, Any]):
         """
@@ -53,7 +57,7 @@ class UnifiedLoopOrchestrator:
         logger.info("Step 1: Running Discovery Loop (RDR + Hypothesis)...")
         discoveries = self.discovery_loop.run_discovery_campaign(datasets)
         
-        valid_discoveries = []
+        valid_capsules = []
         
         for dac in discoveries:
             hypothesis = dac['hypothesis']
@@ -77,9 +81,20 @@ class UnifiedLoopOrchestrator:
             # Step 5: Economic Staking & Value Realization
             self._execute_economics(client_id, refined_design)
             
-            valid_discoveries.append(refined_design)
+            # Step 6: Mint Capsule (Phase 31)
+            # Infer domain/variant from dataset or config (Mocking for now)
+            capsule = self.dac_factory.mint_capsule(
+                domain="fusion",
+                variant="plasma_control",
+                version="v1",
+                hypothesis=hypothesis,
+                design=refined_design,
+                proof=dac.get("proof")
+            )
             
-        return valid_discoveries
+            valid_capsules.append(capsule)
+            
+        return valid_capsules
 
     def _execute_economics(self, client_id: str, design: Dict[str, Any]):
         """

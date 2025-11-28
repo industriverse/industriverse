@@ -33,8 +33,11 @@ async def test_unified_loop_end_to_end():
     results = await orchestrator.run_campaign(client_id, datasets, config)
     
     assert len(results) > 0
-    assert "design_id" in results[0]
-    assert "predicted_energy" in results[0]
+    # Check if result is a Capsule object (or behaves like one)
+    capsule = results[0]
+    assert hasattr(capsule, 'uri')
+    assert str(capsule.uri) == "capsule://fusion/plasma_control/v1"
+    assert "design_id" in capsule.content["design"]
     
     # Check if economics ran (logs would show, but we can check side effects if we had access to state)
     # For now, just ensuring it runs without error and returns results is good.
