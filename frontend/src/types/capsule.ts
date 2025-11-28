@@ -1,4 +1,4 @@
-export type CapsuleStatus = 'active' | 'idle' | 'error' | 'warning' | 'critical' | 'resolved' | 'dismissed';
+export type CapsuleStatus = 'active' | 'idle' | 'error' | 'warning' | 'critical' | 'resolved' | 'dismissed' | 'optimizing' | 'standby';
 export type CapsulePriority = 'low' | 'medium' | 'high' | 'critical';
 export type CapsuleAction = 'ignite' | 'shutdown' | 'restart' | 'mitigate' | 'inspect' | 'dismiss' | 'escalate' | 'acknowledge';
 export type CapsuleViewState = 'pill' | 'expanded' | 'full';
@@ -11,6 +11,9 @@ export interface Capsule {
   prin_score: number;
   energy_usage: number;
   utid?: string;
+  area_code?: number;
+  entropy?: number;
+  version?: string;
 }
 
 export interface CapsuleActionPayload {

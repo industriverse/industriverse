@@ -80,6 +80,18 @@ const statusConfig: Record<CapsuleStatus, {
     color: 'text-red-500',
     bgColor: 'bg-red-900/20',
     borderColor: 'border-red-500/40'
+  },
+  optimizing: {
+    icon: Zap,
+    color: 'text-cyan-400',
+    bgColor: 'bg-cyan-900/20',
+    borderColor: 'border-cyan-500/40'
+  },
+  standby: {
+    icon: Clock,
+    color: 'text-slate-400',
+    bgColor: 'bg-slate-800/50',
+    borderColor: 'border-slate-600/40'
   }
 };
 

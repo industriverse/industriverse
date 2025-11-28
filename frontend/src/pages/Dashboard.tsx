@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from "wouter";
 import CapsuleCard from '../components/CapsuleCard';
 import CapsuleOmniBar from '../components/CapsuleOmniBar';
 import CreditTicker from '../components/CreditTicker';
 import DACRenderer from '../components/DACRenderer';
 import { useSystemPulse } from '../hooks/useSystemPulse';
-import { Capsule } from '../types'; // Assuming Capsule type is defined here or imported
+import { Capsule } from '../types/capsule';
 
 // Mock initial capsules if not fetching from API immediately
 const INITIAL_CAPSULES: Capsule[] = [
@@ -16,7 +17,8 @@ const INITIAL_CAPSULES: Capsule[] = [
         entropy: 0.042,
         prin_score: 0.98,
         utid: "utid:fusion:001",
-        version: "1.0.0"
+        version: "1.0.0",
+        energy_usage: 450
     },
     {
         capsule_id: "grid_v1",
@@ -26,7 +28,8 @@ const INITIAL_CAPSULES: Capsule[] = [
         entropy: 0.156,
         prin_score: 0.92,
         utid: "utid:grid:001",
-        version: "1.0.0"
+        version: "1.0.0",
+        energy_usage: 120
     },
     {
         capsule_id: "robotics_v1",
@@ -36,7 +39,8 @@ const INITIAL_CAPSULES: Capsule[] = [
         entropy: 0.089,
         prin_score: 0.95,
         utid: "utid:robotics:001",
-        version: "1.0.0"
+        version: "1.0.0",
+        energy_usage: 300
     },
     {
         capsule_id: "lifecycle_v1",
@@ -46,11 +50,46 @@ const INITIAL_CAPSULES: Capsule[] = [
         entropy: 0.012,
         prin_score: 0.99,
         utid: "utid:lifecycle:001",
-        version: "1.0.0"
+        version: "1.0.0",
+        energy_usage: 50
+    },
+    {
+        capsule_id: "bio_v1",
+        name: "Protein Folder Delta",
+        category: "Bio/Chem",
+        status: "optimizing",
+        entropy: 0.12,
+        prin_score: 0.88,
+        utid: "utid:bio:001",
+        version: "1.0.0",
+        energy_usage: 600
+    },
+    {
+        capsule_id: "space_v1",
+        name: "Orbital Defense Grid",
+        category: "Space",
+        status: "active",
+        entropy: 0.005,
+        prin_score: 0.99,
+        utid: "utid:space:001",
+        version: "1.0.0",
+        energy_usage: 1200
+    },
+    {
+        capsule_id: "token_v1",
+        name: "Exergy Ledger",
+        category: "Economy",
+        status: "active",
+        entropy: 0.01,
+        prin_score: 0.97,
+        utid: "utid:econ:001",
+        version: "1.0.0",
+        energy_usage: 80
     }
 ];
 
 const Dashboard: React.FC = () => {
+    const [location, setLocation] = useLocation();
     const pulse = useSystemPulse();
     const [capsules, setCapsules] = useState<Capsule[]>(INITIAL_CAPSULES);
     const [selectedDacId, setSelectedDacId] = useState<string | null>(null);
@@ -69,6 +108,34 @@ const Dashboard: React.FC = () => {
 
     const handleLaunch = async (id: string) => {
         console.log(`Launching DAC for ${id}...`);
+
+        // Portal Routing Logic
+        if (id.includes('fusion') || id.includes('grid') || id.includes('motor')) {
+            setLocation('/physics');
+            return;
+        }
+        if (id.includes('robotics') || id.includes('fpga') || id.includes('asm')) {
+            setLocation('/hardware');
+            return;
+        }
+        if (id.includes('bio') || id.includes('pharma')) {
+            setLocation('/bio');
+            return;
+        }
+        if (id.includes('space') || id.includes('satcom')) {
+            setLocation('/space');
+            return;
+        }
+        if (id.includes('token') || id.includes('xrpl')) {
+            setLocation('/economy');
+            return;
+        }
+        if (id.includes('life') || id.includes('nca')) {
+            setLocation('/alife');
+            return;
+        }
+
+        // Fallback to Modal for unknown types
         setSelectedDacId(id);
         setIsLoadingDac(true);
         setDacSchema(null);
