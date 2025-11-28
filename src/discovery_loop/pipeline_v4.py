@@ -76,10 +76,10 @@ class AESPOperatorV4:
 
 # --- Discovery Loop V4 ---
 class IndustriverseDiscoveryV4:
-    def __init__(self, llm_model, embedding_model):
+    def __init__(self, llm_model, embedding_model, userlm=None, rnd1=None):
         # Existing components
-        self.userlm = UserLM8b()
-        self.rnd1 = RND1Base()
+        self.userlm = userlm if userlm else UserLM8b()
+        self.rnd1 = rnd1 if rnd1 else RND1Base()
         self.obmi = OBMIStack()
         self.t2l = T2LPipeline()
         self.asal = ASALProofGenerator()

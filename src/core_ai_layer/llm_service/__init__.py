@@ -6,7 +6,7 @@ from .llm_model_manager import LLMModelManager
 from .llm_inference_service import LLMInferenceService
 from .llm_fine_tuning_service import LLMFineTuningService
 from .llm_evaluation_service import LLMEvaluationService
-from .prompt_template_management import PromptTemplateManager
+from .prompt_template_management import PromptTemplateManagementService
 from .token_usage_tracking_service import TokenUsageTrackingService
 
 __all__ = [
@@ -14,6 +14,6 @@ __all__ = [
     "LLMInferenceService",
     "LLMFineTuningService",
     "LLMEvaluationService",
-    "PromptTemplateManager",
+    "PromptTemplateManagementService",
     "TokenUsageTrackingService"
 ]

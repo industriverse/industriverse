@@ -5,7 +5,8 @@ from typing import Dict, Any, Tuple
 # Import Priors (We can dynamically load or import specific ones)
 from src.ebm_lib.priors.fusion_v1 import FusionPrior
 from src.ebm_lib.priors.grid_v1 import GridPrior
-# ... import others as needed
+from src.ebm_lib.priors.space_v1 import SpacePhysicsPrior
+from src.ebm_lib.priors.bio_v1 import BioPhysicsPrior
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +21,8 @@ class AIShieldV3:
         self.priors = {
             'fusion_v1': FusionPrior(),
             'grid_v1': GridPrior(),
-            # Add others
+            'space_v1': SpacePhysicsPrior(),
+            'bio_v1': BioPhysicsPrior(),
         }
         self.wifi_sensing_active = True
 
@@ -75,3 +77,19 @@ class AIShieldV3:
         """
         # In production, this connects to WiFi sensing hardware API
         return True
+
+    def visual_energy_check(self, image_id: str) -> Tuple[bool, float]:
+        """
+        Perform a visual energy check using SAM 3 Perception.
+        Segments the scene and calculates entropy based on defect density.
+        """
+        from src.core_ai_layer.sam_service import SAMPerceptionService
+        
+        sam = SAMPerceptionService()
+        energy = sam.analyze_visual_energy(image_id)
+        
+        # Threshold for visual entropy (e.g., too many defects)
+        threshold = 0.5
+        if energy > threshold:
+            return False, energy
+        return True, energy
