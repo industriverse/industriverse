@@ -10,6 +10,32 @@ export default {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        // Stellar Obsidian Palette
+        void: {
+          DEFAULT: "#050505",
+          light: "#0A0A0A",
+          dark: "#000000",
+        },
+        plasma: {
+          DEFAULT: "#00F0FF",
+          glow: "rgba(0, 240, 255, 0.5)",
+        },
+        solar: {
+          DEFAULT: "#FFD700",
+          glow: "rgba(255, 215, 0, 0.5)",
+        },
+        nebula: {
+          DEFAULT: "#BC13FE",
+          glow: "rgba(188, 19, 254, 0.5)",
+        },
+        redshift: {
+          DEFAULT: "#FF0055",
+          glow: "rgba(255, 0, 85, 0.5)",
+        },
+        glass: {
+          DEFAULT: "rgba(255, 255, 255, 0.05)",
+          border: "rgba(255, 255, 255, 0.1)",
+        },
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))'

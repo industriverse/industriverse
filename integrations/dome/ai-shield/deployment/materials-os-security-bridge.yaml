@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: materials-os-security-bridge
+  namespace: ai-shield-security
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: materials-os-security-bridge
+  template:
+    metadata:
+      labels:
+        app: materials-os-security-bridge
+    spec:
+      containers:
+      - name: security-bridge
+        image: empeiriahaus/materials-os-security:v1.0.0
+        ports:
+        - containerPort: 5005
+        env:
+        - name: MATERIALS_OS_ENDPOINT
+          value: "http://materials-os-final-service:5004"
+        - name: SHADOW_TWINS_ENDPOINT
+          value: "http://shadow-twins-enhanced-v3:9000"
+        - name: OBMI_ENDPOINT
+          value: "http://localhost:8000"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: materials-os-security-service
+  namespace: ai-shield-security
+spec:
+  selector:
+    app: materials-os-security-bridge
+  ports:
+  - port: 5005
+    targetPort: 5005
+  type: ClusterIP

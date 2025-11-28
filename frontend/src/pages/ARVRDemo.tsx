@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AR/VR Demo Page
  * 

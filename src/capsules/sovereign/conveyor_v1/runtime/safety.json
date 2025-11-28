@@ -1,0 +1,10 @@
+{
+  "max_entropy": 0.1,
+  "stability_threshold": 0.95,
+  "compute_budget_flops": 100000000000.0,
+  "thermal_budget_joules": 80.0,
+  "safety_invariants": [
+    "energy_conservation"
+  ],
+  "max_horizon_steps": 50
+}

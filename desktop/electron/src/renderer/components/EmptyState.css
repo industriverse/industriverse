@@ -1,0 +1,33 @@
+/**
+ * EmptyState Component Styles
+ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  text-align: center;
+  min-height: 400px;
+}
+
+.empty-state svg {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.empty-state-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.empty-state-description {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 280px;
+  line-height: 1.5;
+}

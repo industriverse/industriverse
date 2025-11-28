@@ -1,0 +1,14 @@
+boundary_conditions:
+  type: dirichlet
+  value: 0
+constraints:
+  stability: energy < 0
+domain: Lifecycle Analytics
+equations:
+- Weibull Distribution, Bathtub Curve
+manifold_type: generic_manifold
+state_variables:
+- x
+- y
+- z
+- energy

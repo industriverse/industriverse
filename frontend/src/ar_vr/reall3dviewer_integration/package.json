@@ -1,0 +1,41 @@
+{
+  "name": "@industriverse/shadow-twin-viewer",
+  "version": "1.0.0",
+  "description": "Shadow Twin 3D Gaussian Splatting viewer with real-time capsule overlays for AR/VR",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "3dgs",
+    "gaussian-splatting",
+    "shadow-twin",
+    "capsule",
+    "ar",
+    "vr",
+    "three.js",
+    "webxr"
+  ],
+  "author": "Industriverse",
+  "license": "MIT",
+  "dependencies": {
+    "@reall3d/reall3dviewer": "^2.3.0",
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/three": "^0.160.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "three": "^0.160.0"
+  }
+}

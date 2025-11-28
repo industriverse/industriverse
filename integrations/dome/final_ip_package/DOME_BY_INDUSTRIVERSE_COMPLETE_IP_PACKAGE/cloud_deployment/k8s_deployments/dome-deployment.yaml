@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dome-industriverse-platform
+  namespace: industriverse-unified
+  labels:
+    app: dome-industriverse
+    version: v1.0.0-production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dome-industriverse
+  template:
+    metadata:
+      labels:
+        app: dome-industriverse
+    spec:
+      containers:
+      - name: dome-platform
+        image: industriverse/dome-platform:v1.0.0
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8443
+          name: https
+        - containerPort: 9090
+          name: metrics
+        env:
+        - name: DOME_MODE
+          value: "production"
+        - name: CUDA_VISIBLE_DEVICES
+          value: "all"
+        - name: MCP_BRIDGE_ENDPOINT
+          value: "http://mcp-bridge-minimal-service.obmi-quantum-enhancement.svc.cluster.local:8001"
+        - name: DGM_SERVICE_ENDPOINT
+          value: "http://darwin-godel-molecular-service.molecular-industrial.svc.cluster.local:8080"
+        - name: A2A_FEDERATION_ENDPOINT
+          value: "http://a2a-deploy-anywhere-service.azure-deploy-anywhere.svc.cluster.local:8080"
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+            nvidia.com/gpu: 1
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - name: dome-config
+          mountPath: /app/config
+        - name: cuda-kernels
+          mountPath: /app/cuda_kernels
+      volumes:
+      - name: dome-config
+        configMap:
+          name: dome-config
+      - name: cuda-kernels
+        configMap:
+          name: dome-cuda-kernels
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dome-industriverse-service
+  namespace: industriverse-unified
+spec:
+  selector:
+    app: dome-industriverse
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: https
+    port: 443
+    targetPort: 8443
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dome-config
+  namespace: industriverse-unified
+data:
+  production.yaml: |
+    dome:
+      platform:
+        name: "Dome by Industriverse"
+        version: "1.0.0-production"
+        mode: "production"
+      infrastructure:
+        mcp_bridges:
+          aws: "http://mcp-bridge-minimal-service.obmi-quantum-enhancement.svc.cluster.local:8001"
+          azure: "http://172.212.112.44:8080"
+          gcp: "http://mcp-protocol-service.industriverse.svc.cluster.local:8080"
+        dgm_services:
+          aws: "http://darwin-godel-molecular-service.molecular-industrial.svc.cluster.local:8080"
+        a2a_federation:
+          azure: "http://a2a-deploy-anywhere-service.azure-deploy-anywhere.svc.cluster.local:8080"
+        edge_registry:
+          gcp: "http://edge-device-registry.deploy-anywhere.svc.cluster.local:8080"
+      hardware:
+        esp32:
+          auto_discovery: true
+          firmware_version: "dome_csi_v1.2.0"
+        jetson:
+          cuda_deployment: true
+          kernel_compilation: true
+        plc:
+          modbus_rtu: true
+          modbus_tcp: true
+          opc_ua: true
+      performance:
+        csi_processing_rate: 1000  # frames/second
+        ptp_sync_accuracy: 3.0     # microseconds
+        end_to_end_latency: 100    # milliseconds

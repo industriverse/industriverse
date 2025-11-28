@@ -1,129 +1,268 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from "wouter";
 import CapsuleCard from '../components/CapsuleCard';
-import axios from 'axios';
+import CapsuleOmniBar from '../components/CapsuleOmniBar';
+import CreditTicker from '../components/CreditTicker';
+import DACRenderer from '../components/DACRenderer';
+import { useSystemPulse } from '../hooks/useSystemPulse';
+import { Capsule } from '../types/capsule';
 
-// Define types locally for now, should be shared
-interface Capsule {
-    capsule_id: string;
-    name: string;
-    category: string;
-    status: 'active' | 'idle' | 'error';
-    prin_score: number;
-    energy_usage: number;
-    utid?: string;
-}
+// Mock initial capsules if not fetching from API immediately
+const INITIAL_CAPSULES: Capsule[] = [
+    {
+        capsule_id: "fusion_v1",
+        name: "Fusion Control Alpha",
+        category: "Energy",
+        status: "optimizing",
+        entropy: 0.042,
+        prin_score: 0.98,
+        utid: "utid:fusion:001",
+        version: "1.0.0",
+        energy_usage: 450
+    },
+    {
+        capsule_id: "grid_v1",
+        name: "Grid Immunity Prime",
+        category: "Network",
+        status: "active",
+        entropy: 0.156,
+        prin_score: 0.92,
+        utid: "utid:grid:001",
+        version: "1.0.0",
+        energy_usage: 120
+    },
+    {
+        capsule_id: "robotics_v1",
+        name: "Apparel Robotics",
+        category: "Manufacturing",
+        status: "active",
+        entropy: 0.089,
+        prin_score: 0.95,
+        utid: "utid:robotics:001",
+        version: "1.0.0",
+        energy_usage: 300
+    },
+    {
+        capsule_id: "lifecycle_v1",
+        name: "Garment Ledger",
+        category: "Sustainability",
+        status: "standby",
+        entropy: 0.012,
+        prin_score: 0.99,
+        utid: "utid:lifecycle:001",
+        version: "1.0.0",
+        energy_usage: 50
+    },
+    {
+        capsule_id: "bio_v1",
+        name: "Protein Folder Delta",
+        category: "Bio/Chem",
+        status: "optimizing",
+        entropy: 0.12,
+        prin_score: 0.88,
+        utid: "utid:bio:001",
+        version: "1.0.0",
+        energy_usage: 600
+    },
+    {
+        capsule_id: "space_v1",
+        name: "Orbital Defense Grid",
+        category: "Space",
+        status: "active",
+        entropy: 0.005,
+        prin_score: 0.99,
+        utid: "utid:space:001",
+        version: "1.0.0",
+        energy_usage: 1200
+    },
+    {
+        capsule_id: "token_v1",
+        name: "Exergy Ledger",
+        category: "Economy",
+        status: "active",
+        entropy: 0.01,
+        prin_score: 0.97,
+        utid: "utid:econ:001",
+        version: "1.0.0",
+        energy_usage: 80
+    }
+];
 
 const Dashboard: React.FC = () => {
-    const [capsules, setCapsules] = useState<Capsule[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    // Mock data for initial render until backend connection is fully verified
-    const mockCapsules: Capsule[] = [
-        {
-            capsule_id: 'capsule:fusion:v1',
-            name: 'Fusion Reactor Control',
-            category: 'Category A',
-            status: 'active',
-            prin_score: 0.92,
-            energy_usage: 4500,
-            utid: 'UTID:REAL:HOST:FUSION:20251124:A1B2'
-        },
-        {
-            capsule_id: 'capsule:motor:v1',
-            name: 'Electric Motor Mfg',
-            category: 'Category A',
-            status: 'idle',
-            prin_score: 0.88,
-            energy_usage: 1200
-        },
-        // Add more mocks or fetch from API
-    ];
-
-    useEffect(() => {
-        const fetchCapsules = async () => {
-            try {
-                const response = await axios.get('/api/v1/capsules/');
-                // Transform backend data to frontend model
-                const mappedCapsules: Capsule[] = response.data.map((c: any) => ({
-                    capsule_id: c.id,
-                    name: c.name,
-                    category: c.category,
-                    status: 'idle', // Default status as backend doesn't return it yet
-                    prin_score: 0.85 + Math.random() * 0.15, // Mock score for now
-                    energy_usage: Math.floor(Math.random() * 5000), // Mock energy
-                    utid: undefined
-                }));
-                setCapsules(mappedCapsules);
-            } catch (error) {
-                console.error("Failed to fetch capsules", error);
-                // Fallback to mocks if backend fails
-                const generatedCapsules = Array.from({ length: 27 }, (_, i) => ({
-                    capsule_id: `capsule:generic:${i + 1}`,
-                    name: `Sovereign Capsule ${i + 1}`,
-                    category: i < 7 ? 'Category A' : i < 15 ? 'Category B' : i < 22 ? 'Category C' : 'Category D',
-                    status: Math.random() > 0.8 ? 'active' : 'idle',
-                    prin_score: 0.75 + Math.random() * 0.25,
-                    energy_usage: Math.floor(Math.random() * 5000),
-                })) as Capsule[];
-                setCapsules(generatedCapsules);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchCapsules();
-    }, []);
+    const [location, setLocation] = useLocation();
+    const pulse = useSystemPulse();
+    const [capsules, setCapsules] = useState<Capsule[]>(INITIAL_CAPSULES);
+    const [selectedDacId, setSelectedDacId] = useState<string | null>(null);
+    const [dacSchema, setDacSchema] = useState<any>(null);
+    const [isLoadingDac, setIsLoadingDac] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // Added general loading state
+    const [viewMode, setViewMode] = useState<'grid' | 'grouped'>('grouped');
 
     const handleIgnite = async (id: string) => {
-        console.log(`Igniting capsule ${id}...`);
-        // Optimistic update
+        console.log(`Igniting ${id}...`);
+        // Mock ignition logic
         setCapsules(prev => prev.map(c =>
-            c.capsule_id === id ? { ...c, status: 'active', energy_usage: c.energy_usage + 100 } : c
+            c.capsule_id === id ? { ...c, status: 'active' } : c
         ));
+    };
+
+    const handleLaunch = async (id: string) => {
+        console.log(`Launching DAC for ${id}...`);
+
+        // Portal Routing Logic
+        if (id.includes('fusion') || id.includes('grid') || id.includes('motor')) {
+            setLocation('/physics');
+            return;
+        }
+        if (id.includes('robotics') || id.includes('fpga') || id.includes('asm')) {
+            setLocation('/hardware');
+            return;
+        }
+        if (id.includes('bio') || id.includes('pharma')) {
+            setLocation('/bio');
+            return;
+        }
+        if (id.includes('space') || id.includes('satcom')) {
+            setLocation('/space');
+            return;
+        }
+        if (id.includes('token') || id.includes('xrpl')) {
+            setLocation('/economy');
+            return;
+        }
+        if (id.includes('life') || id.includes('nca')) {
+            setLocation('/alife');
+            return;
+        }
+
+        // Fallback to Modal for unknown types
+        setSelectedDacId(id);
+        setIsLoadingDac(true);
+        setDacSchema(null);
 
         try {
-            const response = await axios.post(`/api/v1/capsules/execute`, {
-                capsule_id: id,
-                payload: { action: "ignite" },
-                priority: "high"
+            // Fetch DAC Schema from Backend
+            const response = await fetch(`http://localhost:8000/capsules/${id}/dac`, {
+                method: 'POST'
             });
 
-            // Update with real UTID from response
-            const utid = response.data.utid;
-            setCapsules(prev => prev.map(c =>
-                c.capsule_id === id ? { ...c, utid: utid } : c
-            ));
+            if (!response.ok) {
+                throw new Error(`Failed to load DAC: ${response.statusText}`);
+            }
 
-        } catch (error) {
-            console.error("Ignition failed", error);
-            setCapsules(prev => prev.map(c =>
-                c.capsule_id === id ? { ...c, status: 'error' } : c
-            ));
+            const data = await response.json();
+            if (data.status === 'success' && data.dac) {
+                setDacSchema(data.dac.ui_schema);
+            }
+        } catch (err) {
+            console.error("DAC Launch Error:", err);
+            // Fallback/Mock for demo if backend is unreachable
+            setDacSchema({
+                components: [
+                    { type: "Header", props: { title: `${id} (Offline Mode)` } },
+                    { type: "ReactorGauge", props: { metric: "entropy" } }
+                ]
+            });
+        } finally {
+            setIsLoadingDac(false);
         }
     };
 
+    const closeDac = () => {
+        setSelectedDacId(null);
+        setDacSchema(null);
+    };
+
     return (
-        <div className="min-h-screen bg-gray-900 text-white p-8">
-            <header className="mb-8">
-                <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-400">
-                    Mission Control: 27 Sovereign Capsules
-                </h1>
-                <p className="text-gray-400 mt-2">Thermodynamic Discovery Loop V16 Status</p>
+        <div className="min-h-screen bg-black text-white font-sans selection:bg-cyan-500/30">
+            {/* Header */}
+            <header className="border-b border-slate-800 bg-slate-950/50 backdrop-blur-md sticky top-0 z-10">
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                            <span className="font-bold text-lg">I</span>
+                        </div>
+                        <h1 className="text-xl font-bold tracking-tight">
+                            INDUSTRI<span className="text-cyan-400">VERSE</span>
+                        </h1>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-900 rounded-full border border-slate-800">
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                            <span className="text-xs font-mono text-slate-400">SYSTEM ONLINE</span>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700" />
+                    </div>
+                </div>
             </header>
 
-            {loading ? (
-                <div className="flex justify-center items-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+            <main className="container mx-auto px-4 py-8">
+                <div className="flex justify-between items-center mb-8">
+                    <h2 className="text-2xl font-light tracking-wide text-slate-400">
+                        Sovereign Capsules <span className="text-cyan-500">({capsules.length})</span>
+                    </h2>
                 </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {capsules.map(capsule => (
-                        <CapsuleCard
-                            key={capsule.capsule_id}
-                            capsule={capsule}
-                            onIgnite={handleIgnite}
-                        />
-                    ))}
+
+                {/* OmniBar */}
+                <div className="mb-8">
+                    <CapsuleOmniBar onIgnite={handleIgnite} />
+                </div>
+
+                {/* Credit Ticker */}
+                <div className="mb-8">
+                    <CreditTicker />
+                </div>
+
+                {isLoading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {[...Array(8)].map((_, i) => (
+                            <div key={i} className="h-64 bg-slate-900/50 rounded-xl animate-pulse border border-slate-800" />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {capsules.map((capsule) => (
+                            <CapsuleCard
+                                key={capsule.capsule_id}
+                                capsule={capsule}
+                                onIgnite={handleIgnite}
+                                onLaunch={handleLaunch}
+                            />
+                        ))}
+                    </div>
+                )}
+            </main>
+
+            {/* DAC Modal */}
+            {selectedDacId && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="w-full max-w-6xl bg-gray-950 rounded-2xl shadow-2xl border border-gray-800 overflow-hidden flex flex-col h-[90vh]">
+                        {/* Modal Header */}
+                        <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-900">
+                            <div className="flex items-center space-x-2">
+                                <span className="text-cyan-500">◈</span>
+                                <h2 className="font-bold text-lg text-white">DAC: {selectedDacId}</h2>
+                            </div>
+                            <button onClick={closeDac} className="text-gray-400 hover:text-white transition-colors">
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* Modal Content */}
+                        <div className="flex-1 overflow-y-auto p-6 bg-black">
+                            {isLoadingDac ? (
+                                <div className="flex flex-col items-center justify-center h-64 space-y-4">
+                                    <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="text-cyan-400 font-mono animate-pulse">Materializing DAC...</div>
+                                </div>
+                            ) : dacSchema ? (
+                                <DACRenderer schema={dacSchema} />
+                            ) : (
+                                <div className="text-red-500">Failed to load DAC schema</div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

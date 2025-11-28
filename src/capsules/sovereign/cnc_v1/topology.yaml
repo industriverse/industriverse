@@ -1,0 +1,14 @@
+boundary_conditions:
+  type: dirichlet
+  value: 0
+constraints:
+  stability: energy < 0
+domain: CNC Torque Machining
+equations:
+- Cutting Force Model, Euler-Bernoulli Beam
+manifold_type: generic_manifold
+state_variables:
+- x
+- y
+- z
+- energy

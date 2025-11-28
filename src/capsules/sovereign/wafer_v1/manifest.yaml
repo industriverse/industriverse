@@ -1,0 +1,6 @@
+dac_id: wafer_v1
+version: 1.0.0
+energy_prior: src.ebm_lib.priors.wafer_v1
+tnn_solver: src.tnn.wafer_tnn
+inputs: [state_vector]
+outputs: [optimized_state]

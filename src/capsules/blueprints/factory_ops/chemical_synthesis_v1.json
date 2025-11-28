@@ -1,0 +1,40 @@
+{
+  "capsule_id": "chemical_synthesis_v1",
+  "version": "1.0.0",
+  "area_code": 13,
+  "name": "Synthesis Capsule",
+  "description": "Optimizes reaction kinetics and ensures safety in chemical processes.",
+  "connectors": [
+    {
+      "type": "sensor",
+      "name": "flow_rate"
+    },
+    {
+      "type": "sensor",
+      "name": "reactor_pressure"
+    }
+  ],
+  "models": [
+    {
+      "id": "reaction_kinetics",
+      "type": "simulation"
+    },
+    {
+      "id": "safety_monitor",
+      "type": "inference"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Safety",
+      "claim": "process_stability"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "reaction_kinetics",
+      "title": "Synthesis Capsule Dashboard"
+    }
+  ]
+}

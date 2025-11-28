@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Capsules</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_capsules">Capsule Updates</string>
+    <string name="notification_channel_service">Capsule Service</string>
+    <string name="notification_channel_low_priority">Low Priority</string>
+
+    <!-- Service -->
+    <string name="service_notification_title">Capsule Service</string>
+    <string name="service_notification_text_active">%d active capsule(s)</string>
+    <string name="service_notification_text_monitoring">Monitoring for updates</string>
+
+    <!-- Actions -->
+    <string name="action_dismiss">Dismiss</string>
+    <string name="action_complete">Complete</string>
+    <string name="action_acknowledge">Acknowledge</string>
+    <string name="action_open">Open</string>
+
+    <!-- Errors -->
+    <string name="error_connection_failed">Connection failed</string>
+    <string name="error_unknown">Unknown error occurred</string>
+
+    <!-- Widgets -->
+    <string name="compact_widget_description">Single capsule at a glance</string>
+    <string name="expanded_widget_description">View 3-4 active capsules</string>
+    <string name="full_widget_description">Full capsule launchpad</string>
+    <string name="loading_capsules">Loading capsules…</string>
+    <string name="no_active_capsules">No active capsules</string>
+    <string name="widget_tap_to_open">Tap to open</string>
+</resources>

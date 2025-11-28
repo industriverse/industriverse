@@ -1,0 +1,40 @@
+{
+  "capsule_id": "warehousing_inventory_v1",
+  "version": "1.0.0",
+  "area_code": 22,
+  "name": "Inventory Intelligence Capsule",
+  "description": "Optimizes warehouse layout and predicts stockout risks.",
+  "connectors": [
+    {
+      "type": "wms",
+      "name": "stock_levels"
+    },
+    {
+      "type": "erp",
+      "name": "orders"
+    }
+  ],
+  "models": [
+    {
+      "id": "demand_forecast",
+      "type": "inference"
+    },
+    {
+      "id": "layout_sim",
+      "type": "simulation"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Efficiency",
+      "claim": "pick_rate"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "demand_forecast",
+      "title": "Inventory Intelligence Capsule Dashboard"
+    }
+  ]
+}

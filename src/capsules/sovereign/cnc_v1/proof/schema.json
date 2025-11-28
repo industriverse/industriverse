@@ -1,0 +1,8 @@
+{
+  "proof_type": "thermodynamic_work",
+  "work_metric": "entropy_reduction",
+  "hash_algo": "sha256",
+  "constraints": [
+    "energy_conservation"
+  ]
+}

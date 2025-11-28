@@ -1,0 +1,6 @@
+dac_id: chassis_v1
+version: 1.0.0
+energy_prior: src.ebm_lib.priors.chassis_v1
+tnn_solver: src.tnn.chassis_tnn
+inputs: [state_vector]
+outputs: [optimized_state]

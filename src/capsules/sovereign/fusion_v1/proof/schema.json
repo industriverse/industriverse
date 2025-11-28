@@ -1,0 +1,9 @@
+{
+    "proof_type": "thermodynamic_descent",
+    "work_metric": "plasma_stability_integral",
+    "hash_algo": "sha256",
+    "constraints": [
+        "beta_limit",
+        "q_safety_factor"
+    ]
+}

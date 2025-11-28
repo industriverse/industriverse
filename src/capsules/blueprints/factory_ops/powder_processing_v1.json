@@ -1,0 +1,40 @@
+{
+  "capsule_id": "powder_processing_v1",
+  "version": "1.0.0",
+  "area_code": 3,
+  "name": "Feedstock Integrity Capsule",
+  "description": "Ensures powder consistency and quality for additive manufacturing.",
+  "connectors": [
+    {
+      "type": "sensor",
+      "name": "particle_size_analyzer"
+    },
+    {
+      "type": "env",
+      "name": "humidity_log"
+    }
+  ],
+  "models": [
+    {
+      "id": "ace_drift_detector",
+      "type": "inference"
+    },
+    {
+      "id": "flowability_sim",
+      "type": "simulation"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Quality",
+      "claim": "particle_distribution"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "ace_drift_detector",
+      "title": "Feedstock Integrity Capsule Dashboard"
+    }
+  ]
+}

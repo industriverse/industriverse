@@ -1,0 +1,16 @@
+{
+  "chain_id": "human-centric-1764226539",
+  "workforce": {
+    "fatigue": 4.7626898230905,
+    "productivity": 93.2734480350803
+  },
+  "schedule": {
+    "fairness": 3.0,
+    "rotated": false
+  },
+  "lifecycle": {
+    "retention": 1.0386718287408219,
+    "burnout": -0.7266769136416109
+  },
+  "timestamp": 1764226539.109625
+}

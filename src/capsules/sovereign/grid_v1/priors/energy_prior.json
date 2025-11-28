@@ -1,0 +1,20 @@
+{
+    "basins": [
+        {
+            "name": "stable_sync",
+            "energy": -200.0,
+            "stability": 0.95
+        },
+        {
+            "name": "islanded_mode",
+            "energy": -50.0,
+            "stability": 0.7
+        }
+    ],
+    "barriers": [
+        {
+            "name": "cascade_failure",
+            "energy": 5000.0
+        }
+    ]
+}

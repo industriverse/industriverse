@@ -1,0 +1,4 @@
+lineage_signature: casting_v1_genesis_sig
+reputation_min: 0.8
+required_credentials:
+- operator_cert

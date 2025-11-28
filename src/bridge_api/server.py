@@ -15,8 +15,7 @@ from src.bridge_api.controllers import proof_graph_controller
 
 app = FastAPI(
     title="Industriverse Bridge API",
-    description="Unified gateway for all Industriverse services (Trifecta, Expansion Packs, AI Shield)",
-    version="1.0.0"
+    version="0.1.0"
 )
 
 # 1. Security Middlewares (Order matters!)
@@ -34,13 +33,67 @@ app.add_middleware(
 )
 
 # 3. Register Routers
-app.include_router(proof_controller.router)
+# --- MCP Integration (Lightweight Adapter) ---
+class MCPAdapter:
+    def __init__(self, app: FastAPI):
+        self.app = app
+        self.tools = []
+
+    def tool(self):
+        def decorator(func):
+            self.tools.append({
+                "name": func.__name__,
+                "description": func.__doc__,
+                "parameters": func.__annotations__
+            })
+            return func
+        return decorator
+
+    def expose_tools(self):
+        @self.app.get("/mcp/tools")
+        async def list_tools():
+            return {"tools": self.tools}
+
+mcp = MCPAdapter(app)
+
+# --- A2A Integration ---
+from src.capsule_layer.services.a2a_agent_integration import registry, host_agent, WorkflowRequest
+
+@app.get("/agents")
+async def list_agents():
+    """List all registered agents."""
+    return registry.list_agents()
+
+@app.get("/agents/{agent_id}")
+async def get_agent(agent_id: str):
+    """Get details of a specific agent."""
+    agent = registry.get_agent(agent_id)
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    return agent
+
+@app.post("/orchestrate")
+async def orchestrate_workflow(request: WorkflowRequest):
+    """Orchestrate a workflow using A2A agents."""
+    return await host_agent.orchestrate_workflow(request)
+
+# Expose thermodynamic endpoints as MCP tools
+@mcp.tool()
+async def get_thermodynamic_state(capsule_id: str):
+    """Get the thermodynamic state of a capsule."""
+    # Mock implementation
+    return {"entropy": 0.5, "energy": 100}
+
+mcp.expose_tools()
+
+# --- Existing Routes ---
+app.include_router(capsule_router.router, prefix="/capsules", tags=["Capsules"])
+app.include_router(orchestrator_router.router, prefix="/api/v1")
 app.include_router(utid_controller.router)
 app.include_router(shield_controller.router)
 app.include_router(proof_lineage_controller.router)
 app.include_router(proof_graph_controller.router)
 
-# Register Capsule Router
 from src.bridge_api.routers import capsule_router
 app.include_router(capsule_router.router)
 
@@ -112,6 +165,18 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.receive_text() # Keep connection alive
     except WebSocketDisconnect:
         GlobalEventBus.unsubscribe(send_event)
+
+# 6. Shadow Twin WebSocket (Phase 4)
+from src.twin_sync.ws_server import handle_websocket
+from src.twin_sync.bus_emitter import twin_emitter
+
+@app.on_event("startup")
+async def startup_event():
+    twin_emitter.start()
+
+@app.websocket("/ws/pulse")
+async def pulse_websocket(websocket: WebSocket):
+    await handle_websocket(websocket)
 
 if __name__ == "__main__":
     import uvicorn

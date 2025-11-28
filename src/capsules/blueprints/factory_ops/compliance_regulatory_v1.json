@@ -1,0 +1,40 @@
+{
+  "capsule_id": "compliance_regulatory_v1",
+  "version": "1.0.0",
+  "area_code": 24,
+  "name": "Regulatory Proof Capsule",
+  "description": "Automates compliance audits and export control verification.",
+  "connectors": [
+    {
+      "type": "erp",
+      "name": "transactions"
+    },
+    {
+      "type": "api",
+      "name": "reg_db"
+    }
+  ],
+  "models": [
+    {
+      "id": "compliance_checker",
+      "type": "inference"
+    },
+    {
+      "id": "risk_scorer",
+      "type": "inference"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Compliance",
+      "claim": "audit_pass"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "compliance_checker",
+      "title": "Regulatory Proof Capsule Dashboard"
+    }
+  ]
+}

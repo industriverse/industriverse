@@ -1,0 +1,29 @@
+# Dome by Industriverse - Production Requirements
+numpy>=1.21.0
+scipy>=1.7.0
+matplotlib>=3.4.0
+librosa>=0.8.0
+soundfile>=0.10.0
+pywavelets>=1.1.0
+esptool>=3.0.0
+pyserial>=3.5.0
+cryptography>=3.4.0
+websockets>=9.0.0
+jinja2>=3.0.0
+pyyaml>=5.4.0
+grpcio-tools>=1.40.0
+scikit-learn>=1.0.0
+requests>=2.25.0
+
+# CUDA and GPU acceleration (for Jetson deployment)
+cupy-cuda11x>=9.0.0  # For CUDA 11.x
+tensorrt>=8.0.0      # For TensorRT optimization
+
+# Industrial protocols
+pymodbus>=2.5.0      # Modbus RTU/TCP
+opcua>=0.98.0        # OPC-UA client/server
+paho-mqtt>=1.5.0     # MQTT broker connectivity
+
+# Cloud deployment
+kubernetes>=18.0.0   # Kubernetes Python client
+docker>=5.0.0        # Docker container management

@@ -1,0 +1,40 @@
+{
+  "capsule_id": "finance_procurement_v1",
+  "version": "1.0.0",
+  "area_code": 26,
+  "name": "Procurement Capsule",
+  "description": "Scores supplier risk and verifies financial compliance.",
+  "connectors": [
+    {
+      "type": "erp",
+      "name": "po_data"
+    },
+    {
+      "type": "api",
+      "name": "market_feed"
+    }
+  ],
+  "models": [
+    {
+      "id": "supplier_risk_model",
+      "type": "inference"
+    },
+    {
+      "id": "spend_analyzer",
+      "type": "inference"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Risk",
+      "claim": "supplier_health"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "supplier_risk_model",
+      "title": "Procurement Capsule Dashboard"
+    }
+  ]
+}

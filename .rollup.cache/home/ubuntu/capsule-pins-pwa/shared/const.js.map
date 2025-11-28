@@ -1,0 +1,1 @@
+{"version":3,"file":"const.js","sourceRoot":"","sources":["const.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,IAAM,WAAW,GAAG,gBAAgB,CAAC;AAC5C,MAAM,CAAC,IAAM,WAAW,GAAG,IAAI,GAAG,EAAE,GAAG,EAAE,GAAG,EAAE,GAAG,GAAG,CAAC","sourcesContent":["export const COOKIE_NAME = \"app_session_id\";\nexport const ONE_YEAR_MS = 1000 * 60 * 60 * 24 * 365;\n"]}

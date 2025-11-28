@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "capsule_id": "{{ capsule_id }}",
+  "title": "{{ title }}",
+  "description": "{{ description }}",
+  "utid_pattern": "{{ utid_pattern }}",
+  "energy_prior": "{{ energy_prior }}",
+  "tnn": "{{ tnn_class }}",
+  "widgets": [
+    {
+      "id": "reactor_gauge",
+      "type": "ReactorGauge",
+      "bind": {"energy": "telemetry.energy", "entropy": "telemetry.entropy"},
+      "layout": {"x":0,"y":0,"w":6,"h":4}
+    },
+    {% for control in controls %}
+    {
+      "id": "{{ control.id }}",
+      "type": "{{ control.type }}",
+      "label": "{{ control.label }}",
+      "bind": "{{ control.bind }}",
+      "props": {{ control.props }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %},
+    {
+      "id":"visualizer",
+      "type":"{{ visualizer.type }}",
+      "config": {{ visualizer.config }},
+      "layout": {"x":6,"y":0,"w":6,"h":8}
+    },
+    {
+      "id":"proof_widget",
+      "type":"ProofWidget",
+      "bind":{"proof_id":"last_proof.id","proof_score":"last_proof.score"}
+    }
+  ],
+  "gesture_map": {{ gesture_map }}
+}

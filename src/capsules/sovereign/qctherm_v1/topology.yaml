@@ -1,0 +1,16 @@
+boundary_conditions:
+  type: dirichlet
+  value: 0
+constraints:
+  stability: energy < 0
+domain: Quality Control Thermal
+equations:
+- Planck's Law, Stefan-Boltzmann
+manifold_type: generic_manifold
+state_variables:
+- x
+- y
+- z
+- energy
+- visual_defect_rate
+- thermal_signature

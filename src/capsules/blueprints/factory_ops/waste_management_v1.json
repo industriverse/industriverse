@@ -1,0 +1,40 @@
+{
+  "capsule_id": "waste_management_v1",
+  "version": "1.0.0",
+  "area_code": 23,
+  "name": "Circular Economy Capsule",
+  "description": "Tracks waste streams and identifies recycling opportunities.",
+  "connectors": [
+    {
+      "type": "scale",
+      "name": "waste_weight"
+    },
+    {
+      "type": "sensor",
+      "name": "bin_level"
+    }
+  ],
+  "models": [
+    {
+      "id": "waste_classifier",
+      "type": "inference"
+    },
+    {
+      "id": "recycling_opt",
+      "type": "optimization"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Sustainability",
+      "claim": "diversion_rate"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "waste_classifier",
+      "title": "Circular Economy Capsule Dashboard"
+    }
+  ]
+}

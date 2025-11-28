@@ -37,3 +37,20 @@ class ReflectionLog(BaseModel):
     user_satisfaction: float  # 0.0 to 1.0
     reflection_notes: str
     timestamp: datetime
+
+class ACERequest(BaseModel):
+    request_id: str
+    context: Dict[str, Any]
+    intent: str
+    utid: Optional[str] = None
+
+class ReflectionResult(BaseModel):
+    intent: str
+    context_analysis: str
+    suggested_strategies: List[str]
+
+class ACEResponse(BaseModel):
+    request_id: str
+    reflection: ReflectionResult
+    selected_playbook: Optional[ContextPlaybook]
+    timestamp: datetime

@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-shield-emergent-protocol
+  namespace: industriverse
+  labels:
+    app: ai-shield-emergent
+    component: emergent-security-protocol
+    emergent-intelligence: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-shield-emergent
+  template:
+    metadata:
+      labels:
+        app: ai-shield-emergent
+        component: emergent-security-protocol
+        emergent-intelligence: "true"
+    spec:
+      containers:
+      - name: ai-shield-emergent
+        image: empeiriahaus/ai-shield-emergent:v1.0.0
+        ports:
+        - containerPort: 5005
+        env:
+        - name: PROTOCOL_TYPE
+          value: "AI-SHIELD-EMERGENT"
+        - name: EMERGENT_ECOSYSTEM
+          value: "industriverse"
+        - name: SYNCHRONIZATION_MODE
+          value: "emergent-intelligence"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/ai-shield/health
+            port: 5005
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/ai-shield/health
+            port: 5005
+          initialDelaySeconds: 10
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-shield-emergent-service
+  namespace: industriverse
+  labels:
+    app: ai-shield-emergent
+    emergent-intelligence: "true"
+spec:
+  selector:
+    app: ai-shield-emergent
+  ports:
+  - port: 5005
+    targetPort: 5005
+    name: emergent-security
+  type: ClusterIP

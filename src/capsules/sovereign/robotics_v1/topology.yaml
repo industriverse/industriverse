@@ -1,0 +1,17 @@
+boundary_conditions:
+  type: dirichlet
+  value: 0
+constraints:
+  stability: energy < 0
+domain: Warehouse Robotics
+equations:
+- Vicsek Model, Social Force Model
+manifold_type: generic_manifold
+state_variables:
+- x
+- y
+- z
+- energy
+- kinematics_5axis
+- thread_tension
+- needle_friction

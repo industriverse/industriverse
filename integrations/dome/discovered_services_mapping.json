@@ -1,0 +1,58 @@
+{
+  "mcp_services": {
+    "aws": {
+      "service": "mcp-bridge-minimal-service",
+      "cluster_ip": "10.100.43.4",
+      "namespace": "obmi-quantum-enhancement",
+      "endpoint": "http://mcp-bridge-minimal-service.obmi-quantum-enhancement.svc.cluster.local:8001"
+    },
+    "azure": {
+      "service": "azure-mcp-bridge", 
+      "load_balancer": "172.212.112.44",
+      "namespace": "mcp-protocol",
+      "endpoint": "http://172.212.112.44:8080"
+    },
+    "gcp": {
+      "service": "mcp-protocol-service",
+      "cluster_ip": "34.118.229.98", 
+      "namespace": "industriverse",
+      "endpoint": "http://mcp-protocol-service.industriverse.svc.cluster.local:8080"
+    }
+  },
+  "a2a_services": {
+    "azure_a2a": {
+      "service": "a2a-deploy-anywhere-service",
+      "cluster_ip": "10.0.152.86",
+      "namespace": "azure-deploy-anywhere"
+    },
+    "azure_federation": {
+      "service": "a2a-multicloud-federation-service",
+      "cluster_ip": "10.0.13.177",
+      "namespace": "a2a-multicloud-federation"
+    },
+    "a2a2_bridge": {
+      "service": "a2a2-federation-bridge-service", 
+      "cluster_ip": "10.0.183.83",
+      "namespace": "dac-foundry"
+    }
+  },
+  "edge_services": {
+    "gcp_registry": {
+      "service": "edge-device-registry",
+      "cluster_ip": "34.118.235.161",
+      "namespace": "deploy-anywhere"
+    }
+  },
+  "ambient_services": {
+    "aws_orchestrator": {
+      "service": "ambient-intelligence-orchestrator",
+      "cluster_ip": "10.100.156.181", 
+      "namespace": "ai-services"
+    },
+    "azure_interface": {
+      "service": "ambient-intelligence-interface-service",
+      "load_balancer": "135.237.79.111",
+      "namespace": "industriverse-unified"
+    }
+  }
+}

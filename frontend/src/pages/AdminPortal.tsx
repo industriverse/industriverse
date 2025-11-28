@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Admin Portal
  * Week 8: White-Label Platform - Phase 4

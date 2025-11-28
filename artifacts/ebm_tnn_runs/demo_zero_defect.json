@@ -1,0 +1,14 @@
+{
+  "chain_id": "zero-defect-1764225705",
+  "wafer": {
+    "anomaly_mag": 0.156047956878329,
+    "zone": 3
+  },
+  "pcb": {
+    "solder_temp": 250.0
+  },
+  "electronics": {
+    "predicted_yield": 0.99
+  },
+  "timestamp": 1764225705.8472672
+}

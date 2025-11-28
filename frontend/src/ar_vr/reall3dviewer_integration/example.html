@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shadow Twin Viewer - Example</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #ffffff;
+      overflow: hidden;
+    }
+    
+    #viewer-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    
+    #metrics-panel {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      min-width: 250px;
+      backdrop-filter: blur(10px);
+    }
+    
+    #metrics-panel h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #00d4ff;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+    }
+    
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    
+    .metric-label {
+      color: #888;
+    }
+    
+    .metric-value {
+      font-weight: bold;
+      color: #fff;
+    }
+    
+    .metric-value.critical {
+      color: #ff3333;
+    }
+    
+    .metric-value.warning {
+      color: #ffaa33;
+    }
+    
+    .metric-value.active {
+      color: #33ff33;
+    }
+    
+    #capsule-detail {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      display: none;
+    }
+    
+    #capsule-detail.visible {
+      display: block;
+    }
+    
+    #capsule-detail h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #00d4ff;
+    }
+    
+    #capsule-detail p {
+      margin-bottom: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    .status-badge.critical {
+      background: #ff3333;
+      color: #fff;
+    }
+    
+    .status-badge.warning {
+      background: #ffaa33;
+      color: #000;
+    }
+    
+    .status-badge.active {
+      background: #33ff33;
+      color: #000;
+    }
+    
+    .status-badge.resolved {
+      background: #888;
+      color: #fff;
+    }
+    
+    #loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top: 4px solid #00d4ff;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="viewer-container">
+    <!-- Loading indicator -->
+    <div id="loading">
+      <div class="spinner"></div>
+      <p>Loading Shadow Twin...</p>
+    </div>
+    
+    <!-- Metrics panel -->
+    <div id="metrics-panel">
+      <h2>Capsule Metrics</h2>
+      <div class="metric-row">
+        <span class="metric-label">Total:</span>
+        <span class="metric-value" id="metric-total">0</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Critical:</span>
+        <span class="metric-value critical" id="metric-critical">0</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Warning:</span>
+        <span class="metric-value warning" id="metric-warning">0</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Active:</span>
+        <span class="metric-value active" id="metric-active">0</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Resolved:</span>
+        <span class="metric-value" id="metric-resolved">0</span>
+      </div>
+    </div>
+    
+    <!-- Capsule detail panel -->
+    <div id="capsule-detail">
+      <h3 id="capsule-title"></h3>
+      <p>
+        <span class="status-badge" id="capsule-status"></span>
+        <span style="margin-left: 10px; color: #888;">Priority: <span id="capsule-priority"></span></span>
+      </p>
+      <p id="capsule-description"></p>
+      <p style="color: #888; font-size: 12px; margin-top: 10px;">
+        Source: <span id="capsule-source"></span> | 
+        <span id="capsule-timestamp"></span>
+      </p>
+    </div>
+  </div>
+  
+  <!-- Import ShadowTwinViewer (bundled) -->
+  <script type="module">
+    import ShadowTwinViewer from './dist/ShadowTwinViewer.js';
+    import * as THREE from 'three';
+    
+    // Configuration
+    const config = {
+      container: document.getElementById('viewer-container'),
+      shadowTwinId: 'motor_001',
+      capsuleGatewayUrl: 'wss://capsule-gateway.industriverse.io/ws',
+      modelBaseUrl: 'https://s3.industriverse.io/shadow-twins',
+      qualityLevel: 7,
+      enableAR: false,
+      enableVR: false,
+      authToken: '' // Add auth token if required
+    };
+    
+    // Initialize viewer
+    const viewer = new ShadowTwinViewer(config);
+    
+    // Initialize and load model
+    viewer.initialize()
+      .then(() => {
+        console.log('Viewer initialized');
+        
+        // Hide loading indicator
+        document.getElementById('loading').style.display = 'none';
+        
+        // Update metrics every second
+        setInterval(updateMetrics, 1000);
+        
+        // Add demo capsules (for testing without WebSocket)
+        addDemoCapsules();
+      })
+      .catch((error) => {
+        console.error('Failed to initialize viewer:', error);
+        document.getElementById('loading').innerHTML = `
+          <div class="spinner"></div>
+          <p style="color: #ff3333;">Failed to load Shadow Twin</p>
+          <p style="font-size: 12px; color: #888;">${error.message}</p>
+        `;
+      });
+    
+    // Listen for capsule selection
+    config.container.addEventListener('capsule-selected', (event) => {
+      const capsule = event.detail;
+      showCapsuleDetail(capsule);
+    });
+    
+    // Update metrics panel
+    function updateMetrics() {
+      const metrics = viewer.getCapsuleMetrics();
+      
+      document.getElementById('metric-total').textContent = metrics.total;
+      document.getElementById('metric-critical').textContent = metrics.critical;
+      document.getElementById('metric-warning').textContent = metrics.warning;
+      document.getElementById('metric-active').textContent = metrics.active;
+      document.getElementById('metric-resolved').textContent = metrics.resolved;
+    }
+    
+    // Show capsule detail panel
+    function showCapsuleDetail(capsule) {
+      document.getElementById('capsule-title').textContent = capsule.title;
+      document.getElementById('capsule-description').textContent = capsule.description;
+      document.getElementById('capsule-source').textContent = capsule.source;
+      document.getElementById('capsule-priority').textContent = `P${capsule.priority}`;
+      
+      const statusBadge = document.getElementById('capsule-status');
+      statusBadge.textContent = capsule.status;
+      statusBadge.className = `status-badge ${capsule.status}`;
+      
+      const timestamp = new Date(capsule.timestamp);
+      document.getElementById('capsule-timestamp').textContent = timestamp.toLocaleString();
+      
+      document.getElementById('capsule-detail').classList.add('visible');
+      
+      // Hide after 5 seconds
+      setTimeout(() => {
+        document.getElementById('capsule-detail').classList.remove('visible');
+      }, 5000);
+    }
+    
+    // Add demo capsules (for testing)
+    function addDemoCapsules() {
+      const demoCapsules = [
+        {
+          id: 'cap-001',
+          title: 'Motor Overheating',
+          description: 'Temperature spike detected in motor bearing A. Immediate attention required.',
+          status: 'critical',
+          priority: 5,
+          timestamp: new Date().toISOString(),
+          source: 'thermal_sensor',
+          metadata: { temperature: '95°C', threshold: '80°C' },
+          actions: ['acknowledge', 'escalate'],
+          position: new THREE.Vector3(1, 0.5, 0)
+        },
+        {
+          id: 'cap-002',
+          title: 'Vibration Anomaly',
+          description: 'Unusual vibration pattern detected. Maintenance recommended.',
+          status: 'warning',
+          priority: 3,
+          timestamp: new Date().toISOString(),
+          source: 'vibration_sensor',
+          metadata: { vibration: '12 Hz', threshold: '10 Hz' },
+          actions: ['inspect', 'schedule_maintenance'],
+          position: new THREE.Vector3(-1, 0.5, 0)
+        },
+        {
+          id: 'cap-003',
+          title: 'System Health Check',
+          description: 'All systems operating within normal parameters.',
+          status: 'active',
+          priority: 1,
+          timestamp: new Date().toISOString(),
+          source: 'system_monitor',
+          metadata: { status: 'healthy' },
+          actions: ['dismiss'],
+          position: new THREE.Vector3(0, 1, 0)
+        }
+      ];
+      
+      demoCapsules.forEach(capsule => {
+        viewer.addCapsuleOverlay(capsule, capsule.position);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "capsule_id": "chem_v1",
+  "title": "Chem Control (v1)",
+  "description": "Physics-driven control for chem",
+  "utid_pattern": "urn:utid:chem:{node}:{nonce}",
+  "energy_prior": "chem_v1",
+  "tnn": "tnn.chem_tnn.ChemTNN",
+  "widgets": [
+    {
+      "id": "reactor_gauge",
+      "type": "ReactorGauge",
+      "bind": {"energy": "telemetry.energy", "entropy": "telemetry.entropy"},
+      "layout": {"x":0,"y":0,"w":6,"h":4}
+    },
+    
+    {
+      "id": "param_1",
+      "type": "Slider",
+      "label": "Parameter 1",
+      "bind": "controls.p1",
+      "props": {'min': 0, 'max': 100, 'step': 1}
+    },
+    
+    {
+      "id": "run",
+      "type": "Button",
+      "label": "Run Simulation",
+      "bind": "actions.run",
+      "props": {}
+    }
+    ,
+    {
+      "id":"visualizer",
+      "type":"ReactorGauge",
+      "config": {},
+      "layout": {"x":6,"y":0,"w":6,"h":8}
+    },
+    {
+      "id":"proof_widget",
+      "type":"ProofWidget",
+      "bind":{"proof_id":"last_proof.id","proof_score":"last_proof.score"}
+    }
+  ],
+  "gesture_map": {'run': 'THUMBS_UP'}
+}

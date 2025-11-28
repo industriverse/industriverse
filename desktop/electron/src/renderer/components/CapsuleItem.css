@@ -1,0 +1,234 @@
+/**
+ * CapsuleItem Component Styles
+ */
+
+.capsule-item {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--capsule-color);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.capsule-item:hover {
+  background: var(--color-surface-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.capsule-item.expanded {
+  background: var(--color-surface-hover);
+}
+
+.capsule-item.priority-critical {
+  border-left-width: 4px;
+  animation: pulse 2s infinite;
+}
+
+.capsule-item.priority-high {
+  border-left-width: 4px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Header */
+.capsule-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+
+.capsule-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  flex: 1;
+  min-width: 0;
+}
+
+.capsule-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.capsule-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin: 0 0 4px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.capsule-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.capsule-type {
+  text-transform: capitalize;
+}
+
+.capsule-separator {
+  opacity: 0.5;
+}
+
+.capsule-time {
+  opacity: 0.7;
+}
+
+.capsule-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.capsule-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--capsule-color);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 9px;
+}
+
+.capsule-menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.capsule-menu-button:hover {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+/* Description */
+.capsule-description {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm);
+  background: var(--color-background);
+  border-radius: var(--radius-sm);
+}
+
+/* Metadata */
+.capsule-metadata {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm);
+  background: var(--color-background);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
+
+.capsule-metadata-item {
+  display: flex;
+  gap: 6px;
+}
+
+.capsule-metadata-key {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.capsule-metadata-value {
+  color: var(--color-text-primary);
+}
+
+/* Actions */
+.capsule-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.capsule-action-button {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.capsule-action-button.primary {
+  background: var(--capsule-color);
+  color: white;
+}
+
+.capsule-action-button.primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.capsule-action-button.primary:active {
+  transform: translateY(0);
+}
+
+.capsule-action-button.secondary {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.capsule-action-button.secondary:hover {
+  background: var(--color-border);
+}
+
+/* Secondary actions */
+.capsule-secondary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.capsule-secondary-actions .capsule-action-button {
+  flex: 0 1 auto;
+}
+
+/* Priority indicator */
+.capsule-priority-indicator {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  background: var(--capsule-color);
+  border-radius: 0 var(--radius-md) 0 4px;
+}

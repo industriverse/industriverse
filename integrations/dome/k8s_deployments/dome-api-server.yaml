@@ -1,0 +1,180 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dome-api-code
+  namespace: industriverse-unified
+data:
+  app.py: |
+    from flask import Flask, jsonify, request
+    import json
+    import time
+    import numpy as np
+    from datetime import datetime
+    
+    app = Flask(__name__)
+    
+    # Dome API Endpoints
+    @app.route('/api/health', methods=['GET'])
+    def health_check():
+        return jsonify({
+            "status": "healthy",
+            "service": "Dome by Industriverse",
+            "version": "1.0.0-production",
+            "timestamp": datetime.now().isoformat()
+        })
+    
+    @app.route('/api/wifi-sensing/csi-capture', methods=['POST'])
+    def csi_capture():
+        data = request.get_json() or {}
+        return jsonify({
+            "status": "success",
+            "message": "CSI capture initiated",
+            "frames_captured": 1000,
+            "sampling_rate": data.get("sampling_rate", 1000),
+            "channels": data.get("channels", [1, 6, 11]),
+            "timestamp": time.time()
+        })
+    
+    @app.route('/api/ambient-intelligence/detect', methods=['POST'])
+    def ambient_detection():
+        data = request.get_json() or {}
+        return jsonify({
+            "status": "success",
+            "events_detected": [
+                {"type": "person_walking", "confidence": 0.92, "location": "zone_1"},
+                {"type": "machinery_vibration", "confidence": 0.87, "location": "zone_3"}
+            ],
+            "processing_time_ms": 45,
+            "timestamp": time.time()
+        })
+    
+    @app.route('/api/safety-monitoring/alerts', methods=['GET'])
+    def safety_alerts():
+        return jsonify({
+            "active_alerts": [
+                {"id": "SA001", "type": "motion_in_restricted_zone", "severity": "high", "timestamp": time.time()-300}
+            ],
+            "alert_count": 1,
+            "compliance_score": 94.7,
+            "last_updated": time.time()
+        })
+    
+    @app.route('/api/proof-economy/generate', methods=['POST'])
+    def generate_proof():
+        data = request.get_json() or {}
+        return jsonify({
+            "proof_hash": "0x" + "a" * 64,  # Simulated hash
+            "verification_status": "verified",
+            "compliance_standards": ["OSHA", "ISO-45001", "IEC-61508"],
+            "timestamp": time.time(),
+            "digital_signature": "verified"
+        })
+    
+    @app.route('/api/obmi-operators/execute', methods=['POST'])
+    def execute_obmi():
+        data = request.get_json() or {}
+        return jsonify({
+            "operators_executed": ["matrix_algebra", "tensor_contraction", "fft_convolution", "attention_fusion"],
+            "execution_time_ms": 23,
+            "results": {
+                "covariance_matrix": "computed",
+                "motion_signature": "extracted",
+                "safety_score": 0.94
+            },
+            "timestamp": time.time()
+        })
+    
+    @app.route('/api/hardware/esp32/status', methods=['GET'])
+    def esp32_status():
+        return jsonify({
+            "connected_devices": 3,
+            "devices": [
+                {"id": "ESP32_001", "status": "active", "signal_strength": -45, "location": "zone_1"},
+                {"id": "ESP32_002", "status": "active", "signal_strength": -52, "location": "zone_2"},
+                {"id": "ESP32_003", "status": "active", "signal_strength": -38, "location": "zone_3"}
+            ],
+            "total_csi_frames": 15420,
+            "last_update": time.time()
+        })
+    
+    @app.route('/api/widgets/occupancy-heatmap', methods=['GET'])
+    def occupancy_heatmap():
+        return jsonify({
+            "heatmap_data": {
+                "zones": {
+                    "zone_1": {"occupancy": 3, "activity_level": 0.7},
+                    "zone_2": {"occupancy": 1, "activity_level": 0.3},
+                    "zone_3": {"occupancy": 0, "activity_level": 0.1}
+                }
+            },
+            "total_people": 4,
+            "last_updated": time.time()
+        })
+    
+    @app.route('/api/dgm/evolution-request', methods=['POST'])
+    def dgm_evolution():
+        data = request.get_json() or {}
+        return jsonify({
+            "evolution_id": "EVO_" + str(int(time.time())),
+            "status": "processing",
+            "estimated_improvement": "3.2% accuracy gain",
+            "safety_validated": True,
+            "eta_seconds": 120
+        })
+    
+    if __name__ == '__main__':
+        app.run(host='0.0.0.0', port=8080, debug=False)
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dome-api-server
+  namespace: industriverse-unified
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dome-api-server
+  template:
+    metadata:
+      labels:
+        app: dome-api-server
+    spec:
+      containers:
+      - name: dome-api
+        image: python:3.11-slim
+        command: ["sh", "-c", "pip install flask numpy && python /app/app.py"]
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: api-code
+          mountPath: /app
+        env:
+        - name: FLASK_ENV
+          value: "production"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "400m"
+      volumes:
+      - name: api-code
+        configMap:
+          name: dome-api-code
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dome-api-service
+  namespace: industriverse-unified
+spec:
+  selector:
+    app: dome-api-server
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer

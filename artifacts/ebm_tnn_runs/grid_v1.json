@@ -1,0 +1,302 @@
+{
+  "capsule": "grid_v1",
+  "manifest": {
+    "description": "Sovereign capsule for grid.",
+    "energy_prior": "grid_v1",
+    "id": "grid_v1",
+    "prin": {
+      "approval_threshold": 0.75,
+      "score_weights": {
+        "coherence": 0.2,
+        "novelty": 0.2,
+        "physics": 0.6
+      }
+    },
+    "safety": {
+      "energy_budget_j": 1000000.0,
+      "entropy_threshold": 10.0,
+      "runtime_budget_ms": 10000
+    },
+    "title": "Grid Capsule v1",
+    "tnn_class": "tnn.grid_tnn.GridTNN",
+    "utid_pattern": "urn:utid:grid:{node}:{nonce}",
+    "visual": {
+      "dac_schema": "frontend/dac_schemas/grid_v1.json"
+    }
+  },
+  "proof": {
+    "capsule": "grid_v1",
+    "prior": "grid_v1",
+    "final_energy": 2.459012107218588,
+    "timestamp": 1764225290.17778,
+    "run_id": "grid_v1-1764225290"
+  },
+  "ebm": {
+    "final_energy": 2.459012107218588,
+    "trace_len": 50
+  },
+  "tnn": {
+    "trajectory": [
+      {
+        "step": 0,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 1,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 2,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 3,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 4,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 5,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 6,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 7,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 8,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 9,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 10,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 11,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 12,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 13,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 14,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 15,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 16,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 17,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 18,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 19,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  }
+}

@@ -36,6 +36,8 @@ from enum import Enum
 import hashlib
 import json
 import uuid
+import asyncio
+from src.bridge_api.event_bus import GlobalEventBus
 
 # ============================================================================
 # REMIX LAB MODELS
@@ -179,6 +181,7 @@ class RemixLabService:
             }
         )
         self.events.append(event)
+        await GlobalEventBus.publish(event.dict())
         
         return snapshot
     
@@ -389,17 +392,19 @@ class RemixLabService:
         
         # 7. Emit events
         # Event 1: UTID minted
-        self.events.append(RemixEvent(
+        event_utid = RemixEvent(
             event_type=RemixEventType.UTID_MINTED,
             payload={
                 "utid": utid,
                 "remix_hash": remix_hash,
                 "proof_id": proof_id
             }
-        ))
+        )
+        self.events.append(event_utid)
+        await GlobalEventBus.publish(event_utid.dict())
         
         # Event 2: Remix committed (for DAC Orchestrator)
-        self.events.append(RemixEvent(
+        event_commit = RemixEvent(
             event_type=RemixEventType.REMIX_COMMITTED,
             payload={
                 "type": "remix_commit",
@@ -408,7 +413,9 @@ class RemixLabService:
                 "proof_ref": proof_id,
                 "dac_manifest": dac_manifest
             }
-        ))
+        )
+        self.events.append(event_commit)
+        await GlobalEventBus.publish(event_commit.dict())
         
         # Update snapshot status
         snapshot.status = "committed"
@@ -504,6 +511,12 @@ class RemixLabService:
 # FACTORY FUNCTION
 # ============================================================================
 
+# Global singleton instance
+_remix_lab_service: Optional[RemixLabService] = None
+
 def create_remix_lab_service() -> RemixLabService:
-    """Create Remix Lab Service"""
-    return RemixLabService()
+    """Create or get global Remix Lab Service instance"""
+    global _remix_lab_service
+    if _remix_lab_service is None:
+        _remix_lab_service = RemixLabService()
+    return _remix_lab_service

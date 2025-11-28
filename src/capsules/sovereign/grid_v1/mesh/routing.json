@@ -1,0 +1,16 @@
+{
+    "upstream_capsules": [
+        "weather_v1"
+    ],
+    "downstream_capsules": [
+        "fusion_v1",
+        "storage_v1"
+    ],
+    "entropy_spillover_targets": [
+        "storage_v1"
+    ],
+    "coupling_factors": {
+        "fusion_v1": 0.9,
+        "storage_v1": 0.7
+    }
+}

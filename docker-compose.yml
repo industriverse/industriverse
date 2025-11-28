@@ -1,0 +1,238 @@
+# Docker Compose for Complete DAC Factory
+# Week 16: Production-Ready Deployment
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: dac-factory-postgres
+    environment:
+      POSTGRES_DB: capsule_pins
+      POSTGRES_USER: capsule_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme_in_production}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U capsule_admin -d capsule_pins"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dac-factory-network
+    restart: unless-stopped
+
+  # MQTT Broker (Eclipse Mosquitto)
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0
+    container_name: dac-factory-mqtt
+    volumes:
+      - ./mqtt/config:/mosquitto/config
+      - ./mqtt/data:/mosquitto/data
+      - ./mqtt/log:/mosquitto/log
+      - ./mqtt/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    ports:
+      - "1883:1883"  # MQTT
+      - "9001:9001"  # WebSocket
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -t '$$SYS/#' -C 1 | grep -v Error || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dac-factory-network
+    restart: unless-stopped
+
+  # Redis (for caching and session management)
+  redis:
+    image: redis:7-alpine
+    container_name: dac-factory-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-changeme_in_production}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dac-factory-network
+    restart: unless-stopped
+
+  # Capsule Pins PWA (Main Application)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: dac-factory-app
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://capsule_admin:${DB_PASSWORD:-changeme_in_production}@postgres:5432/capsule_pins
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme_in_production}@redis:6379
+      MQTT_BROKER_URL: mqtt://mqtt-broker:1883
+      JWT_SECRET: ${JWT_SECRET}
+      VITE_APP_TITLE: ${VITE_APP_TITLE:-Capsule Pins}
+      VITE_APP_LOGO: ${VITE_APP_LOGO}
+      # Shadow Twin Consensus
+      SHADOW_TWIN_INTEGRATION_URL: ${SHADOW_TWIN_INTEGRATION_URL}
+      SHADOW_TWIN_CONTROLLER_URL: ${SHADOW_TWIN_CONTROLLER_URL}
+      # Feature flags
+      ENABLE_CONSENSUS_VALIDATION: ${ENABLE_CONSENSUS_VALIDATION:-true}
+      ENABLE_AR_VR_MODE: ${ENABLE_AR_VR_MODE:-true}
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mqtt-broker:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - dac-factory-network
+    restart: unless-stopped
+
+  # Sensor Ingestion Service (Standalone service for MQTT/OPC-UA)
+  sensor-ingestion:
+    build:
+      context: .
+      dockerfile: Dockerfile.sensor-ingestion
+    container_name: dac-factory-sensor-ingestion
+    environment:
+      NODE_ENV: production
+      MQTT_BROKER_URL: mqtt://mqtt-broker:1883
+      CAPSULE_GATEWAY_URL: ws://app:3000/ws
+      # OPC-UA configuration
+      OPCUA_ENDPOINT: ${OPCUA_ENDPOINT}
+      OPCUA_USERNAME: ${OPCUA_USERNAME}
+      OPCUA_PASSWORD: ${OPCUA_PASSWORD}
+    depends_on:
+      - mqtt-broker
+      - app
+    networks:
+      - dac-factory-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: dac-factory-nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - dac-factory-network
+    restart: unless-stopped
+
+  # Prometheus (Monitoring)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: dac-factory-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    networks:
+      - dac-factory-network
+    restart: unless-stopped
+
+  # Grafana (Visualization)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: dac-factory-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - dac-factory-network
+    restart: unless-stopped
+
+  # Loki (Log Aggregation)
+  loki:
+    image: grafana/loki:latest
+    container_name: dac-factory-loki
+    volumes:
+      - ./monitoring/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - dac-factory-network
+    restart: unless-stopped
+
+  # Promtail (Log Shipper)
+  promtail:
+    image: grafana/promtail:latest
+    container_name: dac-factory-promtail
+    volumes:
+      - ./monitoring/promtail-config.yml:/etc/promtail/config.yml:ro
+      - ./logs:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - dac-factory-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  loki_data:
+    driver: local
+
+networks:
+  dac-factory-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

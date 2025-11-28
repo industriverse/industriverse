@@ -1,0 +1,5 @@
+domain: EV Chassis Alignment
+intelligence_level: L2_Control
+narrative_role: The Frame Aligner
+physics_class: Mechanics
+regularity_score: 0.95

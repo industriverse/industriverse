@@ -1,0 +1,40 @@
+{
+  "capsule_id": "battery_production_v1",
+  "version": "1.0.0",
+  "area_code": 14,
+  "name": "Battery Intelligence Capsule",
+  "description": "Optimizes electrode coating and cell formation for extended battery life.",
+  "connectors": [
+    {
+      "type": "sensor",
+      "name": "coating_thickness"
+    },
+    {
+      "type": "cycler",
+      "name": "formation_data"
+    }
+  ],
+  "models": [
+    {
+      "id": "electrochemical_sim",
+      "type": "simulation"
+    },
+    {
+      "id": "lifetime_pred",
+      "type": "inference"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Performance",
+      "claim": "cycle_life"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "electrochemical_sim",
+      "title": "Battery Intelligence Capsule Dashboard"
+    }
+  ]
+}

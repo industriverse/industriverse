@@ -1,0 +1,40 @@
+{
+  "capsule_id": "polymers_composites_v1",
+  "version": "1.0.0",
+  "area_code": 9,
+  "name": "Composite Intelligence Capsule",
+  "description": "Optimizes curing cycles and mold flow for polymer and composite parts.",
+  "connectors": [
+    {
+      "type": "sensor",
+      "name": "dielectric_cure"
+    },
+    {
+      "type": "sensor",
+      "name": "pressure_transducer"
+    }
+  ],
+  "models": [
+    {
+      "id": "viscoelastic_sim",
+      "type": "simulation"
+    },
+    {
+      "id": "cure_cycle_opt",
+      "type": "optimization"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Quality",
+      "claim": "cure_completeness"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "viscoelastic_sim",
+      "title": "Composite Intelligence Capsule Dashboard"
+    }
+  ]
+}

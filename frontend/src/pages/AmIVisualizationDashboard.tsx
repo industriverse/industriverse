@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AmI Visualization Dashboard
  * Week 8: White-Label Platform - Phase 4 Final

@@ -28,7 +28,7 @@ from collections import defaultdict
 # logger = get_core_ai_logger(__name__)
 # For now, using a standard logger:
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format=\'%(asctime)s - %(name)s - %(levelname)s - %(message)s\')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # In-memory store for simulation if no data_layer_client is provided.
 SIMULATED_DB: List[Dict[str, Any]] = []
@@ -137,7 +137,7 @@ class TokenUsageTrackingService:
         # except Exception as e:
         #     logger.error(f"Authorization check failed: {e}", exc_info=True)
         #     return False
-        logger.info(f"(Placeholder) Authorizing user {user_context.get(\'user_id\')} for action \'{action}\'.")
+        logger.info(f"(Placeholder) Authorizing user {user_context.get('user_id')} for action '{action}'.")
         return True # Simulate authorization pass
 
     async def publish_usage_event_async(self, usage_data: Dict[str, Any], user_context: Optional[Dict[str, Any]] = None) -> bool:
@@ -196,7 +196,7 @@ class TokenUsageTrackingService:
                                 tenant_id_filter: Optional[str] = None,
                                 start_time: Optional[str] = None, 
                                 end_time: Optional[str] = None) -> Dict[str, Any]:
-        logger.info(f"User {user_context.get(\'user_id\')} attempting to get usage summary.")
+        logger.info(f"User {user_context.get('user_id')} attempting to get usage summary.")
         
         # Authorization: Check if user can access usage summaries.
         # Potentially, restrict filters based on user role (e.g., user can only see their own usage).
@@ -270,7 +270,7 @@ class TokenUsageTrackingService:
                                          end_time: Optional[str] = None,
                                          limit: int = 100, 
                                          offset: int = 0) -> List[Dict[str, Any]]:
-        logger.info(f"User {user_context.get(\'user_id\')} attempting to get detailed usage records.")
+        logger.info(f"User {user_context.get('user_id')} attempting to get detailed usage records.")
 
         if not await self._authorize_action(user_context, "get_detailed_token_usage", 
                                           resource={"filters": {"user_id": user_id_filter, "tenant_id": tenant_id_filter}}):
@@ -313,7 +313,7 @@ class TokenUsageTrackingService:
     async def audit_log_action(self, user_context: Dict[str, Any], action: str, details: Dict[str, Any]):
         """Placeholder for logging actions to an audit trail."""
         # This would typically integrate with a dedicated Audit Logging Service
-        log_message = f"AUDIT: User \'{user_context.get(\'user_id\', \'system\')}\' performed action \'{action}\'. Details: {json.dumps(details)}"
+        log_message = f"AUDIT: User '{user_context.get('user_id', 'system')}' performed action '{action}'. Details: {json.dumps(details)}"
         logger.info(log_message) # Replace with actual audit logging call
 
 # Example Usage

@@ -1,0 +1,16 @@
+{
+  "chain_id": "inf-energy-1764225705",
+  "fusion": {
+    "final_energy": 0.010482833446857978,
+    "stability": 0.9896259163442688
+  },
+  "grid": {
+    "target_freq": 60.097925183268856,
+    "final_energy": 3509.1082224901875
+  },
+  "microgrid": {
+    "load_factor": 1.2,
+    "final_energy": 0.5843409814748659
+  },
+  "timestamp": 1764225705.631683
+}

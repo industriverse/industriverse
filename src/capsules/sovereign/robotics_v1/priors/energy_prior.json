@@ -1,0 +1,16 @@
+{
+  "basins": [
+    {
+      "name": "stable_state",
+      "energy": -10.0,
+      "stability": 0.9
+    }
+  ],
+  "barriers": [
+    {
+      "name": "instability",
+      "energy": 100.0
+    }
+  ],
+  "source_map": "active_matter_energy_map.npz"
+}

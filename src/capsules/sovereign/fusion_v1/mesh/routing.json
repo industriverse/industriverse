@@ -1,0 +1,16 @@
+{
+    "upstream_capsules": [
+        "grid_v1",
+        "materials_v1"
+    ],
+    "downstream_capsules": [
+        "thermal_v1"
+    ],
+    "entropy_spillover_targets": [
+        "thermal_v1"
+    ],
+    "coupling_factors": {
+        "grid_v1": 0.8,
+        "materials_v1": 0.5
+    }
+}

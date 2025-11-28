@@ -1,0 +1,19 @@
+# Directive 01: Physics Topology
+# Power grid network topology
+domain: power_grid
+manifold_type: graph
+state_variables:
+  - voltage_magnitude (V)
+  - voltage_angle (theta)
+  - active_power (P)
+  - reactive_power (Q)
+  - frequency (f)
+boundary_conditions:
+  nominal_frequency: 60Hz
+  voltage_limits: [0.95pu, 1.05pu]
+constraints:
+  thermal_limits: "I_line < I_max"
+  stability_margin: "P_load < P_max"
+equations:
+  - "P = V * I * cos(phi)"
+  - "Q = V * I * sin(phi)"

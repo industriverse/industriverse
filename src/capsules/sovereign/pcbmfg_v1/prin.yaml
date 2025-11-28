@@ -1,0 +1,5 @@
+domain: PCB Manufacturing
+intelligence_level: L3_Control
+narrative_role: The Board Etcher
+physics_class: Manufacturing
+regularity_score: 0.85

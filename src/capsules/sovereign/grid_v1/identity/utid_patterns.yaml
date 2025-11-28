@@ -1,0 +1,6 @@
+# Directive 08: UTID Patterns
+required_credentials:
+  - "grid_operator_cert"
+  - "nerc_cip_compliance"
+reputation_min: 0.9
+lineage_signature: "grid_v1_sentinel_sig"

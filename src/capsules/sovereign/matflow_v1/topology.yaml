@@ -1,0 +1,16 @@
+boundary_conditions:
+  type: dirichlet
+  value: 0
+constraints:
+  stability: energy < 0
+domain: Material Flow
+equations:
+- Little's Law, Max-Flow Min-Cut
+manifold_type: generic_manifold
+state_variables:
+- x
+- y
+- z
+- energy
+- fabric_stretch
+- weave_orientation

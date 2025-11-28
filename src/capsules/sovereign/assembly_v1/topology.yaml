@@ -1,0 +1,14 @@
+boundary_conditions:
+  type: dirichlet
+  value: 0
+constraints:
+  stability: energy < 0
+domain: Assembly Line Balancing
+equations:
+- Salveson's Algorithm
+manifold_type: generic_manifold
+state_variables:
+- x
+- y
+- z
+- energy

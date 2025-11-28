@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package dome.csi;
+
+message CSIFrame {
+    uint64 timestamp = 1;
+    string source_id = 2;
+    repeated float amplitude = 3;
+    repeated float phase = 4;
+    uint32 num_subcarriers = 5;
+    uint32 num_antennas = 6;
+    float sampling_rate = 7;
+    string hardware_type = 8;
+    repeated float features = 9;
+}
+
+message SensingEvent {
+    uint64 timestamp = 1;
+    string event_type = 2;
+    float confidence = 3;
+    repeated float motion_signature = 4;
+    string proof_hash = 5;
+}

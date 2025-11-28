@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dome-production-gcp
+  namespace: industriverse-unified
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dome-production-gcp
+  template:
+    metadata:
+      labels:
+        app: dome-production-gcp
+    spec:
+      containers:
+      - name: dome-platform
+        image: python:3.11-slim
+        command: ["python", "-c", "import time; print('Dome by Industriverse - Production GCP'); import http.server; import socketserver; PORT = 8080; Handler = http.server.SimpleHTTPRequestHandler; httpd = socketserver.TCPServer(('', PORT ), Handler); print(f'Server running on port {PORT}'); httpd.serve_forever( )"]
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DOME_MODE
+          value: "production-gcp"
+        - name: CLOUD_PROVIDER
+          value: "gcp"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "400m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dome-production-gcp-service
+  namespace: industriverse-unified
+spec:
+  selector:
+    app: dome-production-gcp
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer

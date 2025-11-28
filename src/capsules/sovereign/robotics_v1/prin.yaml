@@ -1,0 +1,5 @@
+domain: Warehouse Robotics
+intelligence_level: L4_Swarm
+narrative_role: The Hive Mind
+physics_class: SwarmDynamics
+regularity_score: 0.8

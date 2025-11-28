@@ -1,0 +1,40 @@
+{
+  "capsule_id": "sensor_integration_v1",
+  "version": "1.0.0",
+  "area_code": 11,
+  "name": "Embedded Intelligence Capsule",
+  "description": "Manages sensor fusion and on-device inference for embedded systems.",
+  "connectors": [
+    {
+      "type": "firmware",
+      "name": "debug_log"
+    },
+    {
+      "type": "sensor",
+      "name": "raw_stream"
+    }
+  ],
+  "models": [
+    {
+      "id": "sensor_fusion_kalman",
+      "type": "inference"
+    },
+    {
+      "id": "firmware_opt",
+      "type": "optimization"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Performance",
+      "claim": "sensor_accuracy"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "sensor_fusion_kalman",
+      "title": "Embedded Intelligence Capsule Dashboard"
+    }
+  ]
+}

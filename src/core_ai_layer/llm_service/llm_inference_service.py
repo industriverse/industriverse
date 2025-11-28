@@ -20,16 +20,22 @@ class LLMInferenceService:
             params (dict, optional): Additional generation parameters (e.g., max_tokens, temperature).
         Returns:
             str: The generated response from the model.
-        Raises:
-            ModelNotFoundError: If the model_id is not found or cannot be loaded.
-            InferenceError: If an error occurs during the inference process.
         """
-        # 1. Get model instance from model_manager
-        # 2. Prepare input for the model (tokenize prompt)
-        # 3. Run inference
-        # 4. Decode output
-        # 5. Handle potential batching, streaming, etc.
-        raise NotImplementedError("Inference logic not yet implemented.")
+        # Mock Implementation for Demo Suite
+        import random
+        
+        # Simulate processing time
+        # await asyncio.sleep(0.1)
+        
+        if params is None:
+            params = {}
+            
+        if "hypothesis" in prompt.lower():
+            return f"HYPOTHESIS: Optimized configuration for {params.get('domain', 'system')} to minimize entropy."
+        elif "proof" in prompt.lower():
+            return "PROOF: Validated via thermodynamic constraints. QED."
+        else:
+            return f"Response to: {prompt[:20]}..."
 
     async def stream_response(self, model_id: str, prompt: str, params: dict = None):
         """
@@ -45,6 +51,55 @@ class LLMInferenceService:
             InferenceError: If an error occurs during the inference process.
         """
         raise NotImplementedError("Streaming inference logic not yet implemented.")
+
+class TransparentUserLM(LLMInferenceService):
+    """
+    Adapter for OLMo 3.
+    Provides full transparency and source tracing for generated outputs.
+    """
+    def __init__(self, model_manager=None):
+        super().__init__(model_manager)
+        self.model_id = "OLMo-3-32B"
+        
+    async def generate_response(self, model_id: str, prompt: str, params: dict = None):
+        # Call parent or custom logic
+        response = await super().generate_response(model_id, prompt, params)
+        # In a real implementation, we would attach trace data here
+        return response
+
+    def trace_source(self, response_segment: str) -> dict:
+        """
+        Trace the source of a specific response segment using OlmoTrace.
+        """
+        # Mock OlmoTrace API
+        return {
+            "segment": response_segment,
+            "source_documents": [
+                {"id": "doc_123", "title": "Thermodynamics of Computation", "relevance": 0.95},
+                {"id": "doc_456", "title": "OLMo 3 Technical Report", "relevance": 0.88}
+            ],
+            "training_stage": "Mid-Training (Math/Reasoning)"
+        }
+
+    async def think_and_code(self, problem: str) -> dict:
+        """
+        OLMo 3 Mode: Think (CoT) -> Code -> Verify.
+        """
+        # 1. Think (Chain of Thought)
+        thought_process = f"Thinking about {problem}... Breaking down requirements... Designing solution..."
+        
+        # 2. Code (Generate Solution)
+        code_solution = f"def solve():\n    # Solution for {problem}\n    return True"
+        
+        # 3. Verify (Mock Test Execution)
+        tests_passed = True
+        
+        return {
+            "thought_process": thought_process,
+            "code": code_solution,
+            "verified": tests_passed,
+            "model": "OLMo-3-Coder"
+        }
 
 if __name__ == "__main__":
     # Example usage (to be developed further with a mock model manager)

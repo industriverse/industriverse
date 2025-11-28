@@ -4,7 +4,7 @@ from datetime import datetime
 from .schema import ACERequest, ACEResponse, ReflectionResult
 from .reflection_engine import ReflectionEngine
 from .playbook_manager import PlaybookManager
-from .memory_logger import MemoryLogger
+from .memory_logger import ACEMemoryLogger
 from src.proof_core.integrity_layer import record_reasoning_edge
 
 # Thermodynamic Integration
@@ -18,9 +18,9 @@ class ACEService:
     """
     
     def __init__(self):
-        self.reflection_engine = ReflectionEngine()
         self.playbook_manager = PlaybookManager()
-        self.memory_logger = MemoryLogger()
+        self.reflection_engine = ReflectionEngine(self.playbook_manager)
+        self.memory_logger = ACEMemoryLogger()
         
         # Initialize Energy Atlas (Mocked for now)
         self.energy_atlas = EnergyAtlas(use_mock=True)
@@ -35,14 +35,18 @@ class ACEService:
         """
         start_time = datetime.now()
         
-        # 1. Reflection
-        reflection = await self.reflection_engine.reflect(request.context)
+        # 1. Playbook Selection (Directly from intent)
+        playbook = self.playbook_manager.get_playbook(request.intent)
         
-        # 2. Playbook Selection
-        playbook = self.playbook_manager.select_playbook(reflection.intent)
+        # 2. Pre-computation Reflection (Mocked for now)
+        reflection = ReflectionResult(
+            intent=request.intent,
+            context_analysis=f"Analyzed {len(request.context)} context items.",
+            suggested_strategies=playbook.strategies if playbook else []
+        )
         
         # 3. Memory Logging
-        self.memory_logger.log_interaction(request, reflection)
+        # self.memory_logger.log_interaction(request, reflection)
         
         # 4. Thermodynamic Telemetry + Proof/UTID lineage
         # Estimate energy cost based on complexity
@@ -50,12 +54,12 @@ class ACEService:
         complexity = len(request.context) / 1000.0 # normalized
         energy_cost = 0.001 + complexity * 0.005 # Joules (mocked)
         
-        self._report_thermodynamic_cost("ace_reflection", energy_cost)
+        self._report_thermodynamic_cost("ace_planning", energy_cost)
 
         utid = getattr(request, "utid", "UTID:REAL:unknown")
         await record_reasoning_edge(
             utid=utid,
-            domain="ace_reflection",
+            domain="ace_planning",
             node_id="ace_service",
             inputs={"context": request.context},
             outputs={"reflection": reflection.dict(), "playbook": getattr(playbook, "playbook_id", None)},

@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dome-industriverse-production
+  namespace: industriverse-unified
+  labels:
+    app: dome-production
+    version: v1.0.0-production
+    platform: dome-industriverse
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dome-production
+  template:
+    metadata:
+      labels:
+        app: dome-production
+        platform: dome-industriverse
+    spec:
+      containers:
+      - name: dome-platform
+        image: empeiriahaus/dome-industriverse-real:v1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: DOME_MODE
+          value: "production"
+        - name: PYTHONPATH
+          value: "/app/src"
+        - name: FLASK_ENV
+          value: "production"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "300m"
+          limits:
+            memory: "1Gi"
+            cpu: "600m"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 8080
+          initialDelaySeconds: 45
+          periodSeconds: 15
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dome-production-service
+  namespace: industriverse-unified
+  labels:
+    app: dome-production
+    platform: dome-industriverse
+spec:
+  selector:
+    app: dome-production
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: 8080
+    protocol: TCP
+  type: LoadBalancer
+  loadBalancerSourceRanges: []
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dome-production-config
+  namespace: industriverse-unified
+data:
+  production.yaml: |
+    dome:
+      mode: production
+      debug: false
+      widgets:
+        modular_ready: true
+        client_customizable: true
+      api:
+        rate_limiting: true
+        cors_enabled: true
+      infrastructure:
+        multi_cloud: true
+        auto_scaling: true

@@ -1,0 +1,4 @@
+NAMESPACE     NAME                 ENDPOINTS                                            AGE
+default       kubernetes           192.168.65.3:6443                                    58d
+kube-system   docker.io-hostpath   <none>                                               58d
+kube-system   kube-dns             10.1.0.28:53,10.1.0.30:53,10.1.0.28:53 + 3 more...   58d

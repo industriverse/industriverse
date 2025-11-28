@@ -1,0 +1,6 @@
+dac_id: heat_v1
+version: 1.0.0
+energy_prior: src.ebm_lib.priors.heat_v1
+tnn_solver: src.tnn.heat_tnn
+inputs: [state_vector]
+outputs: [optimized_state]

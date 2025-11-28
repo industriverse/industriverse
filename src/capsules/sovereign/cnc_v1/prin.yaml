@@ -1,0 +1,5 @@
+domain: CNC Torque Machining
+intelligence_level: L2_Control
+narrative_role: The Precision Carver
+physics_class: Mechanics
+regularity_score: 0.95

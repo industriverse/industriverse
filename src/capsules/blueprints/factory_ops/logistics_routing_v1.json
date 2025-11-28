@@ -1,0 +1,40 @@
+{
+  "capsule_id": "logistics_routing_v1",
+  "version": "1.0.0",
+  "area_code": 21,
+  "name": "Adaptive Logistics Capsule",
+  "description": "Optimizes supply chain routing and inventory flow.",
+  "connectors": [
+    {
+      "type": "api",
+      "name": "tms_feed"
+    },
+    {
+      "type": "gps",
+      "name": "telematics"
+    }
+  ],
+  "models": [
+    {
+      "id": "rnd1_router",
+      "type": "optimization"
+    },
+    {
+      "id": "shadow_twin_inventory",
+      "type": "simulation"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Sustainability",
+      "claim": "carbon_neutral"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "rnd1_router",
+      "title": "Adaptive Logistics Capsule Dashboard"
+    }
+  ]
+}

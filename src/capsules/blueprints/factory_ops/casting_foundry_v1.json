@@ -1,0 +1,40 @@
+{
+  "capsule_id": "casting_foundry_v1",
+  "version": "1.0.0",
+  "area_code": 4,
+  "name": "Digital Foundry Capsule",
+  "description": "Predicts defects and optimizes mold filling using CFD and MHD simulations.",
+  "connectors": [
+    {
+      "type": "sensor",
+      "name": "thermocouples"
+    },
+    {
+      "type": "camera",
+      "name": "thermal_cam"
+    }
+  ],
+  "models": [
+    {
+      "id": "cfd_mold_fill",
+      "type": "simulation"
+    },
+    {
+      "id": "defect_predictor",
+      "type": "inference"
+    }
+  ],
+  "proofs": [
+    {
+      "type": "Quality",
+      "claim": "porosity_free"
+    }
+  ],
+  "ui_widgets": [
+    {
+      "type": "dashboard_panel",
+      "data_source": "cfd_mold_fill",
+      "title": "Digital Foundry Capsule Dashboard"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "dome_platform": {
+    "name": "dome-industriverse",
+    "version": "1.0.0",
+    "deployment_mode": "infrastructure_connected"
+  },
+  "infrastructure_connections": {},
+  "service_mappings": {},
+  "endpoints": {}
+}

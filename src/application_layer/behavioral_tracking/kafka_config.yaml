@@ -1,0 +1,143 @@
+---
+# Kafka Topic Configuration for Capsule Interaction Events
+# Part of Week 9: Behavioral Tracking Infrastructure
+
+topics:
+  - name: capsule-interactions
+    description: Stream of all capsule interaction events for behavioral analysis
+    partitions: 6  # Allows parallel processing by 6 consumers
+    replication_factor: 3  # High availability across 3 brokers
+    retention_ms: 2592000000  # 30 days retention (30 * 24 * 60 * 60 * 1000)
+    compression_type: lz4  # LZ4 compression for better throughput
+    config:
+      # Performance tuning
+      min.insync.replicas: 2
+      unclean.leader.election.enable: false
+
+      # Retention policy
+      retention.bytes: 107374182400  # 100GB per partition
+      segment.ms: 86400000  # 1 day segments
+
+      # Cleanup policy
+      cleanup.policy: delete
+      delete.retention.ms: 86400000  # 1 day
+
+      # Message size
+      max.message.bytes: 1048576  # 1MB max message size
+
+  - name: capsule-interactions-aggregated
+    description: Aggregated behavioral metrics (hourly/daily rollups)
+    partitions: 3
+    replication_factor: 3
+    retention_ms: 7776000000  # 90 days retention
+    compression_type: snappy
+    config:
+      min.insync.replicas: 2
+      cleanup.policy: compact,delete
+      retention.bytes: 53687091200  # 50GB per partition
+
+  - name: capsule-behavioral-vectors
+    description: Computed Behavioral Vectors for users
+    partitions: 3
+    replication_factor: 3
+    retention_ms: -1  # Infinite retention (compacted topic)
+    compression_type: snappy
+    config:
+      min.insync.replicas: 2
+      cleanup.policy: compact
+      delete.retention.ms: 86400000
+      segment.ms: 604800000  # 7 day segments
+
+consumer_groups:
+  - name: behavioral-vector-processor
+    description: Processes interaction events to compute Behavioral Vectors
+    topics:
+      - capsule-interactions
+    config:
+      auto.offset.reset: earliest
+      enable.auto.commit: false
+      max.poll.records: 500
+      session.timeout.ms: 30000
+
+  - name: adaptive-ux-engine
+    description: Consumes BVs to drive adaptive UX decisions
+    topics:
+      - capsule-behavioral-vectors
+    config:
+      auto.offset.reset: latest
+      enable.auto.commit: true
+      max.poll.records: 100
+
+  - name: analytics-aggregator
+    description: Aggregates interaction metrics for dashboards
+    topics:
+      - capsule-interactions
+    config:
+      auto.offset.reset: earliest
+      enable.auto.commit: false
+      max.poll.records: 1000
+
+# Kafka Connect Sinks
+sinks:
+  - name: postgres-behavioral-sink
+    connector.class: io.confluent.connect.jdbc.JdbcSinkConnector
+    topics: capsule-interactions,capsule-behavioral-vectors
+    connection.url: ${POSTGRES_URL}
+    connection.user: ${POSTGRES_USER}
+    connection.password: ${POSTGRES_PASSWORD}
+    auto.create: false
+    insert.mode: upsert
+    pk.mode: record_value
+    pk.fields: event_id
+    batch.size: 1000
+
+  - name: elasticsearch-behavioral-sink
+    connector.class: io.confluent.connect.elasticsearch.ElasticsearchSinkConnector
+    topics: capsule-interactions
+    connection.url: ${ELASTICSEARCH_URL}
+    type.name: _doc
+    key.ignore: false
+    batch.size: 500
+    max.in.flight.requests: 5
+
+# Schema Registry Configuration
+schema_registry:
+  url: ${SCHEMA_REGISTRY_URL}
+  schemas:
+    - subject: capsule-interactions-value
+      schema_file: schemas/interaction_event.avsc
+      compatibility: BACKWARD
+
+    - subject: capsule-behavioral-vectors-value
+      schema_file: schemas/behavioral_vector.avsc
+      compatibility: BACKWARD
+
+# Monitoring & Alerting
+monitoring:
+  metrics:
+    - name: interaction_event_rate
+      description: Events per second
+      alert_threshold: 10000  # Alert if > 10k events/sec
+
+    - name: consumer_lag
+      description: Consumer group lag
+      alert_threshold: 100000  # Alert if lag > 100k messages
+
+    - name: error_rate
+      description: Event processing error rate
+      alert_threshold: 0.01  # Alert if error rate > 1%
+
+# Development/Test Configuration
+development:
+  kafka_bootstrap_servers: localhost:9092
+  schema_registry_url: http://localhost:8081
+  create_topics_on_startup: true
+  auto_delete_topics: false
+
+# Production Configuration
+production:
+  kafka_bootstrap_servers: ${KAFKA_BOOTSTRAP_SERVERS}
+  schema_registry_url: ${SCHEMA_REGISTRY_URL}
+  create_topics_on_startup: false
+  enable_monitoring: true
+  enable_tracing: true

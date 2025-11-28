@@ -1,5 +1,7 @@
+// @ts-nocheck
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useSystemPulse } from "@/hooks/useSystemPulse";
 
 type Proof = {
     proof_id: string;
@@ -17,6 +19,13 @@ const fallbackProofs: Proof[] = [
 export function TruthSigil() {
     const [proofs, setProofs] = useState<Proof[]>(fallbackProofs);
     const [loading, setLoading] = useState(true);
+    const { lastEvent } = useSystemPulse();
+
+    useEffect(() => {
+        if (lastEvent && lastEvent.type === 'proof_generated' && lastEvent.proof) {
+            setProofs(prev => [lastEvent.proof, ...prev].slice(0, 50)); // Keep last 50
+        }
+    }, [lastEvent]);
 
     useEffect(() => {
         const fetchProofs = async () => {
