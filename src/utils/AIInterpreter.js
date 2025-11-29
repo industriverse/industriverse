@@ -1,4 +1,5 @@
 import glyphs from './glyphs.json' with { type: "json" };
+import SimulationService from '../../backend/services/simulationService.js';
 
 class AIInterpreter {
     constructor() {
@@ -7,13 +8,13 @@ class AIInterpreter {
     }
 
     /**
-     * Translates a Glyph into a Machine Command.
+     * Translates a Glyph into a Machine Command with Thermodynamic Checks.
      * @param {string} glyph - The glyph symbol (e.g., "⊼13E")
      * @param {string} machineType - The target machine ID (e.g., "ASML_NXE_3400")
-     * @returns {object} - { type, cmd, energy }
+     * @returns {Promise<object>} - { type, cmd, energy, warning? }
      */
-    translate(glyph, machineType = 'default') {
-        // 1. Check Cache
+    async translate(glyph, machineType = 'default') {
+        // 1. Check Cache (Fast Path)
         const cacheKey = `${glyph}:${machineType}`;
         if (this.cache.has(cacheKey)) {
             return this.cache.get(cacheKey);
@@ -25,16 +26,31 @@ class AIInterpreter {
             return this.slowTranslate(glyph, machineType);
         }
 
-        // 3. Resolve Command
+        // 3. Thermodynamic Simulation (The Grand Synthesis)
+        // Query the Energy Atlas for the "Ground Truth" cost
+        const simResult = await SimulationService.predictEnergy(glyph);
+
+        // 4. Thermodynamic Autocorrect
+        let warning = null;
+        let energy = simResult.energy || parseFloat(entry.energy_cost) || 0;
+
+        // Threshold Check: If energy > 100J, flag it (Heuristic)
+        if (energy > 100.0) {
+            warning = `High Energy Alert: ${energy.toFixed(1)}J. Consider optimization.`;
+        }
+
+        // 5. Resolve Command
         const cmd = entry[machineType] || entry['default'];
         const result = {
             type: machineType,
             cmd: cmd,
-            energy: entry.energy_cost,
+            energy: `${energy.toFixed(1)}J`,
+            source: simResult.source || "Vault",
+            warning: warning,
             timestamp: Date.now()
         };
 
-        // 4. Cache Result
+        // 6. Cache Result
         this.cache.set(cacheKey, result);
         return result;
     }
@@ -42,7 +58,7 @@ class AIInterpreter {
     /**
      * Fallback for novel glyphs (simulates Manus AI inference).
      */
-    slowTranslate(glyph, machineType) {
+    async slowTranslate(glyph, machineType) {
         console.warn(`[Manus AI] Novel glyph detected: ${glyph}. Inferring intent...`);
 
         // Mock Inference Logic

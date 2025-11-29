@@ -32,7 +32,7 @@ wss.on('connection', (ws) => {
                 console.log(`Received Glyphs: ${glyphs} for ${machineId}`);
 
                 // 1. Interpret (Mock)
-                // const interpreted = glyphs.map(g => AIInterpreter.translate(g, machineId));
+                // const interpreted = await Promise.all(glyphs.map(g => AIInterpreter.translate(g, machineId)));
 
                 // 2. Encrypt (Mock)
                 // const encrypted = interpreted.map(cmd => Encryption.encrypt(cmd.cmd));

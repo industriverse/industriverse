@@ -11,7 +11,7 @@ async function runTest() {
     console.log(`1. User Input: ${glyph} (Target: ${machineId})`);
 
     // 2. Interpretation (The Brain)
-    const interpreted = AIInterpreter.translate(glyph, machineId);
+    const interpreted = await AIInterpreter.translate(glyph, machineId);
     console.log(`2. Interpreted:`, interpreted);
 
     if (interpreted.type === 'error') {
