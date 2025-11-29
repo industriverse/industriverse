@@ -1,11 +1,11 @@
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
-
 // Mock Imports (In real app, these would be require statements)
 // const AIInterpreter = require('../src/utils/AIInterpreter');
 // const Encryption = require('../src/utils/Encryption');
 // const CNCDriver = require('./drivers/cncDriver');
+// const GenerativeGlyphEngine = require('../src/utils/GenerativeGlyphEngine'); // Mock import for Node context
 
 const app = express();
 const server = http.createServer(app);
@@ -46,6 +46,31 @@ wss.on('connection', (ws) => {
                     type: 'FEEDBACK',
                     status: 'EXECUTING',
                     telemetry: { safe: true, progress: 50 }
+                }));
+            } else if (data.type === 'GENERATE_GLYPHS') {
+                const { prompt } = data;
+                console.log(`Generating Glyphs for: "${prompt}"`);
+
+                // Mock Generation (Since we can't import ESM in CJS easily without dynamic import)
+                // In production, use: const result = await GenerativeGlyphEngine.generate(prompt);
+
+                let result = { glyphs: [], energy_estimate: '0J' };
+                if (prompt.includes('bracket')) {
+                    result = {
+                        glyphs: ['⊸C', '⊽0.5', '⊻'],
+                        energy_estimate: '120.5J',
+                        reasoning: 'Identified object: bracket -> Recipe: bracket_v1'
+                    };
+                    if (prompt.includes('lightweight')) {
+                        result.glyphs = ['⊸C', '⊽0.1', '⊻']; // Optimization
+                        result.energy_estimate = '450.2J'; // Higher energy for precision
+                        result.reasoning += ' | Applied modifier: lightweight -> Fine Mill';
+                    }
+                }
+
+                ws.send(JSON.stringify({
+                    type: 'GENERATION_RESULT',
+                    result: result
                 }));
             }
         } catch (e) {

@@ -1,0 +1,56 @@
+{
+    "rules": {
+        "sequence_order": [
+            "preparation",
+            "fabrication",
+            "verification"
+        ],
+        "dependencies": {
+            "cut": [
+                "align"
+            ],
+            "expose": [
+                "align",
+                "coat"
+            ],
+            "etch": [
+                "expose"
+            ]
+        }
+    },
+    "keywords": {
+        "lightweight": {
+            "modifier": "precision",
+            "glyph": "⊽0.1",
+            "desc": "Fine Mill for Mass Reduction"
+        },
+        "fast": {
+            "modifier": "speed",
+            "glyph": "⊽0.5",
+            "desc": "Rough Mill for Speed"
+        },
+        "strong": {
+            "modifier": "integrity",
+            "glyph": "⊼13E",
+            "desc": "EUV Hardening"
+        },
+        "bracket": {
+            "recipe": "bracket_v1"
+        },
+        "gear": {
+            "recipe": "gear_v1"
+        }
+    },
+    "recipes": {
+        "bracket_v1": [
+            "⊸C",
+            "⊽0.5",
+            "⊻"
+        ],
+        "gear_v1": [
+            "⊸C",
+            "⊿5P",
+            "⊻"
+        ]
+    }
+}
