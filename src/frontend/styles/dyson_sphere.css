@@ -1,0 +1,197 @@
+/* Dyson Sphere UI - Visual Manifesto */
+
+:root {
+    /* Primary Palette */
+    --stellar-gold: #F7E399;
+    --cosmic-blue: #3B4BFF;
+    --plasma-orange: #FF7D00;
+    --uv-indigo: #6E00FF;
+    --quantum-white: #FAFAF5;
+
+    /* Accents */
+    --graphite-black: #111111;
+    --nebula-teal: #0E7571;
+    --infrared-red: #FF0033;
+    --photonic-violet: #AA33FF;
+
+    /* Backgrounds */
+    --void-black: #050505;
+    --deep-space: #0a0a12;
+}
+
+body {
+    background-color: var(--void-black);
+    color: var(--quantum-white);
+    font-family: 'Inter', 'IBM Plex Sans', sans-serif;
+    margin: 0;
+    overflow: hidden;
+    /* Immersive */
+}
+
+/* The Dyson Shell Container */
+.dyson-shell {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #1a1a2e 0%, var(--void-black) 80%);
+    perspective: 1000px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ambient Particles (Stars/Dust) */
+.star-field {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background-image:
+        radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 3px),
+        radial-gradient(white, rgba(255, 255, 255, .15) 1px, transparent 2px),
+        radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 3px);
+    background-size: 550px 550px, 350px 350px, 250px 250px;
+    background-position: 0 0, 40px 60px, 130px 270px;
+    animation: drift 120s linear infinite;
+}
+
+@keyframes drift {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(-1000px);
+    }
+}
+
+/* The Intention Star */
+.intention-star {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--stellar-gold) 10%, var(--plasma-orange) 60%, transparent 100%);
+    box-shadow:
+        0 0 60px var(--plasma-orange),
+        0 0 120px var(--stellar-gold);
+    position: absolute;
+    z-index: 10;
+    animation: pulse-star 4s ease-in-out infinite;
+    cursor: pointer;
+    transition: all 0.5s ease;
+}
+
+.intention-star:hover {
+    transform: scale(1.1);
+    box-shadow:
+        0 0 80px var(--plasma-orange),
+        0 0 160px var(--stellar-gold);
+}
+
+@keyframes pulse-star {
+    0% {
+        opacity: 0.9;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    100% {
+        opacity: 0.9;
+        transform: scale(1);
+    }
+}
+
+/* Orbit Rings */
+.orbit-ring {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform-style: preserve-3d;
+    pointer-events: none;
+}
+
+.orbit-inner {
+    width: 400px;
+    height: 400px;
+    animation: rotate-orbit 60s linear infinite;
+}
+
+.orbit-middle {
+    width: 700px;
+    height: 700px;
+    animation: rotate-orbit 120s linear infinite reverse;
+}
+
+.orbit-outer {
+    width: 1000px;
+    height: 1000px;
+    animation: rotate-orbit 240s linear infinite;
+}
+
+@keyframes rotate-orbit {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Capsule Portal */
+.capsule-portal {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: rgba(10, 10, 20, 0.8);
+    border: 1px solid var(--cosmic-blue);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--quantum-white);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px var(--cosmic-blue);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.capsule-portal:hover {
+    width: 80px;
+    height: 80px;
+    border-color: var(--stellar-gold);
+    box-shadow: 0 0 20px var(--stellar-gold);
+    z-index: 20;
+}
+
+/* Aura Ring */
+.aura-ring {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--uv-indigo);
+    animation: spin-aura 2s linear infinite;
+}
+
+@keyframes spin-aura {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
