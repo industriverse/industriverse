@@ -1,0 +1,1 @@
+{"timestamp": 1764437162.6203089, "source": "CAPSULE_A2A", "energy_state": {"joules": 457.34318774021676, "entropy": 0.46084765260363303}, "event_type": "OPTIMIZATION_STEP", "payload": {"action_vector": [0.553176061321596, 0.03343593866739436, 0.4609527106213196], "safety_score": 0.8530612923025586}}
