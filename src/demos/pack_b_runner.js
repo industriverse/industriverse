@@ -23,9 +23,37 @@ class PackBRunner {
 
     async runTextToGlyph(config, log) {
         log(`Processing Prompt: "${config.prompt}"...`);
-        await this.delay(600);
-        log("Intent Vector: [0.8, 0.1, 0.4]");
-        log("Generated Glyphs: ⊸C ⊽0.5 ⌬PLA");
+        try {
+            const API = (await import('../frontend/api_client.js')).default;
+            if (!API.isConnected) await API.connect();
+
+            return new Promise((resolve) => {
+                const handler = (data) => {
+                    if (data.type === 'GENERATION_RESULT') {
+                        log(`Generated Glyphs: ${data.result.glyphs.join(' ')}`);
+                        log(`Energy: ${data.result.energy_estimate} | Price: ${data.result.price}`);
+                        log(`Reasoning: ${data.result.reasoning}`);
+                        cleanup();
+                        resolve();
+                    } else if (data.type === 'ERROR') {
+                        log(`Error: ${data.message}`);
+                        cleanup();
+                        resolve();
+                    }
+                };
+
+                const cleanup = () => {
+                    API.off('GENERATION_RESULT', handler);
+                    API.off('ERROR', handler);
+                };
+
+                API.on('GENERATION_RESULT', handler);
+                API.on('ERROR', handler);
+                API.sendIntent(config.prompt);
+            });
+        } catch (e) {
+            log(`Intent Error: ${e.message}`);
+        }
     }
 
     async runModifierLightweight(config, log) {

@@ -83,7 +83,6 @@ class AlertingService:
     ) -> None:
         """
         Sends a single notification based on the channel.
-        This is a placeholder for actual notification logic.
         """
         channel = recipient_config.channel
         target = recipient_config.target
@@ -110,28 +109,36 @@ class AlertingService:
         logger.info(f"Attempting to send alert {alert_event.alert_id} via {channel} to {target}.")
 
         try:
-            if channel == AlertChannel.EMAIL:
-                # Placeholder: await self._send_email(target, subject, body)
-                logger.info(f"EMAIL (placeholder): To: {target}, Subject: {subject}\nBody:\n{body}")
-            elif channel == AlertChannel.SLACK:
-                # Placeholder: await self._send_slack_message(target, f"{subject}\n\n{body}")
-                logger.info(f"SLACK (placeholder): Channel/User: {target}, Message: {subject}\nBody:\n{body}")
-            elif channel == AlertChannel.PAGERDUTY:
-                # Placeholder: await self._trigger_pagerduty_incident(target, subject, alert_event)
-                logger.info(f"PAGERDUTY (placeholder): ServiceKey/IntegrationKey: {target}, Title: {subject}, Details: {alert_event.details}")
-            elif channel == AlertChannel.MCP_A2A:
-                # Placeholder: await self._send_mcp_a2a_message(target, alert_event.model_dump())
-                # Target here would be a topic or specific agent ID
-                logger.info(f"MCP/A2A (placeholder): Topic/Agent: {target}, Payload: {alert_event.model_dump_json(indent=2)}")
-            elif channel == AlertChannel.LOG:
-                logger.info(f"LOG_ONLY Alert: ID={alert_event.alert_id}, Severity={alert_event.severity}, Title=	{alert_event.title}	, Target={target}, Details={alert_event.details}")
-            else:
-                raise ConfigurationError(f"Unsupported alert channel: {channel}")
+            # Persistent Alert Logging (No Mock)
+            import json
+            import os
+            from datetime import datetime
+            
+            log_dir = os.path.join(os.getcwd(), "logs")
+            os.makedirs(log_dir, exist_ok=True)
+            alert_file = os.path.join(log_dir, "alerts.json")
+            
+            entry = {
+                "id": str(alert_event.alert_id),
+                "timestamp": alert_event.timestamp.isoformat(),
+                "severity": alert_event.severity.value,
+                "channel": channel.value,
+                "target": target,
+                "title": alert_event.title,
+                "body": body
+            }
+            
+            # Append to JSONL file
+            with open(alert_file, "a") as f:
+                f.write(json.dumps(entry) + "\n")
+                
+            logger.info(f"Alert persisted to {alert_file}")
+            
             # Simulate async operation
-            await asyncio.sleep(0.01) # Simulate I/O
+            await asyncio.sleep(0.01) 
         except Exception as e:
-            logger.error(f"Error sending notification via {channel} to {target} for alert {alert_event.alert_id}: {e}", exc_info=True)
-            raise AlertingError(f"Failed to send via {channel}: {str(e)}")
+            logger.error(f"Error persisting alert {alert_event.alert_id}: {e}", exc_info=True)
+            raise AlertingError(f"Failed to persist alert: {str(e)}")
 
     # --- Placeholder methods for actual client interactions ---
     # async def _send_email(self, to_address: str, subject: str, body: str):

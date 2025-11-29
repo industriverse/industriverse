@@ -7,18 +7,17 @@ import json
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.maestro.conductor import MaestroConductor
+from src.loop.intent_queue import IntentQueue
 
 class AGIController:
     """
-    AI Shield v3 - Gate 13: AGI Controller.
-    The 'Heart' of the system. Runs the infinite loop of:
-    Perceive -> Plan -> Act -> Verify.
+    Manufacturing AGI Loop Controller (Phase 65).
+    Orchestrates the Perceive -> Plan -> Act -> Verify loop.
     """
     def __init__(self):
-        print("Booting Manufacturing AGI Loop...")
         self.maestro = MaestroConductor()
         self.is_running = False
-        self.intent_queue = [] # Mock Queue
+        self.intent_queue = IntentQueue() # Persistent Queue (SQLite)
 
     def start(self):
         self.is_running = True

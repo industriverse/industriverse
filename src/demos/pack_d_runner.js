@@ -23,9 +23,27 @@ class PackDRunner {
 
     async runMonitor(config, log) {
         log("Starting Real-Time Monitor...");
-        for (let i = 0; i < 5; i++) {
-            await this.delay(500);
-            log(`[T+${i}s] Temp: ${210 + Math.random()}C | Power: ${100 + Math.random() * 5}W`);
+        try {
+            const API = (await import('../frontend/api_client.js')).default;
+            if (!API.isConnected) await API.connect();
+
+            return new Promise((resolve) => {
+                let count = 0;
+                const handler = (msg) => {
+                    if (msg.type === 'TELEMETRY' && msg.machineId === 'Haas_VF2') {
+                        log(`[T+${count}s] Temp: ${msg.data.temp.toFixed(2)}C | Vib: ${msg.data.vibration.toFixed(3)}`);
+                        count++;
+                        if (count >= 5) {
+                            API.off('TELEMETRY', handler);
+                            resolve();
+                        }
+                    }
+                };
+                API.on('TELEMETRY', handler);
+                API.subscribeTelemetry('Haas_VF2');
+            });
+        } catch (e) {
+            log(`Monitor Error: ${e.message}`);
         }
     }
 

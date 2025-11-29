@@ -38,11 +38,19 @@ class PackARunner {
 
     async runMaterialQuery(config, log) {
         log(`Querying Atlas for '${config.query}'...`);
-        await this.delay(800);
-        log("Found 3 Matches:");
-        log("1. PLA_Standard (Cost: $0.05/cm3, Energy: 120J/cm3)");
-        log("2. PLA_Tough (Cost: $0.08/cm3, Energy: 150J/cm3)");
-        log("3. PLA_Conductive (Cost: $0.12/cm3, Energy: 180J/cm3)");
+        try {
+            const API = (await import('../frontend/api_client.js')).default;
+            // Ensure connected
+            if (!API.isConnected) await API.connect();
+
+            const data = await API.fetchAtlas(config.query);
+            log(`Found ${data.results.length} Matches:`);
+            data.results.forEach((item, index) => {
+                log(`${index + 1}. ${item.name} (Cost: $${item.cost}/cm3)`);
+            });
+        } catch (e) {
+            log(`Atlas Query Error: ${e.message}`);
+        }
     }
 
     async runGCodeViz(config, log) {

@@ -34,22 +34,46 @@ class DGMDiscoveryAgent:
         # In real implementation, call LLM here
         hypothesis = f"Hypothesis for {topic} using agent {self.id}"
         
-        # Mock OBMI scoring
+        # Heuristic Scoring (No Randomness)
+        # Score based on hypothesis length, complexity, and keyword density
+        length_score = min(1.0, len(hypothesis) / 100.0)
+        
+        # Complexity: Ratio of unique words to total words
+        words = hypothesis.split()
+        unique_words = set(words)
+        complexity_score = len(unique_words) / max(1, len(words))
+        
+        # Keyword density (Physics terms)
+        physics_keywords = ["energy", "entropy", "quantum", "force", "mass", "velocity"]
+        keyword_count = sum(1 for w in words if w.lower() in physics_keywords)
+        relevance_score = min(1.0, keyword_count / 5.0)
+        
+        # Weighted OBMI Score
+        prin_score = (length_score * 0.3) + (complexity_score * 0.3) + (relevance_score * 0.4)
+        aesp_score = (complexity_score * 0.5) + (relevance_score * 0.5)
+        
         scores = {
-            'prin': 0.7 + random.uniform(-0.1, 0.2),
-            'aesp': 0.6 + random.uniform(-0.1, 0.2),
-            'valid': True
+            'prin': round(prin_score, 2),
+            'aesp': round(aesp_score, 2),
+            'valid': prin_score > 0.3
         }
         return {'hypothesis': hypothesis, 'scores': scores}
     
     def propose_improvement(self) -> Dict[str, Any]:
         """Use LLM to propose code/prompt modification"""
-        # Mock proposal
-        mod_type = random.choice(['prompt_tweak', 'threshold_adjust'])
+        # Deterministic Proposal Logic
+        # If score is low, suggest prompt tweak. If high, suggest threshold tightening.
+        if self.score < 0.5:
+            mod_type = 'prompt_tweak'
+            value = "Add constraint: 'Focus on thermodynamic efficiency'"
+        else:
+            mod_type = 'threshold_adjust'
+            value = "Increase PRIN threshold by 0.05"
+            
         return {
             'type': mod_type,
-            'description': f"Improve {mod_type}",
-            'value': f"New value for {mod_type}"
+            'description': f"Improvement Strategy: {mod_type}",
+            'value': value
         }
     
     def apply_modification(self, modification: Dict[str, Any]) -> 'DGMDiscoveryAgent':

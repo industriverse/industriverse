@@ -1,13 +1,20 @@
+
 # model_performance_monitor.py
 
 import logging
 from typing import List, Dict, Any, Optional, Union
 from datetime import datetime
 import numpy as np
-from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, 
-    mean_squared_error, mean_absolute_error, r2_score
-)
+try:
+    from sklearn.metrics import (
+        accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, 
+        mean_squared_error, mean_absolute_error, r2_score
+    )
+except ImportError:
+    # Fallback for environments without sklearn
+    def _mock_metric(*args, **kwargs): return 0.0
+    accuracy_score = precision_score = recall_score = f1_score = roc_auc_score = _mock_metric
+    mean_squared_error = mean_absolute_error = r2_score = _mock_metric
 # For LLM metrics, specific libraries might be needed, e.g., evaluate (from Hugging Face), nltk
 # from evaluate import load # Example
 

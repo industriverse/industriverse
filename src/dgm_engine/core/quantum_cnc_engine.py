@@ -23,10 +23,66 @@ class QuantumCNCEngine:
             self.circuit = None
         
     def optimize_toolpath(self, waypoints: list, constraints: dict) -> list:
-        """Use quantum annealing to find optimal toolpath"""
-        print("Optimizing toolpath using Quantum Annealing (Simulated)...")
-        # Mock optimization result
-        return sorted(waypoints, key=lambda x: x[0]) # Simple sort as mock
+        """
+        Use Simulated Annealing to find optimal toolpath (TSP).
+        Simulates Quantum Annealing behavior.
+        """
+        import math
+        import random
+        
+        if not waypoints:
+            return []
+            
+        print("Optimizing toolpath using Simulated Annealing (Quantum Proxy)...")
+        
+        # Initial State: Random Shuffle
+        current_path = waypoints[:]
+        random.shuffle(current_path)
+        
+        def path_cost(path):
+            cost = 0.0
+            for i in range(len(path) - 1):
+                p1 = path[i]
+                p2 = path[i+1]
+                dist = math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
+                cost += dist
+            return cost
+            
+        current_cost = path_cost(current_path)
+        best_path = current_path[:]
+        best_cost = current_cost
+        
+        # Annealing Parameters
+        temp = 1000.0
+        cooling_rate = 0.995
+        
+        while temp > 1.0:
+            # Create neighbor by swapping two random cities
+            new_path = current_path[:]
+            i, j = random.sample(range(len(new_path)), 2)
+            new_path[i], new_path[j] = new_path[j], new_path[i]
+            
+            new_cost = path_cost(new_path)
+            
+            # Acceptance Probability (Metropolis Criterion)
+            if new_cost < current_cost:
+                accept = True
+            else:
+                delta = new_cost - current_cost
+                probability = math.exp(-delta / temp)
+                accept = random.random() < probability
+                
+            if accept:
+                current_path = new_path
+                current_cost = new_cost
+                
+                if current_cost < best_cost:
+                    best_path = current_path[:]
+                    best_cost = current_cost
+                    
+            temp *= cooling_rate
+            
+        return best_path
     
     def simulate_material(self, material_properties: dict, cutting_parameters: dict) -> dict:
         """Quantum simulation of material behavior"""

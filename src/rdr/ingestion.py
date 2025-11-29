@@ -42,27 +42,46 @@ class PhysicsDataPreparation:
 
     def _crawl_venue(self, venue: str, start_year: int) -> List[Dict[str, Any]]:
         """
-        Mock crawler for physics venues.
-        In production, this would use arXiv API or web scraping.
+        Scan local directory 'data/ingest' for real files.
+        Replaces mock crawler.
         """
-        print(f"Crawling {venue} from {start_year}...")
-        # Mock data return
-        return [
-            {
-                "id": f"{venue}_001",
-                "title": f"Novel MHD Simulation in {venue}",
-                "abstract": "We present a new method for simulating plasma instabilities...",
-                "year": 2024,
-                "venue": venue
-            },
-            {
-                "id": f"{venue}_002",
-                "title": f"Turbulence Modeling in {venue}",
-                "abstract": "A study of Reynolds numbers in fluid dynamics...",
-                "year": 2023,
-                "venue": venue
-            }
-        ]
+        import os
+        import hashlib
+        
+        ingest_dir = os.path.join(os.getcwd(), "data", "ingest")
+        if not os.path.exists(ingest_dir):
+            os.makedirs(ingest_dir, exist_ok=True)
+            # Create a sample file if empty to demonstrate functionality
+            with open(os.path.join(ingest_dir, "sample_physics.txt"), "w") as f:
+                f.write("Title: MHD Simulation of Plasma\nAbstract: We simulate high-energy plasma turbulence using Navier-Stokes equations.")
+        
+        print(f"Scanning {ingest_dir} for papers...")
+        papers = []
+        
+        for root, dirs, files in os.walk(ingest_dir):
+            for file in files:
+                if file.endswith(".txt") or file.endswith(".md"):
+                    path = os.path.join(root, file)
+                    try:
+                        with open(path, "r", encoding="utf-8") as f:
+                            content = f.read()
+                            
+                        # Simple parsing: Assume first line is title, rest is abstract
+                        lines = content.split('\n')
+                        title = lines[0].replace("Title:", "").strip() if lines else file
+                        abstract = "\n".join(lines[1:]).replace("Abstract:", "").strip() if len(lines) > 1 else ""
+                        
+                        papers.append({
+                            "id": hashlib.md5(path.encode()).hexdigest(),
+                            "title": title,
+                            "abstract": abstract,
+                            "year": 2024, # Default to current year for local files
+                            "venue": "Local Ingest"
+                        })
+                    except Exception as e:
+                        print(f"Error reading {file}: {e}")
+                        
+        return papers
 
     def _matches_domain(self, paper: Dict[str, Any], definition: str) -> bool:
         """
