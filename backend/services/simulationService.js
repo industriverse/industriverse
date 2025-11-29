@@ -5,17 +5,29 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const SCRIPT_PATH = path.resolve(__dirname, '../../scripts/energy_atlas/query_atlas.py');
-
 class SimulationService {
+    constructor() {
+        this.scriptPath = path.join(__dirname, '../../src/simulation/simulation_oracle.py');
+    }
+
     /**
-     * Queries the Energy Atlas for a thermodynamic prediction.
-     * @param {string} glyph - The glyph to analyze.
-     * @returns {Promise<object>} - { energy, unit, confidence }
+     * Simulates a Bytecode program to predict energy and time.
+     * @param {Array} bytecode 
+     * @returns {Promise<object>}
      */
-    async predictEnergy(glyph) {
+    async simulate(bytecode) {
         return new Promise((resolve, reject) => {
-            const pythonProcess = spawn('python3', [SCRIPT_PATH, glyph]);
+            const pythonProcess = spawn('python3', ['-c', `
+import sys
+import json
+import os
+sys.path.append(os.getcwd())
+from src.simulation.simulation_oracle import SimulationOracle
+
+oracle = SimulationOracle()
+program = ${JSON.stringify(bytecode)}
+print(json.dumps(oracle.simulate(program)))
+            `]);
 
             let dataString = '';
             let errorString = '';
@@ -30,17 +42,13 @@ class SimulationService {
 
             pythonProcess.on('close', (code) => {
                 if (code !== 0) {
-                    console.error(`Simulation Service Error: ${errorString}`);
-                    resolve({ energy: 0, error: 'Simulation Failed' }); // Fallback
-                    return;
-                }
-
-                try {
-                    const result = JSON.parse(dataString);
-                    resolve(result);
-                } catch (e) {
-                    console.error('Failed to parse simulation result:', dataString);
-                    resolve({ energy: 0, error: 'Parse Error' });
+                    reject(new Error(`Simulation Oracle failed: ${errorString}`));
+                } else {
+                    try {
+                        resolve(JSON.parse(dataString));
+                    } catch (e) {
+                        reject(new Error(`Failed to parse Simulation output: ${e.message}`));
+                    }
                 }
             });
         });
