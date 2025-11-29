@@ -1,0 +1,151 @@
+{
+  "factory_001": {
+    "workers": {
+      "worker_001": {
+        "path": "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_001",
+        "chunks": [
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_001/factory001_worker001_part00.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_001/factory001_worker001_part01.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_001/factory001_worker001_part02.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_001/factory001_worker001_part03.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_001/factory001_worker001_part04.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_001/factory001_worker001_part05.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_001/factory001_worker001_part06.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_001/factory001_worker001_part07.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_001/factory001_worker001_part08.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_001/factory001_worker001_part09.tar"
+        ]
+      },
+      "worker_002": {
+        "path": "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_002",
+        "chunks": [
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_002/factory001_worker002_part00.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_002/factory001_worker002_part01.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_002/factory001_worker002_part02.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_002/factory001_worker002_part03.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_002/factory001_worker002_part04.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_002/factory001_worker002_part05.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_002/factory001_worker002_part06.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_002/factory001_worker002_part07.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_002/factory001_worker002_part08.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_002/factory001_worker002_part09.tar"
+        ]
+      },
+      "worker_003": {
+        "path": "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003",
+        "chunks": [
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003/factory001_worker003_part00.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003/factory001_worker003_part01.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003/factory001_worker003_part02.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003/factory001_worker003_part03.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003/factory001_worker003_part04.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003/factory001_worker003_part05.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003/factory001_worker003_part06.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003/factory001_worker003_part07.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003/factory001_worker003_part08.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003/factory001_worker003_part09.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003/factory001_worker003_part10.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_003/factory001_worker003_part11.tar"
+        ]
+      },
+      "worker_005": {
+        "path": "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_005",
+        "chunks": [
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_005/factory001_worker005_part00.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_005/factory001_worker005_part01.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_005/factory001_worker005_part02.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_005/factory001_worker005_part03.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_005/factory001_worker005_part04.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_005/factory001_worker005_part05.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_005/factory001_worker005_part06.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_005/factory001_worker005_part07.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_005/factory001_worker005_part08.tar"
+        ]
+      },
+      "worker_004": {
+        "path": "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_004",
+        "chunks": [
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_004/factory001_worker004_part00.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_004/factory001_worker004_part01.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_004/factory001_worker004_part02.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_004/factory001_worker004_part03.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_004/factory001_worker004_part04.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_004/factory001_worker004_part05.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_004/factory001_worker004_part06.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_004/factory001_worker004_part07.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_004/factory001_worker004_part08.tar"
+        ]
+      },
+      "worker_006": {
+        "path": "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_006",
+        "chunks": [
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_006/factory001_worker006_part00.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_006/factory001_worker006_part01.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_006/factory001_worker006_part02.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_006/factory001_worker006_part03.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_006/factory001_worker006_part04.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_006/factory001_worker006_part05.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_006/factory001_worker006_part06.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_006/factory001_worker006_part07.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_006/factory001_worker006_part08.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_006/factory001_worker006_part09.tar"
+        ]
+      },
+      "worker_007": {
+        "path": "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_007",
+        "chunks": [
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_007/factory001_worker007_part00.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_007/factory001_worker007_part01.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_007/factory001_worker007_part02.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_007/factory001_worker007_part03.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_007/factory001_worker007_part04.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_007/factory001_worker007_part05.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_007/factory001_worker007_part06.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_007/factory001_worker007_part07.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_007/factory001_worker007_part08.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_007/factory001_worker007_part09.tar"
+        ]
+      },
+      "worker_008": {
+        "path": "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_008",
+        "chunks": [
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_008/factory001_worker008_part00.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_008/factory001_worker008_part01.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_008/factory001_worker008_part02.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_008/factory001_worker008_part03.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_008/factory001_worker008_part04.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_008/factory001_worker008_part05.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_008/factory001_worker008_part06.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_008/factory001_worker008_part07.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_008/factory001_worker008_part08.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_008/factory001_worker008_part09.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_008/factory001_worker008_part10.tar"
+        ]
+      },
+      "worker_009": {
+        "path": "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_009",
+        "chunks": [
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_009/factory001_worker009_part00.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_009/factory001_worker009_part01.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_009/factory001_worker009_part02.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_009/factory001_worker009_part03.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_009/factory001_worker009_part04.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_009/factory001_worker009_part05.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_009/factory001_worker009_part06.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_009/factory001_worker009_part07.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_009/factory001_worker009_part08.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_009/factory001_worker009_part09.tar"
+        ]
+      },
+      "worker_010": {
+        "path": "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_010",
+        "chunks": [
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_010/factory001_worker010_part00.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_010/factory001_worker010_part01.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_010/factory001_worker010_part02.tar",
+          "/Volumes/Expansion/Egocentric-10K/factory_001/workers/worker_010/factory001_worker010_part03.tar"
+        ]
+      }
+    }
+  }
+}
