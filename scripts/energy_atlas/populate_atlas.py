@@ -46,15 +46,24 @@ def populate_atlas():
                 
                 # Create Mock Voxel Grid (Placeholder until full decode)
                 # We'll store a 1x1x1 voxel with the total energy for now
-                voxels = np.array([[[energy_joules]]])
+                energy_voxels = np.array([[[energy_joules]]])
+                material_voxels = np.array([[[1]]]) # 1 = PLA (Mock)
+                geometry_voxels = np.array([[[1]]]) # 1 = Solid (Mock)
                 
                 # Add to Atlas
                 model_id = os.path.basename(fpath).replace('.bgcode', '')
-                atlas.add_planned_voxel_grid(model_id, voxels, meta)
+                atlas.add_planned_voxel_grid(
+                    model_id, 
+                    energy_voxels, 
+                    material_voxels, 
+                    geometry_voxels, 
+                    energy_joules, 
+                    meta
+                )
                 success_count += 1
                 
             except Exception as e:
-                # print(f"Failed {fpath}: {e}")
+                print(f"Failed {fpath}: {e}")
                 pass
                 
         print(f"Successfully populated {success_count} entries into the Energy Atlas.")

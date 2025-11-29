@@ -1,4 +1,5 @@
 import struct
+import re
 import os
 from typing import Dict, Any
 
@@ -64,7 +65,32 @@ class BGCodeDecoder:
                         pass
                         
                     metadata[key] = val
-                    
+            
+            # Extract Metadata Block
+            # (Simplified: In real BGCode, this is a structured binary block. 
+            # We look for known keys in the header area).
+            
+            # 1. Filament Used (Material)
+            filament_match = re.search(rb'filament used \[cm3\]\x00(.*?)\x00', head_data)
+            if filament_match:
+                try:
+                    metadata['filament_used_cm3'] = float(filament_match.group(1).decode('utf-8', errors='ignore'))
+                except: pass
+
+            # 2. Layer Height (Geometry/Precision)
+            layer_match = re.search(rb'layer_height\x00(.*?)\x00', head_data)
+            if layer_match:
+                try:
+                    metadata['layer_height_mm'] = float(layer_match.group(1).decode('utf-8', errors='ignore'))
+                except: pass
+
+            # 3. Estimated Time
+            time_match = re.search(rb'estimated printing time \(normal mode\)\x00(.*?)\x00', head_data)
+            if time_match:
+                try:
+                    metadata['estimated_time_s'] = self._parse_time(time_match.group(1).decode('utf-8', errors='ignore'))
+                except: pass
+
         return metadata
 
 if __name__ == "__main__":

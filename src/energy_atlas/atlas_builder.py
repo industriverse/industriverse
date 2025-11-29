@@ -24,17 +24,30 @@ class EnergyAtlas:
         if 'metadata' not in self.f:
             self.f.create_group('metadata')
 
-    def add_planned_voxel_grid(self, model_id: str, voxels: np.ndarray, metadata: Dict[str, Any]):
+    def add_planned_voxel_grid(self, model_id: str, energy_voxels: np.ndarray, material_voxels: np.ndarray, geometry_voxels: np.ndarray, total_energy: float, metadata: Dict[str, Any]):
         """
         Add a 3D Energy Voxel Grid (from Slice100k).
-        voxels: 3D numpy array where value = Energy (Joules)
+        energy_voxels: 3D numpy array where value = Energy (Joules)
+        material_voxels: 3D numpy array where value = Material ID
+        geometry_voxels: 3D numpy array where value = Geometry ID
         """
         grp = self.f['planned'].create_group(model_id)
-        dset = grp.create_dataset('energy_voxels', data=voxels, compression="gzip")
+        # Create datasets
+        grp.create_dataset('energy_voxels', data=energy_voxels, compression="gzip")
+        grp.create_dataset('material_voxels', data=material_voxels, compression="gzip")
+        grp.create_dataset('geometry_voxels', data=geometry_voxels, compression="gzip")
         
         # Store metadata
+        grp.attrs['total_energy_j'] = total_energy
+        grp.attrs['filament_used_cm3'] = metadata.get('filament_used_cm3', 0.0)
+        grp.attrs['layer_height_mm'] = metadata.get('layer_height_mm', 0.2) # Default to 0.2mm
+        grp.attrs['estimated_time_s'] = metadata.get('estimated_time_s', 0.0)
+        grp.attrs['timestamp'] = np.bytes_(metadata.get('timestamp', ''))
+        
+        # Store any other metadata not explicitly handled
         for k, v in metadata.items():
-            grp.attrs[k] = v
+            if k not in ['filament_used_cm3', 'layer_height_mm', 'estimated_time_s', 'timestamp']:
+                grp.attrs[k] = v
             
     def add_observed_heatmap(self, video_id: str, heatmap: np.ndarray, metadata: Dict[str, Any]):
         """
