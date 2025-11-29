@@ -1,0 +1,399 @@
+{
+    "packs": [
+        {
+            "id": "pack_a",
+            "title": "Pack A: Energy Atlas",
+            "description": "The Physics of Manufacturing",
+            "demos": [
+                {
+                    "id": "a1",
+                    "title": "Voxel Grid Visualization",
+                    "type": "atlas_viz",
+                    "config": {
+                        "view": "voxels"
+                    }
+                },
+                {
+                    "id": "a2",
+                    "title": "Material Query Engine",
+                    "type": "atlas_query",
+                    "config": {
+                        "query": "material"
+                    }
+                },
+                {
+                    "id": "a3",
+                    "title": "G-Code Slicing Inspector",
+                    "type": "gcode_viz",
+                    "config": {
+                        "file": "bracket.gcode"
+                    }
+                },
+                {
+                    "id": "a4",
+                    "title": "Energy Heatmap Layer",
+                    "type": "atlas_viz",
+                    "config": {
+                        "view": "energy"
+                    }
+                },
+                {
+                    "id": "a5",
+                    "title": "Thermodynamic Cost Map",
+                    "type": "atlas_viz",
+                    "config": {
+                        "view": "cost"
+                    }
+                },
+                {
+                    "id": "a6",
+                    "title": "Multi-Material Fusion",
+                    "type": "atlas_viz",
+                    "config": {
+                        "view": "fusion"
+                    }
+                },
+                {
+                    "id": "a7",
+                    "title": "Entropy Risk Analysis",
+                    "type": "atlas_viz",
+                    "config": {
+                        "view": "entropy"
+                    }
+                },
+                {
+                    "id": "a8",
+                    "title": "Historical Replay (100k)",
+                    "type": "replay",
+                    "config": {
+                        "speed": "10x"
+                    }
+                },
+                {
+                    "id": "a9",
+                    "title": "Anomaly Cluster View",
+                    "type": "atlas_viz",
+                    "config": {
+                        "view": "anomalies"
+                    }
+                },
+                {
+                    "id": "a10",
+                    "title": "Global Efficiency Report",
+                    "type": "report",
+                    "config": {
+                        "metric": "efficiency"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "pack_b",
+            "title": "Pack B: Intent Layer",
+            "description": "Text-to-Factory Generative AI",
+            "demos": [
+                {
+                    "id": "b1",
+                    "title": "Text-to-Glyph Generation",
+                    "type": "intent_gen",
+                    "config": {
+                        "prompt": "Make a gear"
+                    }
+                },
+                {
+                    "id": "b2",
+                    "title": "Modifier Impact (Lightweight)",
+                    "type": "intent_gen",
+                    "config": {
+                        "prompt": "Lightweight bracket"
+                    }
+                },
+                {
+                    "id": "b3",
+                    "title": "Modifier Impact (Precision)",
+                    "type": "intent_gen",
+                    "config": {
+                        "prompt": "Precision shaft"
+                    }
+                },
+                {
+                    "id": "b4",
+                    "title": "Grammar Validation Logic",
+                    "type": "grammar_check",
+                    "config": {
+                        "code": "⊸C"
+                    }
+                },
+                {
+                    "id": "b5",
+                    "title": "Ambiguity Resolution",
+                    "type": "intent_gen",
+                    "config": {
+                        "prompt": "Make it fast"
+                    }
+                },
+                {
+                    "id": "b6",
+                    "title": "Multi-Step Intent Chain",
+                    "type": "intent_gen",
+                    "config": {
+                        "prompt": "Rough then Finish"
+                    }
+                },
+                {
+                    "id": "b7",
+                    "title": "Safety Constraint Injection",
+                    "type": "intent_gen",
+                    "config": {
+                        "constraint": "Low Heat"
+                    }
+                },
+                {
+                    "id": "b8",
+                    "title": "Cost Estimation Preview",
+                    "type": "pricing_preview",
+                    "config": {}
+                },
+                {
+                    "id": "b9",
+                    "title": "Alternative Plan Generation",
+                    "type": "plan_compare",
+                    "config": {}
+                },
+                {
+                    "id": "b10",
+                    "title": "User Feedback Loop",
+                    "type": "feedback_loop",
+                    "config": {}
+                }
+            ]
+        },
+        {
+            "id": "pack_c",
+            "title": "Pack C: AI Shield v3",
+            "description": "Thermodynamic Cybersecurity",
+            "demos": [
+                {
+                    "id": "c1",
+                    "title": "Static Threat Detection",
+                    "type": "shield_scan",
+                    "config": {
+                        "threat": "syntax"
+                    }
+                },
+                {
+                    "id": "c2",
+                    "title": "Parameter Clamping (RPM)",
+                    "type": "shield_scan",
+                    "config": {
+                        "threat": "rpm"
+                    }
+                },
+                {
+                    "id": "c3",
+                    "title": "Forbidden Sequence Block",
+                    "type": "shield_scan",
+                    "config": {
+                        "threat": "sequence"
+                    }
+                },
+                {
+                    "id": "c4",
+                    "title": "Thermodynamic Overload Prev.",
+                    "type": "shield_scan",
+                    "config": {
+                        "threat": "thermal"
+                    }
+                },
+                {
+                    "id": "c5",
+                    "title": "Runtime E-STOP Trigger",
+                    "type": "runtime_monitor",
+                    "config": {
+                        "event": "estop"
+                    }
+                },
+                {
+                    "id": "c6",
+                    "title": "Sanitization Log Audit",
+                    "type": "audit_log",
+                    "config": {}
+                },
+                {
+                    "id": "c7",
+                    "title": "Simulation Oracle Check",
+                    "type": "oracle_check",
+                    "config": {}
+                },
+                {
+                    "id": "c8",
+                    "title": "Visual Anomaly Detection",
+                    "type": "vision_check",
+                    "config": {}
+                },
+                {
+                    "id": "c9",
+                    "title": "Operator Override Safety",
+                    "type": "override_check",
+                    "config": {}
+                },
+                {
+                    "id": "c10",
+                    "title": "Shield Integrity Self-Test",
+                    "type": "self_test",
+                    "config": {}
+                }
+            ]
+        },
+        {
+            "id": "pack_d",
+            "title": "Pack D: Predictive Twin",
+            "description": "Seeing the Future (1s - 1h)",
+            "demos": [
+                {
+                    "id": "d1",
+                    "title": "Real-Time Monitoring (Now)",
+                    "type": "twin_monitor",
+                    "config": {
+                        "horizon": 0
+                    }
+                },
+                {
+                    "id": "d2",
+                    "title": "Short-Term Drift (1s - 5s)",
+                    "type": "twin_predict",
+                    "config": {
+                        "horizon": 5
+                    }
+                },
+                {
+                    "id": "d3",
+                    "title": "Process Stability (15s - 1m)",
+                    "type": "twin_predict",
+                    "config": {
+                        "horizon": 60
+                    }
+                },
+                {
+                    "id": "d4",
+                    "title": "Thermal Saturation (5m - 15m)",
+                    "type": "twin_predict",
+                    "config": {
+                        "horizon": 900
+                    }
+                },
+                {
+                    "id": "d5",
+                    "title": "Long-Horizon Energy (1h)",
+                    "type": "twin_predict",
+                    "config": {
+                        "horizon": 3600
+                    }
+                },
+                {
+                    "id": "d6",
+                    "title": "Confidence Decay Viz",
+                    "type": "confidence_graph",
+                    "config": {}
+                },
+                {
+                    "id": "d7",
+                    "title": "What-If Scenario: Speed Up",
+                    "type": "what_if",
+                    "config": {
+                        "change": "speed_up"
+                    }
+                },
+                {
+                    "id": "d8",
+                    "title": "What-If Scenario: Coolant Fail",
+                    "type": "what_if",
+                    "config": {
+                        "change": "coolant_fail"
+                    }
+                },
+                {
+                    "id": "d9",
+                    "title": "Historical vs Predicted",
+                    "type": "compare_viz",
+                    "config": {}
+                },
+                {
+                    "id": "d10",
+                    "title": "Predictive Maintenance Alert",
+                    "type": "alert_sim",
+                    "config": {}
+                }
+            ]
+        },
+        {
+            "id": "pack_e",
+            "title": "Pack E: Grand Loop",
+            "description": "Self-Correcting Autonomy",
+            "demos": [
+                {
+                    "id": "e1",
+                    "title": "End-to-End Job Execution",
+                    "type": "grand_loop",
+                    "config": {
+                        "job": "bracket"
+                    }
+                },
+                {
+                    "id": "e2",
+                    "title": "Capsule Bidding War",
+                    "type": "bidding_viz",
+                    "config": {}
+                },
+                {
+                    "id": "e3",
+                    "title": "Operator Learning (Style)",
+                    "type": "learning_viz",
+                    "config": {}
+                },
+                {
+                    "id": "e4",
+                    "title": "Dynamic Price Negotiation",
+                    "type": "pricing_viz",
+                    "config": {}
+                },
+                {
+                    "id": "e5",
+                    "title": "Multi-Machine Orchestration",
+                    "type": "orchestration",
+                    "config": {}
+                },
+                {
+                    "id": "e6",
+                    "title": "Error Recovery (Self-Heal)",
+                    "type": "recovery",
+                    "config": {}
+                },
+                {
+                    "id": "e7",
+                    "title": "Supply Chain Integration",
+                    "type": "supply_chain",
+                    "config": {}
+                },
+                {
+                    "id": "e8",
+                    "title": "Global Energy Optimization",
+                    "type": "optimization",
+                    "config": {}
+                },
+                {
+                    "id": "e9",
+                    "title": "Investor Demo (Showstopper)",
+                    "type": "showstopper",
+                    "config": {}
+                },
+                {
+                    "id": "e10",
+                    "title": "System Shutdown & Report",
+                    "type": "shutdown",
+                    "config": {}
+                }
+            ]
+        }
+    ]
+}

@@ -63,6 +63,51 @@ class SimulationOracle:
             "simulation_id": "sim_" + str(int(total_energy))
         }
 
+    def predict_horizon(self, current_state, horizon_seconds):
+        """
+        Predicts future state based on current state and physics model.
+        Input: 
+            current_state: { temp: float, power: float, ... }
+            horizon_seconds: int (1, 5, 60, 3600, etc.)
+        Output: { temp: float, energy_used: float, confidence: float }
+        """
+        # Simplified Physics Model for Extrapolation
+        # 1. Thermal Drift (Newton's Law of Cooling / Heating)
+        # dQ/dt = P_in - P_out
+        # P_in = current_state['power']
+        # P_out = k * (T - T_ambient)
+        
+        T_ambient = 20.0
+        k_cooling = 0.05 # Cooling coefficient
+        mass_thermal = 5.0 # Thermal mass factor
+        
+        current_temp = current_state.get('temp', 20.0)
+        power_in = current_state.get('power', 100.0) # Assume 100W if unknown
+        
+        # Iterative Euler Integration for accuracy over long horizons
+        dt = 1.0 # 1 second steps
+        steps = int(horizon_seconds / dt)
+        
+        temp = current_temp
+        energy_acc = 0.0
+        
+        for _ in range(steps):
+            p_out = k_cooling * (temp - T_ambient)
+            net_power = power_in - p_out
+            d_temp = net_power / (mass_thermal * 100) # Simplified specific heat capacity
+            temp += d_temp
+            energy_acc += power_in * dt
+            
+        # Confidence drops over time
+        confidence = max(0.1, 1.0 - (horizon_seconds / 7200.0)) # 0.5 confidence at 1 hour
+        
+        return {
+            "horizon_s": horizon_seconds,
+            "predicted_temp": round(temp, 2),
+            "predicted_energy_j": round(energy_acc, 2),
+            "confidence": round(confidence, 2)
+        }
+
 if __name__ == "__main__":
     # Test with a simple program
     program = [

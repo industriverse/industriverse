@@ -74,6 +74,34 @@ class ShadowRuntime:
 
         print("Shadow Twin Loop Complete.")
 
+    def run_predictive_loop(self, initial_state, duration_s=10):
+        """
+        Runs a predictive monitoring session.
+        Input: initial_state { temp, power }
+        """
+        print(f"Starting Predictive Twin (Duration: {duration_s}s)...")
+        self.is_running = True
+        start_time = time.time()
+        
+        horizons = [1, 5, 15, 60, 300, 900, 3600] # 1s to 1h
+        
+        while self.is_running and (time.time() - start_time) < duration_s:
+            current_state = initial_state.copy()
+            # Simulate slight fluctuation in current state
+            current_state['temp'] += random.uniform(-0.1, 0.1)
+            
+            print(f"\n[T+{int(time.time() - start_time)}s] Current Temp: {current_state['temp']:.2f}C")
+            
+            predictions = {}
+            for h in horizons:
+                pred = self.oracle.predict_horizon(current_state, h)
+                predictions[f"{h}s"] = pred
+                print(f"  -> +{h}s: {pred['predicted_temp']}C (Conf: {pred['confidence']})")
+                
+            time.sleep(1.0) # 1Hz update rate
+
+        print("Predictive Loop Complete.")
+
 if __name__ == "__main__":
     runtime = ShadowRuntime()
     program = [{"op": "OP_MOVE", "params": {"x": 100, "y": 50}}]
