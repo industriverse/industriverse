@@ -1,15 +1,16 @@
-const express = require('express');
-const http = require('http');
-const WebSocket = require('ws');
+import express from 'express';
+import http from 'http';
+import { WebSocketServer } from 'ws';
 // Mock Imports (In real app, these would be require statements)
 // const AIInterpreter = require('../src/utils/AIInterpreter');
 // const Encryption = require('../src/utils/Encryption');
 // const CNCDriver = require('./drivers/cncDriver');
 // const GenerativeGlyphEngine = require('../src/utils/GenerativeGlyphEngine'); // Mock import for Node context
+import IntentService from './services/intentService.js';
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocketServer({ server });
 
 const PORT = 5001;
 
@@ -51,27 +52,60 @@ wss.on('connection', (ws) => {
                 const { prompt } = data;
                 console.log(`Generating Glyphs for: "${prompt}"`);
 
-                // Mock Generation (Since we can't import ESM in CJS easily without dynamic import)
-                // In production, use: const result = await GenerativeGlyphEngine.generate(prompt);
+                try {
+                    // 1. Call Intent Kernel (Python)
+                    const intentPlan = await IntentService.fuseIntent(prompt);
 
-                let result = { glyphs: [], energy_estimate: '0J' };
-                if (prompt.includes('bracket')) {
-                    result = {
-                        glyphs: ['⊸C', '⊽0.5', '⊻'],
-                        energy_estimate: '120.5J',
-                        reasoning: 'Identified object: bracket -> Recipe: bracket_v1'
-                    };
-                    if (prompt.includes('lightweight')) {
-                        result.glyphs = ['⊸C', '⊽0.1', '⊻']; // Optimization
-                        result.energy_estimate = '450.2J'; // Higher energy for precision
-                        result.reasoning += ' | Applied modifier: lightweight -> Fine Mill';
+                    // 2. Resolve Glyphs from Plan
+                    // (This logic maps the abstract plan to concrete Glyphs)
+                    let glyphs = [];
+                    let basePrice = 0;
+                    let baseEnergy = 0;
+
+                    // Base Recipe
+                    if (intentPlan.base_recipe === 'bracket') {
+                        glyphs.push('⊸C'); // Align
+                        glyphs.push('⊽0.5'); // Default Cut
+                        glyphs.push('⊻');    // Verify
+                        basePrice = 15.20;
+                        baseEnergy = 120.5;
+                    } else if (intentPlan.base_recipe === 'gear') {
+                        glyphs.push('⊸C');
+                        glyphs.push('⊿5P');
+                        glyphs.push('⊻');
+                        basePrice = 25.00;
+                        baseEnergy = 200.0;
                     }
-                }
 
-                ws.send(JSON.stringify({
-                    type: 'GENERATION_RESULT',
-                    result: result
-                }));
+                    // Apply Modifiers from Intent
+                    if (intentPlan.modifiers.includes('⊽0.1')) {
+                        // Replace rough cut with fine cut
+                        const idx = glyphs.indexOf('⊽0.5');
+                        if (idx !== -1) glyphs[idx] = '⊽0.1';
+                        basePrice += 30.00; // Surcharge
+                        baseEnergy += 330.0; // More energy
+                    }
+
+                    // Construct Result
+                    const result = {
+                        glyphs: glyphs,
+                        energy_estimate: `${baseEnergy.toFixed(1)}J`,
+                        price: `$${basePrice.toFixed(2)}`,
+                        reasoning: intentPlan.reasoning.join(' | ')
+                    };
+
+                    ws.send(JSON.stringify({
+                        type: 'GENERATION_RESULT',
+                        result: result
+                    }));
+
+                } catch (err) {
+                    console.error("Intent Service Error:", err);
+                    ws.send(JSON.stringify({
+                        type: 'ERROR',
+                        message: "Failed to generate glyphs: " + err.message
+                    }));
+                }
             }
         } catch (e) {
             console.error('Error processing message:', e);
