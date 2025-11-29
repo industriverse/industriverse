@@ -1,0 +1,22 @@
+{
+    "⊼13E": {
+        "default": "EXPOSE 13.5nm EUV",
+        "ASML_NXE_3400": "EUV_EXP wavelength=13.5 dose=20mJ",
+        "energy_cost": "4.2J"
+    },
+    "⊽0.1": {
+        "default": "G01 X0.1 F50",
+        "Haas_VF2": "G1 X0.1 F50.0",
+        "energy_cost": "50J"
+    },
+    "⊿!": {
+        "default": "M0 ; PAUSE FOR DRIFT",
+        "Haas_VF2": "M00 ; OPERATOR CHECK",
+        "energy_cost": "15J"
+    },
+    "⊸C": {
+        "default": "ALIGN CENTER",
+        "ASML_NXE_3400": "ALIGN_WAFER type=optical target=center",
+        "energy_cost": "0.5J"
+    }
+}
