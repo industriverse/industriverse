@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "dataset_name": "DemoBase-1",
+    "created_at": 1764436135.233792,
+    "sample_count": 5,
+    "sources": [
+      "CAPSULE_A2A",
+      "ROBOTICS",
+      "AI_SHIELD"
+    ],
+    "schema_version": "1.0"
+  },
+  "data": [
+    {
+      "timestamp": 1764436134.7118368,
+      "source": "CAPSULE_A2A",
+      "energy_state": {
+        "joules": 237.73496408894692,
+        "entropy": 0.6478570957511783
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.19043614313569168,
+          0.5070194340496259,
+          0.22745068460139628
+        ],
+        "safety_score": 0.8660761180149438
+      }
+    },
+    {
+      "timestamp": 1764436134.9250119,
+      "source": "CAPSULE_A2A",
+      "energy_state": {
+        "joules": 305.3479466033617,
+        "entropy": 0.2524961651726151
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.6628314863585475,
+          0.5416993772760503,
+          0.3661308458583964
+        ],
+        "safety_score": 0.8419039540501213
+      }
+    },
+    {
+      "timestamp": 1764436135.027143,
+      "source": "AI_SHIELD",
+      "energy_state": {
+        "joules": 373.0728570491278,
+        "entropy": 0.4277746276225335
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.2171562818149716,
+          0.9373155704172285,
+          0.4843484262500901
+        ],
+        "safety_score": 0.8847750741106056
+      }
+    },
+    {
+      "timestamp": 1764436135.131379,
+      "source": "AI_SHIELD",
+      "energy_state": {
+        "joules": 176.71501919169063,
+        "entropy": 0.16750080436649706
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.37016086822780225,
+          0.07864398275138651,
+          0.6522976336687456
+        ],
+        "safety_score": 0.8175549551247814
+      }
+    },
+    {
+      "timestamp": 1764436134.8194728,
+      "source": "ROBOTICS",
+      "energy_state": {
+        "joules": 304.49259936666175,
+        "entropy": 0.37704023330359304
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.22574734083354686,
+          0.17853402118987516,
+          0.5692404096009716
+        ],
+        "safety_score": 0.927235727436358
+      }
+    }
+  ]
+}

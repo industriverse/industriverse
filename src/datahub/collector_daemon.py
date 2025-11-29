@@ -2,52 +2,87 @@ import time
 import json
 import os
 import random
+import logging
+import signal
+import sys
 from typing import Dict, Any
+
+# Configure Logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("data/datahub/collector.log"),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger("CollectorDaemon")
 
 class CollectorDaemon:
     """
-    Industriverse Data Hub: Collector Daemon.
+    Industriverse Data Hub: Collector Daemon (Production Ready).
     
     Purpose:
-    Runs 24/7 to collect:
-    - Simulator runs
-    - Energy minimization trajectories
-    - AI Shield rejects
-    - Operator overrides
-    - A2A capsule negotiations
-    
-    Output:
-    Raw data shards in 'data/datahub/raw/'.
+    Runs 24/7 to collect system telemetry and generate data shards.
+    Robustness: Logging, Error Handling, Graceful Shutdown.
     """
-    def __init__(self, output_dir="data/datahub/raw"):
-        self.output_dir = output_dir
+    def __init__(self, config: Dict[str, Any] = None):
+        self.config = config or {
+            "output_dir": "data/datahub/raw",
+            "interval_seconds": 0.5,
+            "max_shards_per_run": 1000 # Safety limit for demo
+        }
+        self.output_dir = self.config["output_dir"]
         os.makedirs(self.output_dir, exist_ok=True)
         self.is_running = False
         
+        # Handle Signals
+        signal.signal(signal.SIGINT, self.handle_signal)
+        signal.signal(signal.SIGTERM, self.handle_signal)
+
+    def handle_signal(self, signum, frame):
+        logger.info(f"Received signal {signum}. Shutting down...")
+        self.stop()
+
     def start(self):
         self.is_running = True
-        print("📡 Data Hub Collector Daemon Started.")
-        print(f"   Target: {self.output_dir}")
-        self.run_loop()
+        logger.info("📡 Data Hub Collector Daemon Started.")
+        logger.info(f"   Target: {self.output_dir}")
+        logger.info(f"   Interval: {self.config['interval_seconds']}s")
+        
+        try:
+            self.run_loop()
+        except Exception as e:
+            logger.critical(f"🔥 Critical Failure: {e}", exc_info=True)
+        finally:
+            self.stop()
         
     def stop(self):
         self.is_running = False
-        print("🛑 Data Hub Collector Daemon Stopped.")
+        logger.info("🛑 Data Hub Collector Daemon Stopped.")
 
     def run_loop(self):
         """
-        Simulates the continuous collection loop.
+        Continuous collection loop.
         """
         count = 0
-        while self.is_running and count < 5: # Limit for demo
-            data_packet = self.collect_system_state()
-            self.save_packet(data_packet)
-            count += 1
-            time.sleep(0.5)
+        while self.is_running:
+            if count >= self.config["max_shards_per_run"]:
+                logger.info("Reached max shards limit. Stopping.")
+                break
+                
+            try:
+                data_packet = self.collect_system_state()
+                self.save_packet(data_packet)
+                count += 1
+            except Exception as e:
+                logger.error(f"Error in collection loop: {e}")
+                
+            time.sleep(self.config["interval_seconds"])
 
     def collect_system_state(self) -> Dict[str, Any]:
         """
-        Simulates gathering data from various subsystems.
+        Gather data from subsystems.
         """
         # Mock Data Sources
         return {
@@ -70,10 +105,20 @@ class CollectorDaemon:
         """
         filename = f"shard_{int(packet['timestamp']*1000)}_{packet['source']}.json"
         path = os.path.join(self.output_dir, filename)
-        with open(path, 'w') as f:
-            json.dump(packet, f)
-        print(f"   Saved shard: {filename}")
+        
+        try:
+            with open(path, 'w') as f:
+                json.dump(packet, f)
+            logger.debug(f"Saved shard: {filename}")
+        except IOError as e:
+            logger.error(f"Failed to write shard {filename}: {e}")
 
 if __name__ == "__main__":
-    daemon = CollectorDaemon()
+    # Example Config
+    config = {
+        "output_dir": "data/datahub/raw",
+        "interval_seconds": 0.2,
+        "max_shards_per_run": 10
+    }
+    daemon = CollectorDaemon(config)
     daemon.start()

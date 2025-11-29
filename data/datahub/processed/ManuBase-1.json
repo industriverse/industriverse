@@ -1,87 +1,185 @@
-[
-  {
-    "timestamp": 1764435842.205985,
-    "source": "CAPSULE_A2A",
-    "energy_state": {
-      "joules": 153.34751597711954,
-      "entropy": 0.8891615191446074
-    },
-    "event_type": "OPTIMIZATION_STEP",
-    "payload": {
-      "action_vector": [
-        0.14460613794568833,
-        0.771543739003053,
-        0.2611194973683463
-      ],
-      "safety_score": 0.8052426235905467
-    }
+{
+  "metadata": {
+    "dataset_name": "ManuBase-1",
+    "created_at": 1764436077.152709,
+    "sample_count": 10,
+    "sources": [
+      "SIMULATOR",
+      "AI_SHIELD",
+      "ROBOTICS"
+    ],
+    "schema_version": "1.0"
   },
-  {
-    "timestamp": 1764435843.7159412,
-    "source": "ROBOTICS",
-    "energy_state": {
-      "joules": 380.26670133638476,
-      "entropy": 0.6280578397272123
+  "data": [
+    {
+      "timestamp": 1764436076.885556,
+      "source": "ROBOTICS",
+      "energy_state": {
+        "joules": 193.73463679858673,
+        "entropy": 0.8088048537670754
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.3028352827648154,
+          0.932438931789682,
+          0.240026330023407
+        ],
+        "safety_score": 0.9938459919768154
+      }
     },
-    "event_type": "OPTIMIZATION_STEP",
-    "payload": {
-      "action_vector": [
-        0.9264208173044715,
-        0.6674702262457681,
-        0.46825163138128945
-      ],
-      "safety_score": 0.9859561266262248
-    }
-  },
-  {
-    "timestamp": 1764435843.210598,
-    "source": "ROBOTICS",
-    "energy_state": {
-      "joules": 315.21849565028236,
-      "entropy": 0.492626865493785
+    {
+      "timestamp": 1764436075.4401011,
+      "source": "AI_SHIELD",
+      "energy_state": {
+        "joules": 362.39980950895733,
+        "entropy": 0.4060887397189826
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.08583706334184771,
+          0.412373285583278,
+          0.7319682522597649
+        ],
+        "safety_score": 0.8857090293226321
+      }
     },
-    "event_type": "OPTIMIZATION_STEP",
-    "payload": {
-      "action_vector": [
-        0.586371339682229,
-        0.6944542524227549,
-        0.18163887143213386
-      ],
-      "safety_score": 0.9509500584184576
-    }
-  },
-  {
-    "timestamp": 1764435841.702423,
-    "source": "AI_SHIELD",
-    "energy_state": {
-      "joules": 420.4522386801926,
-      "entropy": 0.7711503116637892
+    {
+      "timestamp": 1764436075.029193,
+      "source": "ROBOTICS",
+      "energy_state": {
+        "joules": 183.0367145077206,
+        "entropy": 0.8622125685482563
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.8881767110097217,
+          0.3227245222230273,
+          0.3940729934792202
+        ],
+        "safety_score": 0.9544431719170896
+      }
     },
-    "event_type": "OPTIMIZATION_STEP",
-    "payload": {
-      "action_vector": [
-        0.30527983717419727,
-        0.8978008084926934,
-        0.589012147392788
-      ],
-      "safety_score": 0.8830015436806704
-    }
-  },
-  {
-    "timestamp": 1764435842.709076,
-    "source": "ROBOTICS",
-    "energy_state": {
-      "joules": 300.1579393230668,
-      "entropy": 0.3733675418642268
+    {
+      "timestamp": 1764436076.2693372,
+      "source": "AI_SHIELD",
+      "energy_state": {
+        "joules": 412.93409138459924,
+        "entropy": 0.35103062862538825
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.5414643208235055,
+          0.972978686089411,
+          0.9198594250746208
+        ],
+        "safety_score": 0.9503628744360333
+      }
     },
-    "event_type": "OPTIMIZATION_STEP",
-    "payload": {
-      "action_vector": [
-        0.08191029902422398,
-        0.23428523605891816,
-        0.977515873773628
-      ],
-      "safety_score": 0.8817994414200059
+    {
+      "timestamp": 1764436076.0533,
+      "source": "AI_SHIELD",
+      "energy_state": {
+        "joules": 436.1181453015281,
+        "entropy": 0.3942871116495582
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.9252710418384342,
+          0.5350178632046475,
+          0.29033391600934577
+        ],
+        "safety_score": 0.9565685525587659
+      }
+    },
+    {
+      "timestamp": 1764436076.680064,
+      "source": "ROBOTICS",
+      "energy_state": {
+        "joules": 454.5415814727311,
+        "entropy": 0.38959713358454373
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.6944888779753936,
+          0.02134256019708336,
+          0.375718084355817
+        ],
+        "safety_score": 0.863128631367293
+      }
+    },
+    {
+      "timestamp": 1764436076.47471,
+      "source": "AI_SHIELD",
+      "energy_state": {
+        "joules": 399.57935876073753,
+        "entropy": 0.8711505340579415
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.21936736538012713,
+          0.48386051855201895,
+          0.5857867743042572
+        ],
+        "safety_score": 0.8967713183278316
+      }
+    },
+    {
+      "timestamp": 1764436075.234441,
+      "source": "SIMULATOR",
+      "energy_state": {
+        "joules": 365.53534661603175,
+        "entropy": 0.6413176326931115
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.27742846731881043,
+          0.05189405971779659,
+          0.8246133267952834
+        ],
+        "safety_score": 0.938894671985127
+      }
+    },
+    {
+      "timestamp": 1764436075.852179,
+      "source": "AI_SHIELD",
+      "energy_state": {
+        "joules": 230.31703696140573,
+        "entropy": 0.2189950706645366
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.1368998991592919,
+          0.6043522166905704,
+          0.2680310586689342
+        ],
+        "safety_score": 0.8678854214549875
+      }
+    },
+    {
+      "timestamp": 1764436075.645427,
+      "source": "SIMULATOR",
+      "energy_state": {
+        "joules": 319.355816775946,
+        "entropy": 0.4280412861896571
+      },
+      "event_type": "OPTIMIZATION_STEP",
+      "payload": {
+        "action_vector": [
+          0.7291259497360751,
+          0.5623453047174067,
+          0.6948048630170983
+        ],
+        "safety_score": 0.9521356507345698
+      }
     }
-  }
-]
+  ]
+}
