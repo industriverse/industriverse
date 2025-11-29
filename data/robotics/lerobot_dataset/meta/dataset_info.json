@@ -1,0 +1,32 @@
+{
+  "dataset_name": "egocentric_10k_robotics",
+  "version": "1.0.0",
+  "description": "Robotics dataset derived from Egocentric-10K human demonstrations.",
+  "features": {
+    "observation.state": {
+      "dtype": "float32",
+      "shape": [
+        6
+      ],
+      "names": [
+        "lh_x",
+        "lh_y",
+        "lh_z",
+        "rh_x",
+        "rh_y",
+        "rh_z"
+      ]
+    },
+    "action": {
+      "dtype": "float32",
+      "shape": [
+        3
+      ],
+      "names": [
+        "x",
+        "y",
+        "z"
+      ]
+    }
+  }
+}

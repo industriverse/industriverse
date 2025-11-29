@@ -1,0 +1,87 @@
+[
+  {
+    "timestamp": 1764435842.205985,
+    "source": "CAPSULE_A2A",
+    "energy_state": {
+      "joules": 153.34751597711954,
+      "entropy": 0.8891615191446074
+    },
+    "event_type": "OPTIMIZATION_STEP",
+    "payload": {
+      "action_vector": [
+        0.14460613794568833,
+        0.771543739003053,
+        0.2611194973683463
+      ],
+      "safety_score": 0.8052426235905467
+    }
+  },
+  {
+    "timestamp": 1764435843.7159412,
+    "source": "ROBOTICS",
+    "energy_state": {
+      "joules": 380.26670133638476,
+      "entropy": 0.6280578397272123
+    },
+    "event_type": "OPTIMIZATION_STEP",
+    "payload": {
+      "action_vector": [
+        0.9264208173044715,
+        0.6674702262457681,
+        0.46825163138128945
+      ],
+      "safety_score": 0.9859561266262248
+    }
+  },
+  {
+    "timestamp": 1764435843.210598,
+    "source": "ROBOTICS",
+    "energy_state": {
+      "joules": 315.21849565028236,
+      "entropy": 0.492626865493785
+    },
+    "event_type": "OPTIMIZATION_STEP",
+    "payload": {
+      "action_vector": [
+        0.586371339682229,
+        0.6944542524227549,
+        0.18163887143213386
+      ],
+      "safety_score": 0.9509500584184576
+    }
+  },
+  {
+    "timestamp": 1764435841.702423,
+    "source": "AI_SHIELD",
+    "energy_state": {
+      "joules": 420.4522386801926,
+      "entropy": 0.7711503116637892
+    },
+    "event_type": "OPTIMIZATION_STEP",
+    "payload": {
+      "action_vector": [
+        0.30527983717419727,
+        0.8978008084926934,
+        0.589012147392788
+      ],
+      "safety_score": 0.8830015436806704
+    }
+  },
+  {
+    "timestamp": 1764435842.709076,
+    "source": "ROBOTICS",
+    "energy_state": {
+      "joules": 300.1579393230668,
+      "entropy": 0.3733675418642268
+    },
+    "event_type": "OPTIMIZATION_STEP",
+    "payload": {
+      "action_vector": [
+        0.08191029902422398,
+        0.23428523605891816,
+        0.977515873773628
+      ],
+      "safety_score": 0.8817994414200059
+    }
+  }
+]
