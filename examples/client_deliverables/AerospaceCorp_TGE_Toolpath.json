@@ -1,0 +1,40 @@
+{
+  "timestamp": 1764436549.884031,
+  "generated_gcode": [
+    "G21 ; Metric",
+    "G90 ; Absolute",
+    "M104 S210 ; Set Temp (Optimized)",
+    "G1 F1500 ; Feed Rate (Energy Minimized)",
+    "G1 X100 Y100 E10"
+  ],
+  "optimization_trace": [
+    {
+      "step": 0,
+      "energy_joules": 900.0,
+      "action": "ADJUST_FEED_RATE"
+    },
+    {
+      "step": 1,
+      "energy_joules": 810.0,
+      "action": "ADJUST_FEED_RATE"
+    },
+    {
+      "step": 2,
+      "energy_joules": 729.0,
+      "action": "ADJUST_FEED_RATE"
+    },
+    {
+      "step": 3,
+      "energy_joules": 656.1,
+      "action": "ADJUST_FEED_RATE"
+    },
+    {
+      "step": 4,
+      "energy_joules": 590.49,
+      "action": "ADJUST_FEED_RATE"
+    }
+  ],
+  "final_energy_joules": 590.49,
+  "exergy_cost_usd": 0.0885735,
+  "is_deterministic": true
+}

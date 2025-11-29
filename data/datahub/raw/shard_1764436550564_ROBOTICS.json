@@ -1,0 +1,1 @@
+{"timestamp": 1764436550.564076, "source": "ROBOTICS", "energy_state": {"joules": 445.51687985500354, "entropy": 0.19320501621035496}, "event_type": "OPTIMIZATION_STEP", "payload": {"action_vector": [0.17862812743748657, 0.015466837531256994, 0.2847584715626814], "safety_score": 0.9982993794013866}}

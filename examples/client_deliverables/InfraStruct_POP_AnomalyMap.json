@@ -1,0 +1,7 @@
+{
+  "timestamp": 1764436549.884841,
+  "max_force_newtons": 60,
+  "turbulence_index": 110.0,
+  "anomaly_detected": true,
+  "recommendation": "REDUCE_FEED_RATE"
+}

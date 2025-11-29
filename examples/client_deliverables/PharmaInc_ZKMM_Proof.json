@@ -1,0 +1,10 @@
+{
+  "proof_id": "zk-ec0a2c1c",
+  "public_claims": {
+    "yield": 0.99,
+    "energy_cost": 10.5,
+    "duration": 120
+  },
+  "proof_string": "zk-snark-mock-ec0a2c1c97a6d48bfae6ebe809f3827b07fe844bb32f4ce9e5a7a74051ec1e0d",
+  "verified": true
+}
