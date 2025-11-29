@@ -1,0 +1,19 @@
+{
+    "id": "CAP_001",
+    "name": "Precision Miller Alpha",
+    "type": "CNC_MILL",
+    "capabilities": [
+        "precision",
+        "metal",
+        "3-axis"
+    ],
+    "status": "IDLE",
+    "specs": {
+        "max_rpm": 12000,
+        "work_area": [
+            300,
+            300,
+            200
+        ]
+    }
+}
