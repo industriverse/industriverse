@@ -18,7 +18,12 @@ async function runTest() {
         } else {
             console.log(`Generated Sequence: ${JSON.stringify(result.glyphs)}`);
             console.log(`Energy Estimate: ${result.energy_estimate}`);
+            console.log(`Exergy Price: ${result.price}`); // New Check
             console.log(`Reasoning: ${result.reasoning}`);
+
+            if (!result.price || !result.price.startsWith('$')) {
+                console.error("FAIL: Price missing or invalid format.");
+            }
 
             // Validation Logic
             if (prompt.includes("lightweight") && !result.glyphs.includes("⊽0.1")) {

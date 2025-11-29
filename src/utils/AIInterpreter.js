@@ -30,9 +30,14 @@ class AIInterpreter {
         // Query the Energy Atlas for the "Ground Truth" cost
         const simResult = await SimulationService.predictEnergy(glyph);
 
-        // 4. Thermodynamic Autocorrect
+        // 4. Thermodynamic Autocorrect & Pricing
         let warning = null;
         let energy = simResult.energy || parseFloat(entry.energy_cost) || 0;
+        let price = parseFloat(entry.base_price) || 0;
+
+        // Dynamic Pricing: Energy Surcharge (e.g., $0.001 per Joule)
+        const energySurcharge = energy * 0.001;
+        const totalPrice = (price + energySurcharge).toFixed(2);
 
         // Threshold Check: If energy > 100J, flag it (Heuristic)
         if (energy > 100.0) {
@@ -45,6 +50,7 @@ class AIInterpreter {
             type: machineType,
             cmd: cmd,
             energy: `${energy.toFixed(1)}J`,
+            price: `$${totalPrice}`,
             source: simResult.source || "Vault",
             warning: warning,
             timestamp: Date.now()

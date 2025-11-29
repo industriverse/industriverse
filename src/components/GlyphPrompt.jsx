@@ -13,7 +13,19 @@ const GlyphPrompt = ({ onGenerate }) => {
             const timer = setTimeout(() => {
                 setIsDreaming(false);
                 // Simple client-side heuristic for preview
-                if (prompt.includes('bracket')) setPreview(['⊸C', '⊽...', '⊻']);
+                if (prompt.includes('bracket')) {
+                    let price = '$15.20';
+                    let energy = '120.5J';
+                    if (prompt.includes('lightweight')) {
+                        price = '$45.50'; // Higher price for precision
+                        energy = '450.2J';
+                    }
+                    setPreview({
+                        glyphs: prompt.includes('lightweight') ? ['⊸C', '⊽0.1', '⊻'] : ['⊸C', '⊽0.5', '⊻'],
+                        price: price,
+                        energy: energy
+                    });
+                }
                 else setPreview(null);
             }, 500);
             return () => clearTimeout(timer);
@@ -54,12 +66,21 @@ const GlyphPrompt = ({ onGenerate }) => {
 
                 {/* Glyph Preview */}
                 {preview && !isDreaming && (
-                    <div className="absolute -top-12 left-0 flex gap-2">
-                        {preview.map((g, i) => (
-                            <div key={i} className="bg-black/80 border border-cyan-500/30 px-2 py-1 rounded text-cyan-300 text-sm font-mono animate-fade-in-up">
-                                {g}
+                    <div className="absolute -top-16 left-0 w-full">
+                        <div className="flex justify-between items-end mb-2">
+                            <div className="flex gap-2">
+                                {preview.glyphs.map((g, i) => (
+                                    <div key={i} className="bg-black/80 border border-cyan-500/30 px-2 py-1 rounded text-cyan-300 text-sm font-mono animate-fade-in-up">
+                                        {g}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                            <div className="text-right">
+                                <div className="text-xs text-gray-400">EST. EXERGY PRICE</div>
+                                <div className="text-xl font-bold text-green-400">{preview.price}</div>
+                                <div className="text-[10px] text-gray-500">{preview.energy}</div>
+                            </div>
+                        </div>
                     </div>
                 )}
             </form>

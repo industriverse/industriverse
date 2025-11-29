@@ -65,16 +65,20 @@ class GenerativeGlyphEngine {
             reasoning.push("Auto-corrected: Added Alignment step.");
         }
 
-        // 5. Thermodynamic Estimation
+        // 5. Thermodynamic Estimation & Pricing
         let totalEnergy = 0;
+        let totalPrice = 0;
+
         for (const glyph of currentSequence) {
             const result = await AIInterpreter.translate(glyph);
             totalEnergy += parseFloat(result.energy) || 0;
+            totalPrice += parseFloat(result.price.replace('$', '')) || 0;
         }
 
         return {
             glyphs: currentSequence,
             energy_estimate: `${totalEnergy.toFixed(1)}J`,
+            price: `$${totalPrice.toFixed(2)}`,
             reasoning: reasoning.join(' | ')
         };
     }
