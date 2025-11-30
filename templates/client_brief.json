@@ -1,0 +1,17 @@
+{
+    "client_name": "Acme Corp",
+    "project_code": "ACME-001",
+    "contact_email": "cto@acme.com",
+    "problem_statement": "Reduce energy consumption of our welding robots by 20%.",
+    "constraints": {
+        "budget_usd": 50000,
+        "deadline": "2025-12-31",
+        "max_downtime_hours": 4
+    },
+    "technical_requirements": {
+        "machine_type": "Kuka-KR-1000",
+        "material": "Aluminum 6061",
+        "target_metric": "ENTROPY_REDUCTION"
+    },
+    "preferred_persona": "research_lead"
+}

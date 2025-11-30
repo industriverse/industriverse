@@ -1,0 +1,40 @@
+{
+    "system_name": "Empeiria Haus Data Hub Factory",
+    "version": "1.0.0-RC1",
+    "last_updated": "2025-11-29",
+    "components": {
+        "daemon": {
+            "path": "src/datahub/collector_daemon.py",
+            "status": "ACTIVE",
+            "capabilities": [
+                "IPC",
+                "ResearchMode",
+                "TrinityBridge"
+            ]
+        },
+        "orchestrator": {
+            "path": "src/core/trifecta_orchestrator.py",
+            "status": "ACTIVE",
+            "personas": [
+                "research_lead",
+                "safety_officer",
+                "financial_auditor"
+            ]
+        },
+        "research_engine": {
+            "controller": "src/research/research_controller.py",
+            "models": [
+                "TGE",
+                "ZKMM",
+                "PEM",
+                "MFEM"
+            ]
+        },
+        "frontend": {
+            "portal": "src/frontend/pages/EmpeiriaPortal.jsx",
+            "theme": "Architect's Void"
+        }
+    },
+    "security_level": "MAXIMUM",
+    "certification": "READY_FOR_CLIENT_DEPLOYMENT"
+}
