@@ -62,9 +62,23 @@ A superorganism cannot run on simple scripts. It requires a brain that understan
 *   **Logic**: If a task fails, Telos does not just retry. It spawns a **Diagnosis Agent** (UserLM) to read the logs, fix the input, and evolve the workflow.
 *   **Result**: The system gets smarter with every failure.
 
+### Aletheia (The Truth Layer)
+*   **Physics**: Reality & Validation.
+*   **Function**: The Sensorium. It validates that the "Map" (Model) matches the "Territory" (Physics).
+*   **Logic**: "The simulation predicts 500°C, but the sensor reads 550°C. **HALT**. Drift Detected. Recalibrate."
+*   **Result**: The system is grounded in physical truth, preventing hallucination.
+
 ---
 
-## 4. The Economic Engine: The Capsule Marketplace
+## 4. The Dark Factory (Lights-Out Manufacturing)
+The ultimate goal is the **Dark Factory**—a facility that runs without human intervention, guided by the **Quadrality**.
+*   **Controller**: The `DarkFactoryController` acts as the Autopilot.
+*   **Optimization**: The **Entropy Market Maker (EMM)** dynamically adjusts energy budgets and priorities based on global market conditions.
+*   **Personas**: Each factory has a "Personality" (e.g., "Aggressive Growth" vs "Conservative Stability") that dictates its bidding strategy.
+
+---
+
+## 5. The Economic Engine: The Capsule Marketplace
 We do not sell software. We monetize the **Physics of Efficiency**.
 1.  **Quantify**: We measure efficiency gains as "Negentropy Score".
 2.  **Tokenize**: We mint these gains as XRPL Tokens (Capsules).

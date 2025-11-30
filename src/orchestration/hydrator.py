@@ -10,18 +10,19 @@ class ServiceHydrator:
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir)
 
-    def hydrate(self, b2_path):
+    def hydrate(self, b2_path, region="us-east"):
         """
         Downloads service from B2 if not already cached.
+        Simulates Region Awareness (Edge Caching).
         """
         filename = b2_path.split("/")[-1]
         local_path = os.path.join(self.cache_dir, filename)
 
         if os.path.exists(local_path):
-            print(f"[Hydrator] ⚡ Cache Hit: {filename}")
+            print(f"[Hydrator] ⚡ Cache Hit ({region}): {filename}")
             return local_path
 
-        print(f"[Hydrator] 🌧️ Hydrating from B2: {b2_path}...")
+        print(f"[Hydrator] 🌧️ Hydrating from B2 ({region}): {b2_path}...")
         # Simulate Download Latency
         time.sleep(1.0) 
         
