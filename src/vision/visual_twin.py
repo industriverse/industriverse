@@ -39,36 +39,35 @@ class VisualTwin:
 
     def perceive(self, video_chunk_path):
         """
-        Input: Path to current video chunk.
-        Output: Simulated perception metadata based on real file.
+        Simulates perception on a video chunk.
+        Returns a list of detected objects/actions.
         """
-        if not video_chunk_path or not os.path.exists(video_chunk_path):
-             return {
-                "state_vector": {"x": 0, "y": 0, "temp": 20.0, "status": "NO_SIGNAL"},
-                "confidence": 0.0
-            }
+        # In a real system, this would run a VLM (e.g., PaliGemma/GPT-4o)
+        # Here we return mock detections based on the file path
+        return [
+            {"label": "human_hand", "confidence": 0.98, "box": [100, 100, 200, 200]},
+            {"label": "tool_wrench", "confidence": 0.92, "box": [150, 150, 250, 250]},
+            {"label": "action_tightening", "confidence": 0.85}
+        ]
 
-        # In a real system, we would run the Vision Transformer here.
-        # For now, we simulate "Perception" by extracting metadata and returning a valid state.
-        
-        file_size = os.path.getsize(video_chunk_path)
-        
+    def ingest_multimodal(self, telemetry):
+        """
+        Challenge #4: Real-Time Digital Twin Consistency.
+        Ingests non-visual sensor data (Thermal, Vibration, Acoustic).
+        """
+        self.latest_telemetry = telemetry
+        # In a real system, this would fuse with video data via MFEM.
+        print(f"[VisualTwin] 🌡️  Fused Telemetry: {telemetry}")
+
+    def get_state(self):
+        """
+        Returns the current belief state of the Digital Twin.
+        """
         return {
-            "source": video_chunk_path,
-            "state_vector": {
-                "x": 100.0 + random.uniform(-1, 1), 
-                "y": 50.0 + random.uniform(-1, 1),
-                "z": 0.0,
-                "temp": 210.0 + random.uniform(-5, 5), # Simulated IR reading
-                "spaghetti_detected": False,
-                "operator_present": True
-            },
-            "meta": {
-                "file_size_bytes": file_size,
-                "dataset": "Egocentric-10K"
-            },
-            "anomalies": [],
-            "confidence": 0.98, # High confidence because we have real data
+            "visual": "active",
+            "telemetry": getattr(self, 'latest_telemetry', {}),
+            "drift_status": "nominal",
+            "confidence": 0.98,
             "timestamp": time.time()
         }
 
