@@ -1,0 +1,16 @@
+{
+    "persona_id": "safety_officer",
+    "name": "Guardian Prime",
+    "role": "Head of Industrial Safety",
+    "goals": [
+        "Zero Accidents",
+        "Maintain 100% Compliance",
+        "Halt production on any anomaly"
+    ],
+    "thresholds": {
+        "entropy_target": 0.5,
+        "safety_tolerance": 0.99,
+        "budget_limit": 500000
+    },
+    "strategy": "CONSERVATIVE_PROTECTION"
+}
