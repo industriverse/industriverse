@@ -1,0 +1,362 @@
+{
+    "chapter_1_physics": [
+        {
+            "id": "PHY-01",
+            "name": "Fusion Plasma Stability",
+            "target": "Tokamak-7",
+            "model": "TGE",
+            "metric": "Magnetic Flux Variance"
+        },
+        {
+            "id": "PHY-02",
+            "name": "Grid Load Balancing",
+            "target": "Texas-ERCOT",
+            "model": "PEM",
+            "metric": "Frequency Deviation"
+        },
+        {
+            "id": "PHY-03",
+            "name": "Motor Harmonic Cancellation",
+            "target": "Tesla-Model-S-Motor",
+            "model": "TGE",
+            "metric": "Vibration (Hz)"
+        },
+        {
+            "id": "PHY-04",
+            "name": "Superconductor Cooling",
+            "target": "Maglev-Rail",
+            "model": "TGE",
+            "metric": "Temperature (K)"
+        },
+        {
+            "id": "PHY-05",
+            "name": "Fluid Dynamics Optimization",
+            "target": "Pipeline-X",
+            "model": "TGE",
+            "metric": "Turbulence Index"
+        },
+        {
+            "id": "PHY-06",
+            "name": "Quantum Decoherence Prevention",
+            "target": "Qubit-Array",
+            "model": "PEM",
+            "metric": "Coherence Time"
+        },
+        {
+            "id": "PHY-07",
+            "name": "Battery Thermal Management",
+            "target": "Pack-4680",
+            "model": "TGE",
+            "metric": "Heat Dissipation"
+        },
+        {
+            "id": "PHY-08",
+            "name": "Aerodynamic Drag Reduction",
+            "target": "Drone-Wing",
+            "model": "TGE",
+            "metric": "Drag Coefficient"
+        },
+        {
+            "id": "PHY-09",
+            "name": "Seismic Vibration Damping",
+            "target": "Skyscraper-Base",
+            "model": "TGE",
+            "metric": "Richter Stability"
+        },
+        {
+            "id": "PHY-10",
+            "name": "Laser Beam Focusing",
+            "target": "Cutter-Head",
+            "model": "TGE",
+            "metric": "Focal Precision"
+        }
+    ],
+    "chapter_2_bio": [
+        {
+            "id": "BIO-01",
+            "name": "Protein Folding Prediction",
+            "target": "Alpha-Helix-9",
+            "model": "TGE",
+            "metric": "Free Energy (G)"
+        },
+        {
+            "id": "BIO-02",
+            "name": "Enzyme Catalysis Boost",
+            "target": "Polymerase-X",
+            "model": "TGE",
+            "metric": "Reaction Rate"
+        },
+        {
+            "id": "BIO-03",
+            "name": "CRISPR Off-Target Minimization",
+            "target": "Gene-Seq-21",
+            "model": "PEM",
+            "metric": "Error Probability"
+        },
+        {
+            "id": "BIO-04",
+            "name": "Drug Binding Affinity",
+            "target": "Receptor-5HT",
+            "model": "TGE",
+            "metric": "Binding Energy"
+        },
+        {
+            "id": "BIO-05",
+            "name": "Metabolic Pathway Optimization",
+            "target": "Yeast-Strain-7",
+            "model": "TGE",
+            "metric": "Yield %"
+        },
+        {
+            "id": "BIO-06",
+            "name": "Neural Spike Sorting",
+            "target": "Brain-Interface",
+            "model": "PEM",
+            "metric": "Signal-to-Noise"
+        },
+        {
+            "id": "BIO-07",
+            "name": "DNA Storage Encoding",
+            "target": "Archive-Helix",
+            "model": "TGE",
+            "metric": "Bit Density"
+        },
+        {
+            "id": "BIO-08",
+            "name": "Virus Capsid Stability",
+            "target": "Vector-V1",
+            "model": "TGE",
+            "metric": "Structural Integrity"
+        },
+        {
+            "id": "BIO-09",
+            "name": "Photosynthesis Efficiency",
+            "target": "Algae-Tank",
+            "model": "TGE",
+            "metric": "Photon Capture"
+        },
+        {
+            "id": "BIO-10",
+            "name": "Bioreactor Flow Control",
+            "target": "Vat-3000",
+            "model": "PEM",
+            "metric": "Shear Stress"
+        }
+    ],
+    "chapter_3_space": [
+        {
+            "id": "SPC-01",
+            "name": "Orbital Trajectory Optimization",
+            "target": "Sat-Constellation",
+            "model": "TGE",
+            "metric": "Delta-V Usage"
+        },
+        {
+            "id": "SPC-02",
+            "name": "Satellite Camouflage",
+            "target": "Asset-Black",
+            "model": "TGE",
+            "metric": "Radar Cross Section"
+        },
+        {
+            "id": "SPC-03",
+            "name": "Deep Space Navigation",
+            "target": "Probe-Voyager",
+            "model": "PEM",
+            "metric": "Position Error"
+        },
+        {
+            "id": "SPC-04",
+            "name": "Solar Sail Attitude Control",
+            "target": "Sail-1",
+            "model": "TGE",
+            "metric": "Thrust Vector"
+        },
+        {
+            "id": "SPC-05",
+            "name": "Debris Avoidance Maneuver",
+            "target": "ISS-Module",
+            "model": "PEM",
+            "metric": "Collision Probability"
+        },
+        {
+            "id": "SPC-06",
+            "name": "Rocket Nozzle Flow",
+            "target": "Engine-Raptor",
+            "model": "TGE",
+            "metric": "Exhaust Velocity"
+        },
+        {
+            "id": "SPC-07",
+            "name": "Habitat Life Support",
+            "target": "Mars-Base",
+            "model": "PEM",
+            "metric": "O2 Efficiency"
+        },
+        {
+            "id": "SPC-08",
+            "name": "Asteroid Mining Drill",
+            "target": "Rock-X",
+            "model": "TGE",
+            "metric": "Bit Wear"
+        },
+        {
+            "id": "SPC-09",
+            "name": "Inter-Satellite Link",
+            "target": "Laser-Comms",
+            "model": "TGE",
+            "metric": "Beam Jitter"
+        },
+        {
+            "id": "SPC-10",
+            "name": "Re-entry Heat Shield",
+            "target": "Capsule-Dragon",
+            "model": "TGE",
+            "metric": "Ablation Rate"
+        }
+    ],
+    "chapter_4_hardware": [
+        {
+            "id": "HW-01",
+            "name": "FPGA Logic Synthesis",
+            "target": "Xilinx-Ultra",
+            "model": "TGE",
+            "metric": "Gate Count"
+        },
+        {
+            "id": "HW-02",
+            "name": "ASM Code Acceleration",
+            "target": "RISC-V-Core",
+            "model": "TGE",
+            "metric": "Cycles/Op"
+        },
+        {
+            "id": "HW-03",
+            "name": "Edge Inference Pruning",
+            "target": "Jetson-Nano",
+            "model": "TGE",
+            "metric": "Model Size (MB)"
+        },
+        {
+            "id": "HW-04",
+            "name": "PCB Trace Routing",
+            "target": "Motherboard-Z",
+            "model": "TGE",
+            "metric": "Signal Crosstalk"
+        },
+        {
+            "id": "HW-05",
+            "name": "Silicon Wafer Lithography",
+            "target": "Fab-Tool-ASML",
+            "model": "PEM",
+            "metric": "Defect Rate"
+        },
+        {
+            "id": "HW-06",
+            "name": "Data Center Cooling",
+            "target": "Server-Rack",
+            "model": "TGE",
+            "metric": "PUE Score"
+        },
+        {
+            "id": "HW-07",
+            "name": "Optical Interconnect",
+            "target": "Switch-400G",
+            "model": "TGE",
+            "metric": "Latency (ns)"
+        },
+        {
+            "id": "HW-08",
+            "name": "Memory Controller Timing",
+            "target": "DDR5-RAM",
+            "model": "TGE",
+            "metric": "Bandwidth"
+        },
+        {
+            "id": "HW-09",
+            "name": "Antenna Beamforming",
+            "target": "5G-Tower",
+            "model": "TGE",
+            "metric": "Gain (dB)"
+        },
+        {
+            "id": "HW-10",
+            "name": "Quantum Error Correction",
+            "target": "Q-Chip",
+            "model": "PEM",
+            "metric": "Fidelity"
+        }
+    ],
+    "chapter_5_economy": [
+        {
+            "id": "ECO-01",
+            "name": "XRPL Tokenization",
+            "target": "Skill-Capsule-1",
+            "model": "ZKMM",
+            "metric": "Minting Cost"
+        },
+        {
+            "id": "ECO-02",
+            "name": "NCA Morphogenesis",
+            "target": "Agent-Swarm",
+            "model": "TGE",
+            "metric": "Adaptation Rate"
+        },
+        {
+            "id": "ECO-03",
+            "name": "Ecosystem Balance",
+            "target": "Market-Maker",
+            "model": "PEM",
+            "metric": "Volatility Index"
+        },
+        {
+            "id": "ECO-04",
+            "name": "Supply Chain Optimization",
+            "target": "Global-Logistics",
+            "model": "TGE",
+            "metric": "Delivery Time"
+        },
+        {
+            "id": "ECO-05",
+            "name": "Carbon Credit Verification",
+            "target": "Forest-Offset",
+            "model": "ZKMM",
+            "metric": "Trust Score"
+        },
+        {
+            "id": "ECO-06",
+            "name": "Energy Arbitrage",
+            "target": "Grid-Battery",
+            "model": "PEM",
+            "metric": "Profit Margin"
+        },
+        {
+            "id": "ECO-07",
+            "name": "Predictive Maintenance Insurance",
+            "target": "Factory-Policy",
+            "model": "PEM",
+            "metric": "Risk Premium"
+        },
+        {
+            "id": "ECO-08",
+            "name": "Automated IP Licensing",
+            "target": "Patent-Bot",
+            "model": "ZKMM",
+            "metric": "Royalty Flow"
+        },
+        {
+            "id": "ECO-09",
+            "name": "Resource Allocation Auction",
+            "target": "Compute-Cluster",
+            "model": "TGE",
+            "metric": "Utilization %"
+        },
+        {
+            "id": "ECO-10",
+            "name": "Circular Economy Loop",
+            "target": "Recycling-Plant",
+            "model": "TGE",
+            "metric": "Waste Recovery"
+        }
+    ]
+}
