@@ -19,6 +19,19 @@ class ResearchController:
         self.entropy_threshold = 0.3 # Trigger if entropy drops below this
         self.anomaly_threshold = 0.9 # Trigger if safety score drops below this (high risk)
 
+    def determine_mastery_stage(self, entropy: float, confidence: float) -> str:
+        """
+        Classifies the event into the Framework of Mastery (Bible).
+        """
+        if confidence < 0.5:
+            return "STAGE_1_OBSERVATION" # Still learning, low confidence
+        elif confidence < 0.8:
+            return "STAGE_2_IMITATION" # Simulating, medium confidence
+        elif entropy < self.entropy_threshold:
+            return "STAGE_3_INNOVATION" # High confidence + Low Entropy = Innovation
+        else:
+            return "STAGE_4_MASTERY" # High confidence, stable state
+
     def set_active(self, active: bool):
         self.active = active
         state = "ENABLED" if active else "DISABLED"
@@ -36,9 +49,13 @@ class ResearchController:
         entropy = energy_state.get("entropy", 1.0)
         payload = packet.get("payload", {})
         safety_score = payload.get("safety_score", 1.0)
+        confidence = payload.get("confidence", 0.5) # Default to 0.5 if missing
         source = packet.get("source", "UNKNOWN")
 
-        # 1. Detection Logic
+        # 1. Determine Mastery Stage
+        mastery_stage = self.determine_mastery_stage(entropy, confidence)
+
+        # 2. Detection Logic
         event_type = None
         hypothesis = None
 
@@ -59,6 +76,7 @@ class ResearchController:
                 "timestamp": time.time(),
                 "event_id": f"res-{int(time.time()*1000)}",
                 "event_type": event_type,
+                "mastery_stage": mastery_stage,
                 "hypothesis": hypothesis,
                 "source_packet": packet,
                 "metrics": {
