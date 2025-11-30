@@ -1,16 +1,20 @@
 import random
+from src.integrations.energy_api import EnergyAPI
 
-class KairosOptimizer:
+class KairosEconomicOptimizer:
     """
-    The Economist. Optimizes execution based on Energy Price vs. Value.
+    The Economic Optimizer.
+    Decides 'When' to run based on Value vs Cost.
     """
     def __init__(self):
-        pass
+        self.energy_api = EnergyAPI()
+        self.min_profit_margin = 0.10
 
     def get_grid_price(self):
-        """Simulates real-time energy price ($/kWh)."""
-        # In prod, this would hit an API.
-        return random.uniform(0.05, 0.25)
+        """
+        Gets the real-time electricity price from the Energy API.
+        """
+        return self.energy_api.get_current_price()
 
     def evaluate(self, task):
         """

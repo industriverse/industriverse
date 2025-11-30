@@ -53,6 +53,24 @@ def run_demo():
     valid, drift, msg = controller.aletheia.validate({"name": "Fusion_Weld", "id": "task_999"}, {"temperature": 500})
     print(f"[Demo] Aletheia Verdict: {msg}")
 
+    # Scenario 4: The Fix (Zero-Drift Manufacturing)
+    print("\n🛠️  SCENARIO 4: ZERO-DRIFT CORRECTION ENGAGED")
+    print("---------------------------------------------")
+    from src.orchestration.drift_canceller import DriftCanceller
+    canceller = DriftCanceller()
+    
+    telemetry = {"temperature": 600, "vibration": 0.05} # High temp
+    target_pose = [100.0, 50.0, 25.0]
+    
+    print(f"[DriftCanceller] 🌡️  Input Telemetry: {telemetry}")
+    print(f"[DriftCanceller] 🎯 Target Pose: {target_pose}")
+    
+    corrected_pose, est_drift = canceller.apply_correction(target_pose, telemetry)
+    
+    print(f"[DriftCanceller] 📉 Estimated Drift: {['%.4f' % x for x in est_drift]}")
+    print(f"[DriftCanceller] ✅ Corrected Pose: {['%.4f' % x for x in corrected_pose]}")
+    print("[DriftCanceller] 🚀 Execution Resumed with Compensation.")
+
     print("\n==================================================")
     print("✅ DEMO COMPLETE. The Dark Factory is Alive.")
     print("==================================================")
