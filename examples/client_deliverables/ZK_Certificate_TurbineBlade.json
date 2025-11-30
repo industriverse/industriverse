@@ -1,0 +1,18 @@
+{
+  "certificate_id": "ZK-1764483053",
+  "timestamp": 1764483053.8378298,
+  "issuer": "Empeiria Haus ZKMM Authority",
+  "client": "Defense Corp",
+  "part_id": "Turbine-Blade-Gen5",
+  "verification_data": {
+    "recipe_commitment": "3f55cd38af6614db589bee59e04deb4c6f6c3a1ab7573caab0c6c97fd6538411",
+    "proof_snark": "0x0a03049ac82e75c54240a8fe782bdd396ad4109d1d48c57dd92ad1be4dba3d94...",
+    "public_inputs": {
+      "material": "Inconel 718",
+      "tolerance": "0.001mm",
+      "machine_id": "EDCoC-009"
+    }
+  },
+  "status": "VERIFIED_VALID",
+  "guarantee": "This part was manufactured exactly according to the committed recipe without revealing the recipe contents."
+}
