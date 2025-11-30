@@ -101,6 +101,7 @@ def show_status():
     print(f"Status: {status}")
     if data:
         print(f"PID: {data.get('pid')}")
+        print(f"Research Mode: {'ON' if data.get('research_mode') else 'OFF'}")
         print(f"Shards Collected: {data.get('shards_collected')}")
         print(f"Last Heartbeat: {time.time() - data.get('timestamp', 0):.1f}s ago")
         print(f"Config: {json.dumps(data.get('config'), indent=2)}")
@@ -114,6 +115,9 @@ def main():
     subparsers.add_parser("status", help="Show daemon status")
     subparsers.add_parser("pause", help="Pause collection")
     subparsers.add_parser("resume", help="Resume collection")
+    
+    research_parser = subparsers.add_parser("research", help="Toggle Research Mode")
+    research_parser.add_argument("state", choices=["on", "off"], help="Enable or Disable")
     
     config_parser = subparsers.add_parser("config", help="Update configuration")
     config_parser.add_argument("key", help="Config key")
@@ -131,6 +135,9 @@ def main():
         send_command("PAUSE")
     elif args.action == "resume":
         send_command("RESUME")
+    elif args.action == "research":
+        active = (args.state == "on")
+        send_command("RESEARCH_MODE", {"active": active})
     elif args.action == "config":
         # Try to parse value as number if possible
         val = args.value

@@ -1,0 +1,27 @@
+{
+  "timestamp": 1764482376.515038,
+  "event_id": "res-1764482376515",
+  "event_type": "ANOMALY_DETECTED",
+  "hypothesis": "Safety degradation (0.8922) detected in SIMULATOR. Investigation required.",
+  "source_packet": {
+    "timestamp": 1764482376.514687,
+    "source": "SIMULATOR",
+    "energy_state": {
+      "joules": 242.71404259667295,
+      "entropy": 0.315170264248284
+    },
+    "event_type": "OPTIMIZATION_STEP",
+    "payload": {
+      "action_vector": [
+        0.7626114008536095,
+        0.2250620258723086,
+        0.5924083143100259
+      ],
+      "safety_score": 0.8921573687180028
+    }
+  },
+  "metrics": {
+    "entropy": 0.315170264248284,
+    "safety_score": 0.8921573687180028
+  }
+}

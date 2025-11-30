@@ -1,0 +1,27 @@
+{
+  "timestamp": 1764482375.695599,
+  "event_id": "res-1764482375695",
+  "event_type": "ANOMALY_DETECTED",
+  "hypothesis": "Safety degradation (0.8042) detected in AI_SHIELD. Investigation required.",
+  "source_packet": {
+    "timestamp": 1764482375.695402,
+    "source": "AI_SHIELD",
+    "energy_state": {
+      "joules": 492.71862675658724,
+      "entropy": 0.4713212503364438
+    },
+    "event_type": "OPTIMIZATION_STEP",
+    "payload": {
+      "action_vector": [
+        0.65141541073788,
+        0.2953299097052652,
+        0.8797893444482896
+      ],
+      "safety_score": 0.8042278399062199
+    }
+  },
+  "metrics": {
+    "entropy": 0.4713212503364438,
+    "safety_score": 0.8042278399062199
+  }
+}

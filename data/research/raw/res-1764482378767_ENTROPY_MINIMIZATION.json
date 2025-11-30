@@ -1,0 +1,27 @@
+{
+  "timestamp": 1764482378.767135,
+  "event_id": "res-1764482378767",
+  "event_type": "ENTROPY_MINIMIZATION",
+  "hypothesis": "System found low-entropy state (0.2216) in SIMULATOR.",
+  "source_packet": {
+    "timestamp": 1764482378.766898,
+    "source": "SIMULATOR",
+    "energy_state": {
+      "joules": 340.4406253770261,
+      "entropy": 0.2216247351012516
+    },
+    "event_type": "OPTIMIZATION_STEP",
+    "payload": {
+      "action_vector": [
+        0.7256685306553612,
+        0.24754098591649432,
+        0.556383048110164
+      ],
+      "safety_score": 0.958609278503166
+    }
+  },
+  "metrics": {
+    "entropy": 0.2216247351012516,
+    "safety_score": 0.958609278503166
+  }
+}

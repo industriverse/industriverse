@@ -1,0 +1,27 @@
+{
+  "timestamp": 1764482380.823914,
+  "event_id": "res-1764482380823",
+  "event_type": "ANOMALY_DETECTED",
+  "hypothesis": "Safety degradation (0.8544) detected in CAPSULE_A2A. Investigation required.",
+  "source_packet": {
+    "timestamp": 1764482380.8233669,
+    "source": "CAPSULE_A2A",
+    "energy_state": {
+      "joules": 215.6457343833361,
+      "entropy": 0.4985134633270316
+    },
+    "event_type": "OPTIMIZATION_STEP",
+    "payload": {
+      "action_vector": [
+        0.46561800515385765,
+        0.04578933681468944,
+        0.512182982926491
+      ],
+      "safety_score": 0.8543876407989052
+    }
+  },
+  "metrics": {
+    "entropy": 0.4985134633270316,
+    "safety_score": 0.8543876407989052
+  }
+}

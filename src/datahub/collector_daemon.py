@@ -7,6 +7,10 @@ import signal
 import sys
 from typing import Dict, Any
 
+# Add src to path to find research module
+sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
+from src.research.research_controller import ResearchController
+
 # Configure Logging
 logging.basicConfig(
     level=logging.INFO,
@@ -44,6 +48,9 @@ class CollectorDaemon:
         self.is_running = False
         self.is_paused = False
         self.shards_collected = 0
+        
+        # Research Brain
+        self.research_controller = ResearchController()
         
         # Handle Signals
         signal.signal(signal.SIGINT, self.handle_signal)
@@ -96,6 +103,10 @@ class CollectorDaemon:
                 try:
                     data_packet = self.collect_system_state()
                     self.save_packet(data_packet)
+                    
+                    # Analyze for Research
+                    self.research_controller.analyze_packet(data_packet)
+                    
                     self.shards_collected += 1
                 except Exception as e:
                     logger.error(f"Error in collection loop: {e}")
@@ -132,6 +143,9 @@ class CollectorDaemon:
                 new_config = command_data.get("payload", {})
                 self.config.update(new_config)
                 logger.info(f"⚙️ Config Updated: {new_config}")
+            elif cmd == "RESEARCH_MODE":
+                active = command_data.get("payload", {}).get("active", False)
+                self.research_controller.set_active(active)
                 
             # Delete control file after execution
             os.remove(self.control_file)
@@ -147,6 +161,7 @@ class CollectorDaemon:
             "timestamp": time.time(),
             "pid": os.getpid(),
             "status": "PAUSED" if self.is_paused else "RUNNING",
+            "research_mode": self.research_controller.active,
             "shards_collected": self.shards_collected,
             "config": self.config
         }

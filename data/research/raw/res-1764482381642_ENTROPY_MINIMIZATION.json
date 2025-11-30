@@ -1,0 +1,27 @@
+{
+  "timestamp": 1764482381.6425102,
+  "event_id": "res-1764482381642",
+  "event_type": "ENTROPY_MINIMIZATION",
+  "hypothesis": "System found low-entropy state (0.2871) in ROBOTICS.",
+  "source_packet": {
+    "timestamp": 1764482381.64196,
+    "source": "ROBOTICS",
+    "energy_state": {
+      "joules": 461.45156440955964,
+      "entropy": 0.28712275510981233
+    },
+    "event_type": "OPTIMIZATION_STEP",
+    "payload": {
+      "action_vector": [
+        0.8732048388681244,
+        0.29123291713368893,
+        0.2687680427768928
+      ],
+      "safety_score": 0.9480212163640065
+    }
+  },
+  "metrics": {
+    "entropy": 0.28712275510981233,
+    "safety_score": 0.9480212163640065
+  }
+}

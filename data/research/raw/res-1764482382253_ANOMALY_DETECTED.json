@@ -1,0 +1,27 @@
+{
+  "timestamp": 1764482382.25381,
+  "event_id": "res-1764482382253",
+  "event_type": "ANOMALY_DETECTED",
+  "hypothesis": "Safety degradation (0.8094) detected in ROBOTICS. Investigation required.",
+  "source_packet": {
+    "timestamp": 1764482382.25357,
+    "source": "ROBOTICS",
+    "energy_state": {
+      "joules": 328.24416954997963,
+      "entropy": 0.8242424312105451
+    },
+    "event_type": "OPTIMIZATION_STEP",
+    "payload": {
+      "action_vector": [
+        0.8794242501468211,
+        0.6518335358975024,
+        0.13491398548444145
+      ],
+      "safety_score": 0.8094343410200917
+    }
+  },
+  "metrics": {
+    "entropy": 0.8242424312105451,
+    "safety_score": 0.8094343410200917
+  }
+}

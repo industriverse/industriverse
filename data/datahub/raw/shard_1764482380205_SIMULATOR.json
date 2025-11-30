@@ -1,0 +1,1 @@
+{"timestamp": 1764482380.205763, "source": "SIMULATOR", "energy_state": {"joules": 246.83062755345765, "entropy": 0.382594847224603}, "event_type": "OPTIMIZATION_STEP", "payload": {"action_vector": [0.562019941109791, 0.06779542953640583, 0.07991057397972934], "safety_score": 0.9879346506625513}}
