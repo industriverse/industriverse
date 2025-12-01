@@ -1,0 +1,124 @@
+{
+    "patterns": [
+        {
+            "keywords": [
+                "drift",
+                "alignment",
+                "thermal",
+                "calibration",
+                "precision"
+            ],
+            "modules": [
+                "DriftCanceller",
+                "VisualTwin",
+                "Aletheia"
+            ],
+            "pitch": "Zero-Drift Manufacturing: Real-time physics correction."
+        },
+        {
+            "keywords": [
+                "failure",
+                "predict",
+                "breakdown",
+                "maintenance",
+                "downtime"
+            ],
+            "modules": [
+                "EBDMForecaster",
+                "VisualTwin",
+                "TelosClassifier"
+            ],
+            "pitch": "Ultra-Early Failure Prediction: Detecting entropy climbs before they happen."
+        },
+        {
+            "keywords": [
+                "schedule",
+                "energy",
+                "cost",
+                "price",
+                "optimize",
+                "grid"
+            ],
+            "modules": [
+                "Kairos",
+                "EnergyAPI",
+                "Chronos"
+            ],
+            "pitch": "Thermodynamic Scheduling: Execution based on real-time energy arbitrage."
+        },
+        {
+            "keywords": [
+                "robot",
+                "learn",
+                "video",
+                "demonstration",
+                "skill",
+                "human"
+            ],
+            "modules": [
+                "RoboCOIN",
+                "Egocentric10K",
+                "VisualTwin"
+            ],
+            "pitch": "Generalist Robotics: Learning directly from egocentric human video."
+        },
+        {
+            "keywords": [
+                "negotiate",
+                "bid",
+                "contract",
+                "supply chain",
+                "procurement"
+            ],
+            "modules": [
+                "NegotiationEngine",
+                "A2AProtocol",
+                "MCNP"
+            ],
+            "pitch": "Universal Negotiation: Autonomous agent-to-agent bidding markets."
+        },
+        {
+            "keywords": [
+                "visualize",
+                "dashboard",
+                "ui",
+                "monitor",
+                "interface"
+            ],
+            "modules": [
+                "DysonSphere",
+                "VisualTwin"
+            ],
+            "pitch": "Ambient Intelligence: The factory visualized as a living organism."
+        },
+        {
+            "keywords": [
+                "value",
+                "accounting",
+                "token",
+                "credit",
+                "esg",
+                "audit"
+            ],
+            "modules": [
+                "NegentropyLedger",
+                "Kairos"
+            ],
+            "pitch": "Negentropy Accounting: Tokenizing thermodynamic efficiency gains."
+        },
+        {
+            "keywords": [
+                "defect",
+                "quality",
+                "inspect",
+                "flaw",
+                "visual"
+            ],
+            "modules": [
+                "VisualTwin",
+                "EBDMForecaster"
+            ],
+            "pitch": "Digital Twin Sensorium: Multi-modal truth verification."
+        }
+    ]
+}

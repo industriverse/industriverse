@@ -1,0 +1,149 @@
+[
+    {
+        "id": 1,
+        "name": "Zero-Drift CNC Machine Alignment",
+        "category": "MANUFACTURING",
+        "modules": [
+            "Aletheia",
+            "DriftCanceller",
+            "VisualTwin"
+        ],
+        "description": "CNC spindle heats from 22C -> 40C. Aletheia detects X-axis thermal drift. DriftCanceller compensates.",
+        "telemetry_sequence": [
+            {
+                "temperature": 22.0,
+                "vibration": 0.01
+            },
+            {
+                "temperature": 30.0,
+                "vibration": 0.02
+            },
+            {
+                "temperature": 40.0,
+                "vibration": 0.05
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Welding Torch Drift Prevention",
+        "category": "MANUFACTURING",
+        "modules": [
+            "RoboCOIN",
+            "VisualTwin",
+            "EBDMForecaster"
+        ],
+        "description": "RoboCOIN worker capsule hydrated. EBDM detects deviation in arc stability.",
+        "telemetry_sequence": [
+            {
+                "temperature": 1500.0,
+                "vibration": 0.1
+            },
+            {
+                "temperature": 1550.0,
+                "vibration": 0.3
+            },
+            {
+                "temperature": 1600.0,
+                "vibration": 0.5
+            }
+        ]
+    },
+    {
+        "id": 11,
+        "name": "Smart Grid Load Balancing",
+        "category": "ENERGY",
+        "modules": [
+            "Kairos",
+            "A2AProtocol",
+            "EnergyAPI"
+        ],
+        "description": "Factories bid for power allocation. Kairos optimizes cost.",
+        "telemetry_sequence": [
+            {
+                "grid_price": 0.10,
+                "load": "medium"
+            },
+            {
+                "grid_price": 0.25,
+                "load": "high"
+            },
+            {
+                "grid_price": 0.05,
+                "load": "low"
+            }
+        ]
+    },
+    {
+        "id": 21,
+        "name": "Human Demonstration Replication",
+        "category": "ROBOTICS",
+        "modules": [
+            "Egocentric10K",
+            "RoboCOIN"
+        ],
+        "description": "Operator's POV video fed. Robot learns 'Pick & Place' instantly.",
+        "telemetry_sequence": [
+            {
+                "video_chunk": "chunk_001.mp4",
+                "action": "grasp"
+            },
+            {
+                "video_chunk": "chunk_002.mp4",
+                "action": "lift"
+            },
+            {
+                "video_chunk": "chunk_003.mp4",
+                "action": "place"
+            }
+        ]
+    },
+    {
+        "id": 31,
+        "name": "Capsule Negotiation Market",
+        "category": "SUPPLY_CHAIN",
+        "modules": [
+            "MCNP",
+            "NegotiationEngine",
+            "A2AProtocol"
+        ],
+        "description": "Factories compete to fulfill orders. Capsule bidding.",
+        "telemetry_sequence": [
+            {
+                "ask_price": 0.50,
+                "bid_price": 0.45
+            },
+            {
+                "ask_price": 0.50,
+                "bid_price": 0.40
+            },
+            {
+                "ask_price": 0.50,
+                "bid_price": 0.35
+            }
+        ]
+    },
+    {
+        "id": 41,
+        "name": "Dark Factory Full Autonomy Mode",
+        "category": "ADVANCED",
+        "modules": [
+            "ALL"
+        ],
+        "description": "Entire factory runs unsupervised. Full AGI Loop.",
+        "telemetry_sequence": [
+            {
+                "status": "OPTIMAL",
+                "entropy": 10.0
+            },
+            {
+                "status": "DRIFT_DETECTED",
+                "entropy": 25.0
+            },
+            {
+                "status": "CORRECTED",
+                "entropy": 12.0
+            }
+        ]
+    }
+]
