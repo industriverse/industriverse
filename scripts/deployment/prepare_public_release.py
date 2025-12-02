@@ -34,7 +34,6 @@ def prepare_public_release():
     
     # Define what to copy (Relative Paths)
     allowlist = [
-        "README.md",
         "LICENSE",
         "src/products",  # The 12 Pillars (Wrappers)
         "src/core",      # Core logic (will be skeletonized)
@@ -59,6 +58,14 @@ def prepare_public_release():
                 shutil.copy2(src_path, dst_path)
         else:
             print(f"   WARNING: Allowlisted item not found: {item}")
+
+    # Explicitly Copy Public README
+    print("   Installing Public README...")
+    public_readme_src = os.path.join(source_dir, "docs/collaterals/README_PUBLIC.md")
+    if os.path.exists(public_readme_src):
+        shutil.copy2(public_readme_src, os.path.join(target_dir, "README.md"))
+    else:
+        print("   WARNING: docs/collaterals/README_PUBLIC.md not found! Using default.")
 
     # 3. Redact Sensitive IP (The "Skeleton" Step)
     print("   Redacting proprietary algorithms...")
