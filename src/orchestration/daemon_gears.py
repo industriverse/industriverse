@@ -85,9 +85,9 @@ if __name__ == "__main__":
     manager = OrchestrationLevelManager()
     
     # Simulate Escalation
-    manager.set_level(DaemonLevel.VIGILANCE)
+    manager.set_level(DaemonLevel.ACCELERATED)
     time.sleep(0.5)
-    manager.set_level(DaemonLevel.WAR)
+    manager.set_level(DaemonLevel.SINGULARITY)
     
     print(f"\nCurrent State: {manager.state.level.name}")
     print(f"Active Features: {len(manager.state.active_features)}")
