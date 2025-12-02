@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Dict, Any
+from src.orchestration.daemon_gears import DaemonLevel
 
 # Import SOK components for type hinting (mock if circular dependency issues arise)
 # from src.sok.organism_kernel import SovereignOrganism
@@ -61,22 +62,22 @@ class OverseerStratiform:
         
         if mode == StrategicMode.WAR:
             # High Defense, High Efficiency
-            organism.nervous_system.set_level("ACCELERATED") # Vigilance
+            organism.nervous_system.set_level(DaemonLevel.ACCELERATED) # Vigilance
             organism.incentives.shape_gradient("SURVIVAL")
             
         elif mode == StrategicMode.SINGULARITY:
             # Max Discovery
-            organism.nervous_system.set_level("SINGULARITY")
+            organism.nervous_system.set_level(DaemonLevel.SINGULARITY)
             organism.incentives.shape_gradient("CURIOSITY")
             
         elif mode == StrategicMode.HIBERNATION:
             # Min Energy
-            organism.nervous_system.set_level("STANDARD")
+            organism.nervous_system.set_level(DaemonLevel.STANDARD)
             # organism.state.energy_consumption = 0.1 # Mock
             
         elif mode == StrategicMode.PEACE:
             # Balanced
-            organism.nervous_system.set_level("STANDARD")
+            organism.nervous_system.set_level(DaemonLevel.STANDARD)
             organism.incentives.shape_gradient("EXPANSION")
 
 # --- Verification ---
