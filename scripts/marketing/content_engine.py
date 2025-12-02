@@ -30,6 +30,10 @@ class ContentEngine:
             "THERMODYNASTY": {
                 "voice": "Financial, Liquid, Sophisticated",
                 "visual_token": "liquid copper, emerald green, luxury financial data"
+            },
+            "LITHOGRAPHY_TECH": {
+                "voice": "Philosopher-Physicist, Ethereal, Profound",
+                "visual_token": "cinematic void, floating mathematical axioms, white and gold, 8k, macro"
             }
         }
 
@@ -43,6 +47,8 @@ class ContentEngine:
             return self._create_industriverse_post(data)
         elif event_type == "NEGENTROPY_MINTED":
             return self._create_thermodynasty_post(data)
+        elif event_type == "SCIENTIFIC_DISCOVERY":
+            return self._create_lithographer_post(data)
         else:
             return self._create_generic_post(data)
 
@@ -121,6 +127,31 @@ class ContentEngine:
             text=text,
             image_prompt=prompt,
             hashtags=["#DePIN", "#Negentropy", "#Thermodynasty", "#Yield"]
+        )
+
+    def _create_lithographer_post(self, data) -> MarketingPost:
+        # The Lithographer: The Philosopher
+        discovery = data.get('discovery', 'Unknown Truth')
+        confidence = data.get('confidence', 0.0)
+        
+        text = (
+            f"We have etched a new truth into the substrate.\n"
+            f"Simulation: {discovery}.\n"
+            f"Coherence Score: {confidence:.4f}.\n"
+            f"Physics is not just observed. It is programmable."
+        )
+        
+        prompt = (
+            f"Abstract representation of {discovery}, "
+            f"{self.brands['LITHOGRAPHY_TECH']['visual_token']}, divine lighting"
+        )
+        
+        return MarketingPost(
+            brand="Lithography.tech",
+            platform="Substack/X",
+            text=text,
+            image_prompt=prompt,
+            hashtags=["#LithOS", "#ScientificDiscovery", "#TheLithographer", "#FuturePhysics"]
         )
 
     def _create_generic_post(self, data) -> MarketingPost:
