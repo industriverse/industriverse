@@ -81,7 +81,17 @@ class SovereignOrganismV3:
         
         # 5. Social (Reasoning Updates)
         # Simulate Social Feed
-        # self.social.process_updates()
+        self.social.process_updates()
+        
+        # 6. Memory (IPFS Snapshot)
+        # Log the cycle state to immutable storage
+        state_snapshot = {
+            "timestamp": time.time(),
+            "commands": len(commands) if commands else 0,
+            "usm_entropy": self.usm.get_field("THERMAL").get_average_entropy()
+        }
+        cid = self.ipfs.add(state_snapshot)
+        # print(f"   💾 [MEMORY] Cycle State Pinned: {cid}")
         
         print("   ✨ [CYCLE] Complete.")
 

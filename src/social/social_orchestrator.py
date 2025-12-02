@@ -38,6 +38,19 @@ class SocialOrchestrator:
                 feed.extend(cap.updates)
         return sorted(feed, key=lambda x: x.timestamp, reverse=True)
 
+    def process_updates(self):
+        """
+        Simulates the processing of the social feed.
+        """
+        # In a real system, this would push updates to WebSocket clients
+        # For simulation, we just iterate through capsules and run a cycle occasionally
+        for cid, capsule in self.capsules.items():
+            # Randomly trigger a cycle for liveliness
+            import random
+            if random.random() < 0.3:
+                capsule.run_cycle()
+
+
 # --- Verification ---
 if __name__ == "__main__":
     orch = SocialOrchestrator()
