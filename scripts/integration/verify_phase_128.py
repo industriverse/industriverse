@@ -5,7 +5,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
 from src.evolution.temporal_story_weaver import TemporalStoryWeaver
-from src.marketing.narrative_feedback.py import NarrativeFeedbackLoop # Typo fix in import if needed, but file is narrative_feedback.py
+from src.marketing.narrative_feedback import NarrativeFeedbackLoop
 from src.marketing.narrative_feedback import NarrativeFeedbackLoop
 from src.meta.skill_hydrator import SkillHydrator
 from src.economics.product_factory import ProductFactory
