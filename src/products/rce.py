@@ -1,4 +1,4 @@
-from src.resource_clusters.clusterer import ResourceClusterer
+from src.resource_clusters.clusterer import Clusterer
 
 class ResourceClusterEngine:
     """
@@ -7,7 +7,7 @@ class ResourceClusterEngine:
     """
     def __init__(self):
         self.name = "Resource Cluster Engine"
-        self.clusterer = ResourceClusterer()
+        self.clusterer = Clusterer()
 
     def get_status(self):
         return {
