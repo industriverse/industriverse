@@ -40,7 +40,7 @@ class SovereignOrganismV3:
         self.usm = UnifiedSubstrateModel()
         
         # 4. Cognition (Brain)
-        self.overseer = OverseerStratiformV2(self.usm)
+        self.overseer = OverseerStratiformV2()
         
         # 5. Action (Body)
         self.workforce = WorkforceOrchestrator()
@@ -65,12 +65,15 @@ class SovereignOrganismV3:
         # 2. Perception (Ingest Signals)
         # Simulate incoming sensor data via NATS
         self.nats.publish("usm.sensor.thermal", {"val": 45.0})
+        # In a real system, a NATS subscriber would ingest this into USM
+        # Here we simulate direct ingestion for the demo
+        self.usm.ingest_signal("THERMAL", USMSignal(value=45.0))
         
         # 3. Cognition (Overseer Decides)
         # Simulate Overseer processing
-        decision = self.overseer.process_cycle()
-        if decision:
-            print(f"   🧠 [BRAIN] Decision: {decision}")
+        commands = self.overseer.run_cycle(self.usm.fields)
+        if commands:
+            print(f"   🧠 [BRAIN] Generated {len(commands)} Commands")
             
         # 4. Action (Workforce Executes)
         # Simulate Agent Activity

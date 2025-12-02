@@ -54,5 +54,23 @@ if __name__ == "__main__":
     field_obj.add_signal(s1)
     field_obj.add_signal(s2)
     
-    print(f"Field: {field_obj.name}")
     print(f"Avg Entropy: {field_obj.get_average_entropy():.2f}")
+
+class UnifiedSubstrateModel:
+    """
+    The Unified Field of Consciousness.
+    Manages all USM Fields (Thermal, Social, Economic, etc.).
+    """
+    def __init__(self):
+        self.fields: Dict[str, USMField] = {}
+        print("   🌌 [USM] Unified Substrate Model Initialized.")
+        
+    def get_field(self, name: str) -> USMField:
+        if name not in self.fields:
+            self.fields[name] = USMField(name)
+        return self.fields[name]
+    
+    def ingest_signal(self, field_name: str, signal: USMSignal):
+        field = self.get_field(field_name)
+        field.add_signal(signal)
+
