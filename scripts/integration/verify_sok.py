@@ -23,9 +23,10 @@ def verify_sok_lifecycle():
         
         # Simulate Stress on Pulse 3
         if i == 2:
-            print("\n   ⚠️ SIMULATING DAMAGE...")
+            print("\n   ⚠️ SIMULATING DAMAGE & HIGH ENTROPY...")
             organism.state.health = 0.6
             organism.state.energy = 15.0 # Low Energy
+            organism.state.entropy = 0.8 # High Entropy (Triggers Inference?)
             
     # 3. Final Status
     status = organism.get_status()

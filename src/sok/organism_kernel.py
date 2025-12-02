@@ -16,6 +16,8 @@ class OrganismState:
 
 from src.safety.meta_safety_lattice import MetaSafetyLattice
 from src.unification.narrative_physics_engine import NarrativePhysicsEngine
+from src.economics.incentive_gradient_engine import IncentiveGradientEngine
+from src.unification.cross_domain_inference import CrossDomainInferenceEngine
 
 class SovereignOrganism:
     """
@@ -34,14 +36,18 @@ class SovereignOrganism:
         self.drives = None # GoalHomeostasis (To be injected)
         self.immune_system = None # Autopoeisis (To be injected)
         
-        # Cognitive Cortex (New)
+        # Cognitive Cortex
         self.safety = MetaSafetyLattice() # Prefrontal Cortex
         self.narrative = NarrativePhysicsEngine() # Hippocampus
+        self.incentives = IncentiveGradientEngine() # Dopamine System
+        self.inference = CrossDomainInferenceEngine() # Association Cortex
         
         print("   - Nervous System: ONLINE")
         print("   - Cortex: ONLINE")
         print("   - Safety Lattice: ONLINE")
         print("   - Narrative Engine: ONLINE")
+        print("   - Incentive Gradient: ONLINE")
+        print("   - Inference Engine: ONLINE")
         
     def pulse(self):
         """
@@ -52,18 +58,28 @@ class SovereignOrganism:
         print(f"\n💓 [SOK] Pulse {self.state.age_cycles} | Health: {self.state.health:.2f} | Energy: {self.state.energy:.2f}")
         
         # 0. Narrative Update (Perceive World)
-        # Mocking a signal ingestion for the pulse
         self.narrative.ingest_signal("INTERNAL", self.state.energy, "Metabolic Check")
+        
+        # 0.5 Cross-Domain Inference (Associate)
+        # Mock signals for inference
+        signals = {
+            "SPI_SENTIMENT": self.narrative.world_state.social_sentiment,
+            "SYSTEM_ENTROPY": self.state.entropy,
+            "GRID_LOAD": 0.5 # Mock
+        }
+        self.inference.analyze_signals(signals)
         
         # 1. Check Safety (Prefrontal Cortex)
         is_safe, reason = self.safety.evaluate_safety(self.state)
         if not is_safe:
             print(f"   🛡️ [SAFETY] {reason}")
-            # In a real loop, this would trigger a fallback state
             
         # 2. Check Homeostasis (Drives)
         if self.drives:
             self.drives.evaluate_needs(self.state)
+            # Shape Incentives based on Drive
+            dominant = self.drives.get_dominant_drive()
+            self.incentives.shape_gradient(dominant)
             
         # 3. Check Integrity (Immune System)
         if self.immune_system:
