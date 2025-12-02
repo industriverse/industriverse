@@ -24,7 +24,7 @@ def prepare_public_release():
         target_dir, 
         ignore=shutil.ignore_patterns(
             '.git', '.env', '__pycache__', '*.pyc', 'secrets', 'private',
-            '.DS_Store', 'venv', 'node_modules'
+            '.DS_Store', 'venv', 'node_modules', '*.log'
         )
     )
     

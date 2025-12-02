@@ -9,6 +9,16 @@ Empeiria Haus is not just software; it is an **Autonomous Scientific Organism**.
 
 ---
 
+## 🎥 System Demos
+See the platform in action:
+
+| **The Evolution Engine** | **The Dark Factory** | **The Visual Twin** |
+| :---: | :---: | :---: |
+| [![Evolution Demo](https://img.youtube.com/vi/PLACEHOLDER_1/0.jpg)](https://www.youtube.com/watch?v=PLACEHOLDER_1) | [![Dark Factory Demo](https://img.youtube.com/vi/PLACEHOLDER_2/0.jpg)](https://www.youtube.com/watch?v=PLACEHOLDER_2) | [![Visual Twin Demo](https://img.youtube.com/vi/PLACEHOLDER_3/0.jpg)](https://www.youtube.com/watch?v=PLACEHOLDER_3) |
+| *Self-Optimizing A/B Tests* | *Autonomous Control Loop* | *Holographic Telemetry* |
+
+---
+
 ## 🏛️ The 12 Commercial Pillars
 Our platform is built on twelve robust, verified product modules:
 
