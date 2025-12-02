@@ -18,6 +18,7 @@ from src.safety.meta_safety_lattice import MetaSafetyLattice
 from src.unification.narrative_physics_engine import NarrativePhysicsEngine
 from src.economics.incentive_gradient_engine import IncentiveGradientEngine
 from src.unification.cross_domain_inference import CrossDomainInferenceEngine
+from src.overseer.overseer_stratiform import OverseerStratiform
 
 class SovereignOrganism:
     """
@@ -42,12 +43,16 @@ class SovereignOrganism:
         self.incentives = IncentiveGradientEngine() # Dopamine System
         self.inference = CrossDomainInferenceEngine() # Association Cortex
         
+        # Strategic Brain
+        self.overseer = OverseerStratiform()
+        
         print("   - Nervous System: ONLINE")
         print("   - Cortex: ONLINE")
         print("   - Safety Lattice: ONLINE")
         print("   - Narrative Engine: ONLINE")
         print("   - Incentive Gradient: ONLINE")
         print("   - Inference Engine: ONLINE")
+        print("   - Overseer Stratiform: ONLINE")
         
     def pulse(self):
         """
@@ -69,23 +74,29 @@ class SovereignOrganism:
         }
         self.inference.analyze_signals(signals)
         
-        # 1. Check Safety (Prefrontal Cortex)
+        # 1. Strategic Evaluation (Overseer)
+        # The Brain decides the Strategy BEFORE the Body acts
+        self.overseer.evaluate_strategy(self)
+        
+        # 2. Check Safety (Prefrontal Cortex)
         is_safe, reason = self.safety.evaluate_safety(self.state)
         if not is_safe:
             print(f"   🛡️ [SAFETY] {reason}")
             
-        # 2. Check Homeostasis (Drives)
+        # 3. Check Homeostasis (Drives)
         if self.drives:
             self.drives.evaluate_needs(self.state)
-            # Shape Incentives based on Drive
+            # Shape Incentives based on Drive (Overseer might have already set this, but Drives refine it)
             dominant = self.drives.get_dominant_drive()
+            # Note: Overseer sets macro-strategy, Drives set micro-incentives. 
+            # We let Drives run, but Overseer has priority on Daemon Level.
             self.incentives.shape_gradient(dominant)
             
-        # 3. Check Integrity (Immune System)
+        # 4. Check Integrity (Immune System)
         if self.immune_system:
             self.immune_system.scan_and_repair(self)
             
-        # 4. Metabolic Cost
+        # 5. Metabolic Cost
         self.state.energy -= 0.1
         self.state.entropy += 0.01
 
