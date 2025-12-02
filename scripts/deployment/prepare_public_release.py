@@ -12,17 +12,22 @@ def prepare_public_release():
     
     print(f"🚀 Preparing Release: {source_dir} -> {target_dir}")
     
-    # 1. Clean Target
-    if os.path.exists(target_dir):
-        print("   Cleaning existing target directory...")
+    # 1. Clean Target (Safe Mode)
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+    
+    print("   Cleaning target directory (preserving .git)...")
+    for item in os.listdir(target_dir):
+        item_path = os.path.join(target_dir, item)
+        if item == '.git':
+            continue
         try:
-            shutil.rmtree(target_dir)
+            if os.path.isfile(item_path) or os.path.islink(item_path):
+                os.unlink(item_path)
+            elif os.path.isdir(item_path):
+                shutil.rmtree(item_path)
         except Exception as e:
-            print(f"   WARNING: Could not remove target directory: {e}")
-            # If we can't remove it, we might be inside it. 
-            # We'll try to copy over it, but copytree requires dest to NOT exist.
-            # So we must ensure it's gone.
-            sys.exit(1)
+            print(f"   WARNING: Could not remove {item}: {e}")
     
     # 2. Copy Codebase (STRICT ALLOWLIST)
     print("   Copying codebase (Strict Mode)...")
