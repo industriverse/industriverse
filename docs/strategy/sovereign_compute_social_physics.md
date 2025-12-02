@@ -62,6 +62,39 @@ This involves two new frontiers:
 
 ---
 
+## 6. The 20-Module SPI Expansion Pack (Deep Dive)
+
+### Pillar A: Temporal & Harmonic
+1.  **Harmonic Posting Detector (HPD)**: FFT analysis of timestamps.
+2.  **Attention Acceleration Detector (AAD)**: Physics-based rate caps for virality.
+3.  **Resonance & Social Proof Scanner (RSPS)**: Spectral analysis of "fake virality".
+4.  **Temporal Fingerprint Canonicalizer (TFC)**: Standardizing time signatures.
+5.  **Botnet Fingerprint Database (BFD)**: Reusable signatures of known botnets.
+
+### Pillar B: Entropy & Information
+6.  **Social Entropy Engine (SEE)**: Conversation entropy collapse.
+7.  **Engagement Coherence Detector (ECD)**: Templated/identical reply detection.
+8.  **Identity Entropy Monitor (IEM)**: Profile creation/aging entropy.
+9.  **Narrative Drift Tracker (NDT)**: Vector-based topic shifting.
+10. **Identity Drift Detector (IDD)**: Account repurposing detection.
+
+### Pillar C: Physics & Interaction
+11. **Micro-Gesture Interaction Analyzer (MGIA)**: Non-human scroll/tap dynamics.
+12. **Thermodynamic Ad Load Monitor (TALM)**: Energy cost of forced attention.
+13. **Social Vector Field Divergence (SVFD)**: Graph flow anomalies.
+14. **Algorithmic Pressure Detector (APD)**: UI/Push timing manipulation.
+15. **Geophysical Opportunity Mapper (GOM)**: Bot farm location mapping.
+
+### Pillar D: Integration & Proof
+16. **Cross-Platform Correlator (CPC)**: Multi-channel campaign tracking.
+17. **Influence Attribution TNN (IAT)**: Causal source attribution.
+18. **Influence Fingerprint Composer (IFC)**: ZK-ready evidence bundling.
+19. **Citizen Alert & Evidence Packager (CAEP)**: Public reporting tool.
+20. **SPI Learning Loop (SLP)**: Auto-feeding the Paper Factory.
+
+
+---
+
 ## 5. Implementation Roadmap
 
 ### Phase 1: Scaffolding & Prototypes
