@@ -1,75 +1,58 @@
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import Dict, Any, Optional
+from typing import List, Dict, Any
 import time
 import uuid
-
-class SignalType(Enum):
-    THERMAL = "THERMAL"       # Heat, CPU Load
-    SOCIAL = "SOCIAL"         # Sentiment, Influence
-    ECONOMIC = "ECONOMIC"     # Price, Transaction
-    SECURITY = "SECURITY"     # Threat, Intrusion
-    SCIENTIFIC = "SCIENTIFIC" # Law, Constant
-    INTERNAL = "INTERNAL"     # Health, Drive
-
-@dataclass
-class USMEnergy:
-    """
-    Canonical representation of Energy.
-    Unifies Joules, Compute Cycles, and Economic Value.
-    """
-    joules: float = 0.0
-    compute_flops: float = 0.0
-    economic_value: float = 0.0
-    
-    def to_negentropy_credits(self) -> float:
-        # Conversion logic: 1 Credit = 1 MJ + 1 TFLOP
-        return (self.joules / 1e6) + (self.compute_flops / 1e12)
 
 @dataclass
 class USMEntropy:
     """
-    Canonical representation of Entropy (Disorder).
-    Unifies Shannon Entropy (Info) and Thermodynamic Entropy (Heat).
+    Standardized measure of disorder/uncertainty.
+    Range: 0.0 (Perfect Order) to 1.0 (Max Chaos).
     """
-    shannon_index: float = 0.0 # 0.0 (Ordered) -> 1.0 (Random)
-    thermo_disorder: float = 0.0
-    social_discord: float = 0.0
-    
-    def get_composite_score(self) -> float:
-        return (self.shannon_index + self.thermo_disorder + self.social_discord) / 3
+    value: float
+    type: str # THERMAL, INFORMATION, SOCIAL, ECONOMIC
 
 @dataclass
 class USMSignal:
     """
-    The Atomic Unit of Information in the Organism.
+    The Atomic Unit of the Substrate.
+    Represents a single data point in the unified field.
     """
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    type: SignalType = SignalType.INTERNAL
-    timestamp: float = field(default_factory=time.time)
     source_id: str = "UNKNOWN"
+    timestamp: float = field(default_factory=time.time)
     
-    # Payload
-    energy_delta: Optional[USMEnergy] = None
-    entropy_delta: Optional[USMEntropy] = None
-    raw_data: Dict[str, Any] = field(default_factory=dict)
+    # The Payload
+    value: float = 0.0
+    entropy: USMEntropy = field(default_factory=lambda: USMEntropy(0.0, "INFORMATION"))
+    metadata: Dict[str, Any] = field(default_factory=dict)
     
-    def validate(self) -> bool:
-        """
-        Stringent validation of signal integrity.
-        """
-        if not self.id or not self.source_id:
-            return False
-        if self.timestamp > time.time() + 1.0: # Future timestamp check
-            return False
-        return True
+    def __repr__(self):
+        return f"<Signal {self.id[:8]} | Val:{self.value:.2f} | Ent:{self.entropy.value:.2f} ({self.entropy.type})>"
+
+@dataclass
+class USMField:
+    """
+    A collection of signals representing a state over time/space.
+    """
+    name: str
+    signals: List[USMSignal] = field(default_factory=list)
+    
+    def add_signal(self, signal: USMSignal):
+        self.signals.append(signal)
+        
+    def get_average_entropy(self) -> float:
+        if not self.signals: return 0.0
+        return sum(s.entropy.value for s in self.signals) / len(self.signals)
 
 # --- Verification ---
 if __name__ == "__main__":
-    # Test Energy Conversion
-    energy = USMEnergy(joules=5000000, compute_flops=2e12)
-    print(f"Negentropy Credits: {energy.to_negentropy_credits()}")
+    s1 = USMSignal(value=100.0, entropy=USMEntropy(0.1, "THERMAL"))
+    s2 = USMSignal(value=105.0, entropy=USMEntropy(0.8, "THERMAL")) # High disorder
     
-    # Test Signal Validation
-    sig = USMSignal(type=SignalType.THERMAL, source_id="SENSOR_01")
-    print(f"Signal Valid: {sig.validate()}")
+    field_obj = USMField("Reactor_Core_Temp")
+    field_obj.add_signal(s1)
+    field_obj.add_signal(s2)
+    
+    print(f"Field: {field_obj.name}")
+    print(f"Avg Entropy: {field_obj.get_average_entropy():.2f}")
