@@ -14,7 +14,7 @@ See the platform in action:
 
 | **The Evolution Engine** | **The Dark Factory** | **The Visual Twin** |
 | :---: | :---: | :---: |
-| [![Evolution Demo](https://img.youtube.com/vi/PLACEHOLDER_1/0.jpg)](https://www.youtube.com/watch?v=PLACEHOLDER_1) | [![Dark Factory Demo](https://img.youtube.com/vi/PLACEHOLDER_2/0.jpg)](https://www.youtube.com/watch?v=PLACEHOLDER_2) | [![Visual Twin Demo](https://img.youtube.com/vi/PLACEHOLDER_3/0.jpg)](https://www.youtube.com/watch?v=PLACEHOLDER_3) |
+| [![Evolution Demo](https://placehold.co/600x400/1a1a1a/ffffff?text=Evolution+Engine+Demo)](https://github.com/industriverse/industriverse-public) | [![Dark Factory Demo](https://placehold.co/600x400/1a1a1a/ffffff?text=Dark+Factory+Demo)](https://github.com/industriverse/industriverse-public) | [![Visual Twin Demo](https://placehold.co/600x400/1a1a1a/ffffff?text=Visual+Twin+Demo)](https://github.com/industriverse/industriverse-public) |
 | *Self-Optimizing A/B Tests* | *Autonomous Control Loop* | *Holographic Telemetry* |
 
 ---
