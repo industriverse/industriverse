@@ -18,10 +18,17 @@ from src.social.zk_influence_engine import ZKInfluenceEngine
 from src.social.micro_gesture import MicroGestureAnalyzer
 from src.social.attention_acceleration import AttentionAccelerationDetector
 from src.social.resonance_scanner import ResonanceScanner
+from src.social.spi_advanced import SPIAdvancedSuite
 
 # Import Mobile Modules (for Hybrid Demos)
 from src.mobile.advanced.haptic_feedback import HapticImmuneResponse
 from src.mobile.advanced.ghost_protocol import GhostProtocol
+from src.mobile.advanced.gps_defense import GPSDefenseStack
+
+# Import SCDS Advanced
+from src.desktop.scds_forensics import SCDSForensicsSuite
+from src.desktop.scds_network import SCDSNetworkSuite
+
 
 class InvestorDemoSuite:
     def __init__(self):
@@ -30,6 +37,13 @@ class InvestorDemoSuite:
         self.zk_engine = ZKInfluenceEngine()
         self.haptic = HapticImmuneResponse()
         self.ghost = GhostProtocol()
+        
+        # New Advanced Suites
+        self.scds_forensics = SCDSForensicsSuite()
+        self.scds_network = SCDSNetworkSuite()
+        self.spi_advanced = SPIAdvancedSuite()
+        self.gps_defense = GPSDefenseStack()
+
         
     def print_header(self, title):
         print(f"\n{'='*60}")
@@ -197,8 +211,31 @@ class InvestorDemoSuite:
         print("   - ZK Engine: Ready")
         print("✅ SUCCESS: All Systems Operational.")
 
+    def demo_21_gps_defense(self):
+        self.print_header("21. GPS Defense Stack (Multi-Anchor)")
+        print("🛰️ Verifying Location Integrity...")
+        events = self.gps_defense.scan_location()
+        if not events:
+            print("✅ GPS Integrity Confirmed (Multi-Anchor Consensus).")
+        else:
+            print(f"🚨 GPS Spoofing Detected: {events}")
+
+    def demo_22_scds_deep_scan(self):
+        self.print_header("22. SCDS Deep Forensics (Memory/TPM)")
+        print("🧠 Scanning Memory Entropy & TPM...")
+        events = self.scds_forensics.run_scan()
+        print(f"   Scan Result: {len(events)} anomalies.")
+        print("✅ SUCCESS: Deep Scan Complete.")
+
+    def demo_23_spi_advanced(self):
+        self.print_header("23. SPI Advanced (Ad Load / Identity)")
+        print("🗣️ Analyzing Social Physics...")
+        events = self.spi_advanced.run_suite()
+        print(f"   Scan Result: {len(events)} anomalies.")
+        print("✅ SUCCESS: Social Physics Scan Complete.")
+
     def run_all(self):
-        print("\n🚀 STARTING INVESTOR DEMO SUITE (20 SCENARIOS) 🚀")
+        print("\n🚀 STARTING INVESTOR DEMO SUITE (23 SCENARIOS) 🚀")
         demos = [
             self.demo_01_thermal_anomaly, self.demo_02_mic_spy, self.demo_03_cam_spy,
             self.demo_04_ransomware_spike, self.demo_05_c2_beacon,
@@ -207,7 +244,8 @@ class InvestorDemoSuite:
             self.demo_11_zk_botnet, self.demo_12_zk_virality, self.demo_13_zk_robotic,
             self.demo_14_cross_device_alert, self.demo_15_ghost_protocol, self.demo_16_reality_anchor,
             self.demo_17_neural_battery, self.demo_18_industrial_bid, self.demo_19_multi_vector,
-            self.demo_20_iron_dome
+            self.demo_20_iron_dome,
+            self.demo_21_gps_defense, self.demo_22_scds_deep_scan, self.demo_23_spi_advanced
         ]
         
         for i, demo in enumerate(demos):
