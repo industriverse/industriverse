@@ -85,3 +85,14 @@ async def download_dac(capsule_id: str):
     # For now, let's stick to the UUID-based access if possible, or search.
     
     raise HTTPException(status_code=404, detail="Capsule not found")
+
+@router.get("/dashboard")
+async def get_dashboard_metrics():
+    """
+    Returns the real-time Sovereign Intelligence Dashboard metrics.
+    """
+    metrics_path = "data/datahub/dashboard_metrics.json"
+    if os.path.exists(metrics_path):
+        with open(metrics_path, 'r') as f:
+            return json.load(f)
+    return {"status": "WAITING_FOR_DATA", "message": "Metrics not yet generated"}

@@ -1,0 +1,14 @@
+{
+  "system_status": "ONLINE",
+  "last_update": 1764766173.3309178,
+  "models": {
+    "ebdm_loss": 0.1,
+    "tnn_residual": 0.1,
+    "gen_n_perplexity": 10.0
+  },
+  "operations": {
+    "cfr_fossils_count": 0,
+    "negentropy_minted_total": 0.0,
+    "deployments_24h": 0
+  }
+}

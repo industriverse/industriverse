@@ -1,0 +1,15 @@
+{
+  "id": "FOSSIL-PHY-1764766173-2932896006259327170",
+  "type": "PHYSICS_PRIOR",
+  "source": "real_physics_data.csv",
+  "timestamp": 1764766173.329469,
+  "energy_signature": {
+    "entropy_gradient": 0.42,
+    "thermal_variance": 12.5,
+    "conservation_score": 0.99
+  },
+  "metadata": {
+    "domain": "Thermodynamics",
+    "quality": "HIGH"
+  }
+}
