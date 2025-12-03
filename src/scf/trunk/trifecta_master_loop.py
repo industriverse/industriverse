@@ -15,6 +15,8 @@ from src.research.research_controller import ResearchController
 from src.research.entropy_oracle import EntropyOracle
 from src.datahub.value_vault import ValueVault
 from src.security.emergency_stop import EmergencyStop
+from src.scf.fertilization.value_realization_engine import ValueRealizationEngine
+from src.operations.dashboard_exporter import DashboardExporter
 
 class TrifectaMasterLoop:
     """
@@ -49,6 +51,8 @@ class TrifectaMasterLoop:
         self.entropy_oracle = EntropyOracle() # Physics Metrics
         self.value_vault = ValueVault() # Trade Secret Storage
         self.emergency_stop = EmergencyStop() # The Red Button
+        self.value_engine = ValueRealizationEngine() # ROI Calculator
+        self.dashboard = DashboardExporter() # Metrics Exporter
         
         self.parameters = {}
 
@@ -150,8 +154,29 @@ class TrifectaMasterLoop:
                      # In a real system, we might rollback here.
                      # For now, we just log it.
                 
-                # 6. Fertilize (Record Success)
+                # 6. Fertilization (Record Fossil & Value)
+                # Calculate Realized Value
+                deployment_result = {
+                    "energy_trace_summary": {"joules_saved": 0.0}, # Will be updated by thermo_metrics later
+                    "operational_impact": {"downtime_avoided_sec": 0.0} # Mock for now
+                }
+                value_metrics = self.value_engine.compute_value(deployment_result)
+                
+                # Enrich Review Result with Value
+                review_result["value_metrics"] = value_metrics
+                
                 self.cfr.record(intent, code, review_result)
+                
+                # 7. Update Dashboard
+                self.dashboard.update_model_metrics(
+                    ebdm_loss=0.1, # Mock
+                    tnn_residual=0.05, # Mock
+                    gen_n_ppx=12.0 # Mock
+                )
+                self.dashboard.update_operational_metrics(
+                    fossils_added=1,
+                    negentropy_added=value_metrics["negentropy_credits"]
+                )
                 
                 # 7. Empeiria Haus Research Loop (The Discovery Engine)
                 # Calculate Thermodynamic Value
