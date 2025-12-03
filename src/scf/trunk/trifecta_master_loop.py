@@ -3,6 +3,7 @@ import asyncio
 from src.scf.fertilization.cfr_logger import CFRLogger
 from src.integrations.voice_engine import VoiceEngine
 from src.security.uzkl_ledger import UnifiedZKLedger
+from src.scf.integration.defense_adapter import SovereignDefenseAdapter
 
 class TrifectaMasterLoop:
     """
@@ -18,6 +19,7 @@ class TrifectaMasterLoop:
         self.cfr = CFRLogger() # The Scribe
         self.voice = VoiceEngine() # The Voice
         self.ledger = UnifiedZKLedger() # The Conscience
+        self.defense = SovereignDefenseAdapter() # The Shield
         self.parameters = {}
 
     def set_parameters(self, params: dict):
@@ -36,6 +38,23 @@ class TrifectaMasterLoop:
         
         while attempt < max_retries:
             try:
+                # 0. Defense Check (The Shield)
+                integrity = self.defense.check_environment_integrity()
+                if not integrity["safe_to_deploy"]:
+                    self.voice.speak("Environment unsafe. Defense protocols active.")
+                    print(f"🛡️ [DEFENSE] Threats detected: {integrity['threats']}")
+                    
+                    # Auto-Immune Response: Trigger Counter-Measure Generation
+                    # We recursively call cycle() but with a forced intent to fix the threat.
+                    # In a real system, we'd have a specific 'Defense Mode' to avoid infinite loops.
+                    # For now, we return the threat info so the Daemon can decide.
+                    return {
+                        "status": "aborted", 
+                        "reason": "unsafe_environment", 
+                        "threats": integrity["threats"],
+                        "recommendation": "TRIGGER_AUTO_IMMUNE_RESPONSE"
+                    }
+
                 # 1. Observe: Get Context Slab (Pulse + Memory)
                 context_slab = await self.context_root.get_context_slab()
                 

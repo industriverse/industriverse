@@ -1,0 +1,23 @@
+{
+  "timestamp": 1764738499.492466,
+  "event_id": "res-1764738499492",
+  "event_type": "ENTROPY_MINIMIZATION",
+  "mastery_stage": "STAGE_3_INNOVATION",
+  "hypothesis": "System found low-entropy state (0.1000) in SOVEREIGN_CODE_FOUNDRY.",
+  "source_packet": {
+    "source": "SOVEREIGN_CODE_FOUNDRY",
+    "energy_state": {
+      "entropy": 0.1
+    },
+    "payload": {
+      "intent": "Integrate Sovereign Components",
+      "code_hash": "-5582776067288711355",
+      "confidence": 0.95,
+      "safety_score": 1.0
+    }
+  },
+  "metrics": {
+    "entropy": 0.1,
+    "safety_score": 1.0
+  }
+}

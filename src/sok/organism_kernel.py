@@ -14,6 +14,8 @@ class OrganismState:
     age_cycles: int = 0
     consciousness_level: float = 0.1 # Emerging self-awareness
 
+from src.sok.goal_homeostasis import GoalHomeostasis
+from src.sok.autopoeisis_engine import AutopoeisisEngine
 from src.safety.meta_safety_lattice import MetaSafetyLattice
 from src.unification.narrative_physics_engine import NarrativePhysicsEngine
 from src.economics.incentive_gradient_engine import IncentiveGradientEngine
@@ -34,8 +36,8 @@ class SovereignOrganism:
         print(f"🧬 [SOK] Birthing Organism: {self.name}...")
         self.nervous_system = OrchestrationLevelManager() # The Daemon
         self.cortex = LithOSKernel() # The Brain
-        self.drives = None # GoalHomeostasis (To be injected)
-        self.immune_system = None # Autopoeisis (To be injected)
+        self.drives = GoalHomeostasis() # The Motivation
+        self.immune_system = AutopoeisisEngine() # The Self-Healer
         
         # Cognitive Cortex
         self.safety = MetaSafetyLattice() # Prefrontal Cortex
