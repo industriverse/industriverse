@@ -1,37 +1,32 @@
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict
+from src.core_ai_layer.ace.ace_service import ACEService
+from src.scf.fertilization.cfr_logger import CFRLogger
+from src.scf.roots.pulse_connector import PulseConnector
 
 class ContextRoot:
     """
-    The Anchor of the Sovereign Code Foundry.
-    Loads ACE playbooks, CFR history, and domain knowledge to form the 'Context Slab'.
+    The Anchor of the SCF.
+    Aggregates context from ACE (Memory), CFR (History), and Pulse (Real-time).
     """
     def __init__(self):
-        self.playbooks = {}
-        self.history = []
-        self.cfr = None # Placeholder for Cognitive Fossil Record connection
+        self.ace = ACEService()
+        self.cfr = CFRLogger()
+        self.pulse = PulseConnector()
 
-    def load_ace_playbooks(self) -> None:
+    async def get_context_slab(self) -> Dict[str, Any]:
         """
-        Loads strategic playbooks from the ACE layer.
+        Produces a 'Context Slab' - the grounded reality for code generation.
         """
-        # TODO: Implement ACE integration
-        pass
-
-    def merge_with_cfr(self, fossil_records: List[Any]) -> None:
-        """
-        Merges historical data from the Cognitive Fossil Record.
-        """
-        # TODO: Implement CFR integration
-        pass
-
-    def produce_context_slab(self, intent_spec: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """
-        Return a fully composed 'Context Slab' for code generation.
-        The slab contains all necessary context, constraints, and history for the current intent.
-        """
-        return {
-            "intent": intent_spec,
-            "playbooks": self.playbooks,
-            "history_summary": "...",
-            "constraints": []
+        # 1. Get Long-term Memory from ACE
+        ace_context = self.ace.get_context()
+        
+        # 2. Get Real-time Telemetry from Pulse
+        pulse_data = await self.pulse.fetch_latest()
+        
+        # 3. Merge
+        slab = {
+            "memory": ace_context,
+            "telemetry": pulse_data,
+            "timestamp": pulse_data.get("timestamp")
         }
+        return slab
