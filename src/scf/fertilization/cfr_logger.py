@@ -3,6 +3,7 @@ from typing import Dict, Any
 from src.datahub.value_vault import ValueVault
 from src.research.research_controller import ResearchController
 from src.anthropology.cognitive_fossil_record import FossilRecord, CognitiveFossil
+from src.scf.fertilization.fossil_validator import FossilValidator
 
 class CFRLogger:
     """
@@ -14,6 +15,7 @@ class CFRLogger:
         self.value_vault = ValueVault()
         self.research_controller = ResearchController()
         self.fossil_record = FossilRecord()
+        self.validator = FossilValidator()
         print("📜 CFR Logger Initialized (Connected to Anthropological Layer)")
 
     def record(self, intent: str, code: str, review_result: Dict[str, Any]):
@@ -29,10 +31,29 @@ class CFRLogger:
             outcome="SUCCESS" if review_result.get("verdict") == "APPROVE" else "FAILURE"
         )
         
-        # 2. Preserve in Global History
+        # 2. Validate Fossil (Quality Control)
+        # Construct a validation packet
+        validation_packet = {
+            "intent_id": str(hash(intent)),
+            "context_slab_ref": "LATEST_CONTEXT", # Mock
+            "negentropy_score": review_result.get("score", 0.0),
+            "energy_trace_summary": {"joules_saved": 0.0}, # Mock
+            "proof_id": "PENDING", # Mock
+            "artifact_cid": f"ipfs://{str(hash(code))}", # Mock IPFS CID
+            "verifier_result": review_result.get("verdict", "UNKNOWN")
+        }
+        
+        is_valid, reason = self.validator.validate(validation_packet)
+        if not is_valid:
+            print(f"⚠️ [CFR] Fossil Validation Failed: {reason}. Marking as LOW_QUALITY.")
+            fossil.metadata = {"quality": "LOW", "validation_error": reason}
+        else:
+            fossil.metadata = {"quality": "HIGH"}
+
+        # 3. Preserve in Global History
         self.fossil_record.preserve_fossil(fossil)
         
-        # 3. Store in Value Vault (if valuable)
+        # 4. Store in Value Vault (if valuable)
         # We calculate a 'negentropy' score based on the review
         score = review_result.get("score", 0.5)
         if score > 0.7:
@@ -46,7 +67,7 @@ class CFRLogger:
             }
             self.value_vault.store_secret(insight)
             
-            # 4. Trigger Research if Breakthrough
+            # 5. Trigger Research if Breakthrough
             if score > 0.9:
                 packet = {
                     "source": "SOVEREIGN_CODE_FOUNDRY",

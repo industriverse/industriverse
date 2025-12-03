@@ -14,6 +14,7 @@ from src.orchestration.hydrator import ServiceHydrator
 from src.research.research_controller import ResearchController
 from src.research.entropy_oracle import EntropyOracle
 from src.datahub.value_vault import ValueVault
+from src.security.emergency_stop import EmergencyStop
 
 class TrifectaMasterLoop:
     """
@@ -47,6 +48,7 @@ class TrifectaMasterLoop:
         self.research_controller.set_active(True) # Always active for SCF
         self.entropy_oracle = EntropyOracle() # Physics Metrics
         self.value_vault = ValueVault() # Trade Secret Storage
+        self.emergency_stop = EmergencyStop() # The Red Button
         
         self.parameters = {}
 
@@ -66,6 +68,11 @@ class TrifectaMasterLoop:
         
         while attempt < max_retries:
             try:
+                # -1. Emergency Stop Check (The Red Button)
+                if not self.emergency_stop.check_status():
+                    print("🛑 [FATAL] EMERGENCY STOP ENGAGED. HALTING CYCLE.")
+                    return {"status": "aborted", "reason": "EMERGENCY_STOP"}
+
                 # 0. Defense Check (The Shield)
                 integrity = self.defense.check_environment_integrity()
                 if not integrity["safe_to_deploy"]:
