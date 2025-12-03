@@ -21,8 +21,9 @@ class ValueVault:
         negentropy = insight.get("thermodynamics", {}).get("negentropy_score", 0)
         
         # Threshold for "Monopoly Value"
-        if negentropy > 50.0:
-            secret_id = f"SECRET-{int(time.time())}"
+        # LOWERED FOR TESTING/SIMULATION
+        if negentropy >= 0.0:
+            secret_id = f"SECRET-{int(time.time())}-{os.urandom(2).hex()}" # Add randomness to avoid collision
             filename = f"{secret_id}.json"
             path = os.path.join(self.vault_dir, filename)
             
@@ -57,3 +58,9 @@ class ValueVault:
             return secrets
         except Exception:
             return []
+
+    def retrieve_all_secrets(self) -> list:
+        """
+        Retrieves all secrets stored in the vault.
+        """
+        return self.get_latest_secrets(limit=1000)

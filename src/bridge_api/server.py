@@ -123,6 +123,30 @@ except ImportError as e:
 from src.bridge_api.routers import pulse
 app.include_router(pulse.router)
 
+# 7. SCF Control Endpoint (Daemon Orchestration)
+from pydantic import BaseModel
+import json
+import os
+
+class SCFControlCommand(BaseModel):
+    command: str
+    payload: Dict[str, Any] = {}
+
+@app.post("/scf/control")
+async def scf_control(cmd: SCFControlCommand):
+    """
+    Sends a control command to the SCF Sovereign Daemon.
+    """
+    control_file = "data/scf/control.json"
+    os.makedirs(os.path.dirname(control_file), exist_ok=True)
+    
+    try:
+        with open(control_file, 'w') as f:
+            json.dump(cmd.dict(), f)
+        return {"status": "sent", "command": cmd.command}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to write control file: {str(e)}")
+
 @app.get("/")
 async def root():
     return {

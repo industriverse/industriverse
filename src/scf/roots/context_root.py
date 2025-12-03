@@ -1,32 +1,52 @@
-from typing import Any, Dict
-from src.core_ai_layer.ace.ace_service import ACEService
-from src.scf.fertilization.cfr_logger import CFRLogger
+import asyncio
+from typing import Dict, Any
 from src.scf.roots.pulse_connector import PulseConnector
+from src.scf.roots.memory_stem import MemoryStem
+from src.core_ai_layer.ace.ace_service import ACEService, ACERequest
 
 class ContextRoot:
     """
     The Anchor of the SCF.
-    Aggregates context from ACE (Memory), CFR (History), and Pulse (Real-time).
+    Absorbs real-time data (Pulse) and historical wisdom (Memory) to form the Context Slab.
+    Now powered by ACE (Agentic Context Engineering).
     """
     def __init__(self):
-        self.ace = ACEService()
-        self.cfr = CFRLogger()
         self.pulse = PulseConnector()
+        self.memory = MemoryStem()
+        self.ace = ACEService() # Real ACE Service
 
     async def get_context_slab(self) -> Dict[str, Any]:
         """
-        Produces a 'Context Slab' - the grounded reality for code generation.
+        Synthesizes the Context Slab using ACE.
         """
-        # 1. Get Long-term Memory from ACE
-        ace_context = self.ace.get_context()
+        # 1. Gather Raw Inputs
+        telemetry = await self.pulse.fetch_latest()
+        memories = self.memory.recall(query="current_state")
         
-        # 2. Get Real-time Telemetry from Pulse
-        pulse_data = await self.pulse.fetch_latest()
+        # 2. Construct ACE Request
+        # In a real scenario, 'intent' might come from an upstream trigger, 
+        # but here we are forming the *base* context for intent generation.
+        request = ACERequest(
+            request_id="scf_context_gen",
+            intent="Synthesize Operational Context",
+            context=[str(telemetry), str(memories)]
+        )
         
-        # 3. Merge
-        slab = {
-            "memory": ace_context,
-            "telemetry": pulse_data,
-            "timestamp": pulse_data.get("timestamp")
-        }
-        return slab
+        # 3. Process with ACE
+        try:
+            ace_response = await self.ace.process_request(request)
+            reflection = ace_response.reflection
+            
+            return {
+                "telemetry": telemetry,
+                "memory": memories,
+                "ace_reflection": reflection.dict() if reflection else {},
+                "timestamp": telemetry.get("timestamp")
+            }
+        except Exception as e:
+            print(f"⚠️ ContextRoot: ACE processing failed, falling back to raw data: {e}")
+            return {
+                "telemetry": telemetry,
+                "memory": memories,
+                "error": str(e)
+            }

@@ -1,5 +1,6 @@
 from typing import Any
 import asyncio
+from src.scf.fertilization.cfr_logger import CFRLogger
 
 class TrifectaMasterLoop:
     """
@@ -12,6 +13,7 @@ class TrifectaMasterLoop:
         self.builder = builder_engine
         self.reviewer = reviewer
         self.deployer = deployer
+        self.cfr = CFRLogger() # The Scribe
         self.parameters = {}
 
     def set_parameters(self, params: dict):
@@ -19,8 +21,6 @@ class TrifectaMasterLoop:
         Dynamically updates loop parameters (e.g., from Daemon Level).
         """
         self.parameters.update(params)
-        # Propagate to sub-components if needed
-        # self.builder.set_config(params)
 
     async def cycle(self) -> Any:
         """
@@ -36,7 +36,7 @@ class TrifectaMasterLoop:
                 context_slab = await self.context_root.get_context_slab()
                 
                 # 2. Orient: Generate Intent based on Context
-                intent = self.intent_engine.generate() # Should accept context in real impl
+                intent = self.intent_engine.generate()
                 spec = self.intent_engine.expand(intent)
                 
                 # 3. Build: Generate Code (GenN)
@@ -46,11 +46,15 @@ class TrifectaMasterLoop:
                 review_result = self.reviewer.review(code)
                 
                 if review_result["verdict"] == "REJECT":
-                    # In a real loop, we'd feedback and retry
+                    # Record failure to CFR
+                    self.cfr.record(intent, code, review_result)
                     return {"status": "rejected", "reason": review_result["critique"]}
 
                 # 5. Deploy
                 result = self.deployer.deploy(code, context=context_slab)
+                
+                # 6. Fertilize (Record Success)
+                self.cfr.record(intent, code, review_result)
                 
                 return {
                     "status": "deployed",

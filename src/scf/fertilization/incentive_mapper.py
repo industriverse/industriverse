@@ -8,5 +8,27 @@ class IncentiveMapper:
         """
         Calculates the reward (Joules/Value) for a given code result.
         """
-        # TODO: Implement incentive calculation logic
-        return {"reward": 100.0, "currency": "JouleToken"}
+        # Extract metrics
+        review = code_result.get("review", {})
+        score = review.get("score", 0.0)
+        verdict = review.get("verdict", "REJECT")
+        
+        # Base Reward
+        base_reward = 0.0
+        if verdict == "APPROVE":
+            base_reward = 100.0
+        
+        # Multipliers
+        quality_multiplier = score * 2.0 # Higher score = double reward
+        
+        # Total Calculation
+        total_reward = base_reward * quality_multiplier
+        
+        return {
+            "reward": total_reward,
+            "currency": "JouleToken",
+            "breakdown": {
+                "base": base_reward,
+                "quality_multiplier": quality_multiplier
+            }
+        }

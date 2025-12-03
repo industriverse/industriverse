@@ -48,6 +48,14 @@ class EdgeNodeManager:
                 print(f"     -> ❌ Node {node.hostname} is {node.status}")
         else:
             print(f"     -> ❌ Node ID {node_id} not found.")
+
+    def release_node(self, node_id: str):
+        """
+        Simulates a node finishing its task.
+        """
+        if node_id in self.nodes:
+            self.nodes[node_id].status = "ONLINE"
+            print(f"     -> ✅ Node {self.nodes[node_id].hostname} is now ONLINE.")
             
     def check_health(self):
         print("\n   🏥 [HEALTH CHECK]")
