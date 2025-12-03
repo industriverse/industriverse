@@ -1,7 +1,7 @@
 import random
 from src.integrations.energy_api import EnergyAPI
 
-class KairosEconomicOptimizer:
+class KairosOptimizer:
     """
     The Economic Optimizer.
     Decides 'When' to run based on Value vs Cost.

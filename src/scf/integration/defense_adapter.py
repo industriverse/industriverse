@@ -18,7 +18,7 @@ class SovereignDefenseAdapter:
         self.scds_network = SCDSNetworkSuite()
         self.spi = SPIAdvancedSuite()
         self.gps = GPSDefenseStack()
-        self.atlas = EnergyAtlasBuilder() # Connection to the Global Energy Map
+        self.atlas = EnergyAtlasBuilder(filepath="data/energy_atlas.h5") # Connection to the Global Energy Map
         
     def check_environment_integrity(self) -> Dict[str, Any]:
         """

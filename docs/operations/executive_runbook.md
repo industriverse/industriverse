@@ -1,59 +1,57 @@
-# Empeiria Haus | Executive Runbook
+# Executive Runbook: The Owner's Manual
 
-**"The Owner's Manual for the Thermodynamic Monopoly."**
+**"How to Run the Thermodynamic Monopoly"**
 
-This document outlines the Standard Operating Procedures (SOPs) for running Empeiria Haus as a client-facing research institute.
+This document contains the Standard Operating Procedures (SOPs) for operating Empeiria Haus.
 
 ---
 
-## 1. Client Onboarding (The Handshake)
-When a new prospect approaches Empeiria Haus:
+## 1. Client Onboarding
+**Goal**: Set up a secure, optimized workspace for a new client.
 
-1.  **Send the Brief**: Provide them with `templates/client_brief.json`.
-2.  **Receive the Request**: Save their filled JSON to `incoming_requests/`.
-3.  **Ingest the Project**:
+1.  **Receive Brief**: Send `templates/client_brief.json` to the client.
+2.  **Ingest**: Run the intake script.
     ```bash
-    python3 scripts/client/ingest_request.py incoming_requests/acme_brief.json
+    python3 scripts/client/ingest_request.py client_brief.json
     ```
-    *Result*: A new secure workspace is created in `projects/Acme_Corp/`.
+3.  **Verify**: Check `projects/{client_name}/project_config.json`.
 
 ---
 
-## 2. Factory Orchestration (The Operation)
-Once the project is set up, you must "Run the Factory" to solve their problem.
+## 2. Running the Factory (Orchestration)
+**Goal**: Solve the client's problem using the Trifecta Brain.
 
-1.  **Start the Daemon**:
+1.  **Select Persona**: Choose the right persona for the job.
+    *   `research_lead`: For maximum innovation (High Risk/Reward).
+    *   `safety_officer`: For critical infrastructure (Zero Risk).
+    *   `financial_auditor`: For cost reduction.
+2.  **Launch**:
     ```bash
-    python3 scripts/datahub/datahub_ctl.py start
-    python3 scripts/datahub/datahub_ctl.py research on
+    python3 scripts/trifecta/run_orchestration.py --persona research_lead
     ```
-2.  **Activate the Persona**:
-    Based on the client's brief (e.g., "Reduce Energy"), choose the correct persona.
+3.  **Monitor**: Watch the `EmpeiriaDashboard` for "Research Events".
+
+---
+
+## 3. Delivering Value
+**Goal**: Generate the "Proof of Value" artifacts.
+
+1.  **Generate Audit (TGE)**:
     ```bash
-    python3 scripts/trifecta/run_orchestration.py --persona financial_auditor
+    python3 scripts/research/generate_tge_audit.py --client {client_name}
     ```
-    *Result*: The system will autonomously optimize for the client's goals 24/7.
+2.  **Generate Certificate (ZKMM)**:
+    ```bash
+    python3 scripts/research/generate_zk_proof.py --part {part_id}
+    ```
+3.  **Deliver**: Send the files from `examples/client_deliverables/` to the client.
 
 ---
 
-## 3. Value Delivery (The Artifacts)
-After the factory has run for the agreed duration (e.g., 48 hours):
+## 4. System Maintenance
+**Goal**: Ensure the machine stays clean.
 
-1.  **Generate the Proof**:
-    Run the specific generator for their use case.
-    *   *Energy Savings*: `python3 scripts/research/generate_tge_audit.py`
-    *   *IP Protection*: `python3 scripts/research/generate_zk_proof.py`
-    *   *Risk Alert*: `python3 scripts/research/generate_risk_forecast.py`
+1.  **Check Heartbeat**: `curl http://localhost:8000/status`
+2.  **Prune Vault**: Archive old secrets to Cold Storage (B2) every 30 days.
 
-2.  **Deliver**:
-    Send the generated files from `examples/client_deliverables/` to the client.
-
----
-
-## 4. System Maintenance (The Manifest)
-To ensure stability, always check the **System Manifest** before a major client run.
-*   **File**: `config/system_manifest.json`
-*   **Action**: Ensure all component versions match the manifest.
-
----
-*© 2025 Empeiria Haus. Executive Operations.*
+> "Trust the Process. Trust the Physics."

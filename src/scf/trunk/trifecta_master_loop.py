@@ -4,6 +4,16 @@ from src.scf.fertilization.cfr_logger import CFRLogger
 from src.integrations.voice_engine import VoiceEngine
 from src.security.uzkl_ledger import UnifiedZKLedger
 from src.scf.integration.defense_adapter import SovereignDefenseAdapter
+from src.orchestration.telos_classifier import TelosClassifier
+from src.integrations.energy_api import EnergyAPI
+from src.economics.negentropy_ledger import NegentropyLedger
+from src.orchestration.chronos import Chronos
+from src.orchestration.aletheia import AletheiaTruthLayer
+from src.orchestration.factory_persona import FactoryPersonaManager
+from src.orchestration.hydrator import ServiceHydrator
+from src.research.research_controller import ResearchController
+from src.research.entropy_oracle import EntropyOracle
+from src.datahub.value_vault import ValueVault
 
 class TrifectaMasterLoop:
     """
@@ -20,6 +30,24 @@ class TrifectaMasterLoop:
         self.voice = VoiceEngine() # The Voice
         self.ledger = UnifiedZKLedger() # The Conscience
         self.defense = SovereignDefenseAdapter() # The Shield
+        
+        # Grand Challenge Integrations
+        self.telos_classifier = TelosClassifier() # Self-Healing
+        self.energy_api = EnergyAPI() # Thermo-Scheduling
+        self.negentropy_ledger = NegentropyLedger() # Value Accounting
+        
+        # Dark Factory / Quadrality Integrations
+        self.chronos = Chronos() # Timekeeper
+        self.aletheia = AletheiaTruthLayer() # Truth Layer
+        self.persona_manager = FactoryPersonaManager() # Factory Personality
+        self.hydrator = ServiceHydrator() # Capsule Hydrator
+        
+        # Empeiria Haus / Research Engine Integrations
+        self.research_controller = ResearchController() # The Research Brain
+        self.research_controller.set_active(True) # Always active for SCF
+        self.entropy_oracle = EntropyOracle() # Physics Metrics
+        self.value_vault = ValueVault() # Trade Secret Storage
+        
         self.parameters = {}
 
     def set_parameters(self, params: dict):
@@ -55,6 +83,22 @@ class TrifectaMasterLoop:
                         "recommendation": "TRIGGER_AUTO_IMMUNE_RESPONSE"
                     }
 
+                # 0.5 Thermodynamic Scheduling Check (Challenge #3) & Persona Logic
+                persona_config = self.persona_manager.get_config()
+                price = self.energy_api.get_current_price()
+                
+                # Adjust threshold based on Persona
+                # Higher bid_multiplier means we tolerate higher prices
+                base_threshold = 0.15
+                adjusted_threshold = base_threshold * persona_config['bid_multiplier_base']
+                
+                if price > adjusted_threshold: 
+                    self.voice.speak(f"Energy price ${price:.2f} exceeds limit ${adjusted_threshold:.2f} for {self.persona_manager.current_persona}. Pausing.")
+                    print(f"⚡ [KAIROS] Price ${price:.2f} > Limit ${adjusted_threshold:.2f}. Stance: {persona_config['emm_bias']}. Pausing.")
+                    await asyncio.sleep(1) # Wait a bit
+                    continue # Skip this cycle attempt
+
+
                 # 1. Observe: Get Context Slab (Pulse + Memory)
                 context_slab = await self.context_root.get_context_slab()
                 
@@ -74,21 +118,78 @@ class TrifectaMasterLoop:
                 if review_result["verdict"] == "REJECT":
                     # Record failure to CFR
                     self.cfr.record(intent, code, review_result)
+                    
+                    # Challenge #2: Self-Healing Diagnosis
+                    critique = review_result["critique"]
+                    cat, conf, action = self.telos_classifier.classify_failure(critique)
+                    print(f"🧠 [TELOS] Diagnosis: {cat} -> Action: {action}")
+                    
+                    if action == "TRIGGER_ALETHEIA_RECALIBRATION":
+                        self.voice.speak("Drift detected. Recalibrating.")
+                        # In a real system, we'd trigger the DriftCanceller here
+                        
                     self.voice.speak("Optimization rejected. Refining approach.")
-                    return {"status": "rejected", "reason": review_result["critique"]}
+                    return {"status": "rejected", "reason": critique, "telos_action": action}
 
                 # 5. Deploy
                 result = self.deployer.deploy(code, context=context_slab)
                 
+                # 5.5 Aletheia Truth Check (The Sensorium)
+                # Validate that the deployment didn't break physics
+                is_valid, drift, msg = self.aletheia.validate({"name": intent, "id": "current_cycle"}, {"temperature": 500}) # Mock prediction
+                if not is_valid:
+                     self.voice.speak(f"Physics Violation Detected. {msg}")
+                     print(f"👁️ [ALETHEIA] {msg}")
+                     # In a real system, we might rollback here.
+                     # For now, we just log it.
+                
                 # 6. Fertilize (Record Success)
                 self.cfr.record(intent, code, review_result)
                 
-                # 7. Conscience (Mint ZK Proof)
+                # 7. Empeiria Haus Research Loop (The Discovery Engine)
+                # Calculate Thermodynamic Value
+                # Mocking hardware data for now
+                trinity_packet = {
+                    "components": {
+                        "industriverse": {"capsule_count": 1}, # We deployed 1 "capsule" (code block)
+                        "thermodynasty": {"power_draw_w": 150.0, "edcoc_temp_c": 45.0} # Mock hardware stats
+                    },
+                    "payload": {
+                        "safety_score": 0.99, # Assumed safe if deployed
+                        "confidence": 0.95
+                    },
+                    "source": "SCF_Master_Loop",
+                    "energy_state": {"entropy": 0.1} # Low entropy (success)
+                }
+                
+                thermo_metrics = self.entropy_oracle.calculate_thermodynamic_value(trinity_packet)
+                print(f"🔬 [EMPEIRIA] Negentropy Score: {thermo_metrics['negentropy_score']} {thermo_metrics['unit']}")
+                
+                # Store High-Value Secret
+                insight = {
+                    "intent": intent,
+                    "code_hash": hash(code),
+                    "thermodynamics": thermo_metrics
+                }
+                if self.value_vault.store_secret(insight):
+                    self.voice.speak("High value trade secret archived.")
+                
+                # Trigger Research Event (Feed the Orchestrator)
+                # We enrich the packet with the calculated metrics
+                trinity_packet["energy_state"]["entropy"] = 1.0 / (thermo_metrics["negentropy_score"] + 0.1) # Inverse of negentropy
+                self.research_controller.analyze_packet(trinity_packet)
+
+                # 8. Conscience (Mint ZK Proof)
                 proof = self.ledger.generate_proof(
                     domain="CODE_GENERATION",
                     data={"intent": intent, "code_hash": str(hash(code))},
                     metadata={"verdict": "APPROVE", "score": review_result.get("score")}
                 )
+                
+                # Challenge #10: Negentropy Accounting
+                # We assume a successful deployment reduces entropy (adds value)
+                entropy_reduction = review_result.get("score", 0.5) * 10 # Mock calculation
+                self.negentropy_ledger.record_transaction("SCF_Master_Loop", intent, entropy_reduction)
                 
                 self.voice.speak("Deployment successful. Optimization active.")
                 

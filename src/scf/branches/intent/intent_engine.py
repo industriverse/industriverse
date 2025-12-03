@@ -1,5 +1,7 @@
 import random
 
+from src.marketing.solution_architect import SolutionArchitect
+
 class IntentEngine:
     """
     Generates high-level intent specifications for code generation.
@@ -8,6 +10,7 @@ class IntentEngine:
     def __init__(self, memory_bridge: Any, context_root: Any):
         self.memory = memory_bridge
         self.context = context_root
+        self.architect = SolutionArchitect()
         self.intents = [
             "Optimize system efficiency",
             "Patch security vulnerability in auth",
@@ -28,8 +31,13 @@ class IntentEngine:
         """
         Expands a raw intent into a detailed technical specification.
         """
+        # Use Solution Architect to find technical modules
+        solution = self.architect.map_request_to_solution(raw_intent)
+        
         return {
             "goal": raw_intent,
             "constraints": [],
-            "requirements": []
+            "requirements": [],
+            "technical_modules": solution["modules"],
+            "pitch": solution["pitch"]
         }

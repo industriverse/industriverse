@@ -3,6 +3,7 @@ import uuid
 import json
 from dataclasses import dataclass, field
 from typing import Dict, Any, Optional
+from .hilbert_metrics import HilbertMetrics
 
 # Mock Quadrality Components for this implementation
 class Chronos:
@@ -48,6 +49,7 @@ class ExperimentRunner:
         self.kairos = Kairos()
         self.telos = Telos()
         self.aletheia = Aletheia()
+        self.hilbert = HilbertMetrics()
         self.results = []
 
     def run_experiment(self, name: str, variant_a_func, variant_b_func, context: Dict = None):
@@ -64,6 +66,14 @@ class ExperimentRunner:
         # Determine Winner
         winner = "A" if res_a.roi >= res_b.roi else "B"
         print(f"🏆 Winner: Variant {winner}")
+
+        # Calculate Hilbert Metrics (Evolutionary Angle)
+        # Construct state dicts from results
+        state_a = {'roi': res_a.roi, 'latency': res_a.latency_ms, 'stability': res_a.stability}
+        state_b = {'roi': res_b.roi, 'latency': res_b.latency_ms, 'stability': res_b.stability}
+        
+        evolution_analysis = self.hilbert.analyze_evolution(state_a, state_b)
+        print(f"📐 Hilbert Analysis: {evolution_analysis['interpretation']} (Angle: {evolution_analysis['orthogonality']:.2f})")
         
         return {
             "experiment": name,

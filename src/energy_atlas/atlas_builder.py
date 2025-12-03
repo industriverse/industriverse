@@ -2,7 +2,7 @@ import h5py
 import numpy as np
 from typing import Dict, Any, Optional
 
-class EnergyAtlas:
+class EnergyAtlasBuilder:
     """
     The Energy Atlas: A 4D Spatiotemporal Map of Industrial Energy.
     
