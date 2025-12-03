@@ -2,8 +2,9 @@ import sys
 import os
 from unittest.mock import MagicMock
 
-# Mock numpy
+# Mock numpy and pydantic
 sys.modules["numpy"] = MagicMock()
+sys.modules["pydantic"] = MagicMock()
 
 # Add project root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
@@ -40,7 +41,9 @@ def test_imports():
         "src.scf.governance.zk_compliance_auditor",
         "src.scf.core_models.ebdm",
         "src.scf.core_models.tnn",
-        "src.scf.core_models.gen_n"
+        "src.scf.core_models.gen_n",
+        "src.scf.core_models.nvp_adapter",
+        "src.scf.core_models.prin_adapter"
     ]
 
     print("Verifying SCF Skeleton Imports...")
