@@ -1,6 +1,8 @@
 from typing import Any
 import asyncio
 from src.scf.fertilization.cfr_logger import CFRLogger
+from src.integrations.voice_engine import VoiceEngine
+from src.security.uzkl_ledger import UnifiedZKLedger
 
 class TrifectaMasterLoop:
     """
@@ -14,6 +16,8 @@ class TrifectaMasterLoop:
         self.reviewer = reviewer
         self.deployer = deployer
         self.cfr = CFRLogger() # The Scribe
+        self.voice = VoiceEngine() # The Voice
+        self.ledger = UnifiedZKLedger() # The Conscience
         self.parameters = {}
 
     def set_parameters(self, params: dict):
@@ -39,6 +43,9 @@ class TrifectaMasterLoop:
                 intent = self.intent_engine.generate()
                 spec = self.intent_engine.expand(intent)
                 
+                # Announce Intent
+                self.voice.speak(f"I understand. Proceeding to {intent}.")
+                
                 # 3. Build: Generate Code (GenN)
                 code = self.builder.build(spec)
                 
@@ -48,6 +55,7 @@ class TrifectaMasterLoop:
                 if review_result["verdict"] == "REJECT":
                     # Record failure to CFR
                     self.cfr.record(intent, code, review_result)
+                    self.voice.speak("Optimization rejected. Refining approach.")
                     return {"status": "rejected", "reason": review_result["critique"]}
 
                 # 5. Deploy
@@ -56,11 +64,21 @@ class TrifectaMasterLoop:
                 # 6. Fertilize (Record Success)
                 self.cfr.record(intent, code, review_result)
                 
+                # 7. Conscience (Mint ZK Proof)
+                proof = self.ledger.generate_proof(
+                    domain="CODE_GENERATION",
+                    data={"intent": intent, "code_hash": str(hash(code))},
+                    metadata={"verdict": "APPROVE", "score": review_result.get("score")}
+                )
+                
+                self.voice.speak("Deployment successful. Optimization active.")
+                
                 return {
                     "status": "deployed",
                     "result": result,
                     "intent": intent,
-                    "review": review_result
+                    "review": review_result,
+                    "proof_id": proof.id
                 }
             except Exception as e:
                 attempt += 1
