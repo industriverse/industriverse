@@ -1,46 +1,68 @@
-import random
-from typing import Dict
+"""
+Narrative Feedback Loop
+Consumes social signals and maps them back to experiments and product priorities.
+"""
 
-class NarrativeFeedbackLoop:
-    """
-    The Ear.
-    Closes the loop between market sentiment and evolution direction.
-    """
-    def ingest_market_signals(self) -> Dict[str, float]:
-        print("👂 [Narrative Feedback] Listening to Market Signals...")
-        
-        # Mock Sentiment Analysis from "Social Media"
-        signals = {
-            "physics_grounding": 0.8, # Investors love physics
-            "autonomous_agents": 0.9, # High hype
-            "sustainability": 0.7,
-            "cost_reduction": 0.95    # Clients love this
-        }
-        
-        print(f"   Detected Sentiment: {signals}")
-        return signals
+from typing import Dict, Any, List
+import statistics
 
-    def adjust_evolution_plan(self, current_plan: Dict, signals: Dict[str, float]) -> Dict:
-        print("⚖️ [Narrative Feedback] Adjusting Evolution Weights...")
-        
-        # Adjust weights based on sentiment
-        new_plan = current_plan.copy()
-        
-        if signals.get("cost_reduction", 0) > 0.9:
-            print("   -> Boosting 'Optimization' experiments due to client demand.")
-            new_plan['weights']['optimization'] += 0.2
-            
-        if signals.get("autonomous_agents", 0) > 0.8:
-            print("   -> Boosting 'Agent' experiments due to investor hype.")
-            new_plan['weights']['agents'] += 0.1
-            
-        return new_plan
+class NarrativeFeedback:
+    def __init__(self, stakeholder_weights: Dict[str,float]=None):
+        # e.g., {"vc":5.0, "press":1.2, "peer_researcher":3.0}
+        self.weights = stakeholder_weights or {"default":1.0}
 
-if __name__ == "__main__":
-    # Test
-    loop = NarrativeFeedbackLoop()
-    signals = loop.ingest_market_signals()
-    plan = {'weights': {'optimization': 0.5, 'agents': 0.5}}
-    new_plan = loop.adjust_evolution_plan(plan, signals)
-    print(f"Old Plan: {plan}")
-    print(f"New Plan: {new_plan}")
+    def normalize_signals(self, raw: List[Dict[str,Any]]) -> List[Dict[str,Any]]:
+        """
+        Convert raw social API payloads into normalized attention datapoints:
+        {"content_id","timestamp","impressions","engagement","actor_type"}
+        """
+        normalized = []
+        for r in raw:
+            norm = {
+                "content_id": r.get("id"),
+                "ts": r.get("ts"),
+                "impressions": int(r.get("impr",0)),
+                "engagement": int(r.get("eng",0)),
+                "actor_type": r.get("actor_type","default")
+            }
+            normalized.append(norm)
+        return normalized
+
+    def score_attention(self, normalized: List[Dict[str,Any]]) -> Dict[str, float]:
+        """
+        Return aggregated attention scores per content_id.
+        attention = weighted_sum(engagement + impressions * alpha)
+        """
+        scores = {}
+        for n in normalized:
+            w = self.weights.get(n["actor_type"], self.weights.get("default",1.0))
+            base = n["engagement"] + 0.01 * n["impressions"]
+            score = base * w
+            scores.setdefault(n["content_id"], 0.0)
+            scores[n["content_id"]] += score
+        return scores
+
+    def map_to_experiments(self, content_map: Dict[str,str], attention_scores: Dict[str,float]) -> Dict[str,float]:
+        """
+        content_map: content_id -> experiment_id
+        returns: experiment_id -> aggregated attention score
+        """
+        exp_scores = {}
+        for content_id, score in attention_scores.items():
+            exp_id = content_map.get(content_id)
+            if not exp_id:
+                continue
+            exp_scores.setdefault(exp_id,0.0)
+            exp_scores[exp_id] += score
+        return exp_scores
+
+    def produce_recommendations(self, exp_scores: Dict[str,float], hilbert_novelty: Dict[str,float]) -> List[Dict[str,Any]]:
+        """
+        Combine attention and novelty to rank experiments for budget allocation.
+        """
+        recs = []
+        for exp, atn in exp_scores.items():
+            nov = hilbert_novelty.get(exp, 0.0)
+            score = atn * (1 + nov)
+            recs.append({"experiment":exp,"attention":atn,"novelty":nov,"composite_score":score})
+        return sorted(recs, key=lambda x: x["composite_score"], reverse=True)
