@@ -147,3 +147,5 @@ jspm_packages/
 *.db
 *.sqlite
 *.sqlite3
+!src/scf/branches/build/simulation_harness.py
+!src/scf/branches/build/*
