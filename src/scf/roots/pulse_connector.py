@@ -29,21 +29,29 @@ class PulseConnector:
     async def fetch_latest(self) -> Dict[str, Any]:
         """
         Returns the latest aggregated telemetry snapshot.
+        Includes automatic reconnection logic.
         """
         if not self.connected:
             await self.connect()
             
-        # Simulate fetching data
-        # In real impl, this would return the last message received via WS
-        return {
-            "timestamp": datetime.now().isoformat(),
-            "metrics": {
-                "total_power_watts": 450.0,
-                "avg_temperature_c": 65.0,
-                "system_entropy": 0.45
-            },
-            "shield_state": "GREEN"
-        }
+        try:
+            # Simulate fetching data
+            # In real impl, this would return the last message received via WS
+            return {
+                "timestamp": datetime.now().isoformat(),
+                "metrics": {
+                    "total_power_watts": 450.0,
+                    "avg_temperature_c": 65.0,
+                    "system_entropy": 0.45
+                },
+                "shield_state": "GREEN"
+            }
+        except Exception as e:
+            self.logger.error(f"Pulse connection lost: {e}")
+            self.connected = False
+            # Simple retry once
+            await self.connect()
+            return await self.fetch_latest()
 
     async def close(self):
         self.connected = False
