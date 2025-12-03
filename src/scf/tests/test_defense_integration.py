@@ -39,6 +39,10 @@ sys.modules["src.economics.incentive_gradient_engine"] = MagicMock()
 sys.modules["src.unification.cross_domain_inference"] = MagicMock()
 sys.modules["src.overseer.overseer_stratiform"] = MagicMock()
 
+# Mock Energy Atlas
+sys.modules["src.energy_atlas"] = MagicMock()
+sys.modules["src.energy_atlas.atlas_builder"] = MagicMock()
+
 # Add project root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 

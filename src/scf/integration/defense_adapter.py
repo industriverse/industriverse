@@ -3,12 +3,14 @@ from src.desktop.scds_forensics import SCDSForensicsSuite
 from src.desktop.scds_network import SCDSNetworkSuite
 from src.social.spi_advanced import SPIAdvancedSuite
 from src.mobile.advanced.gps_defense import GPSDefenseStack
+from src.energy_atlas.atlas_builder import EnergyAtlasBuilder
 
 class SovereignDefenseAdapter:
     """
     The Shield of the Sovereign Code Foundry.
     Integrates SCDS (Desktop), SPI (Social), and GPS Defense into the generation loop.
     Ensures that code is generated and deployed only in safe, verified environments.
+    Feeds defense telemetry into the Energy Atlas.
     """
     def __init__(self):
         print("🛡️ [SCF DEFENSE] Initializing Sovereign Defense Suites...")
@@ -16,6 +18,7 @@ class SovereignDefenseAdapter:
         self.scds_network = SCDSNetworkSuite()
         self.spi = SPIAdvancedSuite()
         self.gps = GPSDefenseStack()
+        self.atlas = EnergyAtlasBuilder() # Connection to the Global Energy Map
         
     def check_environment_integrity(self) -> Dict[str, Any]:
         """
@@ -24,6 +27,7 @@ class SovereignDefenseAdapter:
         forensics_events = self.scds_forensics.run_scan()
         network_events = self.scds_network.run_network_audit()
         gps_events = self.gps.scan_location()
+        spi_events = self.spi.run_suite()
         
         integrity_score = 1.0
         threats = []
@@ -39,6 +43,19 @@ class SovereignDefenseAdapter:
         for e in gps_events:
             integrity_score -= 0.2
             threats.append(f"GPS: {e.details['msg']}")
+            
+        for e in spi_events:
+            integrity_score -= 0.15
+            threats.append(f"SPI: {e.details['msg']}")
+
+        # Feed Data to Energy Atlas (Thermodynamic Telemetry)
+        if integrity_score < 1.0:
+            self.atlas.register_anomaly({
+                "type": "DEFENSE_THREAT",
+                "score": 1.0 - integrity_score,
+                "threats": threats,
+                "timestamp": 1234567890 # Mock timestamp
+            })
             
         return {
             "integrity_score": max(0.0, integrity_score),
