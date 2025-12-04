@@ -1,6 +1,10 @@
 import os
 import sys
 import time
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
 
 # Try to import b2sdk
 try:
@@ -62,6 +66,27 @@ class B2Client:
             time.sleep(0.5)
             print("✅ [Mock] Download Complete.")
             return True
+
+    def list_files(self, bucket_name):
+        """
+        Lists files in a B2 bucket.
+        """
+        print(f"📂 B2: Listing files in '{bucket_name}'...")
+        if self.api:
+            try:
+                bucket = self.api.get_bucket_by_name(bucket_name)
+                files = []
+                for file_version, _ in bucket.ls():
+                    files.append((file_version.file_name, file_version.size))
+                    print(f"   - {file_version.file_name} ({file_version.size} bytes)")
+                return files
+            except Exception as e:
+                print(f"❌ Listing Failed: {e}")
+                return []
+        else:
+            print("   [Mock] file_a.tar.gz")
+            print("   [Mock] file_b.tar.gz")
+            return [("file_a.tar.gz", 1024), ("file_b.tar.gz", 2048)]
 
 if __name__ == "__main__":
     client = B2Client()

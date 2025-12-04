@@ -13,13 +13,17 @@ class DACCapsule:
     Wraps any service/object and meters its usage, charging the Ledger.
     Turns a static script into a rent-seeking Autonomous Agent.
     """
-    def __init__(self, service_instance, name="Unknown_DAC", price_per_call=0.01):
+    def __init__(self, service_instance, name="Unknown_DAC", price_per_call=0.01, utid=None, proof=None):
         self.service = service_instance
         self.name = name
         self.price_per_call = price_per_call
+        self.utid = utid
+        self.proof = proof
         self.ledger = NegentropyLedger()
         self.total_revenue = 0.0
-        print(f"💎 DAC Initialized: {self.name} (Price: ${self.price_per_call}/op)")
+        
+        identity_str = f" [UTID: {self.utid}]" if self.utid else " [Unverified]"
+        print(f"💎 DAC Initialized: {self.name}{identity_str} (Price: ${self.price_per_call}/op)")
 
     def __getattr__(self, name):
         """
@@ -40,8 +44,11 @@ class DACCapsule:
                 # 2. Charge Ledger
                 print(f"   💳 Charging Client: ${cost:.4f}...")
                 # record_transaction(agent_id, task_id, entropy_reduction)
-                # We treat the 'cost' (Price) as the 'Value Created' (Entropy Reduction) for this demo
-                self.ledger.record_transaction(self.name, f"Call:{name}", cost)
+                
+                # Sign with UTID if available
+                agent_id = self.utid if self.utid else self.name
+                
+                self.ledger.record_transaction(agent_id, f"Call:{name}", cost)
                 self.total_revenue += cost
                 
                 # 3. Execute Service

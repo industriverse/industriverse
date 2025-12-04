@@ -1,0 +1,106 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "HaaS Pilot Digital Twin",
+    "description": "Schema for a Waste Heat Recovery site in the Industriverse Energy Atlas.",
+    "type": "object",
+    "properties": {
+        "facility_id": {
+            "type": "string",
+            "description": "Unique identifier for the data center facility."
+        },
+        "location": {
+            "type": "object",
+            "properties": {
+                "lat": {
+                    "type": "number"
+                },
+                "lon": {
+                    "type": "number"
+                },
+                "region": {
+                    "type": "string"
+                }
+            }
+        },
+        "thermal_source": {
+            "type": "object",
+            "properties": {
+                "it_load_kw": {
+                    "type": "number",
+                    "description": "Total IT power load available."
+                },
+                "cooling_type": {
+                    "type": "string",
+                    "enum": [
+                        "Liquid",
+                        "Air",
+                        "Hybrid"
+                    ]
+                },
+                "supply_temp_c": {
+                    "type": "number",
+                    "description": "Temperature of fluid leaving the racks."
+                },
+                "return_temp_c": {
+                    "type": "number",
+                    "description": "Temperature of fluid returning to racks."
+                }
+            }
+        },
+        "capture_loop": {
+            "type": "object",
+            "properties": {
+                "heat_exchanger_model": {
+                    "type": "string"
+                },
+                "max_flow_rate_lpm": {
+                    "type": "number"
+                },
+                "target_delta_t": {
+                    "type": "number"
+                }
+            }
+        },
+        "offtaker": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "Greenhouse",
+                        "DistrictHeat",
+                        "Industrial",
+                        "Residential"
+                    ]
+                },
+                "distance_m": {
+                    "type": "number"
+                },
+                "demand_curve_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "economics": {
+            "type": "object",
+            "properties": {
+                "ppa_price_per_mwh": {
+                    "type": "number"
+                },
+                "capex_amortization_years": {
+                    "type": "number"
+                },
+                "currency": {
+                    "type": "string",
+                    "default": "USD"
+                }
+            }
+        }
+    },
+    "required": [
+        "facility_id",
+        "thermal_source",
+        "capture_loop",
+        "offtaker"
+    ]
+}
