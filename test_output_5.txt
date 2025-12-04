@@ -1,0 +1,61 @@
+2025-12-03 23:32:25,371 - SCF.Daemon - INFO - 🟢 SCF Sovereign Daemon Booting Up...
+🛠 Setting up Mock Environment...
+   Created mock fossil at data/daemon_test_env/fossil_vault/fossil-test-001.json
+🚀 Starting Daemon Test...
+   Daemon Module MODEL_ZOO: data/daemon_test_env/model_zoo
+   Daemon running... waiting for processing...
+🟢 SCF Sovereign Daemon Booting Up...
+2025-12-03 23:32:25,372 - SCF.Daemon - INFO -    Root Drive: data/daemon_test_env
+   Root Drive: data/daemon_test_env
+2025-12-03 23:32:25,372 - SCF.Daemon - INFO - Trifecta Cycle Start (Gear=STANDARD) | Processing: fossil-test-001.json
+Trifecta Cycle Start (Gear=STANDARD) | Processing: fossil-test-001.json
+2025-12-03 23:32:25,372 - SCF.Daemon - INFO - Dispatching Job job-d083b5aa to GPU Worker...
+Dispatching Job job-d083b5aa to GPU Worker...
+2025-12-03 23:32:25,373 - SCF.Daemon - INFO -    Waiting for checkpoint in: data/daemon_test_env/model_zoo
+   Waiting for checkpoint in: data/daemon_test_env/model_zoo
+2025-12-03 23:32:25,373 - SCF.Daemon - INFO -    Files in Zoo: []
+   Files in Zoo: []
+2025-12-03 23:32:30,375 - SCF.Daemon - INFO -    Files in Zoo: []
+   Files in Zoo: []
+2025-12-03 23:32:35,377 - SCF.Daemon - INFO -    Files in Zoo: []
+   Files in Zoo: []
+2025-12-03 23:32:40,379 - SCF.Daemon - INFO -    Files in Zoo: []
+   Files in Zoo: []
+2025-12-03 23:32:45,381 - SCF.Daemon - INFO -    Files in Zoo: []
+   Files in Zoo: []
+2025-12-03 23:32:50,382 - SCF.Daemon - INFO -    Files in Zoo: []
+   Files in Zoo: []
+2025-12-03 23:32:55,374 - SCF.Daemon - INFO - Daemon cancelled.
+   Processed Fossils: []
+   Checkpoints: []
+   ZK Proofs: []
+   Vault Contents: ['fossil-test-001.json', 'fossil-test-001.json.lock']
+   --- Log: worker-job-d083b5aa.log ---
+Traceback (most recent call last):
+  File "/Users/industriverse/industriverse_github_clone/industriverse/src/scf/daemon/gpu_worker.py", line 10, in <module>
+    from src.scf.config import EXTERNAL_DRIVE, MODEL_ZOO
+ModuleNotFoundError: No module named 'src'
+
+   ---------------------------
+Daemon cancelled.
+2025-12-03 23:32:55,374 - SCF.Daemon - INFO - 🔴 Daemon Stopped.
+🔴 Daemon Stopped.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/industriverse/industriverse_github_clone/industriverse/src/scf/tests/verify_daemon_bootstrap.py", line 120, in <module>
+    asyncio.run(run_test())
+    ~~~~~~~~~~~^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/Users/industriverse/industriverse_github_clone/industriverse/src/scf/tests/verify_daemon_bootstrap.py", line 110, in run_test
+    assert len(processed_files) > 0, "Fossil was not archived!"
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Fossil was not archived!

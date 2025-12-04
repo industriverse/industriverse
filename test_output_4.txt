@@ -1,0 +1,51 @@
+2025-12-03 23:13:27,108 - SCF.Daemon - INFO - 🟢 SCF Sovereign Daemon Booting Up...
+🛠 Setting up Mock Environment...
+   Created mock fossil at data/daemon_test_env/fossil_vault/fossil-test-001.json
+🚀 Starting Daemon Test...
+   Daemon Module MODEL_ZOO: data/daemon_test_env/model_zoo
+   Daemon running... waiting for processing...
+🟢 SCF Sovereign Daemon Booting Up...
+2025-12-03 23:13:27,108 - SCF.Daemon - INFO -    Root Drive: data/daemon_test_env
+   Root Drive: data/daemon_test_env
+2025-12-03 23:13:27,109 - SCF.Daemon - INFO - Trifecta Cycle Start (Gear=STANDARD) | Processing: fossil-test-001.json
+Trifecta Cycle Start (Gear=STANDARD) | Processing: fossil-test-001.json
+2025-12-03 23:13:27,109 - SCF.Daemon - INFO - Dispatching Job job-c9a58fae to GPU Worker...
+Dispatching Job job-c9a58fae to GPU Worker...
+2025-12-03 23:13:27,110 - SCF.Daemon - INFO -    Waiting for checkpoint in: data/daemon_test_env/model_zoo
+   Waiting for checkpoint in: data/daemon_test_env/model_zoo
+2025-12-03 23:13:27,111 - SCF.Daemon - INFO -    Files in Zoo: []
+   Files in Zoo: []
+2025-12-03 23:13:32,112 - SCF.Daemon - INFO -    Files in Zoo: ['ckpt-job-c9a58fae-1764828807.pt']
+   Files in Zoo: ['ckpt-job-c9a58fae-1764828807.pt']
+2025-12-03 23:13:32,112 - SCF.Daemon - INFO - ✅ Found Checkpoint: ckpt-job-c9a58fae-1764828807.pt
+✅ Found Checkpoint: ckpt-job-c9a58fae-1764828807.pt
+2025-12-03 23:13:32,112 - SCF.Daemon - INFO - 🔐 Verifying and Signing Checkpoint...
+🔐 Verifying and Signing Checkpoint...
+2025-12-03 23:13:32,113 - SCF.Daemon - INFO -    ZK Proof Minted: proof-eda0c67f8e3c4cdaaf34bdd2318a72ec.json
+   ZK Proof Minted: proof-eda0c67f8e3c4cdaaf34bdd2318a72ec.json
+2025-12-03 23:13:32,113 - SCF.Daemon - INFO - 🚀 Checkpoint Promoted to Model Zoo Registry.
+🚀 Checkpoint Promoted to Model Zoo Registry.
+2025-12-03 23:13:32,113 - SCF.Daemon - INFO - Archived fossil: fossil-test-001.json
+Archived fossil: fossil-test-001.json
+2025-12-03 23:13:32,113 - SCF.Daemon - INFO - Trifecta Cycle Complete.
+Trifecta Cycle Complete.
+2025-12-03 23:13:57,120 - SCF.Daemon - INFO - 🔴 Daemon Stopped.
+   Processed Fossils: ['fossil-test-001.json']
+   Checkpoints: ['ckpt-job-c9a58fae-1764828807.pt']
+   ZK Proofs: ['proof-eda0c67f8e3c4cdaaf34bdd2318a72ec.json']
+   Vault Contents: ['processed']
+   --- Log: worker-job-c9a58fae.log ---
+2025-12-03 23:13:27,142 - SCF.GPUWorker - INFO - 👷 GPU Worker Started | Job: job-c9a58fae | Fossil: fossil-test-001.json
+2025-12-03 23:13:27,142 - SCF.GPUWorker - INFO -    Executing: /Users/industriverse/industriverse_github_clone/industriverse/.venv/bin/python3 -m src.scf.training.train_ebdm --fossil data/daemon_test_env/fossil_vault/fossil-test-001.json --out /Users/industriverse/industriverse_github_clone/industriverse/data/daemon_test_env/model_zoo/ckpt-job-c9a58fae-1764828807.pt --epochs 1 --batch_size 32 --fossils 1
+2025-12-03 23:13:27,197 - SCF.TrainEBDM - INFO - 🚀 Starting EBDM Training Loop
+2025-12-03 23:13:27,197 - SCF.TrainEBDM - INFO -    Fossils: data/daemon_test_env/fossil_vault/fossil-test-001.json
+2025-12-03 23:13:27,197 - SCF.TrainEBDM - INFO -    Output: /Users/industriverse/industriverse_github_clone/industriverse/data/daemon_test_env/model_zoo/ckpt-job-c9a58fae-1764828807.pt
+2025-12-03 23:13:27,198 - SCF.TrainEBDM - INFO -    Device: cpu
+2025-12-03 23:13:27,198 - SCF.TrainEBDM - INFO -    --- Epoch 1 ---
+2025-12-03 23:13:27,198 - SCF.TrainEBDM - INFO - ✅ Training Complete. Saved to /Users/industriverse/industriverse_github_clone/industriverse/data/daemon_test_env/model_zoo/ckpt-job-c9a58fae-1764828807.pt
+2025-12-03 23:13:27,206 - SCF.GPUWorker - INFO - ✅ Training Job Complete. Checkpoint: ckpt-job-c9a58fae-1764828807.pt
+
+   ---------------------------
+🛑 Stopping Daemon...
+🔴 Daemon Stopped.
+✅ Test Passed!

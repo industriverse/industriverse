@@ -1,0 +1,10 @@
+torch
+numpy
+aiofiles
+pydantic
+cryptography
+requests
+fastapi
+uvicorn
+pyyaml
+pytest

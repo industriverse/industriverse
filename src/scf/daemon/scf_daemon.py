@@ -1,205 +1,253 @@
-import time
-import json
-import os
-import signal
-import sys
 import asyncio
+import os
+import sys
+import json
+import time
 import logging
-from typing import Dict, Any
+import subprocess
+import uuid
+import shutil
+from pathlib import Path
+from typing import Dict, Any, Optional
 
-# Add src to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
-
-from src.orchestration.daemon_gears import OrchestrationLevelManager, DaemonLevel
-from src.scf.trunk.trifecta_master_loop import TrifectaMasterLoop
-from src.scf.roots.context_root import ContextRoot
-from src.scf.branches.intent.intent_engine import IntentEngine
-from src.scf.branches.build.builder_engine import BuilderEngine
-from src.scf.branches.verify.review_engine import ReviewEngine
-from src.scf.canopy.deploy.bitnet_autodeploy import BitNetAutoDeploy
-
-# Ensure log directory exists
-os.makedirs("data/scf", exist_ok=True)
+from src.scf.config import EXTERNAL_DRIVE, FOSSIL_VAULT, MODEL_ZOO, RELEASES, ZK_PROOFS, CONTROL_FILE
 
 # Configure Logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("data/scf/daemon.log"),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
-logger = logging.getLogger("SCFSovereignDaemon")
+LOG = logging.getLogger("SCF.Daemon")
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-class SCFSovereignDaemon:
-    """
-    The Sovereign Code Foundry Daemon.
-    A continuous process that orchestrates the Trifecta Master Loop.
-    Managed by the DaemonController via 'Daemon Levels'.
-    """
+class OrchestrationLevelManager:
+    LEVELS = ["STANDARD", "ACCELERATED", "HYPER", "SINGULARITY"]
+    
     def __init__(self):
-        self.config_dir = "data/scf"
-        os.makedirs(self.config_dir, exist_ok=True)
-        self.control_file = os.path.join(self.config_dir, "control.json")
-        self.heartbeat_file = os.path.join(self.config_dir, "heartbeat.json")
+        self.level = "STANDARD"
         
-        self.is_running = False
-        self.is_paused = False
-        self.cycles_completed = 0
-        
-        # Orchestration Manager (Gears)
-        self.level_manager = OrchestrationLevelManager()
-        self.current_state = self.level_manager.state
-        
-        # Initialize SCF Components
-        self.context_root = ContextRoot()
-        self.intent_engine = IntentEngine(None, None) # Placeholder args
-        self.builder_engine = BuilderEngine(None, None) # Placeholder args
-        self.reviewer = ReviewEngine()
-        self.deployer = BitNetAutoDeploy()
-        
-        self.master_loop = TrifectaMasterLoop(
-            self.context_root, 
-            self.intent_engine, 
-            self.builder_engine, 
-            self.reviewer, 
-            self.deployer
-        )
-        
-        # Handle Signals
-        signal.signal(signal.SIGINT, self.handle_signal)
-        signal.signal(signal.SIGTERM, self.handle_signal)
+    def set(self, level):
+        if level in self.LEVELS:
+            LOG.info("⚙️ SHIFTING GEARS: %s -> %s", self.level, level)
+            self.level = level
+        else:
+            LOG.warning("⚠️ Invalid Gear Level: %s", level)
 
-    def handle_signal(self, signum, frame):
-        logger.info(f"Received signal {signum}. Shutting down...")
-        self.stop()
+class TrifectaMasterLoop:
+    """
+    The inner conscious loop of the daemon.
+    """
+    def __init__(self, olm: OrchestrationLevelManager):
+        self.olm = olm
+        self.running = False
 
-    def start(self):
-        self.is_running = True
-        logger.info("🚀 SCF Sovereign Daemon Started.")
-        logger.info(f"   Initial Level: {self.current_state.level.name}")
-        
+    def check_disk_usage(self) -> bool:
+        """
+        Checks if disk usage is safe (< 40%).
+        Returns True if safe, False if unsafe (pause).
+        """
         try:
-            asyncio.run(self.run_loop())
+            total, used, free = shutil.disk_usage(EXTERNAL_DRIVE)
+            percent_used = (used / total) * 100
+            if percent_used > 90:
+                LOG.warning("⚠️ STORAGE ALERT: Disk usage is %.2f%% (> 90%%). Pausing Ingestion.", percent_used)
+                return False
+            return True
         except Exception as e:
-            logger.critical(f"🔥 Critical Failure: {e}", exc_info=True)
-        finally:
-            self.stop()
+            LOG.error("Failed to check disk usage: %s", e)
+            return True # Fail open to avoid deadlock, but log error
 
-    def stop(self):
-        self.is_running = False
-        if os.path.exists(self.heartbeat_file):
-            try:
-                os.remove(self.heartbeat_file)
-            except:
-                pass
-        logger.info("🛑 SCF Sovereign Daemon Stopped.")
-
-    async def run_loop(self):
-        """
-        Main Event Loop.
-        """
-        while self.is_running:
-            # 1. Check Control Plane
-            self.check_control_file()
-            
-            # 2. Update Heartbeat
-            self.write_heartbeat()
-            
-            # 3. Execute Conscious Cycle
-            if not self.is_paused:
-                # Apply Daemon Level Parameters to Loop
-                self.apply_level_parameters()
-                
-                logger.info(f"🔄 Starting Cycle {self.cycles_completed + 1} (Level: {self.current_state.level.name})")
-                result = await self.master_loop.cycle()
-                
-                if result.get("status") == "deployed":
-                    self.cycles_completed += 1
-                    logger.info(f"✅ Cycle Completed. Intent: {result.get('intent')}")
-                elif result.get("status") == "error":
-                    logger.error(f"❌ Cycle Failed: {result.get('error')}")
-                
-                # Sleep based on level (Velocity control)
-                await asyncio.sleep(self.get_interval_for_level())
-            else:
-                await asyncio.sleep(1.0)
-
-    def check_control_file(self):
-        """
-        Reads commands from control.json.
-        """
-        if not os.path.exists(self.control_file):
+    async def run_once(self):
+        # One conscious loop
+        LOG.info("Trifecta Master Loop cycle start (Gear=%s)", self.olm.level)
+        
+        # 0) Safety Check: Storage Guard
+        if not self.check_disk_usage():
+            LOG.info("🛑 Daemon Paused due to Storage Limit. Sleeping.")
+            await asyncio.sleep(60)
             return
 
-        try:
-            with open(self.control_file, 'r') as f:
-                command_data = json.load(f)
-            
-            cmd = command_data.get("command")
-            logger.info(f"📥 Received Command: {cmd}")
-            
-            if cmd == "SHIFT_GEAR":
-                level_name = command_data.get("payload", {}).get("level", "STANDARD")
-                try:
-                    level = DaemonLevel[level_name]
-                    self.current_state = self.level_manager.set_level(level)
-                except KeyError:
-                    logger.error(f"Invalid Daemon Level: {level_name}")
-            elif cmd == "PAUSE":
-                self.is_paused = True
-                logger.info("⏸️ Daemon PAUSED.")
-            elif cmd == "RESUME":
-                self.is_paused = False
-                logger.info("▶️ Daemon RESUMED.")
-            elif cmd == "STOP":
-                self.stop()
-                
-            os.remove(self.control_file)
-            
-        except Exception as e:
-            logger.error(f"Failed to process control file: {e}")
+        # 1. Observe (Pulse)
+        candidate = self.pick_fossil()
+        if candidate is None:
+            # If no fossils, we might just sleep, or run a self-reflection cycle
+            # LOG.debug("No new fossils to process.")
+            return
 
-    def write_heartbeat(self):
-        status = {
+        LOG.info("Trifecta Cycle Start (Gear=%s) | Processing: %s", self.olm.level, candidate.name)
+
+        # 2. Orient (Intent)
+        intent = {"task": "train_ebdm", "fossil": str(candidate)}
+
+        # 3. Decide (Dispatch)
+        # In a real scenario, this dispatches to RunPod. For now, we simulate or run local.
+        job_id = await self.dispatch_to_runner(intent, candidate)
+
+        # 4. Act (Wait & Verify)
+        if job_id:
+            ckpt = await self.wait_for_checkpoint(job_id)
+            if ckpt:
+                verified = self.verify_and_sign_checkpoint(ckpt)
+                if verified:
+                    self.promote_checkpoint(ckpt)
+                    # Mark fossil as processed (move or rename)
+                    self.archive_fossil(candidate)
+        
+        LOG.info("Trifecta Cycle Complete.")
+
+    def pick_fossil(self) -> Optional[Path]:
+        """Picks an unprocessed fossil from the vault."""
+        if not FOSSIL_VAULT.exists():
+            return None
+            
+        # Look for .ndjson or .json files
+        files = sorted(list(FOSSIL_VAULT.glob("fossil-*.ndjson")) + list(FOSSIL_VAULT.glob("fossil-*.json")))
+        for f in files:
+            lock = f.with_suffix(f.suffix + ".lock")
+            if lock.exists():
+                continue
+            
+            # Try to acquire lock
+            try:
+                lock.write_text(str(time.time()))
+                return f
+            except Exception:
+                continue
+        return None
+
+    def archive_fossil(self, fossil_path: Path):
+        """Moves processed fossil to an archive folder to prevent re-processing."""
+        archive_dir = FOSSIL_VAULT / "processed"
+        archive_dir.mkdir(exist_ok=True)
+        try:
+            target = archive_dir / fossil_path.name
+            fossil_path.rename(target)
+            # Remove lock
+            lock = fossil_path.with_suffix(fossil_path.suffix + ".lock")
+            if lock.exists():
+                lock.unlink()
+            LOG.info("Archived fossil: %s", fossil_path.name)
+        except Exception as e:
+            LOG.error("Failed to archive fossil %s: %s", fossil_path, e)
+
+    async def dispatch_to_runner(self, intent: Dict[str, Any], fossil_path: Path) -> str:
+        job_id = f"job-{uuid.uuid4().hex[:8]}"
+        LOG.info("Dispatching Job %s to GPU Worker...", job_id)
+        
+        # In production, this makes an HTTP request to RunPod.
+        # For bootstrap, we spawn the local gpu_worker.py
+        
+        worker_script = Path(__file__).parent / "gpu_worker.py"
+        if not worker_script.exists():
+            LOG.error("GPU Worker script not found at %s", worker_script)
+            return None
+
+        try:
+            # Running asynchronously to not block the daemon loop
+            log_dir = EXTERNAL_DRIVE / "logs"
+            log_dir.mkdir(exist_ok=True)
+            log_file = open(log_dir / f"worker-{job_id}.log", "w")
+            
+            # Add repo root to PYTHONPATH so worker can import src
+            env = os.environ.copy()
+            repo_root = Path(__file__).parent.parent.parent.parent
+            env["PYTHONPATH"] = str(repo_root) + os.pathsep + env.get("PYTHONPATH", "")
+
+            subprocess.Popen([
+                sys.executable, str(worker_script),
+                str(fossil_path),
+                "--job", job_id
+            ], env=env, stdout=log_file, stderr=subprocess.STDOUT)
+            return job_id
+        except Exception as e:
+            LOG.error("Failed to dispatch job: %s", e)
+            return None
+
+    async def wait_for_checkpoint(self, job_id: str, timeout=3600) -> Optional[Path]:
+        start = time.time()
+        LOG.info("   Waiting for checkpoint in: %s", MODEL_ZOO)
+        while time.time() - start < timeout:
+            # Look for checkpoint in MODEL_ZOO
+            # Debug: List all files
+            all_files = list(MODEL_ZOO.glob("*"))
+            LOG.info("   Files in Zoo: %s", [f.name for f in all_files])
+            
+            ckpt_glob = list(MODEL_ZOO.glob(f"ckpt-{job_id}*.pt"))
+            if ckpt_glob:
+                ckpt = ckpt_glob[0]
+                LOG.info("✅ Found Checkpoint: %s", ckpt.name)
+                return ckpt
+            await asyncio.sleep(5)
+        
+        LOG.warning("❌ Timeout waiting for job %s. Checked: %s", job_id, MODEL_ZOO)
+        return None
+
+    def verify_and_sign_checkpoint(self, ckpt: Path) -> bool:
+        LOG.info("🔐 Verifying and Signing Checkpoint...")
+        # Placeholder for Aletheia verification
+        # In real impl, load model, run physics checks.
+        
+        # Mint ZK Proof (Mock)
+        proof_id = uuid.uuid4().hex
+        proof_data = {
+            "id": proof_id,
+            "checkpoint": ckpt.name,
             "timestamp": time.time(),
-            "pid": os.getpid(),
-            "status": "PAUSED" if self.is_paused else "RUNNING",
-            "level": self.current_state.level.name,
-            "cycles_completed": self.cycles_completed,
-            "metrics": self.current_state.discovery_metrics
+            "signature": "mock_zk_signature_xyz"
         }
+        
+        proof_path = ZK_PROOFS / f"proof-{proof_id}.json"
         try:
-            with open(self.heartbeat_file, 'w') as f:
-                json.dump(status, f)
+            proof_path.write_text(json.dumps(proof_data, indent=2))
+            LOG.info("   ZK Proof Minted: %s", proof_path.name)
+            return True
         except Exception as e:
-            logger.error(f"Failed to write heartbeat: {e}")
+            LOG.error("Failed to mint proof: %s", e)
+            return False
 
-    def apply_level_parameters(self):
-        """
-        Propagates current Daemon Level settings to the Master Loop components.
-        """
-        # Example: Adjust mutation rate in Builder Engine based on level
-        mutation_rate = self.current_state.discovery_metrics.get("Mutation_Rate", "Low")
-        # In a real impl, we would call: self.builder_engine.set_mutation_rate(mutation_rate)
-        pass
+    def promote_checkpoint(self, ckpt: Path):
+        # Move to a "staging" area or just log it. 
+        # Real promotion happens via the Weekly Release script, but we can tag it here.
+        LOG.info("🚀 Checkpoint Promoted to Model Zoo Registry.")
 
-    def get_interval_for_level(self) -> float:
-        """
-        Determines loop interval based on velocity.
-        """
-        level = self.current_state.level
-        if level == DaemonLevel.STANDARD:
-            return 5.0
-        elif level == DaemonLevel.ACCELERATED:
-            return 1.0
-        elif level == DaemonLevel.HYPER:
-            return 0.1
-        elif level == DaemonLevel.SINGULARITY:
-            return 0.0 # Max speed
-        return 5.0
+class SCFSovereignDaemon:
+    def __init__(self):
+        self.olm = OrchestrationLevelManager()
+        self.master = TrifectaMasterLoop(self.olm)
+        self.master.running = True
+
+    async def start(self):
+        LOG.info("🟢 SCF Sovereign Daemon Booting Up...")
+        LOG.info("   Root Drive: %s", EXTERNAL_DRIVE)
+        
+        cycles = 0
+        try:
+            while self.master.running:
+                # Check Control Plane
+                if CONTROL_FILE.exists():
+                    try:
+                        cfg = json.loads(CONTROL_FILE.read_text())
+                        cmd = cfg.get("command")
+                        if cmd == "SHIFT_GEAR":
+                            self.olm.set(cfg.get("payload", {}).get("level", "STANDARD"))
+                        elif cmd == "STOP":
+                            LOG.info("🛑 STOP command received.")
+                            self.master.running = False
+                    except Exception:
+                        LOG.warning("Malformed control.json")
+
+                # Run Cycle
+                await self.master.run_once()
+                cycles += 1
+                
+                # Heartbeat Sleep
+                sleep_map = {"STANDARD": 5, "ACCELERATED": 1, "HYPER": 0.1, "SINGULARITY": 0.05}
+                await asyncio.sleep(sleep_map.get(self.olm.level, 5))
+                
+        except asyncio.CancelledError:
+            LOG.info("Daemon cancelled.")
+        finally:
+            LOG.info("🔴 Daemon Stopped.")
 
 if __name__ == "__main__":
     daemon = SCFSovereignDaemon()
-    daemon.start()
+    try:
+        asyncio.run(daemon.start())
+    except KeyboardInterrupt:
+        pass

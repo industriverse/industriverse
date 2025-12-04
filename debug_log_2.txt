@@ -1,0 +1,61 @@
+2025-12-04 00:04:42,909 - SCF.Daemon - INFO - 🟢 SCF Sovereign Daemon Booting Up...
+🛠 Setting up Mock Environment...
+   Created mock fossil at data/daemon_test_env/fossil_vault/fossil-test-001.json
+🚀 Starting Daemon Test...
+   Daemon Module MODEL_ZOO: data/daemon_test_env/model_zoo
+   Daemon running... waiting for processing...
+🟢 SCF Sovereign Daemon Booting Up...
+2025-12-04 00:04:42,909 - SCF.Daemon - INFO -    Root Drive: data/daemon_test_env
+   Root Drive: data/daemon_test_env
+2025-12-04 00:04:42,909 - SCF.Daemon - INFO - Trifecta Master Loop cycle start (Gear=STANDARD)
+Trifecta Master Loop cycle start (Gear=STANDARD)
+2025-12-04 00:04:42,909 - SCF.Daemon - INFO - Trifecta Cycle Start (Gear=STANDARD) | Processing: fossil-test-001.json
+Trifecta Cycle Start (Gear=STANDARD) | Processing: fossil-test-001.json
+2025-12-04 00:04:42,910 - SCF.Daemon - INFO - Dispatching Job job-5c0c7e1c to GPU Worker...
+Dispatching Job job-5c0c7e1c to GPU Worker...
+2025-12-04 00:04:42,911 - SCF.Daemon - INFO -    Waiting for checkpoint in: data/daemon_test_env/model_zoo
+   Waiting for checkpoint in: data/daemon_test_env/model_zoo
+2025-12-04 00:04:42,911 - SCF.Daemon - INFO -    Files in Zoo: []
+   Files in Zoo: []
+2025-12-04 00:04:47,913 - SCF.Daemon - INFO -    Files in Zoo: ['ckpt-job-5c0c7e1c-1764831882.pt']
+   Files in Zoo: ['ckpt-job-5c0c7e1c-1764831882.pt']
+2025-12-04 00:04:47,913 - SCF.Daemon - INFO - ✅ Found Checkpoint: ckpt-job-5c0c7e1c-1764831882.pt
+✅ Found Checkpoint: ckpt-job-5c0c7e1c-1764831882.pt
+2025-12-04 00:04:47,913 - SCF.Daemon - INFO - 🔐 Verifying and Signing Checkpoint...
+🔐 Verifying and Signing Checkpoint...
+2025-12-04 00:04:47,913 - SCF.Daemon - INFO -    ZK Proof Minted: proof-5d1029b2975e4345975496f6800acd73.json
+   ZK Proof Minted: proof-5d1029b2975e4345975496f6800acd73.json
+2025-12-04 00:04:47,913 - SCF.Daemon - INFO - 🚀 Checkpoint Promoted to Model Zoo Registry.
+🚀 Checkpoint Promoted to Model Zoo Registry.
+2025-12-04 00:04:47,913 - SCF.Daemon - INFO - Archived fossil: fossil-test-001.json
+Archived fossil: fossil-test-001.json
+2025-12-04 00:04:47,913 - SCF.Daemon - INFO - Trifecta Cycle Complete.
+Trifecta Cycle Complete.
+2025-12-04 00:04:52,915 - SCF.Daemon - INFO - Trifecta Master Loop cycle start (Gear=STANDARD)
+Trifecta Master Loop cycle start (Gear=STANDARD)
+2025-12-04 00:04:57,916 - SCF.Daemon - INFO - Trifecta Master Loop cycle start (Gear=STANDARD)
+Trifecta Master Loop cycle start (Gear=STANDARD)
+2025-12-04 00:05:02,918 - SCF.Daemon - INFO - Trifecta Master Loop cycle start (Gear=STANDARD)
+Trifecta Master Loop cycle start (Gear=STANDARD)
+2025-12-04 00:05:07,920 - SCF.Daemon - INFO - Trifecta Master Loop cycle start (Gear=STANDARD)
+Trifecta Master Loop cycle start (Gear=STANDARD)
+2025-12-04 00:05:12,922 - SCF.Daemon - INFO - 🔴 Daemon Stopped.
+   Processed Fossils: ['fossil-test-001.json']
+   Checkpoints: ['ckpt-job-5c0c7e1c-1764831882.pt']
+   ZK Proofs: ['proof-5d1029b2975e4345975496f6800acd73.json']
+   Vault Contents: ['processed']
+   --- Log: worker-job-5c0c7e1c.log ---
+2025-12-04 00:04:42,943 - SCF.GPUWorker - INFO - 👷 GPU Worker Started | Job: job-5c0c7e1c | Fossil: fossil-test-001.json
+2025-12-04 00:04:42,943 - SCF.GPUWorker - INFO -    Executing: /Users/industriverse/industriverse_github_clone/industriverse/.venv/bin/python3 -m src.scf.training.train_ebdm --fossil data/daemon_test_env/fossil_vault/fossil-test-001.json --out /Users/industriverse/industriverse_github_clone/industriverse/data/daemon_test_env/model_zoo/ckpt-job-5c0c7e1c-1764831882.pt --epochs 1 --batch_size 32 --fossils 1
+2025-12-04 00:04:43,016 - SCF.TrainEBDM - INFO - 🚀 Starting EBDM Training Loop
+2025-12-04 00:04:43,016 - SCF.TrainEBDM - INFO -    Fossils: data/daemon_test_env/fossil_vault/fossil-test-001.json
+2025-12-04 00:04:43,016 - SCF.TrainEBDM - INFO -    Output: /Users/industriverse/industriverse_github_clone/industriverse/data/daemon_test_env/model_zoo/ckpt-job-5c0c7e1c-1764831882.pt
+2025-12-04 00:04:43,016 - SCF.TrainEBDM - INFO -    Device: cpu
+2025-12-04 00:04:43,016 - SCF.TrainEBDM - INFO -    --- Epoch 1 ---
+2025-12-04 00:04:43,016 - SCF.TrainEBDM - INFO - ✅ Training Complete. Saved to /Users/industriverse/industriverse_github_clone/industriverse/data/daemon_test_env/model_zoo/ckpt-job-5c0c7e1c-1764831882.pt
+2025-12-04 00:04:43,023 - SCF.GPUWorker - INFO - ✅ Training Job Complete. Checkpoint: ckpt-job-5c0c7e1c-1764831882.pt
+
+   ---------------------------
+🛑 Stopping Daemon...
+🔴 Daemon Stopped.
+✅ Test Passed!

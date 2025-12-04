@@ -1,0 +1,42 @@
+2025-12-04 00:03:49,031 - SCF.Daemon - INFO - 🟢 SCF Sovereign Daemon Booting Up...
+🛠 Setting up Mock Environment...
+   Created mock fossil at data/daemon_test_env/fossil_vault/fossil-test-001.json
+🚀 Starting Daemon Test...
+   Daemon Module MODEL_ZOO: data/daemon_test_env/model_zoo
+   Daemon running... waiting for processing...
+🟢 SCF Sovereign Daemon Booting Up...
+2025-12-04 00:03:49,031 - SCF.Daemon - INFO -    Root Drive: data/daemon_test_env
+   Root Drive: data/daemon_test_env
+2025-12-04 00:03:49,031 - SCF.Daemon - INFO - Trifecta Master Loop cycle start (Gear=STANDARD)
+Trifecta Master Loop cycle start (Gear=STANDARD)
+2025-12-04 00:03:49,031 - SCF.Daemon - WARNING - ⚠️ STORAGE ALERT: Disk usage is 79.19% (> 40%). Pausing Ingestion.
+⚠️ STORAGE ALERT: Disk usage is 79.19% (> 40%). Pausing Ingestion.
+2025-12-04 00:03:49,031 - SCF.Daemon - INFO - 🛑 Daemon Paused due to Storage Limit. Sleeping.
+🛑 Daemon Paused due to Storage Limit. Sleeping.
+2025-12-04 00:04:19,034 - SCF.Daemon - INFO - Daemon cancelled.
+   Processed Fossils: []
+   Checkpoints: []
+   ZK Proofs: []
+   Vault Contents: ['fossil-test-001.json']
+Daemon cancelled.
+2025-12-04 00:04:19,034 - SCF.Daemon - INFO - 🔴 Daemon Stopped.
+🔴 Daemon Stopped.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/industriverse/industriverse_github_clone/industriverse/src/scf/tests/verify_daemon_bootstrap.py", line 120, in <module>
+    asyncio.run(run_test())
+    ~~~~~~~~~~~^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/Users/industriverse/industriverse_github_clone/industriverse/src/scf/tests/verify_daemon_bootstrap.py", line 110, in run_test
+    assert len(processed_files) > 0, "Fossil was not archived!"
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Fossil was not archived!
