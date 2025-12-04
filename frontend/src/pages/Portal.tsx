@@ -46,10 +46,12 @@ const StrikeButton = ({ domain }: { domain: string }) => {
 import { VoiceCommand } from "@/components/multimodal/VoiceCommand";
 import { useEffect } from "react";
 import { TrifectaConsole } from "@/components/trifecta/TrifectaConsole";
+import { SovereignAvatar } from "@/components/avatar/SovereignAvatar";
 
 export default function Portal() {
     const { data: energyMap } = useEnergyMap();
     const nodeCount = energyMap?.node_count || 0;
+    const [showAvatar, setShowAvatar] = useState(false);
 
     // Listen for voice events
     useEffect(() => {
@@ -67,6 +69,15 @@ export default function Portal() {
         <DysonLayout>
             <VoiceCommand />
             <TrifectaConsole />
+
+            {/* Sovereign Avatar Overlay */}
+            {showAvatar && (
+                <SovereignAvatar
+                    onClose={() => setShowAvatar(false)}
+                    script="Welcome back, Operator. This week we achieved a 5.2% reduction in system entropy. The Energy Atlas indicates stable fusion across the western grid. Shall I proceed with the detailed breakdown?"
+                />
+            )}
+
             <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 pointer-events-none">
                 <div className="pointer-events-auto">
                     <EnergyField />
@@ -110,7 +121,7 @@ export default function Portal() {
                     </Link>
                 </div>
 
-                <div className="mt-12 pointer-events-auto">
+                <div className="mt-12 pointer-events-auto flex gap-4">
                     <Link href="/console">
                         <button className="group relative px-8 py-4 bg-dyson-plasma/10 hover:bg-dyson-plasma/20 border border-dyson-plasma/50 rounded-full transition-all duration-300">
                             <span className="flex items-center gap-2 font-mono text-sm tracking-widest uppercase text-dyson-plasma">
@@ -119,6 +130,16 @@ export default function Portal() {
                             <div className="absolute inset-0 rounded-full ring-1 ring-white/20 group-hover:ring-white/40 animate-pulse" />
                         </button>
                     </Link>
+
+                    {/* Avatar Call Button */}
+                    <button
+                        onClick={() => setShowAvatar(true)}
+                        className="group relative px-6 py-4 bg-dyson-teal/10 hover:bg-dyson-teal/20 border border-dyson-teal/50 rounded-full transition-all duration-300"
+                    >
+                        <span className="flex items-center gap-2 font-mono text-sm tracking-widest uppercase text-dyson-teal">
+                            <Activity className="w-4 h-4" /> Briefing
+                        </span>
+                    </button>
                 </div>
             </div>
             {/* Right Sidebar - HUD & Tools */}
