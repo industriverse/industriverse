@@ -12,3 +12,5 @@
 {"timestamp": 1764832247.718477, "event": "BATCH_CREATED", "details": {"size": 250}}
 {"timestamp": 1764832248.7191942, "event": "FOSSIL_INGEST", "details": {"count": 24}}
 {"timestamp": 1764832248.72, "event": "BATCH_CREATED", "details": {"size": 250}}
+{"timestamp": 1764840512.4490318, "event": "FOSSIL_INGEST", "details": {"count": 24}}
+{"timestamp": 1764840512.451392, "event": "BATCH_CREATED", "details": {"size": 250}}

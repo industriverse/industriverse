@@ -10,6 +10,9 @@ from src.scf.training.training_orchestrator import TrainingOrchestrator
 from src.scf.release.release_manager import ReleaseManager
 from src.scf.safety.emergency_stop import EmergencyStop
 from src.scf.audit.audit_logger import AuditLogger
+from src.core.energy_atlas.atlas_core import EnergyAtlas
+from src.scf.roots.pulse_connector import PulseConnector
+from src.scf.integration.sovereign_bridge import EnergyContext
 
 logger = logging.getLogger("SCF_Daemon")
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -24,6 +27,11 @@ class SCFSovereignDaemon:
         self.releaser = ReleaseManager()
         self.emergency = EmergencyStop()
         self.audit = AuditLogger()
+        
+        # [NEW] Interconnected Systems
+        self.atlas = EnergyAtlas(use_mock=True) # Use mock for now until Neo4j is ready
+        self.pulse = PulseConnector()
+        
         self.gear = "STANDARD"  # STANDARD | ACCELERATED | HYPER | SINGULARITY
         self.heartbeat = 5  # seconds, overridden by gears
         self._running = False
@@ -48,6 +56,16 @@ class SCFSovereignDaemon:
             self.audit.record("LOOP_HALTED", {"reason":"emergency_stop"})
             return
 
+        # [NEW] 0) Gather Context (Pulse + Atlas)
+        pulse_data = await self.pulse.fetch_latest()
+        atlas_data = self.atlas.get_energy_map()
+        
+        context = EnergyContext(
+            pulse_metrics=pulse_data.get("metrics", {}),
+            atlas_state=atlas_data,
+            daemon_gear=self.gear
+        )
+
         # 1) ingest small batch of fossils (non-blocking)
         # In a real run, we might limit this to avoid IO blocking the loop too long
         new = self.batcher.ingest_stream(batch_target_count=10)
@@ -61,11 +79,11 @@ class SCFSovereignDaemon:
             if batch:
                 logger.info("Built batch with %d fossils", len(batch["samples"]))
                 self.audit.record("BATCH_CREATED", {"size": len(batch["samples"])})
-                # schedule training asynchronously
-                asyncio.create_task(self.trainer.train_on_batch(batch))
+                # schedule training asynchronously, passing context
+                asyncio.create_task(self.trainer.train_on_batch(batch, context))
 
         # 3) run one master loop cycle (orchestrates intent->build->verify->deploy)
-        await self.master_loop.cycle()
+        await self.master_loop.cycle(context)
 
         # 4) evaluate for release (run daily gate)
         if self.releaser.should_try_release():
@@ -78,6 +96,9 @@ class SCFSovereignDaemon:
         
         # Start Control API listener
         control_task = asyncio.create_task(self.control_api.start_listener(self))
+        
+        # [NEW] Connect Pulse
+        await self.pulse.connect()
         
         try:
             while self._running:
@@ -92,6 +113,8 @@ class SCFSovereignDaemon:
             logger.info("🛑 SCF Sovereign Daemon Stopped.")
             self.audit.record("DAEMON_STOP", {"time": str(datetime.utcnow())})
             control_task.cancel()
+            await self.pulse.close()
+            self.atlas.close()
 
     async def stop(self):
         logger.info("Received stop; shutting down after current cycle.")

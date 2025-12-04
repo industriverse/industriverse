@@ -22,13 +22,18 @@ class TrainingOrchestrator:
             lr=1e-4
         )
 
-    async def train_on_batch(self, batch_data):
+    async def train_on_batch(self, batch_data, context=None):
         """
         Runs a quick training step on a single batch (or schedules a job).
         In a real daemon, this might offload to a GPU worker.
         Here we run it inline (but async-wrapped) for the prototype.
         """
         LOG.info("Starting training step on batch %s", batch_data.get("batch_id"))
+        
+        if context:
+            # Example: Log if we are training during high entropy
+            if context.total_system_entropy > 0.8:
+                LOG.warning("Training during high system entropy!")
         
         # Unpack data
         tnn_tensor = batch_data["tnn_ready_tensor"]
