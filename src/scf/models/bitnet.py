@@ -5,7 +5,7 @@ import torch.nn.functional as F
 def activation_quant(x):
     """
     Per-token quantization to 8 bits.
-    (Simplified for this implementation)
+    Range: [-127, 127]
     """
     scale = 127.0 / x.abs().max(dim=-1, keepdim=True).values.clamp_(min=1e-5)
     y = (x * scale).round().clamp_(-128, 127) / scale
@@ -14,6 +14,7 @@ def activation_quant(x):
 def weight_quant(w):
     """
     Ternary weight quantization to {-1, 0, 1}.
+    Scale is the mean absolute value of the weights.
     """
     scale = 1.0 / w.abs().mean().clamp_(min=1e-5)
     y = (w * scale).round().clamp_(-1, 1) / scale
@@ -27,15 +28,16 @@ class BitLinear(nn.Linear):
         super(BitLinear, self).__init__(in_features, out_features, bias=bias)
 
     def forward(self, x):
-        # 1. Quantize Weights
+        # 1. Quantize Weights (Ternary)
         w_quant = weight_quant(self.weight)
         
-        # 2. Quantize Activations (Optional, but part of BitNet spec)
-        # x_quant = activation_quant(x) 
-        # For now, we stick to weight quantization for the "1.58-bit weights" goal.
+        # 2. Quantize Activations (8-bit)
+        x_quant = activation_quant(x)
         
         # 3. Linear Operation
-        return F.linear(x, w_quant, self.bias)
+        # Note: In a real kernel, this would be an integer GEMM.
+        # Here we simulate it with FP32 but using quantized values.
+        return F.linear(x_quant, w_quant, self.bias)
 
 class BitNet_Student(nn.Module):
     """
