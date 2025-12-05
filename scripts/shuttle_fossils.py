@@ -51,16 +51,16 @@ def shuttle_fossils(target_dir: str, max_files: int = None):
         local_file.parent.mkdir(parents=True, exist_ok=True)
         
         # Skip if already exists (Idempotency)
-        if local_file.exists() and local_file.stat().st_size == file_version.content_length:
+        if local_file.exists() and local_file.stat().st_size == file_version.size:
             print(f"   Using cached: {file_name}")
             count += 1
             continue
             
-        print(f"   ⬇️  Downloading: {file_name} ({file_version.content_length / 1024 / 1024:.2f} MB)")
+        print(f"   ⬇️  Downloading: {file_name} ({file_version.size / 1024 / 1024:.2f} MB)")
         
         try:
             bucket.download_file_by_name(file_name).save(str(local_file))
-            downloaded_bytes += file_version.content_length
+            downloaded_bytes += file_version.size
             count += 1
         except Exception as e:
             print(f"   ⚠️ Failed to download {file_name}: {e}")
