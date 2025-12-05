@@ -59,7 +59,8 @@ def shuttle_fossils(target_dir: str, max_files: int = None):
         print(f"   ⬇️  Downloading: {file_name} ({file_version.size / 1024 / 1024:.2f} MB)")
         
         try:
-            bucket.download_file_by_name(file_name).save(str(local_file))
+            with open(local_file, 'wb') as f:
+                bucket.download_file_by_name(file_name).save(f)
             downloaded_bytes += file_version.size
             count += 1
         except Exception as e:
