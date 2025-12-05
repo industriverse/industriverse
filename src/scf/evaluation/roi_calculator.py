@@ -1,85 +1,75 @@
-import hashlib
-import json
-import time
-from typing import Dict, Any, List
+from dataclasses import dataclass
+from typing import Dict, Optional
 
-class ROIAuditor:
-    """
-    Cryptographic auditor for energy savings claims.
-    Generates ZK-ready hash chains for every financial calculation.
-    """
-    def __init__(self):
-        self.audit_log = []
-        self.last_hash = "0" * 64 # Genesis hash
-
-    def audit_claim(self, claim: Dict[str, Any]) -> str:
-        """
-        Hashes a financial claim with the previous hash to create a chain.
-        """
-        claim['prev_hash'] = self.last_hash
-        claim['timestamp'] = time.time()
-        
-        # Deterministic serialization
-        payload = json.dumps(claim, sort_keys=True, default=str)
-        claim_hash = hashlib.sha256(payload.encode('utf-8')).hexdigest()
-        
-        self.last_hash = claim_hash
-        self.audit_log.append({
-            "claim": claim,
-            "hash": claim_hash
-        })
-        return claim_hash
+@dataclass
+class ROIMetrics:
+    energy_saved_kwh: float
+    cost_saved_usd: float
+    payback_period_days: float
+    roi_percentage: float
+    carbon_saved_kg: float
 
 class ROICalculator:
     """
-    Calculates Energy ROI and Financial Impact.
+    The Financial Engine of the Sovereign Stack.
+    Converts Joules/kWh into Dollars and ROI.
     """
-    def __init__(self, energy_cost_per_kwh: float = 0.15):
-        self.energy_cost_per_kwh = energy_cost_per_kwh
-        self.auditor = ROIAuditor()
+    def __init__(self, electricity_price_usd_per_kwh: float = 0.12, 
+                 carbon_intensity_kg_per_kwh: float = 0.4):
+        self.price_per_kwh = electricity_price_usd_per_kwh
+        self.carbon_per_kwh = carbon_intensity_kg_per_kwh
 
-    def calculate_savings(self, baseline_power_w: float, optimized_power_w: float, duration_seconds: float) -> Dict[str, float]:
+    def calculate_roi(self, 
+                      baseline_kwh_per_day: float, 
+                      optimized_kwh_per_day: float, 
+                      implementation_cost_usd: float = 0.0) -> ROIMetrics:
         """
-        Computes energy and cost savings.
-        """
-        delta_power_w = baseline_power_w - optimized_power_w
-        kwh_saved = (delta_power_w * duration_seconds) / (1000 * 3600)
-        cost_saved = kwh_saved * self.energy_cost_per_kwh
+        Calculate ROI for a given optimization.
         
+        Args:
+            baseline_kwh_per_day: Energy usage before optimization.
+            optimized_kwh_per_day: Energy usage after optimization.
+            implementation_cost_usd: One-time cost of the optimization (hardware/software).
+        """
+        daily_kwh_saved = max(0.0, baseline_kwh_per_day - optimized_kwh_per_day)
+        daily_usd_saved = daily_kwh_saved * self.price_per_kwh
+        daily_carbon_saved = daily_kwh_saved * self.carbon_per_kwh
+        
+        # Annualized projections
+        annual_usd_saved = daily_usd_saved * 365.0
+        
+        # Payback Period
+        if daily_usd_saved > 0:
+            payback_days = implementation_cost_usd / daily_usd_saved
+        else:
+            payback_days = float('inf')
+            
+        # ROI % (1 Year Horizon)
+        # ROI = (Net Profit / Cost) * 100
+        # Net Profit = Savings - Cost
+        if implementation_cost_usd > 0:
+            net_profit = annual_usd_saved - implementation_cost_usd
+            roi_pct = (net_profit / implementation_cost_usd) * 100.0
+        else:
+            # If no cost, ROI is infinite (or just defined by savings)
+            roi_pct = float('inf') if annual_usd_saved > 0 else 0.0
+
+        return ROIMetrics(
+            energy_saved_kwh=daily_kwh_saved,
+            cost_saved_usd=daily_usd_saved,
+            payback_period_days=payback_days,
+            roi_percentage=roi_pct,
+            carbon_saved_kg=daily_carbon_saved
+        )
+
+    def project_fleet_savings(self, 
+                              single_unit_metrics: ROIMetrics, 
+                              fleet_size: int) -> Dict[str, float]:
+        """
+        Project savings for a fleet of devices.
+        """
         return {
-            "kwh_saved": kwh_saved,
-            "cost_saved_usd": cost_saved,
-            "delta_power_w": delta_power_w
+            "daily_fleet_savings_usd": single_unit_metrics.cost_saved_usd * fleet_size,
+            "annual_fleet_savings_usd": single_unit_metrics.cost_saved_usd * fleet_size * 365.0,
+            "annual_carbon_reduction_tons": (single_unit_metrics.carbon_saved_kg * fleet_size * 365.0) / 1000.0
         }
-
-    def calculate_financials(self, kwh_saved: float, time_period_days: float = 30) -> Dict[str, Any]:
-        """
-        Computes broader financial metrics for the PoV Report.
-        """
-        cost_saved = kwh_saved * self.energy_cost_per_kwh
-        # Entropy Credits: 1 Credit per 100 kWh saved (Arbitrary Pilot Ratio)
-        entropy_credits = kwh_saved / 100.0
-        
-        claim = {
-            "metric": "financials",
-            "kwh_saved": kwh_saved,
-            "cost_saved_usd": cost_saved,
-            "entropy_credits_minted": entropy_credits,
-            "period_days": time_period_days
-        }
-        
-        # Audit this calculation
-        proof_hash = self.auditor.audit_claim(claim)
-        
-        return {
-            **claim,
-            "audit_proof": proof_hash
-        }
-
-    def estimate_payback_period(self, investment_cost: float, daily_savings_usd: float) -> float:
-        """
-        Estimates days to break even.
-        """
-        if daily_savings_usd <= 0:
-            return float('inf')
-        return investment_cost / daily_savings_usd
