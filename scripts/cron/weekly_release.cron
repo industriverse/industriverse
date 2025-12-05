@@ -1,0 +1,3 @@
+# Sovereign Intelligence Cron Schedule
+# Run Weekly Release every Sunday at 00:00
+0 0 * * 0 /Users/industriverse/industriverse_github_clone/industriverse/scripts/release/weekly_release.sh >> /Users/industriverse/industriverse_github_clone/industriverse/release.log 2>&1

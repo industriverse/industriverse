@@ -1,0 +1,50 @@
+name: Sovereign Model Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on version tags, e.g. v2025-12-05
+
+jobs:
+  verify-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run Verification Tests
+        run: |
+          # Run the specific release verification tests
+          pytest tests/test_release_pipeline.py
+
+      - name: Build Deploy Anywhere Capsule (DAC)
+        run: |
+          # Convert the latest model to ONNX (Mock for now)
+          python scripts/export_dac.py --input model_zoo/production/latest.pt --output release_artifacts/ebdm_student.onnx
+
+      - name: Upload Artifact to B2 (Mock)
+        env:
+          B2_KEY_ID: ${{ secrets.B2_KEY_ID }}
+          B2_APP_KEY: ${{ secrets.B2_APP_KEY }}
+        run: |
+          echo "🚀 Uploading DAC to B2..."
+          # In production: b2 upload-file ...
+          echo "✅ Upload Complete."
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release_artifacts/ebdm_student.onnx
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

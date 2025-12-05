@@ -1,41 +1,18 @@
-import torch
-from torch.utils.data import DataLoader
-from src.scf.models.ebdm import EBDM, EBDM_Student
-from src.scf.training.distiller import DistillationTrainer
-from src.scf.dataloading.fossil_streamer import FossilStreamer
-
-VAULT_PATH = "/Volumes/Expansion/fossil_vault"
+import argparse
+import os
+from src.scf.distillation.distill import run_distillation
 
 def main():
-    print("⚗️  Starting Model Distillation (Teacher -> Student)...")
+    parser = argparse.ArgumentParser(description="Sovereign Distillation (Teacher -> Student)")
+    parser.add_argument("--teacher", type=str, default="model_zoo/production/latest.pt", help="Path to Teacher checkpoint")
+    parser.add_argument("--vault", type=str, default="/Volumes/Expansion/fossil_vault", help="Path to Fossil Vault")
+    parser.add_argument("--epochs", type=int, default=5, help="Number of epochs")
+    args = parser.parse_args()
     
-    # 1. Setup Data
-    dataset = FossilStreamer(VAULT_PATH, batch_size=32, max_files=50)
-    dataloader = DataLoader(dataset, batch_size=None)
+    # Handle env var for vault if not passed
+    vault = os.environ.get("VAULT_PATH", args.vault)
     
-    # 2. Setup Models
-    # Teacher (Simulating a larger, pre-trained model)
-    teacher = EBDM(input_dim=4, hidden_dim=64, output_dim=4)
-    # Student (Compressed model)
-    student = EBDM_Student(input_dim=4, hidden_dim=16, output_dim=4)
-    
-    print(f"   Teacher Params: {sum(p.numel() for p in teacher.parameters())}")
-    print(f"   Student Params: {sum(p.numel() for p in student.parameters())}")
-    
-    # 3. Setup Distiller
-    distiller = DistillationTrainer(teacher, student, alpha=0.5, temperature=3.0)
-    
-    # 4. Train Loop
-    epochs = 3
-    print(f"   Distilling for {epochs} epochs...")
-    
-    for epoch in range(epochs):
-        metrics = distiller.train_epoch(dataloader, epoch)
-        if metrics:
-            print(f"   [Epoch {epoch}] Loss: {metrics['loss']:.4f} | Soft: {metrics['soft_loss']:.4f} | Energy: {metrics['kwh_used']:.6f} kWh")
-        
-    print("✅ Distillation Complete.")
-    print(f"   Log saved to: {distiller.log_path}")
+    run_distillation(args.teacher, vault, args.epochs)
 
 if __name__ == "__main__":
     main()
