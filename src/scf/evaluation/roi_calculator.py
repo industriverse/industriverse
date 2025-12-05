@@ -19,6 +19,41 @@ class ROICalculator:
         self.price_per_kwh = electricity_price_usd_per_kwh
         self.carbon_per_kwh = carbon_intensity_kg_per_kwh
 
+    def calculate_cost_saved(self, energy_kwh: float, price_per_kwh: float = None) -> float:
+        """
+        Calculate cost saved in USD.
+        """
+        price = price_per_kwh if price_per_kwh is not None else self.price_per_kwh
+        return energy_kwh * price
+
+    def calculate_payback_period(self, annual_savings: float, capex: float) -> float:
+        """
+        Calculate payback period in years.
+        """
+        if annual_savings <= 0:
+            return float('inf')
+        return capex / annual_savings
+
+    def calculate_npv(self, annual_savings: float, capex: float, years: int = 5, discount_rate: float = 0.10) -> float:
+        """
+        Calculate Net Present Value (NPV) of the investment.
+        NPV = Sum(CashFlow / (1+r)^t) - Initial Investment
+        """
+        npv = -capex
+        for t in range(1, years + 1):
+            npv += annual_savings / ((1 + discount_rate) ** t)
+        return npv
+
+    def calculate_carbon_credits(self, energy_saved_kwh: float) -> float:
+        """
+        Estimate Carbon Credits earned.
+        1 ton CO2e = 1 Credit.
+        Avg Grid Intensity ~ 0.4 kg CO2e / kWh (Global Avg).
+        """
+        kg_co2_saved = energy_saved_kwh * 0.4
+        tons_co2_saved = kg_co2_saved / 1000.0
+        return tons_co2_saved
+
     def calculate_roi(self, 
                       baseline_kwh_per_day: float, 
                       optimized_kwh_per_day: float, 
