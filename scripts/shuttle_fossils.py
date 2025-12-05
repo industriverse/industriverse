@@ -48,6 +48,7 @@ def shuttle_fossils(target_dir: str, max_files: int = None):
             continue
             
         local_file = target_path / file_name
+        local_file.parent.mkdir(parents=True, exist_ok=True)
         
         # Skip if already exists (Idempotency)
         if local_file.exists() and local_file.stat().st_size == file_version.content_length:

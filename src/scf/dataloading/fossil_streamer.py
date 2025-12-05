@@ -15,7 +15,7 @@ class FossilStreamer(IterableDataset):
         self.batch_size = batch_size
         self.max_files = max_files
         # Filter out AppleDouble files (._*) and ensure .ndjson extension
-        self.files = sorted([f for f in self.vault_dir.glob("*.ndjson") if not f.name.startswith("._")])
+        self.files = sorted([f for f in self.vault_dir.rglob("*.ndjson") if not f.name.startswith("._")])
         if self.max_files:
             self.files = self.files[:self.max_files]
         print(f"🌊 FossilStreamer: Found {len(self.files)} batch files in {vault_dir}")
