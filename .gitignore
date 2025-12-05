@@ -149,3 +149,4 @@ jspm_packages/
 *.sqlite3
 !src/scf/branches/build/simulation_harness.py
 !src/scf/branches/build/*
+*.db-journal

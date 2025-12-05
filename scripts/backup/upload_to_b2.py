@@ -15,14 +15,36 @@ if not B2_KEY_ID or not B2_APP_KEY:
     print("❌ Error: B2_KEY_ID or B2_APP_KEY not found in .env")
     sys.exit(1)
 
+
+def auto_caffeinate():
+    """
+    Spawns a background 'caffeinate' process to prevent sleep while this script runs.
+    """
+    try:
+        import subprocess
+        # -i: Prevent idle sleep
+        # -w <pid>: Wait for this process to exit
+        subprocess.Popen(['caffeinate', '-i', '-w', str(os.getpid())])
+        print("☕️  Auto-Caffeinate: System sleep disabled for this session.")
+    except Exception as e:
+        print(f"⚠️  Could not start caffeinate: {e}")
+
 class B2Uploader:
     def __init__(self):
+        auto_caffeinate()
         print("🔌 Connecting to Backblaze B2...")
         self.info = b2.InMemoryAccountInfo()
         self.b2_api = b2.B2Api(self.info)
         self.b2_api.authorize_account("production", B2_KEY_ID, B2_APP_KEY)
         self.bucket = self.b2_api.get_bucket_by_name(BUCKET_NAME)
         print(f"✅ Connected to Bucket: {BUCKET_NAME}")
+        
+        self.history_file = Path("upload_history.log")
+        self.uploaded_files = set()
+        if self.history_file.exists():
+            with open(self.history_file, 'r') as f:
+                self.uploaded_files = set(line.strip() for line in f)
+            print(f"📜 Loaded history: {len(self.uploaded_files)} files already uploaded.")
 
     def upload_directory(self, local_dir: str, remote_prefix: str):
         local_path = Path(local_dir)
@@ -39,11 +61,16 @@ class B2Uploader:
             for file in files:
                 if file.startswith('.'): continue
                 local_file = Path(root) / file
+                
+                # Check history
+                if str(local_file) in self.uploaded_files:
+                    continue
+                    
                 relative_path = local_file.relative_to(local_path)
                 remote_file_name = f"{remote_prefix}/{relative_path}"
                 files_to_upload.append((local_file, remote_file_name))
                 
-        print(f"   Found {len(files_to_upload)} files to upload.")
+        print(f"   Found {len(files_to_upload)} new files to upload.")
         
         with ThreadPoolExecutor(max_workers=10) as executor:
             for local_file, remote_name in files_to_upload:
@@ -54,18 +81,9 @@ class B2Uploader:
         import shutil
         
         try:
-            # Compress on the fly (or to temp)
-            # For 10TB, we don't want to fill up tmp.
-            # Let's just upload with content-encoding if B2 supports it, or zip locally.
-            # B2 supports large files, but for bandwidth, let's gzip to a temp file next to the original?
-            # Or just use stream? B2 SDK supports stream.
-            
             # Simple approach: Gzip to .gz and upload
             compressed_path = local_file.with_suffix(local_file.suffix + '.gz')
             remote_name_gz = remote_name + '.gz'
-            
-            # Check if already uploaded
-            # (Skipping check for speed, B2 handles overwrite or versions)
             
             print(f"   📦 Compressing {local_file.name}...", end="\r")
             with open(local_file, 'rb') as f_in:
@@ -77,6 +95,10 @@ class B2Uploader:
                 local_file=str(compressed_path),
                 file_name=str(remote_name_gz)
             )
+            
+            # Log success
+            with open(self.history_file, 'a') as f:
+                f.write(f"{local_file}\n")
             
             # Cleanup compressed file
             os.remove(compressed_path)

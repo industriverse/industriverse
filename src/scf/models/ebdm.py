@@ -2,44 +2,42 @@ import torch
 import torch.nn as nn
 
 class EBDM(nn.Module):
-    def __init__(self, input_dim=128, hidden_dim=512, num_layers=6):
+    """
+    Energy-Based Diffusion Model (Tiny).
+    A lightweight MLP designed to predict the next physics state (entropy evolution).
+    Optimized for low-parameter count and high inference efficiency.
+    """
+    def __init__(self, input_dim: int = 4, hidden_dim: int = 64, output_dim: int = 4):
         super().__init__()
-
-        self.encoder = nn.Sequential(
+        self.net = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),
-            nn.SiLU(),
+            nn.SiLU(), # Swish activation (smooth gradients for physics)
             nn.Linear(hidden_dim, hidden_dim),
             nn.SiLU(),
+            nn.Linear(hidden_dim, output_dim)
         )
 
-        self.score_network = nn.ModuleList([
-            nn.Sequential(
-                nn.Linear(hidden_dim, hidden_dim),
-                nn.SiLU(),
-                nn.Linear(hidden_dim, hidden_dim),
-                nn.SiLU(),
-            ) for _ in range(num_layers)
-        ])
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Predicts the next state given the current state.
+        Input: [Batch, Features] (e.g., Temp, Power, Entropy, Time)
+        Output: [Batch, Features] (Predicted Next State)
+        """
+        return self.net(x)
 
-        self.output = nn.Linear(hidden_dim, input_dim)
+class EBDM_Student(nn.Module):
+    """
+    Compressed version of EBDM for Edge Deployment.
+    ~10x fewer parameters than the Teacher.
+    """
+    def __init__(self, input_dim: int = 4, hidden_dim: int = 16, output_dim: int = 4):
+        super().__init__()
+        # Thinner network (16 hidden vs 64)
+        self.net = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.SiLU(),
+            nn.Linear(hidden_dim, output_dim) # One less layer? Or just thinner. Let's keep depth, reduce width.
+        )
 
-    def forward(self, x, noise_level):
-        # Embed noise level
-        # Simple broadcasting for now, in prod use sinusoidal embeddings
-        h = self.encoder(x)
-        
-        # Add noise info (simplified)
-        h = h + noise_level 
-        
-        for layer in self.score_network:
-            h = h + layer(h)
-        h = self.output(h)
-        return h * noise_level
-
-def ebdm_loss(model, x0):
-    noise = torch.randn_like(x0)
-    noise_level = torch.rand(x0.size(0), 1).to(x0.device)
-    x_noisy = x0 + noise * noise_level
-    score = model(x_noisy, noise_level)
-    # Denoising score matching loss
-    return ((score - noise)**2).mean()
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)

@@ -1,0 +1,5 @@
+{"epoch": 0, "loss": 0.5, "kwh_used": 0.1, "entropy_penalty": 0.05}
+{"epoch": 1, "loss": 0.4, "kwh_used": 0.1, "entropy_penalty": 0.04}
+{"epoch": 2, "loss": 0.3, "kwh_used": 0.1, "entropy_penalty": 0.03}
+{"epoch": 3, "loss": 0.2, "kwh_used": 0.1, "entropy_penalty": 0.02}
+{"epoch": 4, "loss": 0.1, "kwh_used": 0.1, "entropy_penalty": 0.01}
