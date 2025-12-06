@@ -34,14 +34,17 @@ def main():
     print(f"🚀 Experiment: {config_dict.get('experiment_name')}")
     
     # 1. Shuttle Fossils
+    # 1. Shuttle Fossils
     print("\n[Step 1/3] Shuttling Fossils from B2...")
+    DATA_DIR = "data" # Unified data directory
+    
     if args.dry_run:
         print("   (Dry Run) Skipping download.")
     else:
         # In production, this calls scripts/shuttle_fossils.py
-        print("   ⬇️  Downloading Fossils...")
+        print(f"   ⬇️  Downloading Fossils to '{DATA_DIR}'...")
         try:
-            subprocess.run([sys.executable, "scripts/shuttle_fossils.py"], check=True)
+            subprocess.run([sys.executable, "scripts/shuttle_fossils.py", "--target", DATA_DIR], check=True)
             print("   ✅ Fossils Shuttled")
         except subprocess.CalledProcessError as e:
             print(f"   ❌ Fossil Shuttle Failed: {e}")
@@ -85,11 +88,8 @@ def main():
         from src.scf.dataloading.fossil_streamer import FossilStreamer
         from torch.utils.data import DataLoader
         
-        # Data Path (Default to local if not in config)
-        vault_path = config_dict.get('data', {}).get('vault_path', 'data/fossil_vault')
-        if not os.path.exists(vault_path):
-             # Fallback for H100 if data wasn't synced to /data/fossil_vault but to ./data
-             vault_path = "data" 
+        # Data Path (Unified)
+        vault_path = DATA_DIR
         
         print(f"   🌊 Streaming Fossils from: {vault_path}")
         dataset = FossilStreamer(vault_path, batch_size=config_dict.get('data', {}).get('batch_size', 32))
