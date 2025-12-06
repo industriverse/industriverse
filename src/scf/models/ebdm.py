@@ -13,6 +13,7 @@ class SovereignConfig:
     sequence_length: int = 8192
     dropout: float = 0.1
     bias: bool = False # True: bias in Linears and LayerNorms, like GPT-2. False: a bit better and faster
+    use_checkpointing: bool = False # Enable gradient checkpointing
 
 class CausalSelfAttention(nn.Module):
     def __init__(self, config: SovereignConfig):
