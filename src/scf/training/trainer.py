@@ -41,15 +41,22 @@ class SovereignTrainer:
             self.optimizer.zero_grad()
             
             # Forward
-            output = self.model(data)
-            loss, mse, entropy = self.criterion(output, target)
+            # Model returns (logits, loss) when targets are provided
+            logits, loss = self.model(data, targets=target)
             
             # Backward
             loss.backward()
             self.optimizer.step()
             
             total_loss += loss.item()
-            total_mse += mse.item()
+            
+            # Calculate metrics for logging
+            # MSE is not applicable for tokens, so we track perplexity or just 0
+            mse = 0.0 
+            
+            # Entropy of the distribution (Softmax -> Entropy)
+            probs = torch.softmax(logits, dim=-1)
+            entropy = -(probs * torch.log(probs + 1e-9)).sum(dim=-1).mean()
             total_entropy += entropy.item()
             
         duration = time.time() - start_time

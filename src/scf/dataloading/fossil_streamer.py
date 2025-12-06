@@ -28,22 +28,39 @@ class FossilStreamer(IterableDataset):
 
     def _extract_features(self, fossil: Dict[str, Any]) -> torch.Tensor:
         """
-        Extracts physics features for the EBDM model.
-        [Temp, Power, Entropy, Time]
+        Extracts physics features and tokenizes them for the Sovereign Transformer.
+        Returns LongTensor of shape (4,).
         """
-        # Mock extraction logic based on what we know is in the fossils
-        # In production, this would use EnergySignature to normalize
         meta = fossil.get('meta', {})
         thermo = meta.get('thermodynamics', {})
         
-        # Default values if missing (robustness)
+        # 1. Extract Continuous Values
         temp = float(thermo.get('temperature_c', 25.0))
         power = float(thermo.get('power_w', 0.0))
         entropy = float(thermo.get('entropy_rate', 0.0))
         timestamp = float(fossil.get('timestamp', 0.0))
         
-        # Simple normalization (should be computed globally in real system)
-        return torch.tensor([temp/100.0, power/1000.0, entropy/10.0, (timestamp % 86400)/86400.0])
+        # 2. Discretize into Tokens (Simple Binning Strategy)
+        # Vocab Size is 32000. We allocate ranges.
+        
+        # Temperature: -50 to 150 C -> Bins 0-1000
+        t_token = int(((temp + 50) / 200) * 1000)
+        t_token = max(0, min(1000, t_token))
+        
+        # Power: 0 to 5000 W -> Bins 1001-3000
+        p_token = int((power / 5000) * 2000) + 1001
+        p_token = max(1001, min(3000, p_token))
+        
+        # Entropy: 0 to 10.0 -> Bins 3001-4000
+        e_token = int((entropy / 10.0) * 1000) + 3001
+        e_token = max(3001, min(4000, e_token))
+        
+        # Timestamp: 0 to 1 (Day Cycle) -> Bins 4001-5000
+        ts_norm = (timestamp % 86400) / 86400.0
+        ts_token = int(ts_norm * 1000) + 4001
+        ts_token = max(4001, min(5000, ts_token))
+        
+        return torch.tensor([t_token, p_token, e_token, ts_token], dtype=torch.long)
 
     def __iter__(self) -> Iterator[torch.Tensor]:
         """
