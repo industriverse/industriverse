@@ -61,15 +61,27 @@ class DarkFactoryPilot:
                     action = "OPTIMIZE"
             
             # 4. Audit & ROI
-            # Calculate savings vs initial baseline
-            savings = self.roi_calc.calculate_savings(baseline_power, current_power, 1.0) # 1 sec step
-            total_kwh_saved += savings['kwh_saved']
+            # Calculate savings vs initial baseline (Power in Watts -> kWh for 1 sec)
+            # kWh = (Watts * Hours) / 1000
+            # Hours = 1 / 3600
+            baseline_kwh = (baseline_power * (1/3600)) / 1000
+            current_kwh = (current_power * (1/3600)) / 1000
+            
+            # Use the correct API from ROICalculator
+            # We calculate cost saved for this step
+            step_kwh_saved = max(0.0, baseline_kwh - current_kwh)
+            step_cost_saved = self.roi_calc.calculate_cost_saved(step_kwh_saved)
+            
+            total_kwh_saved += step_kwh_saved
             
             log_entry = {
                 "timestamp": time.time(),
                 "state": state,
                 "action": action,
-                "savings_step": savings
+                "savings_step": {
+                    "kwh_saved": step_kwh_saved,
+                    "usd_saved": step_cost_saved
+                }
             }
             self._log_decision(log_entry)
             
@@ -77,7 +89,18 @@ class DarkFactoryPilot:
             steps += 1
             
         # Final Financial Audit
-        financials = self.roi_calc.calculate_financials(total_kwh_saved, time_period_days=duration_seconds/(3600*24))
+        # Calculate total ROI metrics
+        # We need daily extrapolation for the ROI method, but here we just want totals.
+        total_cost_saved = self.roi_calc.calculate_cost_saved(total_kwh_saved)
+        carbon_saved = self.roi_calc.calculate_carbon_credits(total_kwh_saved) * 1000 # Convert tons back to kg for display if needed
+        
+        financials = {
+            "cost_saved_usd": total_cost_saved,
+            "kwh_saved": total_kwh_saved,
+            "carbon_saved_kg": carbon_saved,
+            "audit_proof": f"zk_{int(time.time())}" # Mock proof
+        }
+        
         print("\n✅ Pilot Complete.")
         print(f"   💰 Cost Saved: ${financials['cost_saved_usd']:.6f}")
         print(f"   🔋 kWh Saved: {financials['kwh_saved']:.6f}")
