@@ -49,10 +49,17 @@ class SovereignTrainer:
             data = data.to(device)
             target = target.to(device)
             
+            # Create Causal Shift (Predict Next Token)
+            # Input:  [A, B, C]
+            # Target: [B, C, D]
+            # Note: FossilStreamer yields [B, 4], so we train on length 3 sequences.
+            inp = data[:, :-1]
+            tgt = target[:, 1:]
+            
             # Forward with Mixed Precision
             with torch.amp.autocast('cuda', dtype=torch.bfloat16):
                 # Model returns (logits, loss) when targets are provided
-                logits, loss = self.model(data, targets=target)
+                logits, loss = self.model(inp, targets=tgt)
             
             # Backward with Scaler
             self.scaler.scale(loss).backward()
