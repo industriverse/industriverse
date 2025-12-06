@@ -33,9 +33,10 @@ rsync -avz -e "ssh -p $PORT -i $SSH_KEY" \
 
 # 2. Execute Remote Setup & Run
 echo "🔥 Executing Big Burn on Remote..."
-ssh -p $PORT -i $SSH_KEY -t $USER@$HOST << EOF
+ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -p $PORT -i $SSH_KEY -t $USER@$HOST << EOF
     export B2_KEY_ID=$B2_KEY_ID
     export B2_APP_KEY=$B2_APP_KEY
+    export B2_BUCKET_NAME="industriverse-backup"
     
     # Create directory if it doesn't exist
     mkdir -p $REMOTE_DIR
@@ -52,7 +53,7 @@ ssh -p $PORT -i $SSH_KEY -t $USER@$HOST << EOF
     
     echo "📦 Installing Dependencies..."
     pip install --upgrade pip
-    pip install torch pyyaml b2sdk
+    pip install torch pyyaml b2sdk numpy bitsandbytes
     
     echo "🚀 Starting The Big Burn..."
     # Run the orchestrator with PYTHONPATH set to current directory

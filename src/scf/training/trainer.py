@@ -7,6 +7,8 @@ from typing import Dict, Any, List
 from src.scf.evaluation.entropy_metrics import EntropyLoss
 from src.scf.ingestion.energy_signature import EnergySignature
 
+import bitsandbytes as bnb
+
 class SovereignTrainer:
     """
     The Training Engine.
@@ -14,7 +16,8 @@ class SovereignTrainer:
     """
     def __init__(self, model: torch.nn.Module, learning_rate: float = 1e-3):
         self.model = model
-        self.optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+        # Use 8-bit AdamW to save ~75% of optimizer memory (Critical for 6.7B model on single GPU)
+        self.optimizer = bnb.optim.AdamW8bit(model.parameters(), lr=learning_rate)
         self.criterion = EntropyLoss(lambda_entropy=0.05)
         self.energy_sig = EnergySignature()
         self.log_path = Path("training_log.jsonl")
