@@ -39,8 +39,14 @@ def main():
         print("   (Dry Run) Skipping download.")
     else:
         # In production, this calls scripts/shuttle_fossils.py
-        # subprocess.run([sys.executable, "scripts/shuttle_fossils.py"])
-        print("   ✅ Fossils Shuttled (Mock)")
+        print("   ⬇️  Downloading Fossils...")
+        try:
+            subprocess.run([sys.executable, "scripts/shuttle_fossils.py"], check=True)
+            print("   ✅ Fossils Shuttled")
+        except subprocess.CalledProcessError as e:
+            print(f"   ❌ Fossil Shuttle Failed: {e}")
+            if not args.mini:
+                sys.exit(1)
 
     # 2. Initialize Sovereign Model
     print("\n[Step 2/3] Initializing Sovereign Model...")
@@ -75,10 +81,41 @@ def main():
     if args.dry_run:
         print("   (Dry Run) Would execute training loop.")
     else:
-        # Here we would normally call the trainer. 
-        # For now, we simulate the hand-off to the training script or trainer class.
-        print("   🔥 Burning... (Training Simulation)")
-        time.sleep(2)
+        from src.scf.training.trainer import SovereignTrainer
+        from src.scf.dataloading.fossil_streamer import FossilStreamer
+        from torch.utils.data import DataLoader
+        
+        # Data Path (Default to local if not in config)
+        vault_path = config_dict.get('data', {}).get('vault_path', 'data/fossil_vault')
+        if not os.path.exists(vault_path):
+             # Fallback for H100 if data wasn't synced to /data/fossil_vault but to ./data
+             vault_path = "data" 
+        
+        print(f"   🌊 Streaming Fossils from: {vault_path}")
+        dataset = FossilStreamer(vault_path, batch_size=config_dict.get('data', {}).get('batch_size', 32))
+        dataloader = DataLoader(dataset, batch_size=None) # Streamer yields batches
+        
+        trainer = SovereignTrainer(model, learning_rate=config_dict.get('training', {}).get('learning_rate', 3e-4))
+        epochs = config_dict.get('training', {}).get('epochs', 1)
+        
+        print(f"   🔥 Burning for {epochs} epochs (Max 6 Hours)...")
+        start_burn = time.time()
+        MAX_DURATION = 6 * 3600 # 6 Hours
+        
+        for epoch in range(epochs):
+            if time.time() - start_burn > MAX_DURATION:
+                print("   🛑 Max duration reached. Stopping burn.")
+                break
+                
+            metrics = trainer.train_epoch(dataloader, epoch)
+            print(f"   [Epoch {epoch}] Loss: {metrics['loss']:.4f} | Energy: {metrics['kwh_used']:.4f} kWh")
+            
+            # Save Checkpoint
+            ckpt_path = f"checkpoints/sovereign_epoch_{epoch}.pt"
+            os.makedirs("checkpoints", exist_ok=True)
+            torch.save(model.state_dict(), ckpt_path)
+            print(f"   💾 Checkpoint saved: {ckpt_path}")
+
         print("   ✅ Training Complete")
 
     # 4. Generate Report
