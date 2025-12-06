@@ -40,6 +40,11 @@ class SovereignTrainer:
         for batch_idx, (data, target) in enumerate(dataloader):
             self.optimizer.zero_grad()
             
+            # Move to device
+            device = next(self.model.parameters()).device
+            data = data.to(device)
+            target = target.to(device)
+            
             # Forward
             # Model returns (logits, loss) when targets are provided
             logits, loss = self.model(data, targets=target)
