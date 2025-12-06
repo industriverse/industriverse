@@ -7,8 +7,8 @@ model_name: "Sovereign-Alpha-1"
 # Data
 data:
   vault_path: "/data/fossil_vault" # Path inside Docker container
-  sequence_length: 8192
-  batch_size: 8 # Reduced from 4096 to fit in 80GB VRAM
+  sequence_length: 4096 # Reduced to save memory
+  batch_size: 2 # Reduced to 2 to fit in memory
   num_workers: 4
 
 # Model Architecture (EBDM)

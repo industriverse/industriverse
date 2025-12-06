@@ -18,6 +18,7 @@ class SovereignTrainer:
         self.criterion = EntropyLoss(lambda_entropy=0.05)
         self.energy_sig = EnergySignature()
         self.log_path = Path("training_log.jsonl")
+        self.scaler = torch.cuda.amp.GradScaler() # Mixed Precision Scaler
         
         # Clear log
         if self.log_path.exists():
@@ -45,13 +46,15 @@ class SovereignTrainer:
             data = data.to(device)
             target = target.to(device)
             
-            # Forward
-            # Model returns (logits, loss) when targets are provided
-            logits, loss = self.model(data, targets=target)
+            # Forward with Mixed Precision
+            with torch.amp.autocast('cuda', dtype=torch.bfloat16):
+                # Model returns (logits, loss) when targets are provided
+                logits, loss = self.model(data, targets=target)
             
-            # Backward
-            loss.backward()
-            self.optimizer.step()
+            # Backward with Scaler
+            self.scaler.scale(loss).backward()
+            self.scaler.step(self.optimizer)
+            self.scaler.update()
             
             total_loss += loss.item()
             
