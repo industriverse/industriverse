@@ -61,7 +61,8 @@ def main():
         hidden_dim=model_conf.get('hidden_dim', 4096),
         num_layers=model_conf.get('num_layers', 32),
         num_heads=model_conf.get('num_heads', 32),
-        sequence_length=config_dict.get('data', {}).get('sequence_length', 8192)
+        sequence_length=config_dict.get('data', {}).get('sequence_length', 8192),
+        use_checkpointing=model_conf.get('use_checkpointing', False)
     )
     
     if args.dry_run:
